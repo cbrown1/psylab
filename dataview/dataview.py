@@ -2,6 +2,7 @@ import numpy as np
 import csv
 from itertools import product
 from pal.nan import mean as nanmean
+import pal.stats
 
 class Dataset:
     def __init__(self, csv_path, dv, subject):
@@ -118,6 +119,31 @@ class Dataset:
             return tuple(fixed)
 
         return self.data[fixtuple(t)]
+
+    def anova_between(self):
+        return pal.stats.anova.anova_between(self.rawdata, self.ivs)
+
+    def pairwise(self, comparisons):
+        def indices_from_dict(d):
+            collapsedIndex = [[Ellipsis] for x in self.rawdata.shape]
+            for group in d:
+                i = self.group_indices[group]
+                collapsedIndex[i] = sorted(self.level_indices[(group,level)] for level in d[group])
+
+            takeThisProduct = []
+            maxlen = max(len(x) for x in collapsedIndex)
+            for i in collapsedIndex:
+                if i == Ellipsis:
+                    takeThisProduct.append([Ellipsis])
+                else:
+                    takeThisProduct.append(i)
+            indices = product(*takeThisProduct)
+            return indices
+
+        import pal.stats.paired_diff_test
+        indices = [(indices_from_dict(x), indices_from_dict(y)) for x,y in comparisons]
+        return pal.stats.paired_diff_test(self.rawdata, comparisons, factors=self.ivs)
+        
 
 class DatasetView:
     def __init__(self, dat, vars=None):
