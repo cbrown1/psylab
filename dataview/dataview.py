@@ -31,11 +31,6 @@ class Dataset:
                 if entry not in self.design[v]:
                     self.design[v].append(entry)
 
-        # print "self.design"
-        # for x in self.ivs:
-        #     print x, self.design[x]
-        # print
-
         # Compute mappings from:
         #     Treatment groups to indices (`group_indices`)
         #     Levels within groups to indices (`level_indices`)
@@ -49,14 +44,7 @@ class Dataset:
                 self.level_indices[(g,l)] = j
                 j += 1
 
-        # print "self.group_indices", self.group_indices
-        # print
-        # print "self.level_indices", self.level_indices
-        # print
-
         treatments = tuple(product(*tuple(self.design[x] for x in self.ivs)))
-        # print "treatments",treatments
-        # print
 
         # Read data from .csv and partition up to repeated measures
         partitions = {}
@@ -66,11 +54,6 @@ class Dataset:
                 partitions[tk] = [np.float64(t[dv])]
             else:
                 partitions[tk] = partitions[tk] + [np.float64(t[dv])]
-
-        # print "partitions"
-        # for x in partitions:
-        #     print x, partitions[x]
-        # print
 
         newshape = [len(set(tmparr[n])) for n in tmparr.dtype.names if n != dv]
         newshape.append(max([len(x) for x in partitions.values()]))
@@ -111,20 +94,15 @@ class Dataset:
             k2 = k[:-1] + (0,)
             self.data[k2] = nanmean(self.rawdata[k])
 
-
     def view(self, var_dict):
         t = [Ellipsis for i in self.data.shape]
         for var in var_dict:
             i = self.group_indices[var]
             k = tuple([self.level_indices[(var,x)] for x in var_dict[var]])
             t[i] = k
-#            if len(k) == 1:
-#                t[i] = k
-#            else:
-#                t[i] = k
         t = tuple(t)
 
-        # Account for bug such that the advanced index:
+        # Account for fact that the advanced index:
         #   ((0,1),(0,1,2),(0,1))
         # is not equivalent to the advanced index:
         #   (Ellipsis,Ellipsis,Ellipsis)
@@ -140,7 +118,6 @@ class Dataset:
             return tuple(fixed)
 
         return self.data[fixtuple(t)]
-
 
 class DatasetView:
     def __init__(self, dat, vars=None):
@@ -164,7 +141,6 @@ class DatasetView:
             self.data = dat.view(vars)
             self.treatments = np.array([str(x) for x in
                                         product(*vars.values())])
-
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
