@@ -80,14 +80,3 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
         result.append((comp_str, t, adjp))
 
     return result
-
-if __name__ == "__main__":
-    import sys
-    sys.path.append("../..")
-    from pal.dataview import Dataset
-    d = Dataset("tests/data/three.csv", dv="dv", subject=None)
-    # shape is: (4, 3, 2, 5)
-    comps = [(((0,0,0,Ellipsis), (0,2,0,Ellipsis)),
-              ((1,0,0,Ellipsis), (2,0,0,Ellipsis), (3,0,0,Ellipsis)))]
-    c = paired_diff_test(d.rawdata, comps)
-    print c

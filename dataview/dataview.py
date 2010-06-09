@@ -140,7 +140,6 @@ class Dataset:
             indices = product(*takeThisProduct)
             return indices
 
-        import pal.stats.paired_diff_test
         indices = [(indices_from_dict(x), indices_from_dict(y)) for x,y in comparisons]
         return pal.stats.paired_diff_test(self.rawdata, comparisons, factors=self.ivs)
         
