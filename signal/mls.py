@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown and Joseph Ranweiler; 
+# Copyright (c) 2008-2010 Christopher Brown and Joseph Ranweiler;
 # All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,27 +9,27 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
-#    * Redistributions of source code must retain the above copyright 
+#
+#    * Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright 
-#      notice, this list of conditions and the following disclaimer in 
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
 #      the documentation and/or other materials provided with the distribution
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
-# 
+#
 
 import numpy as np
 import random
@@ -113,14 +113,14 @@ def generate_lfsr(n, use_rand_seed):
 
     while 1:
         lsb = lfsr & np.uint32(1)
-        yield lsb        
+        yield lsb
         lfsr = (lfsr >> np.uint32(1)) ^ (np.uint32(0) - (lfsr & np.uint32(1)) & toggle_mask)
 
 def mls(n, rand_seed=False):
     '''Generates maximum-length sequences
-        
-        Implements a Galois-configuration linear feedback shift register 
-        to generate maximum-length sequences, which are pseudorandom noises 
+
+        Implements a Galois-configuration linear feedback shift register
+        to generate maximum-length sequences, which are pseudorandom noises
         useful for acoustic measurements.
 
         Parameters
@@ -130,19 +130,19 @@ def mls(n, rand_seed=False):
         rand_seed : bool
             True to begin with a sequence of all ones (repeatable).
             False to begin with a random sequence.
-        
+
         Returns
         -------
         y : array
             The maximum-length sequence, which is 2^(n-1) in length.
-        
+
         Notes
         -----
         Further information at:
         http://www.newwaveinstruments.com/resources/articles/m_sequence_linear_feedback_shift_register_lfsr.htm
         http://www.cfn.upenn.edu/aguirre/wiki/public:m_sequences
         Primitive binary polynomials obtained from:
-          Stahnke, W. (1973). "Primitive binary polynomials," Mathematics of Computation, 27:977-980. 
+          Stahnke, W. (1973). "Primitive binary polynomials," Mathematics of Computation, 27:977-980.
 '''
 
     try:
