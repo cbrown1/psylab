@@ -33,7 +33,7 @@
 
 import numpy as np
 
-def mean(arr):
+def nanmean(arr):
     n = 0
     s = 0
     all_nan = True
@@ -50,5 +50,5 @@ def mean(arr):
         m = s/n
     return m
 
-def product(arr):
+def nanproduct(arr):
     return np.product(tuple(x for x in arr if not np.isnan(x)))
