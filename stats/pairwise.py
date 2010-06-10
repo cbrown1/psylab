@@ -42,12 +42,13 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
         index = tuple(tuple(sorted(set(y))) for y in zip(*indices))
 
         name = []
+        # This is broken if level names are actually passed
         for i in xrange(len(index)-1):
             case = index[i]
             if case[0] == Ellipsis:
                 pass
             elif len(case) == 1:
-                name.append("%s%d" % (factors[i], index[i][0]))
+                name.append("%s[%d]" % (factors[i], index[i][0]))
             else:
                 if index[i] == tuple(xrange(index[i][0],index[i][-1]+1)):
                     name.append("%s[%d:%d]" % 
@@ -63,7 +64,7 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
     for x in comparisons:
         ii,jj = x
 
-        comp_str = " - ".join(map(samplename, (ii,jj)))
+        comp_str = " -- ".join(map(samplename, (ii,jj)))
 
         sample_a = []
         for i in ii:

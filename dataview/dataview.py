@@ -140,9 +140,8 @@ class Dataset:
             indices = product(*takeThisProduct)
             return indices
 
-        indices = [(indices_from_dict(x), indices_from_dict(y)) for x,y in comparisons]
-        return pal.stats.paired_diff_test(self.rawdata, comparisons, factors=self.ivs)
-        
+        indices = [(tuple(indices_from_dict(x)), tuple(indices_from_dict(y))) for x,y in comparisons]
+        return pal.stats.paired_diff_test(self.rawdata, indices, factors=self.ivs)
 
 class DatasetView:
     def __init__(self, dat, vars=None):
