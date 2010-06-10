@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler; 
+# All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,15 +36,15 @@ stat - A random collection of stats functions.
 
 Functions include:
 
+anova_between - Performs analysis of variance for any number of factors.
 cumr2 - Comuputes cumulative R**2 values
+paired_diff_test - Computes a table of pairwise comparisons.
 rau - Converts percent correct scores into "Rationalized" arcsine units
 
 Dependencies:
 
 numpy
 '''
-
-__version__ = '0.1'
 
 from cumr2 import cumr2
 from rau import rau
