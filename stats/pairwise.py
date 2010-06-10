@@ -35,10 +35,12 @@ import numpy as np
 from scipy import stats
 
 def bonferroni(p,k):
+    # Ref: http://books.google.com/books?id=3jpvrEhozGgC&pg=PA70
     return p*k
 
 def sidak(p,k):
-    return 1-(1-p)**1/k
+    # Ref: http://books.google.com/books?id=3jpvrEhozGgC&pg=PA70
+    return 1.0 - (1.0 - p)**k
 
 def paired_diff_test(data, comparisons, correction=bonferroni,
                      factors=None,
@@ -116,5 +118,4 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
         t,p = stats.ttest_ind(sample_a, sample_b)
         adjp = correction(p,k)
         result.append((comp_str, t, adjp))
-
     return result
