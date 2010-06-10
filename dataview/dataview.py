@@ -34,7 +34,7 @@
 import numpy as np
 import csv
 from itertools import product
-from pal.nan import mean as nanmean
+from pal import nanmean
 import pal.stats
 
 class Dataset:

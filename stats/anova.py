@@ -34,7 +34,7 @@
 import numpy as np
 from scipy import stats
 from itertools import combinations, product
-from pal.nan import product as nanproduct
+from pal import nanproduct
 
 def anova_between(data, factors=None):
     """Performs analysis of variance for any number of factors.
