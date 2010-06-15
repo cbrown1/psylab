@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler; 
+# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler;
 # All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,27 +9,27 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
-#    * Redistributions of source code must retain the above copyright 
+#
+#    * Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright 
-#      notice, this list of conditions and the following disclaimer in 
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
 #      the documentation and/or other materials provided with the distribution
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
-# 
+#
 
 import numpy as np
 from scipy import stats
@@ -37,30 +37,25 @@ from itertools import combinations, product
 from pal import nanproduct
 
 def anova_between(data, factors=None):
-    """Performs analysis of variance for any number of factors.
-    
+    """Performs an N-factor between-subjects analysis of variance.
+
     Parameters:
     -----------
     data : ndarray
-        Representation of the experimental data as a multi-dimensional array.
+        Representation of the experimental data as a multi-dimensional array,
+        in which each dimension represents a factor, the length of a dimension
+        is the number of levels of that factor, and the last dimension is the
+        dependent variable (the length of this dimension is the number of
+        scores in each treatment).
 
-        This can be thought of as a generalization of the textbook table used
-        to present the data in two-factor anovas.
-
-        For an experiment with N factors, with R the maximum number of
-        repetitions, then the first N dimensions should determine a treatment--
-        a combination of factor levels--and the last dimension should be large
-        enough to contain as many repetitions as were recorded, thus of size R.
-
-        Suppose an experiment had factors A, B, and C, each with two levels.
+        For example, suppose an experiment has 3 factors, A, B, and C.
+        Suppose also that factors A and B have 2 levels, and C has 3:
         A := A1, A2
         B := B1, B2
-        C := C1, C2
-        Suppose that, for each treatment, 4 measurements were taken, so R = 4.
-        
-        Then it is the case that data.shape == (2,2,2,4).
+        C := C1, C2, C3
+        Finally, suppose that there are 5 scores per AxBxC treatment.
 
-        In other words, the last dimension must be the "repeated y" dimension.
+        Then it is the case that data.shape == (2,2,3,5).
 
     factors : list or tuple
         String of human-readable factor names.
@@ -164,7 +159,7 @@ def anova_between(data, factors=None):
                         df["error"],
                         ms["error"],
                         np.nan, np.nan))
-    anova_table.append(("total", 
+    anova_table.append(("total",
                         ss["total"],
                         df["total"],
                         np.nan, np.nan, np.nan))
