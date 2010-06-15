@@ -239,7 +239,7 @@ def anova_within(data, subject_index=0, factors=None):
                     j += 1
             factors = tuple("F%s" % (i) for i in xrange(num_factors))
 
-    subject = tuple(factors[subject_index])
+    subject = (factors[subject_index],)
 
     assert "error" not in factors
     assert "total" not in factors
