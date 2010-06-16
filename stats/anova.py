@@ -49,27 +49,35 @@ def table(anova_data):
     table : string
         A formatted summary table, with space-delimited columns
     """
-    sourcelength = 8
+    sourcetab = 8
+    mintab = 10
     for x in anova_data:
-        if len(x['source']) > sourcelength:
-            sourcelength = len(x['source'])
-    ret = anova_data.dtype.names[0] + " ".join('' for x in range(0,sourcelength-len(anova_data.dtype.names[0])+3))
-    ret += "\t".join(anova_data.dtype.names[1:]) + "\n"
+        if len(x[anova_data.dtype.names[0]]) > sourcetab:
+            sourcetab = len(x[anova_data.dtype.names[0]])
+    sourcetab += 1
+    ret = anova_data.dtype.names[0] + " ".join('' for n in range(0,sourcetab-len(anova_data.dtype.names[0])))
+    for x in anova_data.dtype.names[1:]:
+        ret += " ".join('' for n in range(0,mintab-len(x)+1)) + x
+    ret += "\n"
     for x in anova_data:
-        ret += x['source'] + " ".join('' for x in range(0, sourcelength - len(x['source'])+3))
-        ret += "\t" + str(x['ss'].round(3))
-        ret += "\t" + str(x['df'].round(3))
-        ret += "\t" + str(x['ms'].round(3))
-        ret += "\t" + str(x['f'].round(3))
-        ret += "\t" + str(x['p'].round(3))
+        ret += x[anova_data.dtype.names[0]] + " ".join('' for n in range(0, sourcetab - len(x[anova_data.dtype.names[0]])))
+        # TODO: Joe, is there any way to replace the 10 here with mintab?
+        ret += "%10.3g" % x[anova_data.dtype.names[1]]
+        ret += "%10.3g" % x[anova_data.dtype.names[2]]
+        if not np.isnan( x[anova_data.dtype.names[3]]):
+            ret += "%10.3g" % x[anova_data.dtype.names[3]]
+        if not np.isnan( x[anova_data.dtype.names[4]]):
+            ret += "%10.3g" % x[anova_data.dtype.names[4]]
+        if not np.isnan( x[anova_data.dtype.names[5]]):
+            ret += "%10.3g" % x[anova_data.dtype.names[5]]
         if x['p'] < .001:
-            ret += "\t***"
+            ret += "  ***"
         elif x['p'] < .01:
-            ret += "\t**"
+            ret += "  **"
         elif x['p'] < .05:
-            ret += "\t*"
+            ret += "  *"
         ret += "\n"
-    return ret.expandtabs(10)
+    return ret
 
 def anova_between(data, factors=None):
     """Performs an N-factor between-subjects analysis of variance.
