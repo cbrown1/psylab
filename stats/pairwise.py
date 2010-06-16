@@ -44,7 +44,8 @@ def sidak(p,k):
 
 def paired_diff_test(data, comparisons, correction=bonferroni,
                      factors=None,
-                     levels=None):
+                     levels=None,
+                     within=False):
     """Computes a table of pairwise comparisons.
 
     Parameters:
@@ -68,6 +69,11 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
     result : list
         
     """
+
+    if within:
+        ttest = stats.ttest_ind(sample_a, sample_b)
+    else:
+        ttest = stats.ttest_rel(sample_a, sample_b)
 
     if factors is None: #If factors aren't specified
         num_factors = len(data.shape) - 1
@@ -115,7 +121,7 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
             sample_b.extend(data[j].flatten())
         sample_b = np.array(sample_b)
 
-        t,p = stats.ttest_ind(sample_a, sample_b)
+        t,p = ttest(sample_a, sample_b)
         adjp = correction(p,k)
         result.append((comp_str, t, adjp))
     return result
