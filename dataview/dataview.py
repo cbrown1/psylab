@@ -155,6 +155,18 @@ class Dataset:
 
     def anova_between(self):
         return pal.stats.anova.anova_between(self.rawdata, self.ivs)
+    
+    def anova_within(self):
+        if self.subject == None:
+            return pal.stats.anova.anova_within(self.rawdata,
+                                                factors=self.ivs)            
+        else:
+            return pal.stats.anova.anova_within(self.rawdata,
+                                                subject_index=self.group_indices[self.subject],
+                                                factors=self.ivs)
+
+    def index_names(self):
+        return [(x,self.group_indices[x]) for x in self.ivs] + [(self.dv, len(self.rawdata.shape)-1)]
 
     def pairwise(self, comparisons):
         def indices_from_dict(d):
