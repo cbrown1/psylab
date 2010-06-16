@@ -36,6 +36,41 @@ from scipy import stats
 from itertools import combinations, product
 from pal import nanproduct
 
+def table(anova_data):
+    """Returns a formatted anova summary table
+    
+    Parameters:
+    -----------
+    anova_data : dict
+        The output of an anova function
+
+    Returns:
+    --------
+    table : string
+        A formatted summary table, with space-delimited columns
+    """
+    sourcelength = 8
+    for x in anova_data:
+        if len(x['source']) > sourcelength:
+            sourcelength = len(x['source'])
+    ret = anova_data.dtype.names[0] + " ".join('' for x in range(0,sourcelength-len(anova_data.dtype.names[0])+3))
+    ret += "\t".join(anova_data.dtype.names[1:]) + "\n"
+    for x in anova_data:
+        ret += x['source'] + " ".join('' for x in range(0, sourcelength - len(x['source'])+3))
+        ret += "\t" + str(x['ss'].round(3))
+        ret += "\t" + str(x['df'].round(3))
+        ret += "\t" + str(x['ms'].round(3))
+        ret += "\t" + str(x['f'].round(3))
+        ret += "\t" + str(x['p'].round(3))
+        if x['p'] < .001:
+            ret += "\t***"
+        elif x['p'] < .01:
+            ret += "\t**"
+        elif x['p'] < .05:
+            ret += "\t*"
+        ret += "\n"
+    return ret.expandtabs(10)
+
 def anova_between(data, factors=None):
     """Performs an N-factor between-subjects analysis of variance.
 
@@ -171,7 +206,7 @@ def anova_between(data, factors=None):
 
 def anova_within(data, subject_index=0, factors=None):
     """Performs analysis of variance for any number of factors.
-    
+
     Parameters:
     -----------
     data : ndarray
@@ -190,7 +225,7 @@ def anova_within(data, subject_index=0, factors=None):
         B := B1, B2
         C := C1, C2
         Suppose that, for each treatment, 4 measurements were taken, so R = 4.
-        
+
         Then it is the case that data.shape == (2,2,2,4).
 
         In other words, the last dimension must be the "repeated y" dimension.
@@ -298,7 +333,7 @@ def anova_within(data, subject_index=0, factors=None):
             df[s] = nanproduct(tuple(df[z] for z in s))
 
         ms[s] = ss[s] / df[s]
-        
+
         if subject[0] in s:
             error_term_from_source[s] = None
         else:
@@ -317,7 +352,7 @@ def anova_within(data, subject_index=0, factors=None):
             f[s] = ms[s] / ms[etfs]
             p[s] = 1 - stats.f.cdf(f[s], df[s], df[etfs])
         df["total"] += df[s]
-            
+
 
     anova_table = []
     for s in [x for x in sources if subject[0] not in x]:
@@ -325,7 +360,7 @@ def anova_within(data, subject_index=0, factors=None):
     for s in [x for x in sources if subject[0] in x]:
         anova_table.append(("*".join(s),ss[s],df[s],ms[s],f[s],p[s]))
 
-    anova_table.append(("total", 
+    anova_table.append(("total",
                         ss["total"],
                         df["total"],
                         np.nan, np.nan, np.nan))
