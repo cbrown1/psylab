@@ -36,9 +36,9 @@ from scipy import stats
 from itertools import combinations, product
 from pal import nanproduct
 
-def table(anova_data):
-    """Returns a formatted anova summary table
-    
+def anova_table(anova_data):
+    """Generates a nicely formatted anova summary table
+
     Parameters:
     -----------
     anova_data : dict
@@ -80,16 +80,16 @@ def table(anova_data):
     return ret
 
 def anova_between(data, factors=None):
-    """Performs an N-factor between-subjects analysis of variance.
+    """Performs a between-factors analysis of variance for any number of factors.
 
     Parameters:
     -----------
     data : ndarray
         Representation of the experimental data as a multi-dimensional array,
-        in which each dimension represents a factor, the length of a dimension
-        is the number of levels of that factor, and the last dimension is the
-        dependent variable (the length of this dimension is the number of
-        scores in each treatment).
+        in which each dimension represents a factor, the length of each
+        dimension is the number of levels of that factor, and the last
+        dimension is the dependent variable (the length of this dimension is
+        the number of scores in each treatment).
 
         For example, suppose an experiment has 3 factors, A, B, and C.
         Suppose also that factors A and B have 2 levels, and C has 3:
@@ -213,33 +213,34 @@ def anova_between(data, factors=None):
     return anova_table
 
 def anova_within(data, subject_index=0, factors=None):
-    """Performs analysis of variance for any number of factors.
+    """Performs a within-subjects analysis of variance for any number of factors.
+
+       All factors must be within (no split-plot designs, etc.).
 
     Parameters:
     -----------
     data : ndarray
-        Representation of the experimental data as a multi-dimensional array.
+        Representation of the experimental data as a multi-dimensional array,
+        in which each dimension represents a factor (one of which is the
+        'subject' factor), the length of each dimension is the number of
+        levels of that factor, and the last dimension is the dependent
+        variable (the length of this dimension is the number of scores in
+        each treatment).
 
-        This can be thought of as a generalization of the textbook table used
-        to present the data in two-factor anovas.
-
-        For an experiment with N factors, with R the maximum number of
-        repetitions, then the first N dimensions should determine a treatment--
-        a combination of factor levels--and the last dimension should be large
-        enough to contain as many repetitions as were recorded, thus of size R.
-
-        Suppose an experiment had factors A, B, and C, each with two levels.
+        For example, suppose an experiment has 3 factors, S(ubjects), A, and B.
+        Suppose also that factor A has 2 levels, B has 3, and there are 5
+        subjects:
+        S := S1, S2, S3, S4, S5
         A := A1, A2
-        B := B1, B2
-        C := C1, C2
-        Suppose that, for each treatment, 4 measurements were taken, so R = 4.
+        B := B1, B2, B3
 
-        Then it is the case that data.shape == (2,2,2,4).
+        Then it is the case that data.shape == (5,2,3,5).
 
-        In other words, the last dimension must be the "repeated y" dimension.
+    factors : list or tuple
+        String of human-readable factor names.
 
     subect_index : int
-        The index of the axis of `data` which is the subject variable.
+        The index of the axis of `data` which is the subject variable [default=0].
 
     factors : list or tuple
         String of human-readable factor names.

@@ -36,17 +36,15 @@ stat - A random collection of stats functions.
 
 Functions include:
 
-anova_between - Performs an N-factor between-subjects analysis of variance.
+anova_between - Performs a between-factors analysis of variance for any number of factors
+anova_table - Generates a nicely formatted anova summary table
+anova_within - Performs a within-subjects analysis of variance for any number of factors
 cumr2 - Comuputes cumulative R**2 values
-paired_diff_test - Computes a table of pairwise comparisons.
+paired_diff_test - Computes a table of pairwise comparisons
 rau - Converts percent correct scores into "Rationalized" arcsine units
-
-Dependencies:
-
-numpy
 '''
 
 from cumr2 import cumr2
 from rau import rau
-from anova import anova_between
+from anova import anova_between, anova_within, anova_table
 from pairwise import paired_diff_test
