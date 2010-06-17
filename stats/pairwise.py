@@ -71,9 +71,9 @@ def paired_diff_test(data, comparisons, correction=bonferroni,
     """
 
     if within:
-        ttest = stats.ttest_ind(sample_a, sample_b)
-    else:
         ttest = stats.ttest_rel(sample_a, sample_b)
+    else:
+        ttest = stats.ttest_ind(sample_a, sample_b)
 
     if factors is None: #If factors aren't specified
         num_factors = len(data.shape) - 1

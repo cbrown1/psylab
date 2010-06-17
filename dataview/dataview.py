@@ -168,25 +168,27 @@ class Dataset:
     def index_names(self):
         return [(x,self.group_indices[x]) for x in self.ivs] + [(self.dv, len(self.rawdata.shape)-1)]
 
-    def pairwise(self, comparisons):
-        def indices_from_dict(d):
-            collapsedIndex = [[Ellipsis] for x in self.rawdata.shape]
-            for group in d:
-                i = self.group_indices[group]
-                collapsedIndex[i] = sorted(self.level_indices[(group,level)] for level in d[group])
+    def indices_from_vars(self, d):
+        collapsedIndex = [[Ellipsis] for x in self.rawdata.shape]
+        for group in d:
+            i = self.group_indices[group]
+            collapsedIndex[i] = sorted(self.level_indices[(group,level)] for 
+                                       level in d[group])
 
-            takeThisProduct = []
-            maxlen = max(len(x) for x in collapsedIndex)
-            for i in collapsedIndex:
-                if i == Ellipsis:
-                    takeThisProduct.append([Ellipsis])
-                else:
-                    takeThisProduct.append(i)
-            indices = product(*takeThisProduct)
-            return indices
+        takeThisProduct = []
+        maxlen = max(len(x) for x in collapsedIndex)
+        for i in collapsedIndex:
+            if i == Ellipsis:
+                takeThisProduct.append([Ellipsis])
+            else:
+                takeThisProduct.append(i)
+        indices = product(*takeThisProduct)
+        return indices
 
-        indices = [(tuple(indices_from_dict(x)), tuple(indices_from_dict(y))) for x,y in comparisons]
-        return pal.stats.paired_diff_test(self.rawdata, indices, factors=self.ivs)
+    def indices_from_comparison(self, comparisons):
+        indices = [(tuple(self.indices_from_dict(x)),
+                    tuple(self.indices_from_dict(y))) for x,y in comparisons]
+        return indices
 
 class DatasetView:
     def __init__(self, dat, vars=None):
