@@ -32,19 +32,19 @@
 #
 
 '''
-stat - A random collection of stats functions.
+stats - A random collection of stats functions.
 
 Functions include:
 
-anova_between - Performs a between-factors analysis of variance for any number of factors
+anova_between - Performs a between-subjects anova for any number of factors
 anova_table - Generates a nicely formatted anova summary table
-anova_within - Performs a within-subjects analysis of variance for any number of factors
+anova_within - Performs a within-subjects anova for any number of factors
 cumr2 - Comuputes cumulative R**2 values
-paired_diff_test - Computes a table of pairwise comparisons
-rau - Converts percent correct scores into "Rationalized" arcsine units
+pairwise_comparisons - Computes a table of pairwise comparisons
+rau - Normalizes percent correct data, converting to rationalized arcsine units
 '''
 
 from cumr2 import cumr2
 from rau import rau
 from anova import anova_between, anova_within, anova_table
-from pairwise import paired_diff_test
+from pairwise import pairwise_comparisons

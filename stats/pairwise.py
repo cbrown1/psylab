@@ -42,7 +42,7 @@ def sidak(p,k):
     # Ref: http://books.google.com/books?id=3jpvrEhozGgC&pg=PA70
     return 1.0 - (1.0 - p)**k
 
-def paired_diff_test(data, comparisons, correction=None,
+def pairwise_comparisons(data, comparisons, correction=None,
                      factors=None,
                      levels=None,
                      within=False):
@@ -51,7 +51,7 @@ def paired_diff_test(data, comparisons, correction=None,
     Parameters:
     -----------
     data : numpy.ndarray
-        Representation of the experimental data (see, eg.,  anova_between).
+        Representation of the experimental data (see, eg., anova_between).
 
     comparisons : list or tuple
         A list of pairs of the form `(ii,jj)`, where `ii` and `jj` are lists
@@ -122,7 +122,7 @@ def paired_diff_test(data, comparisons, correction=None,
         sample_b = np.array(sample_b)
 
         t,p = ttest(sample_a, sample_b)
-        if correction = None:
+        if correction == None:
             adjp = p
         else:
             adjp = correction(p,k)

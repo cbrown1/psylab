@@ -80,7 +80,7 @@ def anova_table(anova_data):
     return ret
 
 def anova_between(data, factors=None):
-    """Performs a between-factors analysis of variance for any number of factors.
+    """Performs a between-subjects analysis of variance for any number of factors.
 
     Parameters:
     -----------
