@@ -55,16 +55,19 @@ class Dataset:
         self.subject = subject
         self.rawdata = None
         self.data = None
+        self.comments = ''
 
         # Get the first line of the .csv that isn't blank or commented, 
         # which is assumed to be a row of labels for each column.
         file_data = csv.reader(open(csv_path))
         for row in file_data:
-            if len(row)>0 and row[0].lstrip().find('#')==-1:
+            if len(row)==0:
+               self.comments += '\n'
+            elif row[0].lstrip().find('#') != -1:
+                self.comments += ','.join(row).lstrip(' #') + "\n"
+            else:
                 csv_labels = row
                 break
-
-        #csv_labels = file_data.next()
 
         tmparr = np.rec.fromrecords([tuple(x) for x in file_data],
                                     names=csv_labels)
