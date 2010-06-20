@@ -37,6 +37,7 @@ signal processing.
 Functions include:
 
 atten - Attenuates input array by a dB value
+compensate - Shapes the input array in the frequency domain [UNTESTED]
 envelope - Extracts the amplitude envelope from a signal
 equate - Equates wavefiles in rms
 erbs2f - Converts erb numbers to frequency values
@@ -44,7 +45,9 @@ f2erbs - Converts frequency values to erb numbers
 f2place - Converts a frequency (Hz) to a basilar membrane place (mm)
 f2oct - Calculates the distance in octaves between two frequencies
 fconv - Convolves two signals using FFT-based fast convolution
+filterbank - Filters the input array with a bank of filters [UNTESTED]
 f0 - Estimates the fundamental frequency of a signal
+gammatone - Computes the filter coefficients for a bank of Gammatone filters [UNTESTED]
 hcomplex - Generates harmonic complexes
 interp_lin - Interpolates a signal using linear interpolation
 interp_spline - Interpolates a signal using cubic spline interpolation
@@ -86,10 +89,12 @@ from scipy.signal import filter_design as filters, lfilter, filtfilt
 #import audiere
 
 from atten import atten
+from compensate import compensate
 from envelope import envelope
 from equate import equate
 from frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from f0 import f0
+from gammatone import gammatone, filterbank
 from hcomplex import hcomplex
 from interp import interp_bad, interp_lin, interp_spline
 from irn import irn
