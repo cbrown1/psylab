@@ -223,7 +223,7 @@ class DatasetView:
             j = index_from_tuple(t)
             jdata = np.array([x for x in dat.data[j].flatten() if not np.isnan(x)])
 
-            n = len(jdata)
+            n = jdata.size
             mean = jdata.mean()
             sd = jdata.std()
             se = sd / np.sqrt(n)
