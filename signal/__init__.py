@@ -106,11 +106,11 @@ from pink import pink
 from ramps import ramps
 from rir import rir, fconv
 from samp2ms import samp2ms
-from sinegen import sinegen
 from smooth import smooth
 from specgram import specgram
 from specplot import specplot
 from t60 import t60
+from tone import tone
 from vocoder import vocoder
 from waveio import wavread, wavwrite
 #from wavplay import wavplay
