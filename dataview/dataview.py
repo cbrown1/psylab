@@ -31,6 +31,14 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 # 
 
+'''Provides views of your data
+    
+    Dataview allows you to easily extract subsets of a dataset to use for 
+    plotting, analysis, etc.. The main class is DataSet, which loads your data
+    into an ndarray. DataSetView allows you to pass a dictionary of variable 
+    names as keys, and lists of levels as values, to view only those data. 
+'''
+
 import numpy as np
 import csv
 from itertools import product
@@ -47,11 +55,19 @@ class Dataset:
         self.subject = subject
         self.rawdata = None
         self.data = None
+        self.comments = ''
 
-        # Get the first line of the .csv containing experimental data, which is
-        # assumed to be a row of labels for each column.
+        # Get the first line of the .csv that isn't blank or commented, 
+        # which is assumed to be a row of labels for each column.
         file_data = csv.reader(open(csv_path))
-        csv_labels = file_data.next()
+        for row in file_data:
+            if len(row)==0:
+               self.comments += '\n'
+            elif row[0].lstrip().find('#') != -1:
+                self.comments += ','.join(row).lstrip(' #') + "\n"
+            else:
+                csv_labels = row
+                break
 
         tmparr = np.rec.fromrecords([tuple(x) for x in file_data],
                                     names=csv_labels)
