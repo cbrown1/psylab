@@ -116,7 +116,7 @@ def anova_between(data, factors=None):
     f = {}
     p = {}
 
-    n["total"] = len(data.flatten())
+    n["total"] = data.size
 
     if factors is None: #If factors aren't specified
         num_factors = len(data.shape) - 1
@@ -164,7 +164,7 @@ def anova_between(data, factors=None):
         # Compute the sum of squares
         squares = 0
         for i in ss_indices(s):
-            squares += np.nansum(data[i].flatten())**2 / len(data[i].flatten())
+            squares += np.nansum(data[i])**2 / data[i].size
 
         # Uncorrected SS that includes interaction effects
         unc = squares - cm
@@ -258,7 +258,7 @@ def anova_within(data, subject_index=0, factors=None):
     f = {}
     p = {}
 
-    n["total"] = len(data.flatten())
+    n["total"] = data.size
 
     if factors is None: #If factors aren't specified
         num_factors = len(data.shape) - 1
@@ -325,7 +325,7 @@ def anova_within(data, subject_index=0, factors=None):
         # Compute the sum of squares
         squares = 0
         for i in ss_indices(s):
-            squares += np.nansum(data[i].flatten())**2 / len(data[i].flatten())
+            squares += np.nansum(data[i])**2 / data[i].size
 
         # Uncorrected SS that includes interaction effects
         unc = squares - cm
@@ -348,7 +348,7 @@ def anova_within(data, subject_index=0, factors=None):
         else:
             error_term_from_source[s] = subject + s
 
-    ss["total"] = np.nansum(data.flatten()**2) - cm
+    ss["total"] = np.nansum(data**2) - cm
     df["total"] = 0
 
     for s in sources:

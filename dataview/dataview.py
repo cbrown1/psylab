@@ -31,6 +31,14 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 # 
 
+'''Provides views of your data
+    
+    Dataview allows you to easily extract subsets of a dataset to use for 
+    plotting, analysis, etc.. The main class is DataSet, which loads your data
+    into an ndarray. DataSetView allows you to pass a dictionary of variable 
+    names as keys, and lists of levels as values, to view only those data. 
+'''
+
 import numpy as np
 import csv
 from itertools import product
@@ -38,7 +46,7 @@ from pal import nanmean
 import pal.stats
 
 class Dataset:
-    def __init__(self, csv_path, dv, subject):
+    def __init__(self, csv_path, dv, subject=None):
         self.design = {}
         self.group_indices = {}
         self.level_indices = {}
@@ -47,11 +55,19 @@ class Dataset:
         self.subject = subject
         self.rawdata = None
         self.data = None
+        self.comments = ''
 
-        # Get the first line of the .csv containing experimental data, which is
-        # assumed to be a row of labels for each column.
+        # Get the first line of the .csv that isn't blank or commented, 
+        # which is assumed to be a row of labels for each column.
         file_data = csv.reader(open(csv_path))
-        csv_labels = file_data.next()
+        for row in file_data:
+            if len(row)==0:
+               self.comments += '\n'
+            elif row[0].lstrip().find('#') != -1:
+                self.comments += ','.join(row).lstrip(' #') + "\n"
+            else:
+                csv_labels = row
+                break
 
         tmparr = np.rec.fromrecords([tuple(x) for x in file_data],
                                     names=csv_labels)
@@ -128,30 +144,8 @@ class Dataset:
             k2 = k[:-1] + (0,)
             self.data[k2] = nanmean(self.rawdata[k])
 
-    def view(self, var_dict):
-        t = [Ellipsis for i in self.data.shape]
-        for var in var_dict:
-            i = self.group_indices[var]
-            k = tuple([self.level_indices[(var,x)] for x in var_dict[var]])
-            t[i] = k
-        t = tuple(t)
-
-        # Account for fact that the advanced index:
-        #   ((0,1),(0,1,2),(0,1))
-        # is not equivalent to the advanced index:
-        #   (Ellipsis,Ellipsis,Ellipsis)
-        def fixtuple(t):
-            fixed = []
-            for i in xrange(len(t)):
-                if t[i] is Ellipsis:
-                    fixed.append(Ellipsis)
-                elif len(t[i]) == self.data.shape[i]:
-                    fixed.append(Ellipsis)
-                else:
-                    fixed.append(t[i])
-            return tuple(fixed)
-
-        return self.data[fixtuple(t)]
+    def view(self, var_dict=None):
+        return DatasetView(self, var_dict)
 
     def anova_between(self):
         return pal.stats.anova.anova_between(self.rawdata, self.ivs)
@@ -162,8 +156,8 @@ class Dataset:
                                                 factors=self.ivs)            
         else:
             return pal.stats.anova.anova_within(self.rawdata,
-                                                subject_index=self.group_indices[self.subject],
-                                                factors=self.ivs)
+                                subject_index=self.group_indices[self.subject],
+                                factors=self.ivs)
 
     def index_names(self):
         return [(x,self.group_indices[x]) for x in self.ivs] + [(self.dv, len(self.rawdata.shape)-1)]
@@ -172,8 +166,7 @@ class Dataset:
         collapsedIndex = [[Ellipsis] for x in self.rawdata.shape]
         for group in d:
             i = self.group_indices[group]
-            collapsedIndex[i] = sorted(self.level_indices[(group,level)] for 
-                                       level in d[group])
+            collapsedIndex[i] = sorted(self.level_indices[(group,level)] for level in d[group])
 
         takeThisProduct = []
         maxlen = max(len(x) for x in collapsedIndex)
@@ -186,9 +179,17 @@ class Dataset:
         return indices
 
     def indices_from_comparison(self, comparisons):
-        indices = [(tuple(self.indices_from_dict(x)),
-                    tuple(self.indices_from_dict(y))) for x,y in comparisons]
+        indices = [(tuple(self.indices_from_vars(x)),
+                    tuple(self.indices_from_vars(y))) for x,y in comparisons]
         return indices
+
+    def write_to_csv(self, csv_name):
+        def index_to_line(index):
+            pass # translate an index tuple to a line of variable names
+        writer = csv.writer(open(csv_name, "w"), delimiter=" ")
+        for index in product(*map(xrange, self.rawdata.shape)):
+            writer.writerow(index_to_line(index))
+
 
 class DatasetView:
     def __init__(self, dat, vars=None):
@@ -209,9 +210,12 @@ class DatasetView:
                                         product(*[dat.design[x] for x in dat.ivs])])
             vars = dat.design
         else:
-            self.data = dat.view(vars)
+            self.data = dat.data
+            indexPrototype = [[Ellipsis] for x in dat.data.shape]
+            for k in vars:
+                indexPrototype[dat.group_indices[k]] = vars[k]
             self.treatments = np.array([str(x) for x in
-                                        product(*vars.values())])
+                                        product(*indexPrototype)])
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
@@ -224,14 +228,16 @@ class DatasetView:
             for i in xrange(len(dat.ivs)):
                 group = dat.ivs[i]
                 j = dat.group_indices[group]
-                index[j] = dat.level_indices[(group,t[i])]
+                if t[i] == Ellipsis:
+                    index[j] = Ellipsis
+                else:
+                    index[j] = dat.level_indices[(group,t[i])]
             return tuple(index)
 
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
             jdata = np.array([x for x in dat.data[j].flatten() if not np.isnan(x)])
-            print "jdata",jdata
 
             n = len(jdata)
             mean = jdata.mean()
