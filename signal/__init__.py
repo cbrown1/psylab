@@ -99,6 +99,7 @@ from hcomplex import hcomplex
 from interp import interp_bad, interp_lin, interp_spline
 from irn import irn
 from magspec import magspec
+from mix import mix
 from mls import mls
 from ms2samp import ms2samp
 from normalize import normalize
