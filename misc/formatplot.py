@@ -69,7 +69,7 @@ def set_backgroundcolor(ax, color):
     if lh != None:
         lh.legendPatch.set_facecolor(color)
 
-def set_framewidth(ax, width):
+def set_framelinewidth(ax, width):
     '''For the specified axes, sets the linewidth of the frame and major ticks
     '''
     for tl in ax.get_xticklines() + ax.get_yticklines():
