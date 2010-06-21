@@ -32,34 +32,28 @@
 
 import numpy as np
 
-def zeropad( *args ):
-    '''Zero pads the shorter of two or more arrays
+def mix( what, where, fs, offset ):
+    '''Mixes one array with another, at a specified offset in time
         
-        Ensures two or more arrays are the same length using zero-padding if necessary
-    
         Parameters
         ----------
-        args: tuple of arrays
-            Function takes any number of input arrays 
+        what : array
+            The array to copy
+
+        where : array
+            The array to paste into
+            
+        fs : scalar
+            The sampling frequency
+        
+        offset : scalar
+            The position, in ms to paste
 
         Returns
         -------
-        args : tuple of arrays
-            The input tuple of arrays is returned
-            
-        Example
-        -------
-        # Assume a, b, and c are arrays, possibly of varying length 
-        a,b,c = zeropad(a,b,c) # All three are now of same length
+        out : array
+            The two input arrays combined
     '''
-    length = 0
-    out = list(args)
-    for arg in args:
-        if len(arg) > length:
-            length = len(arg)
-
-    for n in range(0, len(args)):
-        if length > len(args[n]):
-            out[n] = np.concatenate((args[n], np.zeros(length-len(args[n]))))
-    
-    return tuple(out)
+    prepad = np.zeros(np.round((offset/1000.)*fs))
+    postpad = np.zeros(where.shape[0] - ( prepad.shape[0] + what.shape[0]))
+    return np.hstack((prepad, what, postpad)) + where
