@@ -2,11 +2,33 @@
 
 from distutils.core import setup
 
-setup(name='Pal',
-      version='1.0',
-      description='Psychoacoustics Lab',
+packages = ['pal'+p for p in ['.signal', '.dataview',
+                                '.stats', '.misc', '.array']]
+
+setup(name='PAL',
+      version='0.1',
+      description='PsychoAcoustics Lab',
       author='Christopher Brown, Joseph Ranweiler',
       author_email='c-b@asu.edu',
+      maintainer='Christopher Brown',
+      maintainer_email='c-b@asu.edu',
       url='',
-      packages=[''],
+      package_dir = {'pal': 'src/pal'},
+      packages = packages,
+      platforms = ['any'],
+      classifiers = [
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Natural Language :: English',
+        'Operating System :: MacOS',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: OS Independent',
+        'Operating System :: POSIX',
+        'Operating System :: Unix',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Topic :: Multimedia :: Sound/Audio :: Speech',
+        'Topic :: Multimedia :: Sound/Audio :: Analysis',
+        'Topic :: Scientific/Engineering',
+        ],
      )
