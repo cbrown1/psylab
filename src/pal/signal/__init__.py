@@ -78,8 +78,6 @@ Dependencies:
 numpy, scipy
 '''
 
-__version__ = '0.3'
-
 # A few imports for convenience
 from numpy.random import randn, rand
 from numpy.fft import fft, ifft
