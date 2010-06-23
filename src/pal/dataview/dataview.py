@@ -223,6 +223,7 @@ def from_csv(csv_path, dv):
 class DatasetView:
     def __init__(self, ds, vars=None, looks=None):
         # Stats
+        self.dataset = ds
         self.data = None
         self.treatments = None
 
@@ -255,8 +256,6 @@ class DatasetView:
         else:
             sh = ds.data.shape[:-1] + (1,)
             self.data = nanmean(ds.data, -1).reshape(sh)
-
-        print "treatments:", self.treatments
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
