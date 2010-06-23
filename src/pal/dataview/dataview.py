@@ -50,7 +50,7 @@ class Dataset:
 
     Attributes
     ----------
-    arr : ndarray
+    data : ndarray
         Each axis represents a variable, and each coordinate along that
         axis represents a level in that variable.
 
@@ -63,7 +63,7 @@ class Dataset:
     dv : str
         Name of the dependent variable.
     """
-    array = None
+    data = None
     dv = None
     ivs = None
     labels = None
@@ -72,19 +72,19 @@ class Dataset:
     index_from_level = None
     comments = ""
 
-    def view(self, var_dict=None):
-        return DatasetView(self, var_dict)
+    def view(self, var_dict=None, looks=None):
+        return DatasetView(self, var_dict, looks)
 
     def anova_between(self):
         return pal.stats.anova.anova_between(self.data, self.ivs)
     
-    def anova_within(self, subject=None):
-        if subject == None:
+    def anova_within(self, looks=None):
+        if looks == None:
             return pal.stats.anova.anova_within(self.data,
                                                 factors=self.ivs)
         else:
             return pal.stats.anova.anova_within(self.data,
-                                                subject_index=self.index_from_var[subject],
+                                                looks_index=self.index_from_var[looks],
                                                 factors=self.ivs)
 
     def index_names(self):
@@ -208,7 +208,7 @@ def from_csv(csv_path, dv):
         design_list.append(t)
 
     ds = Dataset()
-    ds.array = array
+    ds.data = array
     ds.labels = tuple(design_list)
     ds.design = dict(design_list)
     ds.dv = dv
@@ -221,7 +221,7 @@ def from_csv(csv_path, dv):
 
 
 class DatasetView:
-    def __init__(self, dat, vars=None):
+    def __init__(self, ds, vars=None, looks=None):
         # Stats
         self.data = None
         self.treatments = None
@@ -231,20 +231,32 @@ class DatasetView:
         self.se = None
         self.n = None
 
-        # Extract data we care about, as indicated by vars
-        # This breaks indexing in a way that is a huge pain
         if vars is None:
-            self.data = dat.data
             self.treatments = np.array([str(x) for x in 
-                                        product(*[dat.design[x] for x in dat.ivs])])
-            vars = dat.design
+                                        product(*[ds.design[x] for x in ds.ivs])])
+            vars = vs.design
         else:
-            self.data = dat.data
-            indexPrototype = [[Ellipsis] for x in dat.data.shape]
+            indexPrototype = [[Ellipsis] for x in ds.data.shape]
             for k in vars:
-                indexPrototype[dat.group_indices[k]] = vars[k]
+                indexPrototype[ds.index_from_var[k]] = vars[k]
             self.treatments = np.array([str(x) for x in
                                         product(*indexPrototype)])
+
+        if looks != None:
+            looks_index = ds.index_from_var[looks]
+            if looks_index == 0: # No need to swap
+                sh = ds.data.shape[:-1] + (1,)
+                self.data = nanmean(ds.data, -1).reshape(sh)
+            else:
+                self.data = ds.data.swapaxes(0, looks_index)
+                sh = self.data.shape[:-1] + (1,)
+                self.data = nanmean(self.data, -1).reshape(sh)
+                self.data = self.data.swapaxes(0, looks_index)
+        else:
+            sh = ds.data.shape[:-1] + (1,)
+            self.data = nanmean(ds.data, -1).reshape(sh)
+
+        print "treatments:", self.treatments
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
@@ -254,19 +266,19 @@ class DatasetView:
         def index_from_tuple(t):
             index = [Ellipsis] * len(self.data.shape)
 
-            for i in xrange(len(dat.ivs)):
-                group = dat.ivs[i]
-                j = dat.group_indices[group]
+            for i in xrange(len(ds.ivs)):
+                var = ds.ivs[i]
+                j = ds.index_from_var[var]
                 if t[i] == Ellipsis:
                     index[j] = Ellipsis
                 else:
-                    index[j] = dat.level_indices[(group,t[i])]
+                    index[j] = ds.index_from_level[(var,t[i])]
             return tuple(index)
 
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
-            jdata = np.array([x for x in dat.data[j].flatten() if not np.isnan(x)])
+            jdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
 
             n = jdata.size
             mean = jdata.mean()
