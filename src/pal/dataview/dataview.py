@@ -67,9 +67,10 @@ class Dataset:
     dv = None
     ivs = None
     labels = None
+    design = None
     index_from_var = None
     index_from_level = None
-    subject = None
+    comments = ""
 
     def view(self, var_dict=None):
         return DatasetView(self, var_dict)
@@ -78,12 +79,12 @@ class Dataset:
         return pal.stats.anova.anova_between(self.data, self.ivs)
     
     def anova_within(self, subject=None):
-        if self.subject == None:
+        if subject == None:
             return pal.stats.anova.anova_within(self.data,
                                                 factors=self.ivs)
         else:
             return pal.stats.anova.anova_within(self.data,
-                                                subject_index=self.index_from_var[self.subject],
+                                                subject_index=self.index_from_var[subject],
                                                 factors=self.ivs)
 
     def index_names(self):
@@ -118,7 +119,7 @@ class Dataset:
 #             writer.writerow(index_to_line(index))
 
 
-def from_csv(csv_path, dv, subject=None):
+def from_csv(csv_path, dv):
     ds = Dataset()
 
     file_data = csv.reader(open(csv_path))
@@ -197,12 +198,24 @@ def from_csv(csv_path, dv, subject=None):
             array[index+(i,)] = v
             i += 1
 
+    items = index_from_level.items()
+    design_list = []
+
+    for var in labels:
+        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
+        if t[0] == dv:
+            t = (t[0], None)
+        design_list.append(t)
+
     ds = Dataset()
     ds.array = array
+    ds.labels = tuple(design_list)
+    ds.design = dict(design_list)
     ds.dv = dv
     ds.ivs = ivs
     ds.index_from_var = index_from_var
     ds.index_from_level = index_from_level
+    ds.comments = comments
 
     return ds
 
