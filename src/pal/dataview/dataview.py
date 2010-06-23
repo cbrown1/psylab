@@ -42,131 +42,58 @@
 import numpy as np
 import csv
 from itertools import product
-from pal import nanmean
+from scipy.stats import nanmean
 import pal.stats
 
 class Dataset:
-    def __init__(self, csv_path, dv, subject=None):
-        self.design = {}
-        self.group_indices = {}
-        self.level_indices = {}
-        self.ivs = None
-        self.dv = dv
-        self.subject = subject
-        self.rawdata = None
-        self.data = None
-        self.comments = ''
+    """Representation of experimental data with one dependent variable.
 
-        # Get the first line of the .csv that isn't blank or commented, 
-        # which is assumed to be a row of labels for each column.
-        file_data = csv.reader(open(csv_path))
-        for row in file_data:
-            if len(row)==0:
-               self.comments += '\n'
-            elif row[0].lstrip().find('#') != -1:
-                self.comments += ','.join(row).lstrip(' #') + "\n"
-            else:
-                csv_labels = row
-                break
+    Attributes
+    ----------
+    arr : ndarray
+        Each axis represents a variable, and each coordinate along that
+        axis represents a level in that variable.
 
-        tmparr = np.rec.fromrecords([tuple(x) for x in file_data],
-                                    names=csv_labels)
+    labels : tuple of tuple
+        Label for each axis and coordinate on that axis.
+        Of the form: ((axis_name_1, (coord_name_1, ..., coord_name_i)),
+                      ...,
+                      (axis_name_n, (coord_name_1, ..., coord_name_j)))
 
-        self.ivs = [x for x in csv_labels if x != dv]
-
-        # Characterize the semantic structure of the experiment
-        for v in self.ivs:
-            self.design[v] = []
-            for entry in tmparr[v]:
-                if entry not in self.design[v]:
-                    self.design[v].append(entry)
-
-        # Compute mappings from:
-        #     Treatment groups to indices (`group_indices`)
-        #     Levels within groups to indices (`level_indices`)
-        i = 0
-        for g in self.ivs:
-            self.group_indices[g] = i
-            i += 1
-
-            j = 0
-            for l in self.design[g]:
-                self.level_indices[(g,l)] = j
-                j += 1
-
-        treatments = tuple(product(*tuple(self.design[x] for x in self.ivs)))
-
-        # Read data from .csv and partition up to repeated measures
-        partitions = {}
-        for t in tmparr:
-            tk = tuple([t[n] for n in self.ivs])
-            if tk not in partitions:
-                partitions[tk] = [np.float64(t[dv])]
-            else:
-                partitions[tk] = partitions[tk] + [np.float64(t[dv])]
-
-        newshape = [len(set(tmparr[n])) for n in tmparr.dtype.names if n != dv]
-        newshape.append(max([len(x) for x in partitions.values()]))
-        newshape = tuple(newshape)
-
-        self.rawdata = np.zeros(shape=newshape) * np.nan
-
-        for k in partitions:
-            gk = tuple(zip(self.ivs, k))
-
-            index = tuple([self.level_indices[k0] for k0 in gk])
-            index = [Ellipsis for dimension in self.rawdata.shape]
-            for k0 in gk:
-                index[self.group_indices[k0[0]]] = self.level_indices[k0]
-            index = tuple(index)
-
-            for i in xrange(len(partitions[k])):
-                self.rawdata[index][i] = partitions[k][i]
-
-        tmp = np.ones(shape=self.rawdata.shape)
-        
-        # Generate the keys that will let us extract the last dimensions.
-        # i.e., for an array of shape: 
-        #     (a_1, ... a_(k-1), a_k),
-        # we should get all possible tuples of the shape:
-        #     (b_1, ..., b_(k-1), Ellipsis)
-        # Where b_1 is in range(a_1),
-        #       b_2 is in range(a_2),
-        #         ...
-        #       b_(k-1) is in range(a_(k-1))
-        keys = [x for x in apply(product,
-                                 map(range,
-                                     self.rawdata.shape[:-1]) + [[Ellipsis]])]
-
-        newshape = self.rawdata.shape[:-1] + (1,)
-        self.data = np.ones(shape=newshape)
-        for k in keys:
-            k2 = k[:-1] + (0,)
-            self.data[k2] = nanmean(self.rawdata[k])
+    dv : str
+        Name of the dependent variable.
+    """
+    array = None
+    dv = None
+    ivs = None
+    labels = None
+    index_from_var = None
+    index_from_level = None
+    subject = None
 
     def view(self, var_dict=None):
         return DatasetView(self, var_dict)
 
     def anova_between(self):
-        return pal.stats.anova.anova_between(self.rawdata, self.ivs)
+        return pal.stats.anova.anova_between(self.data, self.ivs)
     
-    def anova_within(self):
+    def anova_within(self, subject=None):
         if self.subject == None:
-            return pal.stats.anova.anova_within(self.rawdata,
-                                                factors=self.ivs)            
+            return pal.stats.anova.anova_within(self.data,
+                                                factors=self.ivs)
         else:
-            return pal.stats.anova.anova_within(self.rawdata,
-                                subject_index=self.group_indices[self.subject],
-                                factors=self.ivs)
+            return pal.stats.anova.anova_within(self.data,
+                                                subject_index=self.index_from_var[self.subject],
+                                                factors=self.ivs)
 
     def index_names(self):
-        return [(x,self.group_indices[x]) for x in self.ivs] + [(self.dv, len(self.rawdata.shape)-1)]
+        return [(x,self.index_from_var[x]) for x in self.ivs] + [(self.dv, len(self.data.shape)-1)]
 
     def indices_from_vars(self, d):
-        collapsedIndex = [[Ellipsis] for x in self.rawdata.shape]
+        collapsedIndex = [[Ellipsis] for x in self.data.shape]
         for group in d:
-            i = self.group_indices[group]
-            collapsedIndex[i] = sorted(self.level_indices[(group,level)] for level in d[group])
+            i = self.index_from_var[group]
+            collapsedIndex[i] = sorted(self.index_from_level[(group,level)] for level in d[group])
 
         takeThisProduct = []
         maxlen = max(len(x) for x in collapsedIndex)
@@ -183,12 +110,101 @@ class Dataset:
                     tuple(self.indices_from_vars(y))) for x,y in comparisons]
         return indices
 
-    def write_to_csv(self, csv_name):
-        def index_to_line(index):
-            pass # translate an index tuple to a line of variable names
-        writer = csv.writer(open(csv_name, "w"), delimiter=" ")
-        for index in product(*map(xrange, self.rawdata.shape)):
-            writer.writerow(index_to_line(index))
+#     def write_to_csv(self, csv_name):
+#         def index_to_line(index):
+#             pass # translate an index tuple to a line of variable names
+#         writer = csv.writer(open(csv_name, "w"), delimiter=" ")
+#         for index in product(*map(xrange, self.data.shape)):
+#             writer.writerow(index_to_line(index))
+
+
+def from_csv(csv_path, dv, subject=None):
+    ds = Dataset()
+
+    file_data = csv.reader(open(csv_path))
+    comments = ""
+
+    # Get the first line of the .csv that isn't blank or commented, 
+    # which is assumed to be a row of labels for each column.
+    for row in file_data:
+        if len(row)==0:
+            comments += '\n'
+        elif row[0].lstrip().find('#') != -1:
+            comments += ','.join(row).lstrip(' #') + "\n"
+        else:
+            labels = tuple(x.strip().strip("'").strip('"') for x in row)
+            break
+    # (Now the file_data cursor should be pointed at the first substantive row
+    # of the csv file, so if we iterate now, we'll just be getting data rows)
+
+    dv_index = labels.index(dv)
+    ivs = tuple(x for x in labels if x != dv)
+
+    # Prepare a row for `np.rec.fromrecs`
+    def format_row(row):
+        row = [x.strip().strip("'").strip('"') for x in row if x is not dv]
+        row[dv_index] = np.float64(row[dv_index])
+        return tuple(row)
+
+    # A temporary recarray for computing other values
+    temp_array = np.rec.fromrecords(map(format_row, file_data), names=labels)
+
+    # Compute index mappings
+    index_from_var = {}
+    index_from_level = {}
+    shape = [0 for x in labels[:-1]]
+
+    i = 0
+    for v in ivs:
+        index_from_var[v] = i
+        j = 0
+        unique = set(temp_array[v])
+        for l in unique:
+            index_from_level[(v,l)] = j
+            j += 1
+        shape[i] = len(unique)
+        i += 1
+
+    axis_from_var = dict([x[::-1] for x in index_from_var.iteritems()])
+
+    treatments = {}
+    for r in temp_array:
+        key = tuple(r[v] for v in ivs)
+        if key in treatments:
+            treatments[key].append(r[dv])
+        else:
+            treatments[key] = [r[dv]]
+    
+    # Find the shape of the ndarray
+    max_looks = max(map(len, treatments.values()))
+    shape.append(max_looks)
+
+    array = np.ones(shape) * np.nan
+
+    proto_index = [0] * len(ivs)
+    def treatment_to_index(t):
+        index = proto_index
+        i = 0
+        for v in ivs:
+            index[i] = index_from_level[(v,t[i])]
+            i += 1
+        return tuple(index)
+            
+    for t,vals in treatments.iteritems():
+        index = treatment_to_index(t)
+        i = 0
+        for v in vals:
+            array[index+(i,)] = v
+            i += 1
+
+    ds = Dataset()
+    ds.array = array
+    ds.dv = dv
+    ds.ivs = ivs
+    ds.index_from_var = index_from_var
+    ds.index_from_level = index_from_level
+
+    return ds
 
 
 class DatasetView:
