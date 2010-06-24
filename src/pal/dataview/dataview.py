@@ -277,11 +277,18 @@ class DatasetView:
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
-            jdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
-
-            n = jdata.size
+            print self.data[j]
+            jdata = np.array([x for x in self.data[j].flatten() if not np.isnan(x)])
+            print jdata,jdata.shape,jdata.size
+            
+            if looks is None:
+                kdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
+                n = kdata.size
+                sd = kdata.std()
+            else:
+                n = jdata.size
+                sd = jdata.std()
             mean = jdata.mean()
-            sd = jdata.std()
             se = sd / np.sqrt(n)
             
             self.n[i] = n
