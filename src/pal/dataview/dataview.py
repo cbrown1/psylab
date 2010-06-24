@@ -224,6 +224,7 @@ class DatasetView:
     def __init__(self, ds, var_dict=None, looks=None):
         # Stats
         self.dataset = ds
+        self.rawdata = None
         self.data = None
         self.treatments = None
         self.var_dict = var_dict
@@ -248,15 +249,15 @@ class DatasetView:
             looks_index = ds.index_from_var[looks]
             if looks_index == 0: # No need to swap
                 sh = ds.data.shape[:-1] + (1,)
-                self.data = nanmean(ds.data, -1).reshape(sh)
+                self.rawdata = nanmean(ds.data, -1).reshape(sh)
             else:
-                self.data = ds.data.swapaxes(0, looks_index)
-                sh = self.data.shape[:-1] + (1,)
-                self.data = nanmean(self.data, -1).reshape(sh)
-                self.data = self.data.swapaxes(0, looks_index)
+                self.rawdata = ds.data.swapaxes(0, looks_index)
+                sh = self.rawdata.shape[:-1] + (1,)
+                self.rawdata = nanmean(self.rawdata, -1).reshape(sh)
+                self.rawdata = self.rawdata.swapaxes(0, looks_index)
         else:
             sh = ds.data.shape[:-1] + (1,)
-            self.data = nanmean(ds.data, -1).reshape(sh)
+            self.rawdata = nanmean(ds.data, -1).reshape(sh)
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
@@ -264,7 +265,7 @@ class DatasetView:
         self.se = np.ones(shape=self.treatments.shape)
 
         def index_from_tuple(t):
-            index = [Ellipsis] * len(self.data.shape)
+            index = [Ellipsis] * len(self.rawdata.shape)
 
             for i in xrange(len(ds.ivs)):
                 var = ds.ivs[i]
@@ -278,7 +279,7 @@ class DatasetView:
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
-            jdata = np.array([x for x in self.data[j].flatten() if not np.isnan(x)])
+            jdata = np.array([x for x in self.rawdata[j].flatten() if not np.isnan(x)])
             
             if looks is None:
                 kdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
