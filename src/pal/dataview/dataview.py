@@ -221,25 +221,26 @@ def from_csv(csv_path, dv):
 
 
 class DatasetView:
-    def __init__(self, ds, vars=None, looks=None):
+    def __init__(self, ds, var_dict=None, looks=None):
         # Stats
         self.dataset = ds
         self.data = None
         self.treatments = None
+        self.var_dict = var_dict
 
         self.mean = None
         self.sd = None
         self.se = None
         self.n = None
 
-        if vars is None:
+        if var_dict is None:
             self.treatments = np.array([str(x) for x in 
                                         product(*[ds.design[x] for x in ds.ivs])])
-            vars = vs.design
+            var_dict = vs.design
         else:
             indexPrototype = [[Ellipsis] for x in ds.data.shape]
-            for k in vars:
-                indexPrototype[ds.index_from_var[k]] = vars[k]
+            for k in var_dict:
+                indexPrototype[ds.index_from_var[k]] = var_dict[k]
             self.treatments = np.array([str(x) for x in
                                         product(*indexPrototype)])
 
@@ -277,9 +278,7 @@ class DatasetView:
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
-            print self.data[j]
             jdata = np.array([x for x in self.data[j].flatten() if not np.isnan(x)])
-            print jdata,jdata.shape,jdata.size
             
             if looks is None:
                 kdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
