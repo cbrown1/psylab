@@ -169,8 +169,14 @@ class Dataset:
 
         return ds
 
-    def view(self, var_dict=None, looks=None):
+    def _view(self, var_dict=None, looks=None):
         return DatasetView(self, var_dict, looks)
+
+    def view(self, var_dict=None, looks=None):
+        v = self._view(var_dict, looks)
+        d = v.as_dataset()
+        return d._view(var_dict)
+
 
 def from_csv(csv_path, dv):
     ds = Dataset()
