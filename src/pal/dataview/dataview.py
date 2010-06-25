@@ -118,6 +118,59 @@ class Dataset:
 #         for index in product(*map(xrange, self.data.shape)):
 #             writer.writerow(index_to_line(index))
 
+    def from_var_dict(self, var_dict):
+        ds = Dataset()
+
+        labels = []
+        for var,lvs in self.labels:
+            if var in var_dict:
+                labels.append((var,tuple(x for x in lvs if x in var_dict[var])))
+        labels.append(self.labels[-1])
+        labels = tuple(labels)
+
+        index_from_var = {}
+        index_from_level = {}
+
+        i = 0
+        for v,lvls in labels[:-1]:
+            index_from_var[v] = i
+            j = 0
+            for l in lvls:
+                index_from_level[(v,l)] = j
+                j += 1
+            i += 1
+        index_from_var[self.dv] = i
+
+        # How many data points will be extracted
+        size = np.array([self.data[i] for i in self.indices_from_vars(var_dict)]).size
+
+        # How large our dv should be as a consequence
+        dv_size = size / np.product([len(l) for v,l in labels if v != self.dv])
+
+        shape = tuple(len(lvs) for var,lvs in labels[:-1]) + (dv_size,)
+        data = np.ones(shape)
+
+        ivs = tuple(x for x in self.ivs if x in var_dict)
+
+        ds.data = data
+        ds.labels = labels
+        ds.ivs = ivs
+        ds.index_from_level = index_from_level
+        ds.index_from_var = index_from_var
+        ds.design = dict(labels)
+
+        for t in product(*[l for v,l in labels if v != self.dv]):
+            z = zip(ivs,t)
+            i = [ds.index_from_level[x] for x in z]
+
+            j = [Ellipsis] * len(self.data.shape)
+            for v,l in z:
+                j[self.index_from_var[v]] = self.index_from_level[(v,l)]
+
+            ds.data[i] = self.data[j].flatten()
+
+        return ds
+        
 
 def from_csv(csv_path, dv):
     ds = Dataset()
@@ -295,3 +348,15 @@ class DatasetView:
             self.mean[i] = mean
             self.sd[i] = sd
             self.se[i] = se
+
+        #
+        dat = self.dataset.from_var_dict(self.var_dict)
+        print dat
+        print dat.data
+        print dat.data
+        print dat.data.shape
+        print dat.labels
+        print dat.design
+        print dat.index_from_var
+        print dat.index_from_level
+        print dat.ivs
