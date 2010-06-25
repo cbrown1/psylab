@@ -72,9 +72,6 @@ class Dataset:
     index_from_level = None
     comments = ""
 
-    def view(self, var_dict=None, looks=None):
-        return DatasetView(self, var_dict, looks)
-
     def anova_between(self):
         return pal.stats.anova.anova_between(self.data, self.ivs)
     
@@ -158,6 +155,7 @@ class Dataset:
         ds.index_from_level = index_from_level
         ds.index_from_var = index_from_var
         ds.design = dict(labels)
+        ds.dv = self.dv
 
         for t in product(*[l for v,l in labels if v != self.dv]):
             z = zip(ivs,t)
@@ -170,7 +168,9 @@ class Dataset:
             ds.data[i] = self.data[j].flatten()
 
         return ds
-        
+
+    def view(self, var_dict=None, looks=None):
+        return DatasetView(self, var_dict, looks)
 
 def from_csv(csv_path, dv):
     ds = Dataset()
@@ -277,10 +277,10 @@ class DatasetView:
     def __init__(self, ds, var_dict=None, looks=None):
         # Stats
         self.dataset = ds
-        self.rawdata = None
         self.data = None
         self.treatments = None
         self.var_dict = var_dict
+        self.looks = looks
 
         self.mean = None
         self.sd = None
@@ -290,7 +290,7 @@ class DatasetView:
         if var_dict is None:
             self.treatments = np.array([str(x) for x in 
                                         product(*[ds.design[x] for x in ds.ivs])])
-            var_dict = vs.design
+            var_dict = ds.design
         else:
             indexPrototype = [[Ellipsis] for x in ds.data.shape]
             for k in var_dict:
@@ -302,15 +302,15 @@ class DatasetView:
             looks_index = ds.index_from_var[looks]
             if looks_index == 0: # No need to swap
                 sh = ds.data.shape[:-1] + (1,)
-                self.rawdata = nanmean(ds.data, -1).reshape(sh)
+                self.data = nanmean(ds.data, -1).reshape(sh)
             else:
-                self.rawdata = ds.data.swapaxes(0, looks_index)
-                sh = self.rawdata.shape[:-1] + (1,)
-                self.rawdata = nanmean(self.rawdata, -1).reshape(sh)
-                self.rawdata = self.rawdata.swapaxes(0, looks_index)
+                self.data = ds.data.swapaxes(0, looks_index)
+                sh = self.data.shape[:-1] + (1,)
+                self.data = nanmean(self.data, -1).reshape(sh)
+                self.data = self.data.swapaxes(0, looks_index)
         else:
             sh = ds.data.shape[:-1] + (1,)
-            self.rawdata = nanmean(ds.data, -1).reshape(sh)
+            self.data = nanmean(ds.data, -1).reshape(sh)
 
         self.n = np.ones(shape=self.treatments.shape)
         self.mean = np.ones(shape=self.treatments.shape)
@@ -318,7 +318,7 @@ class DatasetView:
         self.se = np.ones(shape=self.treatments.shape)
 
         def index_from_tuple(t):
-            index = [Ellipsis] * len(self.rawdata.shape)
+            index = [Ellipsis] * len(self.data.shape)
 
             for i in xrange(len(ds.ivs)):
                 var = ds.ivs[i]
@@ -332,7 +332,7 @@ class DatasetView:
         for i in xrange(len(self.treatments)):
             t = eval(self.treatments[i])
             j = index_from_tuple(t)
-            jdata = np.array([x for x in self.rawdata[j].flatten() if not np.isnan(x)])
+            jdata = np.array([x for x in self.data[j].flatten() if not np.isnan(x)])
             
             if looks is None:
                 kdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
@@ -349,14 +349,5 @@ class DatasetView:
             self.sd[i] = sd
             self.se[i] = se
 
-        #
-        dat = self.dataset.from_var_dict(self.var_dict)
-        print dat
-        print dat.data
-        print dat.data
-        print dat.data.shape
-        print dat.labels
-        print dat.design
-        print dat.index_from_var
-        print dat.index_from_level
-        print dat.ivs
+    def as_dataset(self):
+        return self.dataset.from_var_dict(self.var_dict)
