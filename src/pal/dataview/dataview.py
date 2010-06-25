@@ -121,7 +121,11 @@ class Dataset:
         labels = []
         for var,lvs in self.labels:
             if var in var_dict:
-                labels.append((var,tuple(x for x in lvs if x in var_dict[var])))
+                if var_dict[var] == []:
+                    var_dict[var] = lvs
+                    labels.append((var,lvs))
+                else:
+                    labels.append((var,tuple(x for x in lvs if x in var_dict[var])))
         labels.append(self.labels[-1])
         labels = tuple(labels)
 
@@ -157,14 +161,14 @@ class Dataset:
         ds.design = dict(labels)
         ds.dv = self.dv
 
-        for t in product(*[l for v,l in labels if v != self.dv]):
+        for t in product(*[l for v,l in labels[:-1]]):
             z = zip(ivs,t)
-            i = [ds.index_from_level[x] for x in z]
 
+            i = [Ellipsis] * len(ds.data.shape)
             j = [Ellipsis] * len(self.data.shape)
             for v,l in z:
+                i[ds.index_from_var[v]] = ds.index_from_level[(v,l)]
                 j[self.index_from_var[v]] = self.index_from_level[(v,l)]
-
             ds.data[i] = self.data[j].flatten()
 
         return ds
