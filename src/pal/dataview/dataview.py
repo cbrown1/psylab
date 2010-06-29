@@ -104,6 +104,7 @@ class Dataset:
         return indices
 
     def indices_from_comparison(self, comparisons):
+        print self, "indices_from_comparison"
         indices = [(tuple(self.indices_from_vars(x)),
                     tuple(self.indices_from_vars(y))) for x,y in comparisons]
         return indices
@@ -116,42 +117,64 @@ class Dataset:
 #             writer.writerow(index_to_line(index))
 
     def from_var_dict(self, var_dict):
+        """Creates a new Dataset from a parent Dataset and a dictionary of var
+        to level mappings. We assume the `dv` is the same.
+
+        Parameters
+        ----------
+        var_dict : dict
+
+        Returns
+        -------
+        ds : Dataset
+        """
+
+        # Initialize the Dataset we will flesh out and return
         ds = Dataset()
 
-        labels = []
+        labels = []  # Initialize what will be the `labels` attribute for `ds`
         for var,lvs in self.labels:
-            if var in var_dict:
-                if var_dict[var] == []:
-                    var_dict[var] = lvs
+            if var == self.dv:
+                labels.append((var,None))
+            elif var in var_dict:
+                if var_dict[var] == []: # var -> [] is shorthand for "all levels"
+                    var_dict[var] = lvs  # fix up var_dict for later assignment
                     labels.append((var,lvs))
                 else:
                     labels.append((var,tuple(x for x in lvs if x in var_dict[var])))
-        labels.append(self.labels[-1])
         labels = tuple(labels)
 
         index_from_var = {}
         index_from_level = {}
 
+        # Compute new indexing dicts for `ds`
         i = 0
-        for v,lvls in labels[:-1]:
+        for v,lvls in labels[:-1]: # last axis is `dv`, so we ignore it here
             index_from_var[v] = i
             j = 0
             for l in lvls:
                 index_from_level[(v,l)] = j
                 j += 1
             i += 1
-        index_from_var[self.dv] = i
-
-        # How many data points will be extracted
-        size = np.array([self.data[i] for i in self.indices_from_vars(var_dict)]).size
-
-        # How large our dv should be as a consequence
-        dv_size = size / np.product([len(l) for v,l in labels if v != self.dv])
-
-        shape = tuple(len(lvs) for var,lvs in labels[:-1]) + (dv_size,)
-        data = np.ones(shape)
+        index_from_var[self.dv] = i  # `i` was incremented before the loop
+                                     # terminated, so it should point to
+                                     # the last axis, as desired.
 
         ivs = tuple(x for x in self.ivs if x in var_dict)
+
+        # How many data points will be extracted based on vars
+        size = 0
+        # We can't just do `self.data.size` because in most cases we'll just
+        # want a proper subset of the values in `self.data`.
+        for i in self.indices_from_vars(var_dict):
+            size += self.data[i].size
+
+        # How large our dv should be to fit each value.
+        # This is determined by (size of our new array)/(product of all desired non-dv axes)
+        dv_size = size / np.product([len(l) for v,l in labels if v in var_dict and v != self.dv])
+
+        shape = tuple(len(lvs) for var,lvs in labels[:-1] if var in var_dict) + (dv_size,)
+        data = np.ones(shape)
 
         ds.data = data
         ds.labels = labels
@@ -169,6 +192,9 @@ class Dataset:
             for v,l in z:
                 i[ds.index_from_var[v]] = ds.index_from_level[(v,l)]
                 j[self.index_from_var[v]] = self.index_from_level[(v,l)]
+            print "i",i
+            print "ds.data[i]",ds.data[i]
+            print "self.data[j].flatten()", self.data[j].flatten()
             ds.data[i] = self.data[j].flatten()
 
         return ds
@@ -177,12 +203,14 @@ class Dataset:
         return DatasetView(self, var_dict, looks)
 
     def view(self, var_dict=None, looks=None):
+        print "view: var_dict",var_dict
         v = self._view(var_dict, looks)
+        print "view: v.vardict", v.var_dict
         d = v.as_dataset()
         return d._view(var_dict)
 
 
-def from_csv(csv_path, dv):
+def from_csv(csv_path, dv, ivs=None):
     ds = Dataset()
 
     file_data = csv.reader(open(csv_path))
@@ -202,7 +230,8 @@ def from_csv(csv_path, dv):
     # of the csv file, so if we iterate now, we'll just be getting data rows)
 
     dv_index = labels.index(dv)
-    ivs = tuple(x for x in labels if x != dv)
+    if ivs == None:
+        ivs = tuple(x for x in labels if x != dv)
 
     # Prepare a row for `np.rec.fromrecs`
     def format_row(row):
@@ -216,7 +245,7 @@ def from_csv(csv_path, dv):
     # Compute index mappings
     index_from_var = {}
     index_from_level = {}
-    shape = [0 for x in labels[:-1]]
+    shape = [0 for x in [y for y in labels[:-1] if y in ivs]]
 
     i = 0
     for v in ivs:
@@ -253,7 +282,7 @@ def from_csv(csv_path, dv):
             index[i] = index_from_level[(v,t[i])]
             i += 1
         return tuple(index)
-            
+
     for t,vals in treatments.iteritems():
         index = treatment_to_index(t)
         i = 0
@@ -272,7 +301,9 @@ def from_csv(csv_path, dv):
 
     ds = Dataset()
     ds.data = array
-    ds.labels = tuple(design_list)
+    print "design_list", design_list
+    print "--->", tuple((v,l) for v,l in design_list if (v in ivs or v == dv))
+    ds.labels = tuple((v,l) for v,l in design_list if v in ivs or v == dv)
     ds.design = dict(design_list)
     ds.dv = dv
     ds.ivs = ivs
@@ -297,16 +328,17 @@ class DatasetView:
         self.se = None
         self.n = None
 
-        if var_dict is None:
+        if var_dict == None:
             self.treatments = np.array([str(x) for x in 
                                         product(*[ds.design[x] for x in ds.ivs])])
-            var_dict = ds.design
+            var_dict = dict([(v,l) for (v,l) in ds.labels if v != ds.dv])
         else:
             indexPrototype = [[Ellipsis] for x in ds.data.shape]
             for k in var_dict:
                 indexPrototype[ds.index_from_var[k]] = var_dict[k]
             self.treatments = np.array([str(x) for x in
                                         product(*indexPrototype)])
+        self.var_dict = var_dict
 
         if looks != None:
             looks_index = ds.index_from_var[looks]
