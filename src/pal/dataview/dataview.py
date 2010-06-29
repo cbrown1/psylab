@@ -195,13 +195,13 @@ class Dataset:
 
         return ds
 
-    def _view(self, var_dict=None, looks=None):
+    def _view(self, var_dict, looks):
         return DatasetView(self, var_dict, looks)
 
     def view(self, var_dict=None, looks=None):
-        v = self._view(var_dict, looks)
+        v = self._view(var_dict, None)
         d = v.as_dataset()
-        return d._view(var_dict)
+        return d._view(var_dict, looks)
 
 
 def from_csv(csv_path, dv, ivs=None):
