@@ -140,7 +140,7 @@ class Dataset:
                     var_dict[var] = lvs  # fix up var_dict for later assignment
                     labels.append((var,lvs))
                 else:
-                    labels.append((var,tuple(x for x in lvs if x in var_dict[var])))
+                    labels.append((var,tuple(var_dict[var])))
         labels = tuple(labels)
 
         index_from_var = {}
