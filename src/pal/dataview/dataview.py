@@ -104,7 +104,6 @@ class Dataset:
         return indices
 
     def indices_from_comparison(self, comparisons):
-        print self, "indices_from_comparison"
         indices = [(tuple(self.indices_from_vars(x)),
                     tuple(self.indices_from_vars(y))) for x,y in comparisons]
         return indices
@@ -186,15 +185,13 @@ class Dataset:
 
         for t in product(*[l for v,l in labels[:-1]]):
             z = zip(ivs,t)
+            print "z", z
 
             i = [Ellipsis] * len(ds.data.shape)
             j = [Ellipsis] * len(self.data.shape)
             for v,l in z:
                 i[ds.index_from_var[v]] = ds.index_from_level[(v,l)]
                 j[self.index_from_var[v]] = self.index_from_level[(v,l)]
-            print "i",i
-            print "ds.data[i]",ds.data[i]
-            print "self.data[j].flatten()", self.data[j].flatten()
             ds.data[i] = self.data[j].flatten()
 
         return ds
@@ -203,9 +200,7 @@ class Dataset:
         return DatasetView(self, var_dict, looks)
 
     def view(self, var_dict=None, looks=None):
-        print "view: var_dict",var_dict
         v = self._view(var_dict, looks)
-        print "view: v.vardict", v.var_dict
         d = v.as_dataset()
         return d._view(var_dict)
 
@@ -301,8 +296,6 @@ def from_csv(csv_path, dv, ivs=None):
 
     ds = Dataset()
     ds.data = array
-    print "design_list", design_list
-    print "--->", tuple((v,l) for v,l in design_list if (v in ivs or v == dv))
     ds.labels = tuple((v,l) for v,l in design_list if v in ivs or v == dv)
     ds.design = dict(design_list)
     ds.dv = dv
