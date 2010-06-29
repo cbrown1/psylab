@@ -207,7 +207,7 @@ def from_csv(csv_path, dv):
     # Prepare a row for `np.rec.fromrecs`
     def format_row(row):
         row = [x.strip().strip("'").strip('"') for x in row if x is not dv]
-        row[dv_index] = np.float64(row[dv_index])
+        row[dv_index] = np.float32(row[dv_index])
         return tuple(row)
 
     # A temporary recarray for computing other values
