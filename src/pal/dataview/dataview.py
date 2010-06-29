@@ -159,7 +159,7 @@ class Dataset:
                                      # terminated, so it should point to
                                      # the last axis, as desired.
 
-        ivs = tuple(x for x in self.ivs if x in var_dict)
+        ivs = tuple(v for v,l in labels[:-1] if v in var_dict)
 
         # How many data points will be extracted based on vars
         size = 0
@@ -185,7 +185,6 @@ class Dataset:
 
         for t in product(*[l for v,l in labels[:-1]]):
             z = zip(ivs,t)
-            print "z", z
 
             i = [Ellipsis] * len(ds.data.shape)
             j = [Ellipsis] * len(self.data.shape)
@@ -305,7 +304,6 @@ def from_csv(csv_path, dv, ivs=None):
     ds.comments = comments
 
     return ds
-
 
 class DatasetView:
     def __init__(self, ds, var_dict=None, looks=None):
