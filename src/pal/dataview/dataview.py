@@ -386,4 +386,4 @@ class DatasetView:
         return self.dataset.from_var_dict(self.var_dict)
 
     def levels(self, var):
-        return np.array([t[self.index_from_var[var]] for t in self.treatments])
+        return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
