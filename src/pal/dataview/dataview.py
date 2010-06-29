@@ -322,7 +322,7 @@ def from_csv(csv_path, dv, ivs=None):
     return ds
 
 class DatasetView:
-    '''Allows you to view only the specified varaiables and levels. 
+    '''Allows you to view only the specified variables and levels. 
     
         The var_dict should have variable names as keys, and lists of 
         levels as vals. You can also specify a 'looks' variable, which is 
