@@ -46,13 +46,15 @@ from scipy.stats import nanmean
 import pal.stats
 
 class Dataset:
-    """Representation of experimental data with one dependent variable.
+    """Representation of a set of data with one dependent variable.
 
     Attributes
     ----------
     data : ndarray
         Each axis represents a variable, and each coordinate along that
-        axis represents a level in that variable.
+        axis represents a level of that variable. So, the data object 
+        is a fully factorialized representation. nan's are used when 
+        treatments contain no data.
 
     labels : tuple of tuple
         Label for each axis and coordinate on that axis.
@@ -199,12 +201,26 @@ class Dataset:
         return DatasetView(self, var_dict, looks)
 
     def view(self, var_dict=None, looks=None):
-        v = self._view(var_dict, None)
+        var_dict1 = var_dict
+        if looks not in var_dict:
+            var_dict1[looks] = []
+        v = self._view(var_dict1, None)
         d = v.as_dataset()
         return d._view(var_dict, looks)
 
 
 def from_csv(csv_path, dv, ivs=None):
+    '''Create a Datset object from a csv file
+        
+        The dv variable is expected to be numeric, the levels of all other 
+        variables are treated as strings. in cases where there are many 
+        levels of many variables, you can pass a list of variables that you 
+        are interested in, and only those will be used. 
+        
+        Header lines (lines at the beginning of the file that begin with '#')
+        are skipped (the text is stored in 'comments').
+    '''
+    
     ds = Dataset()
 
     file_data = csv.reader(open(csv_path))
@@ -306,6 +322,15 @@ def from_csv(csv_path, dv, ivs=None):
     return ds
 
 class DatasetView:
+    '''Allows you to view only the specified varaiables and levels. 
+    
+        The var_dict should have variable names as keys, and lists of 
+        levels as vals. You can also specify a 'looks' variable, which is 
+        useful in the 'multiple looks' situaion (for example, when the same 
+        subject generates more than one data point in a treatment, the 
+        variable that codes for subject would be the looks variable). 
+    '''
+    
     def __init__(self, ds, var_dict=None, looks=None):
         # Stats
         self.dataset = ds
@@ -331,6 +356,7 @@ class DatasetView:
                                         product(*indexPrototype)])
         self.var_dict = var_dict
 
+        print ds.index_from_var
         if looks != None:
             looks_index = ds.index_from_var[looks]
             if looks_index == 0: # No need to swap
@@ -386,4 +412,11 @@ class DatasetView:
         return self.dataset.from_var_dict(self.var_dict)
 
     def levels(self, var):
+        '''Returns an array of codes for a given variable name
+        
+            This is a convenience function to return an array of 
+            labels that is the same length as the properties 'mean,' 
+            'n,' etc. This is useful, eg., when plotting, to easily
+            generate axis labels.
+        '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
