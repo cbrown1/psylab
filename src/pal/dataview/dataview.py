@@ -70,7 +70,7 @@ class Dataset:
     ivs = None
     labels = None
     design = None
-    index_from_var = None
+    index_from_ = None
     index_from_level = None
     comments = ""
 
@@ -197,16 +197,19 @@ class Dataset:
 
         return ds
 
-    def _view(self, var_dict, looks):
-        return DatasetView(self, var_dict, looks)
-
     def view(self, var_dict=None, looks=None):
-        var_dict1 = var_dict.copy()
-        if looks not in var_dict:
-            var_dict1[looks] = []
-        v = self._view(var_dict1, None)
-        d = v.as_dataset()
-        return d._view(var_dict, looks)
+        if var_dict == None:
+            var_dict1 = None
+        else:
+            var_dict1 = var_dict.copy()
+            if looks not in var_dict1:
+                var_dict1[looks] = []
+
+        v1 = DatasetView(self, var_dict, looks)
+        d = v1.as_dataset()
+        v2 = DatasetView(d, var_dict)
+
+        return v2
 
 
 def from_csv(csv_path, dv, ivs=None):
