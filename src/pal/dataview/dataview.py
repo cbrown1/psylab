@@ -204,9 +204,11 @@ class Dataset:
             var_dict1 = var_dict.copy()
             if looks not in var_dict1:
                 var_dict1[looks] = []
+        print "var_dict", var_dict
+        print "var_dict1", var_dict1
 
-        v1 = DatasetView(self, var_dict, looks)
-        d = v1.as_dataset()
+        v1 = DatasetView(self, var_dict1, looks)
+        d = v1.as_dataset().from_var_dict(var_dict)
         v2 = DatasetView(d, var_dict)
 
         return v2
@@ -352,12 +354,16 @@ class DatasetView:
                                         product(*[ds.design[x] for x in ds.ivs])])
             var_dict = dict([(v,l) for (v,l) in ds.labels if v != ds.dv])
         else:
+            print "else"
             indexPrototype = [[Ellipsis] for x in ds.data.shape]
             for k in var_dict:
+                if var_dict[k] == []:
+                    var_dict[k] = ds.design[k]
                 indexPrototype[ds.index_from_var[k]] = var_dict[k]
             self.treatments = np.array([str(x) for x in
                                         product(*indexPrototype)])
         self.var_dict = var_dict.copy()
+        print "treatments", self.treatments
 
         print ds.index_from_var
         if looks != None:
