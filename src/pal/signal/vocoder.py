@@ -34,10 +34,10 @@ import numpy as np
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 from tone import tone
 
-def vocoder(vect, fs, channels, **kwargs):
+def vocoder(signal, fs, channels, **kwargs):
     '''Implements an envelope vocoder
 
-        Vocodes the input vector using specified parameters.
+        Vocodes the input signal using specified parameters.
 
         You can specify a different frequency range for both input
         (analysis) and output, for a given number of channels (the output
@@ -50,7 +50,7 @@ def vocoder(vect, fs, channels, **kwargs):
 
         Parameters
         ----------
-        vect : array
+        signal : array
             The input signal
         fs : scalar
             The sampling frequency
@@ -89,13 +89,13 @@ def vocoder(vect, fs, channels, **kwargs):
     noise = kwargs.get('noise', False) ;
 
     if noise:
-        noisecarrier = np.random.randn(len(vect));
+        noisecarrier = np.random.randn(len(signal));
         noisecarrier = noisecarrier/max(np.abs(noisecarrier));
-    vect = vect - np.mean(vect);
+    signal = signal - np.mean(signal);
     nyq=np.float32(fs/2.);
     ininterval=np.log10(np.float32(inhi)/np.float32(inlo))/np.float32(channels);
     outinterval=np.log10(np.float32(outhi)/np.float32(outlo))/np.float32(channels);
-    summed_carriers = np.zeros(len(vect));
+    summed_carriers = np.zeros(len(signal));
     ord = 3;
     for i in range(channels):
         # Estimate filters
@@ -112,7 +112,7 @@ def vocoder(vect, fs, channels, **kwargs):
         [b_out_lp,a_out_lp]=filters.butter(3,(fouthi/nyq));
 
         ## Filter input
-        Sig_sub = lfilter(b_sub_hp, a_sub_hp, vect);
+        Sig_sub = lfilter(b_sub_hp, a_sub_hp, signal);
         Sig_sub = lfilter(b_sub_lp, a_sub_lp, Sig_sub);
         rms_Sig_sub = np.sqrt(np.mean(Sig_sub**2));
         Sig_env_sub = lfilter(b_env,a_env,np.maximum(Sig_sub,0));
@@ -120,11 +120,12 @@ def vocoder(vect, fs, channels, **kwargs):
             Mod_carrier = filtfilt(b_out_hp, a_out_hp, noisecarrier);
             Mod_carrier = filtfilt(b_out_lp, a_out_lp, Mod_carrier)*Sig_env_sub;
         else:
-            Mod_carrier = tone(np.ones(len(vect))*fcarrier,fs)*Sig_env_sub;
+            Mod_carrier = tone(np.ones(len(signal))*fcarrier,fs)*Sig_env_sub;
 
         ## Filter output
         Mod_carrier_filt = lfilter(b_out_hp, a_out_hp, Mod_carrier);
         Mod_carrier_filt = lfilter(b_out_lp, a_out_lp, Mod_carrier_filt);
         summed_carriers += Mod_carrier/np.sqrt(np.mean(Mod_carrier**2))*rms_Sig_sub;
-    return summed_carriers;
+    # Return the summed carriers, equated in rms to the original signal
+    return summed_carriers * ( np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(summed_carriers**2)) );
 

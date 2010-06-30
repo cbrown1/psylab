@@ -70,16 +70,16 @@ def tone(f, fs, dur, **kwargs):
 
         # Generate a 1000-Hz pure tone, with a sample rate of 22050, a
         # duration of 1s, an amplitude of +-.9, and a cosine starting phase
-        tone = sinegen(1000, 44100, 1000, amp=.9, phase=180);
+        t = tone(1000, 44100, 1000, amp=.9, phase=180);
 
         # Generate a tone with an amplitude that is 3 dB down from peak (+-1.0)
-        tone = sinegen(1000, 44100, 1000, amp=-3);
+        t = tone(1000, 44100, 1000, amp=-3);
 
         # Generate a linear tone sweep starting at 200 Hz and ending at 750 Hz
-        tone = sinegen((200, 750), 44100, 1000, amp=-3);
+        t = tone((200, 750), 44100, 1000, amp=-3);
 
         # Generate 2-Hz FM (with 50 Hz mod depth), on a 500-Hz carrier
-        fm = sinegen(sinegen(2, 44100, 1000) * 25 + 500, 44100);
+        fm = tone(tone(2, 44100, 1000) * 25 + 500, 44100);
 
     '''
 
