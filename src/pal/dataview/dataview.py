@@ -201,7 +201,7 @@ class Dataset:
         return DatasetView(self, var_dict, looks)
 
     def view(self, var_dict=None, looks=None):
-        var_dict1 = var_dict
+        var_dict1 = var_dict.copy()
         if looks not in var_dict:
             var_dict1[looks] = []
         v = self._view(var_dict1, None)
@@ -354,7 +354,7 @@ class DatasetView:
                 indexPrototype[ds.index_from_var[k]] = var_dict[k]
             self.treatments = np.array([str(x) for x in
                                         product(*indexPrototype)])
-        self.var_dict = var_dict
+        self.var_dict = var_dict.copy()
 
         print ds.index_from_var
         if looks != None:
