@@ -34,7 +34,7 @@ import numpy as np
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 from tone import tone
 
-def vocoder(signal, fs, channels, **kwargs):
+def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     '''Implements an envelope vocoder
 
         Vocodes the input signal using specified parameters.

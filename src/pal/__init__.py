@@ -41,7 +41,7 @@ __version__ = '0.1'
 from nan import nanproduct,nanmean
 from array import array
 from dataview import dataview
-from misc import csv_inspect, formatplot
+from misc import csv_inspect, formatplot, vocoder_overlap
 import signal
 import stats
 
