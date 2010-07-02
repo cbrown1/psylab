@@ -42,7 +42,7 @@
 import numpy as np
 import csv
 from itertools import product
-from scipy.stats import nanmean
+from scipy.stats import nanmean, nanstd
 import pal.stats
 
 class Dataset:
@@ -70,7 +70,7 @@ class Dataset:
     ivs = None
     labels = None
     design = None
-    index_from_ = None
+    index_from_var = None
     index_from_level = None
     comments = ""
 
@@ -202,10 +202,8 @@ class Dataset:
             var_dict1 = None
         else:
             var_dict1 = var_dict.copy()
-            if looks not in var_dict1:
+            if (looks != None) and (looks  not in var_dict1):
                 var_dict1[looks] = []
-        print "var_dict", var_dict
-        print "var_dict1", var_dict1
 
         v1 = DatasetView(self, var_dict1, looks)
         d = v1.as_dataset().from_var_dict(var_dict)
@@ -338,7 +336,7 @@ class DatasetView:
     
     def __init__(self, ds, var_dict=None, looks=None):
         # Stats
-        self.dataset = ds
+        self.dataset = None
         self.data = None
         self.treatments = None
         self.var_dict = var_dict
@@ -349,73 +347,126 @@ class DatasetView:
         self.se = None
         self.n = None
 
-        if var_dict == None:
-            self.treatments = np.array([str(x) for x in 
-                                        product(*[ds.design[x] for x in ds.ivs])])
-            var_dict = dict([(v,l) for (v,l) in ds.labels if v != ds.dv])
-        else:
-            print "else"
-            indexPrototype = [[Ellipsis] for x in ds.data.shape]
-            for k in var_dict:
-                if var_dict[k] == []:
-                    var_dict[k] = ds.design[k]
-                indexPrototype[ds.index_from_var[k]] = var_dict[k]
-            self.treatments = np.array([str(x) for x in
-                                        product(*indexPrototype)])
-        self.var_dict = var_dict.copy()
-        print "treatments", self.treatments
+        # Since `[]` values of `var_dict` are shorthand for "all levels",
+        # expand them using the level information in `ds`
+        for v in var_dict:
+            if var_dict[v] == []:
+                var_dict[v] = ds.design[v]
 
-        print ds.index_from_var
+        dv = ds.dv
+
+        labels = []
+        for (v,l) in ds.labels:
+            if v in var_dict:
+                labels.append((v,tuple(var_dict[v])))
+            elif v == looks:
+                labels.append((v,ds.design[v]))
+            elif v == ds.dv:
+                labels.append((v,None))
+        labels = tuple(labels)
+
+        treatments = {}
+        for t in product(*[zip((v,)*len(l), [[x] for x in l]) 
+                           for (v,l) in labels[:-1]]):
+            dt = dict(t)
+            t = tuple(l[0] for (v,l) in t) # Unbox levels coordinate,
+                                           # make suitable for hashing
+            indices = ds.indices_from_vars(dt)
+            idata = np.array([x for x in np.array([ds.data[i] 
+                                                   for i in indices]).flatten()
+                              if np.isfinite(x)])
+            treatments[t] = idata
+
+        dv_size = max(map(len, treatments.values()))
+
+        shape = tuple(len(l) for (v,l) in labels[:-1]) + (dv_size,)
+
+        data = np.ones(shape) * np.nan
+
+        # Populate indexing dictionaries.
+        # Will be recomputed after axis switches.
+        index_from_var = {}
+        index_from_level = {}
+        i = 0
+        for (v,l) in labels:
+            if v == dv:
+                index_from_var[v] = i
+            else:
+                index_from_var[v] = i
+                j = 0
+                for lvl in l:
+                    index_from_level[(v,lvl)] = j
+                    j += 1
+            i += 1
+
+        # Update values of `data`
+        for t,d in treatments.iteritems():
+            i = tuple(index_from_level[(x,y)] for (x,y) in 
+                      zip(tuple(tuple(v for (v,l) in labels[:-1])), t))
+            j = 0
+            for x in d:
+                data[i + (j,)] = x
+                j += 1
+
+        # Take mean wrt to `looks` variable
         if looks != None:
-            looks_index = ds.index_from_var[looks]
-            if looks_index == 0: # No need to swap
-                sh = ds.data.shape[:-1] + (1,)
-                self.data = nanmean(ds.data, -1).reshape(sh)
+            if looks in var_dict:
+                # ...then we don't need to recompute indexing
+                data = nanmean(data, index_from_var[dv]).reshape(shape[:-1] + (1,))
             else:
-                self.data = ds.data.swapaxes(0, looks_index)
-                sh = self.data.shape[:-1] + (1,)
-                self.data = nanmean(self.data, -1).reshape(sh)
-                self.data = self.data.swapaxes(0, looks_index)
-        else:
-            sh = ds.data.shape[:-1] + (1,)
-            self.data = nanmean(ds.data, -1).reshape(sh)
+                j = index_from_var[looks] # index we are deleting
+                index_from_var.pop(looks)
 
-        self.n = np.ones(shape=self.treatments.shape)
-        self.mean = np.ones(shape=self.treatments.shape)
-        self.sd = np.ones(shape=self.treatments.shape)
-        self.se = np.ones(shape=self.treatments.shape)
+                for v,i in index_from_var.iteritems():
+                    if j <= index_from_var[v]:
+                        index_from_var[v] -= 1
 
-        def index_from_tuple(t):
-            index = [Ellipsis] * len(self.data.shape)
+                data = nanmean(data, -1).reshape(shape[:-1] + (1,))
+                dv_size = len(ds.design[looks])
+                shape = tuple(len(l) for (v,l) in labels if v in var_dict) + (dv_size,)
+                data = data.swapaxes(-2, j).reshape(shape)
+                labels = tuple((v,l) for (v,l) in labels if v != looks)
 
-            for i in xrange(len(ds.ivs)):
-                var = ds.ivs[i]
-                j = ds.index_from_var[var]
-                if t[i] == Ellipsis:
-                    index[j] = Ellipsis
-                else:
-                    index[j] = ds.index_from_level[(var,t[i])]
-            return tuple(index)
+        self.dataset = Dataset()
+        self.dataset.data = data
+        self.dataset.dv = dv
+        self.dataset.ivs = tuple(v for (v,l) in labels[:-1])
+        self.dataset.labels = labels
+        self.dataset.design = dict(labels)
+        self.dataset.index_from_var = index_from_var
+        self.dataset.index_from_level = index_from_level
 
-        for i in xrange(len(self.treatments)):
-            t = eval(self.treatments[i])
-            j = index_from_tuple(t)
-            jdata = np.array([x for x in self.data[j].flatten() if not np.isnan(x)])
-            
-            if looks is None:
-                kdata = np.array([x for x in ds.data[j].flatten() if not np.isnan(x)])
-                n = kdata.size
-                sd = kdata.std()
-            else:
-                n = jdata.size
-                sd = jdata.std()
-            mean = jdata.mean()
-            se = sd / np.sqrt(n)
-            
-            self.n[i] = n
-            self.mean[i] = mean
-            self.sd[i] = sd
-            self.se[i] = se
+        self.data = data
+        self.treatments = np.array([str(x) for x in 
+                                   product(*[l for (v,l) in 
+                                                  labels[:-1]])])
+        self.n = np.ones(self.treatments.shape)
+        self.mean = np.ones(self.treatments.shape)
+        self.sd = np.ones(self.treatments.shape)
+        self.se = np.ones(self.treatments.shape)
+
+        self.var_dict = var_dict
+        self.looks = looks
+
+        for i in xrange(self.treatments.size):
+            t = self.treatments[i]
+            index = tuple(self.dataset.index_from_level[(v,l)] for 
+                     (v,l) in zip(self.dataset.ivs, eval(t)))
+            index = index + (Ellipsis,)
+            loop_data = self.data[index]
+
+            self.n[i] = len(tuple(x for x in loop_data if np.isfinite(x)))
+            self.mean[i] = nanmean(loop_data)
+            self.sd[i] = nanstd(loop_data)
+            self.se[i] = self.sd[i] / np.sqrt(self.n[i])
+
+        self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for 
+                                                  t in self.treatments),
+                                            self.n,
+                                            self.mean,
+                                            self.sd,
+                                            self.se),
+                                        names="treatment,n,mean,sd,se")
 
     def as_dataset(self):
         return self.dataset.from_var_dict(self.var_dict)
