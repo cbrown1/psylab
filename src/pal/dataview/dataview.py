@@ -217,8 +217,9 @@ def from_csv(csv_path, dv, ivs=None):
         
         The dv variable is expected to be numeric, the levels of all other 
         variables are treated as strings. in cases where there are many 
-        levels of many variables, you can pass a list of variables that you 
-        are interested in, and only those will be used. 
+        levels of many variables but you aren't interested in all of them, 
+        you can pass a list of variables that you are interested in, and 
+        only those will be used. 
         
         Header lines (lines at the beginning of the file that begin with '#')
         are skipped (the text is stored in 'comments').
