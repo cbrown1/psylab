@@ -93,15 +93,11 @@ from equate import equate
 from frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from f0 import f0
 from gammatone import gammatone, filterbank
-from hcomplex import hcomplex
 from interp import interp_bad, interp_lin, interp_spline
-from irn import irn
 from magspec import magspec
 from mix import mix
-from mls import mls
 from ms2samp import ms2samp
 from normalize import normalize
-from pink import pink
 from ramps import ramps
 from rir import rir, fconv
 from samp2ms import samp2ms
@@ -109,8 +105,8 @@ from smooth import smooth
 from specgram import specgram
 from specplot import specplot
 from t60 import t60
-from tone import tone
 from vocoder import vocoder
+from waveforms import hcomplex, irn, mls, pink, tone
 from waveio import wavread, wavwrite
 #from wavplay import wavplay
 from zeropad import zeropad
