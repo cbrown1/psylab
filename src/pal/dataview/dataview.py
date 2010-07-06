@@ -37,6 +37,8 @@
     plotting, analysis, etc.. The main class is DataSet, which loads your data
     into an ndarray. DataSetView allows you to pass a dictionary of variable 
     names as keys, and lists of levels as values, to view only those data. 
+    
+    
 '''
 
 import numpy as np
@@ -477,6 +479,6 @@ class DatasetView:
             This is a convenience function to return an array of 
             labels that is the same length as the properties 'mean,' 
             'n,' etc. This is useful, eg., when plotting, to easily
-            generate axis labels.
+            generate axis labels. 
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
