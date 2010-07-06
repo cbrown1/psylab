@@ -41,7 +41,7 @@ def anova_table(anova_data):
 
     Parameters:
     -----------
-    anova_data : dict
+    anova_data : record array
         The output of an anova function
 
     Returns:
@@ -51,6 +51,7 @@ def anova_table(anova_data):
     """
     sourcetab = 8
     mintab = 10
+    sfmt = "%"+str(mintab)+".3g"
     for x in anova_data:
         if len(x[anova_data.dtype.names[0]]) > sourcetab:
             sourcetab = len(x[anova_data.dtype.names[0]])
@@ -61,15 +62,9 @@ def anova_table(anova_data):
     ret += "\n"
     for x in anova_data:
         ret += x[anova_data.dtype.names[0]] + " ".join('' for n in range(0, sourcetab - len(x[anova_data.dtype.names[0]])))
-        # TODO: Joe, is there any way to replace the 10 here with mintab?
-        ret += "%10.3g" % x[anova_data.dtype.names[1]]
-        ret += "%10.3g" % x[anova_data.dtype.names[2]]
-        if not np.isnan( x[anova_data.dtype.names[3]]):
-            ret += "%10.3g" % x[anova_data.dtype.names[3]]
-        if not np.isnan( x[anova_data.dtype.names[4]]):
-            ret += "%10.3g" % x[anova_data.dtype.names[4]]
-        if not np.isnan( x[anova_data.dtype.names[5]]):
-            ret += "%10.3g" % x[anova_data.dtype.names[5]]
+        for y in range(1,6):
+            if not np.isnan( x[anova_data.dtype.names[y]]):
+                ret += sfmt % x[anova_data.dtype.names[y]]
         if x['p'] < .001:
             ret += "  ***"
         elif x['p'] < .01:
@@ -241,9 +236,6 @@ def anova_within(data, subject_index=0, factors=None):
 
     subect_index : int
         The index of the axis of `data` which is the subject variable [default=0].
-
-    factors : list or tuple
-        String of human-readable factor names.
 
     Returns:
     --------

@@ -219,8 +219,9 @@ def from_csv(csv_path, dv, ivs=None):
         
         The dv variable is expected to be numeric, the levels of all other 
         variables are treated as strings. in cases where there are many 
-        levels of many variables, you can pass a list of variables that you 
-        are interested in, and only those will be used. 
+        levels of many variables but you aren't interested in all of them, 
+        you can pass a list of variables that you are interested in, and 
+        only those will be used. 
         
         Header lines (lines at the beginning of the file that begin with '#')
         are skipped (the text is stored in 'comments').
@@ -256,6 +257,111 @@ def from_csv(csv_path, dv, ivs=None):
 
     # A temporary recarray for computing other values
     temp_array = np.rec.fromrecords(map(format_row, file_data), names=labels)
+
+    # Compute index mappings
+    index_from_var = {}
+    index_from_level = {}
+    shape = [0 for x in [y for y in labels[:-1] if y in ivs]]
+
+    i = 0
+    for v in ivs:
+        index_from_var[v] = i
+        j = 0
+        unique = set(temp_array[v])
+        for l in unique:
+            index_from_level[(v,l)] = j
+            j += 1
+        shape[i] = len(unique)
+        i += 1
+
+    axis_from_var = dict([x[::-1] for x in index_from_var.iteritems()])
+
+    treatments = {}
+    for r in temp_array:
+        key = tuple(r[v] for v in ivs)
+        if key in treatments:
+            treatments[key].append(r[dv])
+        else:
+            treatments[key] = [r[dv]]
+    
+    # Find the shape of the ndarray
+    max_looks = max(map(len, treatments.values()))
+    shape.append(max_looks)
+
+    array = np.ones(shape) * np.nan
+
+    proto_index = [0] * len(ivs)
+    def treatment_to_index(t):
+        index = proto_index
+        i = 0
+        for v in ivs:
+            index[i] = index_from_level[(v,t[i])]
+            i += 1
+        return tuple(index)
+
+    for t,vals in treatments.iteritems():
+        index = treatment_to_index(t)
+        i = 0
+        for v in vals:
+            array[index+(i,)] = v
+            i += 1
+
+    items = index_from_level.items()
+    design_list = []
+
+    for var in labels:
+        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
+        if t[0] == dv:
+            t = (t[0], None)
+        design_list.append(t)
+
+    ds = Dataset()
+    ds.data = array
+    ds.labels = tuple((v,l) for v,l in design_list if v in ivs or v == dv)
+    ds.design = dict(design_list)
+    ds.dv = dv
+    ds.ivs = ivs
+    ds.index_from_var = index_from_var
+    ds.index_from_level = index_from_level
+    ds.comments = comments
+
+    return ds
+
+def from_arrays(labels=None, *args):
+    '''Create a Datset object from a csv file
+        
+        The dv variable is expected to be numeric, the levels of all other 
+        variables are treated as strings. in cases where there are many 
+        levels of many variables but you aren't interested in all of them, 
+        you can pass a list of variables that you are interested in, and 
+        only those will be used. 
+        
+        Header lines (lines at the beginning of the file that begin with '#')
+        are skipped (the text is stored in 'comments').
+    '''
+    assert len(args) > 2
+    assert np.all([type(x) == type(np.ones(1)) for x in args])
+        
+    if arr_vars == None:
+        num_vars = len(args) - 1
+        if num_vars <= 26: # If the factor dimensions can be mapped to       
+                              # letters of the alphabet...                   
+            labels = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:num_factors]]
+        else: # just give them indexed dummy names                              
+            labels = tuple("F%s" % (i) for i in xrange(num_vars))
+        dv = "dv"
+        labels.append(dv)
+    else:
+        dv = labels[-1]
+
+    ds = Dataset()
+
+    comments = ""
+
+    ivs = labels[:-1]
+
+    # A temporary recarray for computing other values
+    temp_array = np.rec.fromrecords(zip(args), names=labels)
 
     # Compute index mappings
     index_from_var = {}

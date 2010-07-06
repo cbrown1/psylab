@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from distutils.core import setup
+import sys
+sys.path.append("src")
+
+import pal
+version = pal.__version__
 
 packages = ['pal'+p for p in ['.signal', '.dataview',
                                 '.stats', '.misc', '.array']]
-
 setup(name='PAL',
-      version='0.1',
+      version=version,
       description='PsychoAcoustics Lab',
       author='Christopher Brown, Joseph Ranweiler',
       author_email='c-b@asu.edu',
