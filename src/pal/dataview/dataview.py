@@ -328,31 +328,26 @@ def from_csv(csv_path, dv, ivs=None):
     return ds
 
 def from_arrays(labels=None, *args):
-    """Create a Datset object from a csv file
+    """Create a Datset object from a number of 1-dimensional arrays
         
-        The dv variable is expected to be numeric, the levels of all other 
-        variables are treated as strings. in cases where there are many 
-        levels of many variables but you aren't interested in all of them, 
-        you can pass a list of variables that you are interested in, and 
-        only those will be used. 
-        
-        Header lines (lines at the beginning of the file that begin with '#')
-        are skipped (the text is stored in 'comments').
+        The first argument is a tuple of strings that represent the 
+        names of each variable. The last string should be the name of the
+        dependent variable. 
 
-    >>> import numpy as np
-    >>> import pal
-    >>> a = np.array("a1 a1 a2 a2".split(" "))
-    >>> b = np.array("b1 b2 b1 b2".split(" "))
-    >>> dv = np.array([1,2,3,4])
-    >>> d = pal.dataview.from_arrays(("A", "B", "dv"), a, b, dv)
-    >>> d.labels
-    (('A', ('a1', 'a2')), ('B', ('b1', 'b2')), ('dv', None))
-    >>> d.data
-    array([[[ 1.],
-            [ 2.]],
-    <BLANKLINE>
-           [[ 3.],
-            [ 4.]]])
+        >>> import numpy as np
+        >>> import pal
+        >>> a = np.array("a1 a1 a2 a2".split(" "))
+        >>> b = np.array("b1 b2 b1 b2".split(" "))
+        >>> dv = np.array([1,2,3,4])
+        >>> d = pal.dataview.from_arrays(("A", "B", "dv"), a, b, dv)
+        >>> d.labels
+        (('A', ('a1', 'a2')), ('B', ('b1', 'b2')), ('dv', None))
+        >>> d.data
+        array([[[ 1.],
+                [ 2.]],
+        <BLANKLINE>
+               [[ 3.],
+                [ 4.]]])
     """
     assert len(args) > 2
     assert np.all([type(x) == type(np.ones(1)) for x in args])
