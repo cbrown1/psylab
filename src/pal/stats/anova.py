@@ -51,17 +51,18 @@ def anova_table(anova_data):
     """
     sourcetab = 8
     mintab = 10
-    sfmt = "%"+str(mintab)+".3g"
+    sfmts = "%"+str(mintab)+"s"
+    sfmt = "%"+str(mintab)+".4g"
     for x in anova_data:
         if len(x[anova_data.dtype.names[0]]) > sourcetab:
             sourcetab = len(x[anova_data.dtype.names[0]])
     sourcetab += 1
-    ret = anova_data.dtype.names[0] + " ".join('' for n in range(0,sourcetab-len(anova_data.dtype.names[0])))
+    ret = anova_data.dtype.names[0] + " " * (sourcetab - len(anova_data.dtype.names[0]))
     for x in anova_data.dtype.names[1:]:
-        ret += " ".join('' for n in range(0,mintab-len(x)+1)) + x
+        ret += sfmts % x
     ret += "\n"
     for x in anova_data:
-        ret += x[anova_data.dtype.names[0]] + " ".join('' for n in range(0, sourcetab - len(x[anova_data.dtype.names[0]])))
+        ret += x[anova_data.dtype.names[0]] + " " * (sourcetab - len(x[anova_data.dtype.names[0]]))
         for y in range(1,6):
             if not np.isnan( x[anova_data.dtype.names[y]]):
                 ret += sfmt % x[anova_data.dtype.names[y]]
