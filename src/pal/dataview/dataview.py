@@ -328,7 +328,7 @@ def from_csv(csv_path, dv, ivs=None):
     return ds
 
 def from_arrays(labels=None, *args):
-    '''Create a Datset object from a csv file
+    """Create a Datset object from a csv file
         
         The dv variable is expected to be numeric, the levels of all other 
         variables are treated as strings. in cases where there are many 
@@ -338,11 +338,26 @@ def from_arrays(labels=None, *args):
         
         Header lines (lines at the beginning of the file that begin with '#')
         are skipped (the text is stored in 'comments').
-    '''
+
+    >>> import numpy as np
+    >>> import pal
+    >>> a = np.array("a1 a1 a2 a2".split(" "))
+    >>> b = np.array("b1 b2 b1 b2".split(" "))
+    >>> dv = np.array([1,2,3,4])
+    >>> d = pal.dataview.from_arrays(("A", "B", "dv"), a, b, dv)
+    >>> d.labels
+    (('A', ('a1', 'a2')), ('B', ('b1', 'b2')), ('dv', None))
+    >>> d.data
+    array([[[ 1.],
+            [ 2.]],
+    <BLANKLINE>
+           [[ 3.],
+            [ 4.]]])
+    """
     assert len(args) > 2
     assert np.all([type(x) == type(np.ones(1)) for x in args])
         
-    if arr_vars == None:
+    if labels == None:
         num_vars = len(args) - 1
         if num_vars <= 26: # If the factor dimensions can be mapped to       
                               # letters of the alphabet...                   
@@ -361,7 +376,7 @@ def from_arrays(labels=None, *args):
     ivs = labels[:-1]
 
     # A temporary recarray for computing other values
-    temp_array = np.rec.fromrecords(zip(args), names=labels)
+    temp_array = np.rec.fromrecords(zip(*args), names=tuple(labels))
 
     # Compute index mappings
     index_from_var = {}
