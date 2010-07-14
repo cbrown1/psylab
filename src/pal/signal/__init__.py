@@ -105,7 +105,7 @@ from smooth import smooth
 from specgram import specgram
 from specplot import specplot
 from t60 import t60
-from vocoder import vocoder
+from vocoder import vocoder, vocoder_overlap
 from waveforms import hcomplex, irn, mls, pink, tone
 from waveio import wavread, wavwrite
 #from wavplay import wavplay
