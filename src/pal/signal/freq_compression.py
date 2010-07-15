@@ -2,7 +2,16 @@ import numpy as np
 from numpy.fft import fft, ifft
 import interp
 
-def sola(x, window, overlap):
+def sola_dumb(x, window, overlap):
+    """Cheap SOLA implementation that doesn't attempt any overlap matching.
+
+    x : ndarray
+        Time-domain representation of the signal.
+    window : ndarray
+        Shape to ramp the summed timeslices of the signal.
+    overlap : int
+         Samples of overlap for each pair of summed windows.
+    """
     assert overlap <= len(window)
 
     y = np.zeros(x.size)
@@ -15,6 +24,8 @@ def sola(x, window, overlap):
         i += window_size - overlap
         j += window_size
     return y
+
+
 
 def freq_compress(signal, semitones, window, interp_func=interp.interp_lin):
     """Performs frequency compression on a signal

@@ -224,7 +224,7 @@ def mls(n, rand_seed=False):
     def generate_lfsr(n, use_rand_seed):
         toggle_mask = mls_bintaps[n]
         if use_rand_seed:
-            lfsr = np.uint32(random.randint(1, (2**n - 1)))
+            lfsr = np.uint32(np.random.randint(1, (2**n - 1)))
         else:
             lfsr = np.uint32(1)
 
