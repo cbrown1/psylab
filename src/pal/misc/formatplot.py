@@ -84,3 +84,8 @@ def set_ticklabelfontsize(ax, fontsize):
         tick.label1.set_fontsize(fontsize)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
+
+def set_legendtitlefontsize(ax, fontsize):
+    lh = ax.get_legend()
+    if lh != None:
+        lh.get_title().set_fontsize(fontsize)
