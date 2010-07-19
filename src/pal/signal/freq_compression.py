@@ -26,7 +26,6 @@ def sola_dumb(x, window, overlap):
     return y
 
 
-
 def freq_compress(signal, semitones, window, interp_func=interp.interp_lin):
     """Performs frequency compression on a signal
     
@@ -51,5 +50,5 @@ def freq_compress(signal, semitones, window, interp_func=interp.interp_lin):
     resample_factor = (2.0)**(float(semitones)/12)
     #print "1/resample_factor", 1./resample_factor
     over = (1 - 1./resample_factor) * ws
-    return sola(interp_func(signal, int(length * resample_factor)),
-                window, over)[:length]
+    return sola_dumb(interp_func(signal, int(length * resample_factor)),
+                     window, over)[:length]
