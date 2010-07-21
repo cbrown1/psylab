@@ -49,7 +49,7 @@ def solafs_offline(x, w_ov, s_s, s_a, k_max):
     alpha < 1 implies time-domain compression.
     
     Currently very low-performance due to lots of inefficient
-    arithmetic operations occurring at the Python level.
+    arithmetic operations occurring at the Python level. 
     
     Parameters
     ----------
@@ -153,7 +153,7 @@ def freq_compress(x, semitones, window,
         y = interp_func(y, x.size)
         return y
     elif tdsalg == "solafs":
-        y = solafs_offline(x, int(w_ov), ws, int(ws/alpha), k_max)
+        y = solafs_offline(x, int(w_ov), ws, int(ws*alpha), k_max)
         y = interp_func(y, int(x.size))
         return y
     else:
