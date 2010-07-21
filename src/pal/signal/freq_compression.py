@@ -150,7 +150,7 @@ def freq_compress(x, semitones, window,
     w_ov = (1 - 1./alpha) * ws
     if tdsalg == "tdhs":
         y = tdhs(x, window, w_ov)
-        y = interp_func(y, x.size)
+        y = interp_func(y, int(x.size * alpha))[:x.size]
         return y
     elif tdsalg == "solafs":
         y = solafs_offline(x, int(w_ov), ws, int(ws*alpha), k_max)
