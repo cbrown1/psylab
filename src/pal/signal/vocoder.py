@@ -120,7 +120,7 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
             Mod_carrier = filtfilt(b_out_hp, a_out_hp, noisecarrier);
             Mod_carrier = filtfilt(b_out_lp, a_out_lp, Mod_carrier)*Sig_env_sub;
         else:
-            Mod_carrier = tone(np.ones(len(signal))*fcarrier,fs)*Sig_env_sub;
+            Mod_carrier = tone(np.ones(len(signal))*fcarrier,fs,1)*Sig_env_sub;
 
         ## Filter output
         Mod_carrier_filt = lfilter(b_out_hp, a_out_hp, Mod_carrier);
