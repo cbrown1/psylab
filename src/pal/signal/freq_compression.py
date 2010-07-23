@@ -69,7 +69,7 @@ def solafs_offline(x, w_ov, s_s, s_a, k_max):
         Maximum window offset for the next window to add.
     """
     alpha = float(s_s)/s_a
-    beta = np.hanning(w_ov)
+    beta = np.linspace(1,0,w_ov)
 
     w = s_s + w_ov
 
