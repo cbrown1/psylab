@@ -31,33 +31,34 @@
 #
 
 """
-    pa4 - functions to control TDT pa4 attenuators using the serial port
+    pa4 - functions to control TDT PA4 attenuators using the serial port
 
-    functions include:
-
+    Functions
+    ---------
     set_atten(device, atten, com='COM1')
         Sets the specified attenuation level on the specified device.
-        Device 1 is the first module in the first xbus, etc. Atten is
-        a float in dB, between 0 <= 99.9. com is the serial port used.
 
     get_atten(device, com='COM1')
         Gets the current attenuation level on the specified device.
 
     set_mute(device, mute=False, com='COM1')
-        Sets the mute for the specified device. mute is a bool.
+        Sets the mute for the specified device. mute arg is a bool.
 
     find_pa4(com='COM1')
         Scans the first 32 device IDs, looking for PA4s.
 
-    To access pa4's via the serial port, set both jumpers on the back
-    of the OI1 to the RIGHT.
+    Notes
+    -----
+    To access pa4 modules via the serial port, set both jumpers on
+    the back of the OI1 to the RIGHT (jumpers to the left for AP2
+    control).
 
     These functions are based on C code from the House Ear Institute,
     provided by John Wygonski.
 
     Tested on windows and linux.
 
-    depends on pyserial
+    Depends on pyserial (http://sourceforge.net/projects/pyserial/)
 """
 
 import serial
@@ -78,6 +79,7 @@ def set_atten(dev, atten, port='COM1'):
         dev : int
             The device ID. Device 1 is the first module in the first
             xbus, etc.
+
         atten : int
             The amount of attenuation, in dB. Should be 0 <= 99.9
 
@@ -87,7 +89,7 @@ def set_atten(dev, atten, port='COM1'):
 
         Returns
         -------
-        None.
+        None. Raises exception on access error.
     '''
     d = chr(3+dev)         # device ID's start at 4
     b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
@@ -141,6 +143,7 @@ def get_atten(dev, port='COM1'):
         dev : int
             The device ID. Device 1 is the first module in the first
             xbus, etc.
+
         port : str
             The serial port to use. Default is 'COM1'. On my linux
             box, it is '/dev/ttyS0'
