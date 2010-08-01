@@ -38,9 +38,8 @@ PAL - Psychoacoustics Lab
 
 __version__ = '0.2'
 
-from nan import nanproduct,nanmean
-from array import array
+from array import array, nanproduct, nanmean
 from dataview import dataview
-#from misc import csv_inspect, formatplot
+from misc import csv_inspect, formatplot
 import signal
 import stats
