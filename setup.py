@@ -7,8 +7,14 @@ sys.path.append("src")
 import pal
 version = pal.__version__
 
-packages = ['pal'+p for p in ['', '.signal', '.dataview',
-                                '.stats', '.misc', '.array']]
+packages = ['pal%s' % (p) for p in ['',
+                                    '.array',
+                                    '.dataview',
+                                    '.exper',
+                                    '.hardware',
+                                    '.misc',
+                                    '.signal',
+                                    '.stats']]
 
 setup(name='PAL',
       version=version,
