@@ -7,8 +7,9 @@ sys.path.append("src")
 import pal
 version = pal.__version__
 
-packages = ['pal'+p for p in ['.signal', '.dataview',
+packages = ['pal'+p for p in ['', '.signal', '.dataview',
                                 '.stats', '.misc', '.array']]
+
 setup(name='PAL',
       version=version,
       description='PsychoAcoustics Lab',
