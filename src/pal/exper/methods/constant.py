@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler;
-# All Rights Reserved.
+# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,19 +30,24 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-'''
-PAL - Psychoacoustics Lab
-
-A loose collection of modules useful for various aspects of running
-psychoacoustics experiments, although several will be more generally
-useful.
+'''Method of constant stimuli
 
 '''
 
-__version__ = '0.3'
+def pre_exp(exp, run, var, stim, user):
+    # Check if there are enough stimuli
+    for stimset in stim.stimvars:
+        if stim.sets[stimset]['type'] != 'manual':
+            if not stim.sets[stimset]['repeat']:
+                if run.trialsperblock*var.nlevels_total > stim.sets[stimset]['n']:
+                    raise Exception,  "Not enough stimulus files for stimset: " + stimset + "\nNeeded for design: " + str(run.trialsperblock*var.nlevels_total) + "\nAvailable: " + str(stim.sets[stimset]['n'])
 
-from array import array, nanproduct, nanmean
-from dataview import dataview
-from misc import csv_inspect, formatplot
-import signal
-import stats
+def post_exp(exp, run, var, stim, user):
+    pass
+
+def post_trial(exp, run, var, stim, user):
+    run.stim_index = run.trial # Not used atm
+    if run.btrial == run.trialsperblock-1:
+        run.block_on = False
+    run.trial_on = False
+
