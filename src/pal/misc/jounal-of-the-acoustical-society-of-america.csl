@@ -289,7 +289,6 @@
     <option name="et-al-subsequent-use-first" value="1"/>
     <option name="disambiguate-add-year-suffix" value="true"/>
     <option name="disambiguate-add-names" value="true"/>
-    <option name="disambiguate-add-givenname" value="true"/>
     <option name="collapse" value="year"/>
     <sort>
       <key macro="author"/>
