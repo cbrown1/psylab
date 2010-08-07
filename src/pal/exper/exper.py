@@ -135,7 +135,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     settings.setup(exp,run,stim,var,user)
 
-    #method = __import__('methods',globals(), locals(), 'constant')
     try:
         methodi = __import__('methods',globals(), locals(), exp.method)
     except ImportError:
@@ -167,8 +166,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     else:
         exp.post_exp = method.post_exp
 
-    exp.utils.process_stimuli(stim)
-    exp.utils.process_variables(var)
     exp.utils.process_initialize(exp,run,var,stim,user)
     exp.recordData = recordData
     if exp.recordData:
@@ -176,44 +173,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             raise Exception, "Can't record data, variable not set: exp.dataString_Trial"
 
     if var.order == 'menu':
-        strtable = exp.utils.get_variable_strtable(var) + "\nSelected Conditions: ["
-        sel = []
-        conditions = []
-        for i in range(1,var.nlevels_total+1):
-            conditions.append(str(i))
-        while True:
-            disp = strtable
-            for s in sel:
-                disp += " " + s
-            disp += " ]\n\nMenu"
-            if not exp.recordData:
-                disp += "  [NO DATA WILL BE RECORDED]"
-            disp += ":\nCondition # - Add condition\n"
-            disp += "%11s - run exp using selected conditions in random order\n" % 'r'
-            disp += "%11s - run exp using selected conditions in selected order\n" % 's'
-            disp += "%11s - clear condition list\n" % 'c'
-            disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
-            ret = exp.term.get_input(parent=None, title = 'Exper!', prompt = disp)
-            if ret in conditions:
-                sel.append(ret)
-            elif ret in exp.quitKeys:
-                run.exper_is_go = False
-                break;
-            elif ret in ['c']:
-                sel = []
-            elif ret in ['r']:
-                sel = np.random.permutation(sel).tolist()
-                for s in sel:
-                    var.orderarray.append(int(s)-1)
-                var.nblocks = len(var.orderarray)
-                run.exper_is_go = True
-                break;
-            elif ret in ['s']:
-                for s in sel:
-                    var.orderarray.append(int(s)-1)
-                var.nblocks = len(var.orderarray)
-                run.exper_is_go = True
-                break;
+        exp.utils.menu_condition(exp,run,var,stim,user)
     else:
         if not exp.recordData:
             print "WARNING: No data will be recorded!"
@@ -232,9 +192,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(logstr, exp.logFile)
     run.exper_is_go = True
-    if exp.recordData:
-        thisdataString = exp.utils.get_expanded_vars_in_string(exp.dataString_Trial, exp, run, var, stim, user)
-        exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = True)
+    exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,stim,var,user)
@@ -249,9 +207,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             if exp.consoleString_Block != '':
                 thisString = exp.utils.get_expanded_vals_in_string(exp.consoleString_Block, exp, run, var, stim, user)
                 exp.utils.log(thisString,exp.logFile)
-            if exp.recordData and exp.dataString_Block != '':
-                thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user)
-                exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = False)
+            exp.utils.record_data(exp,run,var,stim,user, block=True)
 
             while run.block_on:
                 run.trial = (run.block*run.trialsperblock)+run.btrial
@@ -268,9 +224,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                 if exp.consoleString_Trial != '':
                     thisString = exp.utils.get_expanded_vals_in_string(exp.consoleString_Trial, exp, run, var, stim, user)
                     exp.utils.log(thisString,exp.logFile)
-                if exp.recordData:
-                    thisString = exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user)
-                    exp.utils.write_data(thisString, filename = exp.dataFile, onlyIfNew = False)
+                exp.utils.record_data(exp,run,var,stim,user)
 
                 run.btrial += 1
 

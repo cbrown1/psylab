@@ -156,8 +156,20 @@ class user:
 
 
 def process_initialize(exp,run,var,stim,user):
+    '''Do stuff necessary for the start of an experiment
+    '''
+    exp.utils.process_stimuli(stim)
+    exp.utils.process_variables(var)
     stim.debug = exp.debug
     var.debug = exp.debug
+    datapath = os.path.split(exp.dataFile)
+    if not os.path.isdir(datapath):
+        print "Creating datafile path: " + datapath
+        os.makedirs(datapath)
+    logpath = os.path.split(exp.logFile)
+    if not os.path.isdir(logpath):
+        print "Creating logfile path: " + logpath
+        os.makedirs(datapath)
     exp.dataFile_unexpanded = exp.dataFile
     exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
     exp.logFile_unexpanded = exp.logFile
@@ -321,6 +333,7 @@ def process_stimuli(stim):
                         stim.sets[stimset]['tokens'].append(thisn)
                 reset_stim_order(stim, stimset)
                 stim.sets[stimset]['n'] = len(stim.sets[stimset]['order_'])
+# End process_stimuli
 
 
 def get_current_variables(var, stim, condition):
@@ -331,6 +344,8 @@ def get_current_variables(var, stim, condition):
         var.current[v] = var.levelsbycond[v][condition]
 
 def get_variable_strtable(var):
+    '''Creates a table specifying the levels of each variable for each condition
+    '''
     vlength = {}
     out = "Condition"
     for v in var.varlist:
@@ -345,6 +360,49 @@ def get_variable_strtable(var):
             out += fmt % var.levelsbycond[v][i]
         out += "\n"
     return out
+
+def menu_condition(exp,run,var,stim,user):
+    '''Prompts the experiment to choose the conditions to run
+    '''
+    strtable = exp.utils.get_variable_strtable(var) + "\nSelected Conditions: ["
+    sel = []
+    conditions = []
+    for i in range(1,var.nlevels_total+1):
+        conditions.append(str(i))
+    while True:
+        disp = strtable
+        for s in sel:
+            disp += " " + s
+        disp += " ]\n\nMenu"
+        if not exp.recordData:
+            disp += "  [NO DATA WILL BE RECORDED]"
+        disp += ":\nCondition # - Add condition\n"
+        disp += "%11s - run exp using selected conditions in random order\n" % 'r'
+        disp += "%11s - run exp using selected conditions in selected order\n" % 's'
+        disp += "%11s - clear condition list\n" % 'c'
+        disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
+        ret = exp.term.get_input(parent=None, title = 'Exper!', prompt = disp)
+        if ret in conditions:
+            sel.append(ret)
+        elif ret in exp.quitKeys:
+            run.exper_is_go = False
+            break;
+        elif ret in ['c']:
+            sel = []
+        elif ret in ['r']:
+            sel = np.random.permutation(sel).tolist()
+            for s in sel:
+                var.orderarray.append(int(s)-1)
+            var.nblocks = len(var.orderarray)
+            run.exper_is_go = True
+            break;
+        elif ret in ['s']:
+            for s in sel:
+                var.orderarray.append(int(s)-1)
+            var.nblocks = len(var.orderarray)
+            run.exper_is_go = True
+            break;
+
 
 def get_current_stimulus(stim, stimset):
     '''Load the next stimulus for the specified stimulus set
@@ -372,6 +430,8 @@ def get_current_stimulus(stim, stimset):
 
 
 def reset_stim_order(stim, stimset):
+    '''Resets the order of stimuli
+    '''
     stim.current[stimset]['ind'] = -1
     if stim.sets[stimset]['order'] == 'random':
         stim.sets[stimset]['order_'] = np.random.permutation(len(stim.sets[stimset]['tokens']))
@@ -382,11 +442,15 @@ def reset_stim_order(stim, stimset):
 
 
 def update_time(run):
+    '''Updates the date and time
+    '''
     run.time = datetime.datetime.now().strftime('%H:%M:%S')
     run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
 def log(message, tofile=None, toconsole = True):
+    '''Writes info to a log file, to the console, or both
+    '''
     if toconsole:
         print(message),
     if tofile is not None and tofile is not '':
@@ -399,6 +463,8 @@ def log(message, tofile=None, toconsole = True):
 
 
 def write_data(data, filename, onlyIfNew = True):
+    '''Saves data to a file
+    '''
     if not (onlyIfNew and os.path.isfile(filename)):
         if os.path.isfile(filename):
             text_file = open(filename, "a")
@@ -408,8 +474,25 @@ def write_data(data, filename, onlyIfNew = True):
         text_file.close()
 
 
-def get_frontend(exp, frontend):
+def record_data(exp,run,var,stim,user, header=False, block=False):
+    '''Expand data, write to file
+    '''
+    if exp.recordData:
+        if block:
+            if exp.dataString_Block != '':
+                thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user)
+                exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = False)
+        else:
+            if header:
+                thisdataString = exp.utils.get_expanded_vars_in_string(exp.dataString_Trial, exp, run, var, stim, user)
+            else:
+                thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user)
+            exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = header)
 
+
+def get_frontend(exp, frontend):
+    '''Tries to load the specified frontend
+    '''
     if frontend not in exp.frontendTypes:
         print 'Unknown frontend. Using tk'
         frontend = 'tk'
