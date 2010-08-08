@@ -64,6 +64,10 @@ rm -r deb
 
 cd ..
 
+# Clean
+rm -r build
+rm -r ${package}.egg-info
+
 # Make source & egg distributions
 #python setup.py sdist --formats zip,gztar
 #python setup.py bdist_egg
