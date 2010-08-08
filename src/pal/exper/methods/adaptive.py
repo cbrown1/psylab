@@ -67,7 +67,7 @@ class dynamic:
 
 
     def track(correct, exp,run,stim,var,user):
-        '''correct should a simple bool
+        '''correct should be a simple bool
         '''
         var.dynamic.values.append(var.dynamic.value)
         if correct:

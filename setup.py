@@ -37,6 +37,7 @@ setup(name='PAL',
       platforms = ['any'],
       classifiers = [
         'Development Status :: 4 - Beta',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
         'Operating System :: MacOS',

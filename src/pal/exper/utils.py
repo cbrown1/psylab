@@ -61,6 +61,7 @@ class exp:
     dataString_Block = '' #Write this string to datafile after every block
     dataFile ='$name.csv'
     dataFile_unexpanded =''
+    stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
     quitKeys = ['q', '/']
     responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
@@ -163,13 +164,13 @@ def process_initialize(exp,run,var,stim,user):
     stim.debug = exp.debug
     var.debug = exp.debug
     datapath = os.path.split(exp.dataFile)
-    if not os.path.isdir(datapath):
-        print "Creating datafile path: " + datapath
-        os.makedirs(datapath)
+    if not os.path.isdir(datapath[0]):
+        print "Creating datafile path: " + datapath[0]
+        os.makedirs(datapath[0])
     logpath = os.path.split(exp.logFile)
-    if not os.path.isdir(logpath):
-        print "Creating logfile path: " + logpath
-        os.makedirs(datapath)
+    if not os.path.isdir(logpath[0]):
+        print "Creating logfile path: " + logpath[0]
+        os.makedirs(logpath[0])
     exp.dataFile_unexpanded = exp.dataFile
     exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
     exp.logFile_unexpanded = exp.logFile
@@ -304,16 +305,25 @@ def process_stimuli(stim):
                 stim.sets[stimset]['name'] = stimset
                 stim.sets[stimset]['tokens'] = []
                 if 'text' in stim.sets[stimset] and stim.sets[stimset]['text'] != '':
+                    dlm_toks = ','
+                    if stim.sets[stimset]['txtfmt'] != '':
+                        if stim.sets[stimset]['txtfmt'].find(',') != -1:
+                            fmt_toks = stim.sets[stimset]['txtfmt'].split(',')
+                        else:
+                            fmt_toks = stim.sets[stimset]['txtfmt'].split(' ')
+                            dlm_toks = ' '
+                    else:
+                        fmt_toks = exp.stimtext_fmt.split(',')
                     thislisth = open(stim.sets[stimset]['text'], 'r')
                     thislist = thislisth.readlines()
                     thislisth.close()
                     thisset = {}
                     for line in thislist:
                         if line != "":
-                            thistext = line.split(' ',2)
+                            thistext = line.split(dlm_toks,len(fmt_toks)-1)
                             thisset[thistext[0]] = {}
-                            thisset[thistext[0]]['kw'] = thistext[1]
-                            thisset[thistext[0]]['text'] = thistext[2].strip()
+                            for tkn in fmt_toks:
+                                thisset[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
                 filelist = sorted(os.listdir(stim.sets[stimset]['path']))
                 masks = [x.strip() for x in stim.sets[stimset]['mask'].split(";")]
                 for filename in filelist:
@@ -405,7 +415,7 @@ def menu_condition(exp,run,var,stim,user):
 
 
 def get_current_stimulus(stim, stimset):
-    '''Load the next stimulus for the specified stimulus set
+    '''Load the next stimulus for each stimulus set
     '''
     stim.current[stimset]['ind'] += 1  # Index of index
     stim.current[stimset]['ind2'] = stim.sets[stimset]['order_'][stim.current[stimset]['ind']]
