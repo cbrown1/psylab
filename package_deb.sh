@@ -1,14 +1,17 @@
 #!/bin/bash -x
 
-# Get metadata
+# Set these as needed
 pyver=2.6
-architecture="i386";
+architecture="all"; #"i386";
+section='python';  # Most python packages seem to go here
 pybin="python${pyver}";
+
+# Get metadata
 ver=$(${pybin} setup.py --version);
 package=$(${pybin} setup.py --name);
 required="${pybin} (>=${pyver})"        # Require the python version being used
 req=$(${pybin} setup.py --requires);    # Look for package-specific requires
-if [ -n "$req" ]; then                  # And add them to the list
+if [ -n "$req" ]; then                  # prepend with 'python-' and add to list
     required=$(echo "${required}, python-${req}" | sed -n '1h;2,$H;${g;s/\n/, python-/g;p}');
 fi
 author=$(${pybin} setup.py --author);
@@ -39,29 +42,39 @@ fss=$(du -s deb)
 set -- $fss
 fs=$1
 
+cd deb
+
 # Create Deb control file
-mkdir -p deb/DEBIAN
-control="./deb/DEBIAN/control"
+mkdir -p DEBIAN
+control="./DEBIAN/control"
 touch "${control}" 2> /dev/null
 if [ -e "${control}" ] ; then
   echo "Package: python-${package}" > "${control}"
   echo "Version: ${ver}" >> "${control}"
+  if [ "$url" != "UNKNOWN" ]; then
+    echo "Homepage: ${url}" >> "${control}"
+  fi
   echo "Maintainer: ${maintainer} <${maintaineremail}>" >> "${control}"
   echo "Installed-Size: ${fs}" >> "${control}"
+  echo "Section: ${section}" >> "${control}"
   echo "Architecture: ${architecture}" >> "${control}"
   echo "Depends: ${required}" >> "${control}"
   echo "Description: ${description}" >> "${control}"
 fi
+
+md5sum `find . -type f | grep -v '^[.]/DEBIAN/'  | sed -e 's/.\///'` >DEBIAN/md5sums
+
+cd ..
 
 ## Copy documentation
 #mkdir -p deb/usr/share/doc/$package
 #cp ../docs/* deb/usr/share/doc/$package
 
 # Make deb package
-deb="${package}-${ver}-py${pyver}-${architecture}.deb"
+deb="${package}_${ver}_${architecture}.deb"
 dpkg-deb -b deb ${deb}
-rm -r deb
 
+rm -r deb
 cd ..
 
 # Clean
