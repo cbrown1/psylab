@@ -6,21 +6,21 @@ architecture="i386";
 pybin="python${pyver}";
 ver=$(${pybin} setup.py --version);
 package=$(${pybin} setup.py --name);
-required="${pybin} (>=${pyver})"
-req=$(${pybin} setup.py --requires);
-if [ -n "$req" ]; then
-required=$(echo "${required}, python-${req}" | sed -n '1h;2,$H;${g;s/\n/, python-/g;p}');
+required="${pybin} (>=${pyver})"        # Require the python version being used
+req=$(${pybin} setup.py --requires);    # Look for package-specific requires
+if [ -n "$req" ]; then                  # And add them to the list
+    required=$(echo "${required}, python-${req}" | sed -n '1h;2,$H;${g;s/\n/, python-/g;p}');
 fi
 author=$(${pybin} setup.py --author);
 authoremail=$(${pybin} setup.py --author-email);
 maintainer=$(${pybin} setup.py --maintainer);
 maintaineremail=$(${pybin} setup.py --maintainer-email);
-sdescription=$(${pybin} setup.py --description);
-ldescription=$(${pybin} setup.py --long-description);
+sdescription=$(${pybin} setup.py --description);      # Build deb description from py short desc
+ldescription=$(${pybin} setup.py --long-description); # and py long desc
 url=$(${pybin} setup.py --url);
-description=$(echo -e "${sdescription}\n${ldescription}");
+description=$(echo -e "${sdescription}\n${ldescription}"); # Add url to end of desc if present
 if [ "$url" != "UNKNOWN" ]; then
-description=$(echo -e "${description}\n ${url}");
+description=$(echo -e "${description}\n .\n ${url}");
 fi
 # Clean
 rm -r build
@@ -72,6 +72,7 @@ rm -r ${package}.egg-info
 #python setup.py sdist --formats zip,gztar
 #python setup.py bdist_egg
 
+# Upload
 #ftp -n $hostname <<EOF
 #quote USER $username
 #quote PASS $password
