@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from distutils.core import setup
+from setuptools import setup
 import sys
 sys.path.append("src")
 
@@ -15,10 +16,16 @@ packages = ['pal%s' % (p) for p in ['',
                                     '.misc',
                                     '.signal',
                                     '.stats']]
+requires=[
+'numpy (>=1.2)',
+]
 
 setup(name='PAL',
       version=version,
       description='PsychoAcoustics Lab',
+      long_description='''\
+ A loose collection of modules useful for various aspects of running psychoacoustics
+ experiments, although several will be more generally useful.''',
       author='Christopher Brown, Joseph Ranweiler',
       author_email='c-b@asu.edu',
       maintainer='Christopher Brown',
@@ -26,6 +33,7 @@ setup(name='PAL',
       url='',
       package_dir = {'pal': 'src/pal'},
       packages = packages,
+      requires = requires,
       platforms = ['any'],
       classifiers = [
         'Development Status :: 4 - Beta',
@@ -38,6 +46,7 @@ setup(name='PAL',
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Multimedia :: Sound/Audio :: Speech',
         'Topic :: Multimedia :: Sound/Audio :: Analysis',
         'Topic :: Scientific/Engineering',
