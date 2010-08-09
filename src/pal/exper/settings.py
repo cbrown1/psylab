@@ -52,11 +52,17 @@ def setup(exp,run,stim,var,user):
 
         There are several optional settings for soundfiles:
 
-        'text' is the full path to a text file with the corresponding text
-                [no text]. The format of the file should be one space-delimited
-                line per token in the format: 'CUNY001 4 They LOOKED UP at the
-                BLUE SKY.' where CUNY001 is the filename [no extension], 4 is the
-                number of keywords, and the rest of the line is the text.
+        'text' is the full path to a text file that specifies text for each token.
+                There should be one line per token, and the format can be
+                specified (see below).
+
+        'txtfmt' If you're using a text file, you can specify the format here.
+                  You can specify 3 values, 'file', 'kw', and 'text'. The default
+                  format is 'file,kw,text' which in your file would look like:
+                  'CUNY001,4,They LOOKED UP at the BLUE SKY.' where CUNY001 is
+                  the filename [no extension], 4 is the number of keywords, and
+                  the rest of the line is the text. The text should always be
+                  last on the line, and the delimiter can be a comma or a space.
 
         'mask' is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
 
@@ -80,6 +86,7 @@ def setup(exp,run,stim,var,user):
                               'path':   os.path.join(basedir,'stim','CUNYf'),
                               'fs'  :   44100,
                               'text':   os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
+                              'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
                               'load':   'auto',  # 'auto' = Load stimuli automatically (default)
                               'order':  '1:10', #
