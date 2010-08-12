@@ -27,6 +27,7 @@ def setup(exp,run,stim,var,user):
     exp.debug = True
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
+    exp.cacheTrials = False
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid responses
     exp.note = 'CI Pilot data'
     exp.comments = '''ci_fmam: CI Pilot data
@@ -278,7 +279,7 @@ def prompt_response(exp,run,stim,var,user):
         ret = exp.term.get_input(None, "Exper!",p)
         if ret in exp.validKeys_:
             run.response = ret
-            exp.utils.log(p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
+            exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
         elif ret in exp.quitKeys:
             run.block_on = False

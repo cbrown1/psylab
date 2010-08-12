@@ -153,6 +153,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         exp.pre_trial = settings.pre_trial
     else:
         raise Exception, "Function pre_trial must be specified in settings file"
+    if hasattr(settings, 'present_trial'):
+        exp.present_trial = settings.present_trial
+    else:
+        exp.present_trial = exp.utils.present_trial
     if hasattr(settings, 'post_trial'):
         exp.post_trial = settings.post_trial
     else:
@@ -190,7 +194,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     # Begin block loop
     exp.utils.update_time(run)
     logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
-    exp.utils.log(logstr, exp.logFile)
+    exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
     run.exper_is_go = True
     exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
@@ -204,9 +208,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
-            if exp.consoleString_Block != '':
-                thisString = exp.utils.get_expanded_vals_in_string(exp.consoleString_Block, exp, run, var, stim, user)
-                exp.utils.log(thisString,exp.logFile)
+            exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
 
             while run.block_on:
@@ -218,12 +220,11 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                         exp.utils.get_current_stimulus(stim, s)
                 while run.trial_on:
                     exp.pre_trial(exp,run,stim,var,user)
+                    exp.present_trial(exp,run,stim,var,user)
                     exp.prompt_response(exp,run,stim,var,user)
                     exp.post_trial(exp,run,stim,var,user);
 
-                if exp.consoleString_Trial != '':
-                    thisString = exp.utils.get_expanded_vals_in_string(exp.consoleString_Trial, exp, run, var, stim, user)
-                    exp.utils.log(thisString,exp.logFile)
+                exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
                 exp.utils.record_data(exp,run,var,stim,user)
 
                 run.btrial += 1
@@ -236,7 +237,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     # End block loop
     exp.utils.update_time(run)
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
-    exp.utils.log(logstr, exp.logFile)
+    exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 
 if __name__ == '__main__':
     settingsFile = None

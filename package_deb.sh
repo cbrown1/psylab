@@ -62,6 +62,7 @@ if [ -e "${control}" ] ; then
   echo "Description: ${description}" >> "${control}"
 fi
 
+# Create md5sum file
 md5sum `find . -type f | grep -v '^[.]/DEBIAN/'  | sed -e 's/.\///'` >DEBIAN/md5sums
 
 cd ..

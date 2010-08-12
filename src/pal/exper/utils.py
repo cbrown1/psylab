@@ -63,6 +63,7 @@ class exp:
     dataFile_unexpanded =''
     stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
+    cacheTrials = False
     quitKeys = ['q', '/']
     responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
     methodTypes = ['constant', 'staircase']
@@ -71,8 +72,6 @@ class exp:
     varTypes = ['stim', 'manual', 'dynamic']
     frontendTypes = ['qt', 'tk']
     from frontends import term
-    #t = __import__('frontends',globals(), locals(), 'term')
-    #term = getattr(t,'term')
 
     def prompt_response(self,exp,run,stim,var,user):
         while True:
@@ -458,18 +457,20 @@ def update_time(run):
     run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
-def log(message, tofile=None, toconsole = True):
+def log(exp,run,var,stim,user, message, tofile=None, toconsole = True):
     '''Writes info to a log file, to the console, or both
     '''
-    if toconsole:
-        print(message),
-    if tofile is not None and tofile is not '':
-        if not os.path.isfile(tofile):
-            text_file = open(tofile, "w")
-        else:
-            text_file = open(tofile, "a")
-        text_file.write(message)
-        text_file.close()
+    if message != '':
+        message = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
+        if toconsole:
+            print(message),
+        if tofile is not None and tofile is not '':
+            if not os.path.isfile(tofile):
+                text_file = open(tofile, "w")
+            else:
+                text_file = open(tofile, "a")
+            text_file.write(message)
+            text_file.close()
 
 
 def write_data(data, filename, onlyIfNew = True):
@@ -498,6 +499,10 @@ def record_data(exp,run,var,stim,user, header=False, block=False):
             else:
                 thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user)
             exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = header)
+
+
+def present_trial(exp,run,stim,var,user):
+    pass
 
 
 def get_frontend(exp, frontend):
