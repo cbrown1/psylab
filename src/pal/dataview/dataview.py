@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler; 
+# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler;
 # All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,36 +9,36 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
-#    * Redistributions of source code must retain the above copyright 
+#
+#    * Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright 
-#      notice, this list of conditions and the following disclaimer in 
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
 #      the documentation and/or other materials provided with the distribution
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
-# 
+#
 
 '''Provides views of your data
-    
-    Dataview allows you to easily extract subsets of a dataset to use for 
+
+    Dataview allows you to easily extract subsets of a dataset to use for
     plotting, analysis, etc.. The main class is DataSet, which loads your data
-    into an ndarray. DataSetView allows you to pass a dictionary of variable 
-    names as keys, and lists of levels as values, to view only those data. 
-    
-    
+    into an ndarray. DataSetView allows you to pass a dictionary of variable
+    names as keys, and lists of levels as values, to view only those data.
+
+
 '''
 
 import numpy as np
@@ -54,8 +54,8 @@ class Dataset:
     ----------
     data : ndarray
         Each axis represents a variable, and each coordinate along that
-        axis represents a level of that variable. So, the data object 
-        is a fully factorialized representation. nan's are used when 
+        axis represents a level of that variable. So, the data object
+        is a fully factorialized representation. nan's are used when
         treatments contain no data.
 
     labels : tuple of tuple
@@ -78,7 +78,7 @@ class Dataset:
 
     def anova_between(self):
         return pal.stats.anova.anova_between(self.data, self.ivs)
-    
+
     def anova_within(self, looks=None):
         if looks == None:
             return pal.stats.anova.anova_within(self.data,
@@ -216,23 +216,23 @@ class Dataset:
 
 def from_csv(csv_path, dv, ivs=None):
     '''Create a Datset object from a csv file
-        
-        The dv variable is expected to be numeric, the levels of all other 
-        variables are treated as strings. in cases where there are many 
-        levels of many variables but you aren't interested in all of them, 
-        you can pass a list of variables that you are interested in, and 
-        only those will be used. 
-        
+
+        The dv variable is expected to be numeric, the levels of all other
+        variables are treated as strings. in cases where there are many
+        levels of many variables but you aren't interested in all of them,
+        you can pass a list of variables that you are interested in, and
+        only those will be used.
+
         Header lines (lines at the beginning of the file that begin with '#')
         are skipped (the text is stored in 'comments').
     '''
-    
+
     ds = Dataset()
 
     file_data = csv.reader(open(csv_path))
     comments = ""
 
-    # Get the first line of the .csv that isn't blank or commented, 
+    # Get the first line of the .csv that isn't blank or commented,
     # which is assumed to be a row of labels for each column.
     for row in file_data:
         if len(row)==0:
@@ -283,7 +283,7 @@ def from_csv(csv_path, dv, ivs=None):
             treatments[key].append(r[dv])
         else:
             treatments[key] = [r[dv]]
-    
+
     # Find the shape of the ndarray
     max_looks = max(map(len, treatments.values()))
     shape.append(max_looks)
@@ -329,10 +329,10 @@ def from_csv(csv_path, dv, ivs=None):
 
 def from_arrays(labels=None, *args):
     """Create a Datset object from a number of 1-dimensional arrays
-        
-        The first argument is a tuple of strings that represent the 
+
+        The first argument is a tuple of strings that represent the
         names of each variable. The last string should be the name of the
-        dependent variable. 
+        dependent variable.
 
         >>> import numpy as np
         >>> import pal
@@ -351,13 +351,13 @@ def from_arrays(labels=None, *args):
     """
     assert len(args) > 2
     assert np.all([type(x) == type(np.ones(1)) for x in args])
-        
+
     if labels == None:
         num_vars = len(args) - 1
-        if num_vars <= 26: # If the factor dimensions can be mapped to       
-                              # letters of the alphabet...                   
+        if num_vars <= 26: # If the factor dimensions can be mapped to
+                              # letters of the alphabet...
             labels = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:num_factors]]
-        else: # just give them indexed dummy names                              
+        else: # just give them indexed dummy names
             labels = tuple("F%s" % (i) for i in xrange(num_vars))
         dv = "dv"
         labels.append(dv)
@@ -398,7 +398,7 @@ def from_arrays(labels=None, *args):
             treatments[key].append(r[dv])
         else:
             treatments[key] = [r[dv]]
-    
+
     # Find the shape of the ndarray
     max_looks = max(map(len, treatments.values()))
     shape.append(max_looks)
@@ -443,15 +443,15 @@ def from_arrays(labels=None, *args):
     return ds
 
 class DatasetView:
-    '''Allows you to view only the specified variables and levels. 
-    
-        The var_dict should have variable names as keys, and lists of 
-        levels as vals. You can also specify a 'looks' variable, which is 
-        useful in the 'multiple looks' situaion (for example, when the same 
-        subject generates more than one data point in a treatment, the 
-        variable that codes for subject would be the looks variable). 
+    '''Allows you to view only the specified variables and levels.
+
+        The var_dict should have variable names as keys, and lists of
+        levels as vals. You can also specify a 'looks' variable, which is
+        useful in the 'multiple looks' situaion (for example, when the same
+        subject generates more than one data point in a treatment, the
+        variable that codes for subject would be the looks variable).
     '''
-    
+
     def __init__(self, ds, var_dict=None, looks=None):
         # Stats
         self.dataset = None
@@ -484,13 +484,13 @@ class DatasetView:
         labels = tuple(labels)
 
         treatments = {}
-        for t in product(*[zip((v,)*len(l), [[x] for x in l]) 
+        for t in product(*[zip((v,)*len(l), [[x] for x in l])
                            for (v,l) in labels[:-1]]):
             dt = dict(t)
             t = tuple(l[0] for (v,l) in t) # Unbox levels coordinate,
                                            # make suitable for hashing
             indices = ds.indices_from_vars(dt)
-            idata = np.array([x for x in np.array([ds.data[i] 
+            idata = np.array([x for x in np.array([ds.data[i]
                                                    for i in indices]).flatten()
                               if np.isfinite(x)])
             treatments[t] = idata
@@ -519,7 +519,7 @@ class DatasetView:
 
         # Update values of `data`
         for t,d in treatments.iteritems():
-            i = tuple(index_from_level[(x,y)] for (x,y) in 
+            i = tuple(index_from_level[(x,y)] for (x,y) in
                       zip(tuple(tuple(v for (v,l) in labels[:-1])), t))
             j = 0
             for x in d:
@@ -548,15 +548,15 @@ class DatasetView:
         self.dataset = Dataset()
         self.dataset.data = data
         self.dataset.dv = dv
-        self.dataset.ivs = tuple(v for (v,l) in labels[:-1])
+        self.dataset.factors = tuple(v for (v,l) in labels[:-1])
         self.dataset.labels = labels
         self.dataset.design = dict(labels)
         self.dataset.index_from_var = index_from_var
         self.dataset.index_from_level = index_from_level
 
         self.data = data
-        self.treatments = np.array([str(x) for x in 
-                                   product(*[l for (v,l) in 
+        self.treatments = np.array([str(x) for x in
+                                   product(*[l for (v,l) in
                                                   labels[:-1]])])
         self.n = np.ones(self.treatments.shape)
         self.mean = np.ones(self.treatments.shape)
@@ -568,7 +568,7 @@ class DatasetView:
 
         for i in xrange(self.treatments.size):
             t = self.treatments[i]
-            index = tuple(self.dataset.index_from_level[(v,l)] for 
+            index = tuple(self.dataset.index_from_level[(v,l)] for
                      (v,l) in zip(self.dataset.ivs, eval(t)))
             index = index + (Ellipsis,)
             loop_data = self.data[index]
@@ -578,7 +578,7 @@ class DatasetView:
             self.sd[i] = nanstd(loop_data)
             self.se[i] = self.sd[i] / np.sqrt(self.n[i])
 
-        self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for 
+        self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for
                                                   t in self.treatments),
                                             self.n,
                                             self.mean,
@@ -591,10 +591,10 @@ class DatasetView:
 
     def levels(self, var):
         '''Returns an array of codes for a given variable name
-        
-            This is a convenience function to return an array of 
-            labels that is the same length as the properties 'mean,' 
+
+            This is a convenience function to return an array of
+            labels that is the same length as the properties 'mean,'
             'n,' etc. This is useful, eg., when plotting, to easily
-            generate axis labels. 
+            generate axis labels.
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
