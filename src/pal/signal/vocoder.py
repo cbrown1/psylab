@@ -72,6 +72,12 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
         noise : bool
             False for sinusoidal carriers [ default ]
             True for noise band carriers
+        sumchannels : bool
+            False to return a 2-d array in which each output channel is a column
+            True to return a 1-d array containing the summed output channels. The rms
+            will be equated to the rms of the input [ default ]
+        order : int
+            The filter order to use [ default = 3 ]
 
         Returns
         -------
@@ -87,6 +93,8 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     outhi = kwargs.get('outhi', inhi) ;
     envfilter = kwargs.get('envfilter', 400) ;
     noise = kwargs.get('noise', False) ;
+    sumchannels = kwargs.get('sumchannels', True) ;
+    ord = kwargs.get('order', 3) ;
 
     if noise:
         noisecarrier = np.random.randn(len(signal));
@@ -95,8 +103,11 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     nyq=np.float32(fs/2.);
     ininterval=np.log10(np.float32(inhi)/np.float32(inlo))/np.float32(channels);
     outinterval=np.log10(np.float32(outhi)/np.float32(outlo))/np.float32(channels);
-    summed_carriers = np.zeros(len(signal));
-    ord = 3;
+    if sumchannels:
+        carriers = np.zeros(len(signal));
+    else:
+        carriers = np.zeros((len(signal), channels));
+
     for i in range(channels):
         # Estimate filters
         finhi=np.float32(inlo)*10.**(ininterval*(i+1));
@@ -104,12 +115,12 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
         fouthi=np.float32(outlo)*10.**(outinterval*(i+1));
         foutlo=np.float32(outlo)*10.**(outinterval*i);
         fcarrier=.5*(fouthi+foutlo);
-        [b_sub_hp,a_sub_hp]=filters.butter(3,(finlo/nyq),btype='high');
-        [b_sub_lp,a_sub_lp]=filters.butter(3,(finhi/nyq));
+        [b_sub_hp,a_sub_hp]=filters.butter(ord,(finlo/nyq),btype='high');
+        [b_sub_lp,a_sub_lp]=filters.butter(ord,(finhi/nyq));
 
         [b_env,a_env]=filters.butter(2,min((.5*(fouthi-foutlo)), envfilter)/nyq);
-        [b_out_hp,a_out_hp]=filters.butter(3,(foutlo/nyq),btype='high');
-        [b_out_lp,a_out_lp]=filters.butter(3,(fouthi/nyq));
+        [b_out_hp,a_out_hp]=filters.butter(ord,(foutlo/nyq),btype='high');
+        [b_out_lp,a_out_lp]=filters.butter(ord,(fouthi/nyq));
 
         ## Filter input
         Sig_sub = lfilter(b_sub_hp, a_sub_hp, signal);
@@ -125,9 +136,14 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
         ## Filter output
         Mod_carrier_filt = lfilter(b_out_hp, a_out_hp, Mod_carrier);
         Mod_carrier_filt = lfilter(b_out_lp, a_out_lp, Mod_carrier_filt);
-        summed_carriers += Mod_carrier/np.sqrt(np.mean(Mod_carrier**2))*rms_Sig_sub;
-    # Return the summed carriers, equated in rms to the original signal
-    return summed_carriers * ( np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(summed_carriers**2)) );
+        if sumchannels:
+            carriers += Mod_carrier_filt/np.sqrt(np.mean(Mod_carrier_filt**2))*rms_Sig_sub;
+        else:
+            carriers[:,i] = Mod_carrier_filt/np.sqrt(np.mean(Mod_carrier_filt**2))*rms_Sig_sub;
+    if sumchannels:
+        return carriers * ( np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(carriers**2)) );
+    else:
+        return carriers
 
 def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
     '''Prototype vocoder where channel width is independent of channel spacing

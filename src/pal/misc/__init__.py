@@ -33,3 +33,7 @@
 
 import csv_inspect
 import formatplot
+try:
+    import pa4
+except ImportError, e:
+    print "Could not import pa4"
