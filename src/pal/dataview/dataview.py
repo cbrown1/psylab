@@ -549,6 +549,7 @@ class DatasetView:
         self.dataset.data = data
         self.dataset.dv = dv
         self.dataset.factors = tuple(v for (v,l) in labels[:-1])
+        self.dataset.ivs = tuple(x for x in self.dataset.factors if x != self.dataset.dv)
         self.dataset.labels = labels
         self.dataset.design = dict(labels)
         self.dataset.index_from_var = index_from_var
@@ -566,10 +567,15 @@ class DatasetView:
         self.var_dict = var_dict
         self.looks = looks
 
+        # print "DEBUG:", self.treatments
+
         for i in xrange(self.treatments.size):
             t = self.treatments[i]
+            # print "DEBUG:", self.dataset.ivs
+            # print "DEBUG:", eval(t)
+            # print "DEBUG:", zip(self.dataset.ivs, eval(t))
             index = tuple(self.dataset.index_from_level[(v,l)] for
-                     (v,l) in zip(self.dataset.ivs, eval(t)))
+                          (v,l) in zip(self.dataset.ivs, eval(t)))
             index = index + (Ellipsis,)
             loop_data = self.data[index]
 
