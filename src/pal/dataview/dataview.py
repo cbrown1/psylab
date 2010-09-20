@@ -206,11 +206,10 @@ class Dataset:
             var_dict1 = var_dict.copy()
             if (looks != None) and (looks  not in var_dict1):
                 var_dict1[looks] = []
-
         v1 = DatasetView(self, var_dict1, looks)
         d = v1.as_dataset().from_var_dict(var_dict)
         v2 = DatasetView(d, var_dict)
-
+        
         return v2
 
 
@@ -472,7 +471,7 @@ class DatasetView:
                 var_dict[v] = ds.design[v]
 
         dv = ds.dv
-
+        
         labels = []
         for (v,l) in ds.labels:
             if v in var_dict:
@@ -495,11 +494,13 @@ class DatasetView:
                               if np.isfinite(x)])
             treatments[t] = idata
 
+
         dv_size = max(map(len, treatments.values()))
 
         shape = tuple(len(l) for (v,l) in labels[:-1]) + (dv_size,)
 
         data = np.ones(shape) * np.nan
+
 
         # Populate indexing dictionaries.
         # Will be recomputed after axis switches.
@@ -516,6 +517,7 @@ class DatasetView:
                     index_from_level[(v,lvl)] = j
                     j += 1
             i += 1
+            
 
         # Update values of `data`
         for t,d in treatments.iteritems():
@@ -525,6 +527,7 @@ class DatasetView:
             for x in d:
                 data[i + (j,)] = x
                 j += 1
+
 
         # Take mean wrt to `looks` variable
         if looks != None:
@@ -567,8 +570,6 @@ class DatasetView:
         self.var_dict = var_dict
         self.looks = looks
 
-        # print "DEBUG:", self.treatments
-
         for i in xrange(self.treatments.size):
             t = self.treatments[i]
             # print "DEBUG:", self.dataset.ivs
@@ -576,12 +577,18 @@ class DatasetView:
             # print "DEBUG:", zip(self.dataset.ivs, eval(t))
             index = tuple(self.dataset.index_from_level[(v,l)] for
                           (v,l) in zip(self.dataset.ivs, eval(t)))
+                          
             index = index + (Ellipsis,)
             loop_data = self.data[index]
+            
 
             self.n[i] = len(tuple(x for x in loop_data if np.isfinite(x)))
             self.mean[i] = nanmean(loop_data)
-            self.sd[i] = nanstd(loop_data)
+            if loop_data.size == 1:
+                # for n == 1, std should be 0
+                self.sd[i] = 0.0
+            else:
+                self.sd[i] = nanstd(loop_data)
             self.se[i] = self.sd[i] / np.sqrt(self.n[i])
 
         self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for
