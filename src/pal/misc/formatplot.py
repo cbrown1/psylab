@@ -53,6 +53,7 @@ def set_foregroundcolor(ax, color):
     ax.axes.title.set_color(color)
     lh = ax.get_legend()
     if lh != None:
+        lh.get_title().set_color(color)
         lh.legendPatch.set_edgecolor(color)
         labels = lh.get_texts()
         for lab in labels:

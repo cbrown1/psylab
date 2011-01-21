@@ -33,7 +33,7 @@
 import numpy as np
 from scipy.signal import filter_design as filters, filtfilt, hilbert
 
-def envelope(signal,fs,use_hilbert=False,env_cutoff=16.,env_order=6.):
+def envelope(signal,fs,use_hilbert=False,env_cutoff=16.,env_order=4.):
     '''Extracts the amplitude envelope from a signal
     
         If use_hilbert is False, half-wave rectification and low-pass 
