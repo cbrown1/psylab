@@ -36,14 +36,12 @@
 
 def pre_exp(exp, run, var, stim, user):
     # Check if there are enough stimuli
+	# Move to settingsfile? Are stim issues really method related?
     for stimset in stim.stimvars:
         if stim.sets[stimset]['type'] != 'manual':
             if not stim.sets[stimset]['repeat']:
                 if run.trialsperblock*var.nlevels_total > stim.sets[stimset]['n']:
                     raise Exception,  "Not enough stimulus files for stimset: " + stimset + "\nNeeded for design: " + str(run.trialsperblock*var.nlevels_total) + "\nAvailable: " + str(stim.sets[stimset]['n'])
-
-def post_exp(exp, run, var, stim, user):
-    pass
 
 def post_trial(exp, run, var, stim, user):
     run.stim_index = run.trial # Not used atm

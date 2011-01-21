@@ -101,6 +101,24 @@ class exp:
                     run.condition = iret
                     break
 
+    def present_trial(self,exp,run,stim,var,user):
+		pass
+	
+    def pre_exp(self,exp,run,stim,var,user):
+		pass
+	
+    def pre_block(self,exp,run,stim,var,user):
+		pass
+	
+    def post_trial(self,exp,run,stim,var,user):
+		pass
+	
+    def post_block(self,exp,run,stim,var,user):
+		pass
+	
+    def post_exp(self,exp,run,stim,var,user):
+		pass
+	
 
 class var:
     '''Experiment variable settings
@@ -499,10 +517,6 @@ def record_data(exp,run,var,stim,user, header=False, block=False):
             else:
                 thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user)
             exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = header)
-
-
-def present_trial(exp,run,stim,var,user):
-    pass
 
 
 def get_frontend(exp, frontend):

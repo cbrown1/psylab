@@ -47,3 +47,4 @@ from dataview import dataview
 from misc import csv_inspect, formatplot
 import signal
 import stats
+import exper

@@ -143,31 +143,46 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     print method
 
     exp.utils.get_frontend(exp, frontend)
+	
+	# Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp 
 
-    if hasattr(settings, 'prompt_response'):
-        exp.prompt_response = settings.prompt_response;
+    if hasattr(settings, 'pre_exp'):
+        exp.pre_exp = settings.pre_exp
+    elif hasattr(method, 'pre_exp'):
+        exp.pre_exp = method.pre_exp
+
+    if hasattr(settings, 'pre_block'):
+        exp.pre_block = settings.pre_block
+    elif hasattr(method, 'pre_block'):
+        exp.pre_block = method.pre_block
+
     if hasattr(settings, 'prompt_condition'):
         exp.prompt_condition = settings.prompt_condition
-
+    
     if hasattr(settings, 'pre_trial'):
         exp.pre_trial = settings.pre_trial
     else:
-        raise Exception, "Function pre_trial must be specified in settings file"
+        raise Exception, "Function `pre_trial` must be specified in settings file"
+    
     if hasattr(settings, 'present_trial'):
         exp.present_trial = settings.present_trial
-    else:
-        exp.present_trial = exp.utils.present_trial
+
+    if hasattr(settings, 'prompt_response'):
+        exp.prompt_response = settings.prompt_response
+    
     if hasattr(settings, 'post_trial'):
         exp.post_trial = settings.post_trial
-    else:
+    elif hasattr(method, 'post_trial'):
         exp.post_trial = method.post_trial
-    if hasattr(settings, 'pre_exp'):
-        exp.pre_exp = settings.pre_exp
-    else:
-        exp.pre_exp = method.pre_exp
+
+    if hasattr(settings, 'post_block'):
+        exp.post_block = settings.post_block
+    elif hasattr(method, 'post_block'):
+        exp.post_block = method.post_block
+
     if hasattr(settings, 'post_exp'):
         exp.post_exp = settings.post_exp
-    else:
+    elif hasattr(method, 'post_exp'):
         exp.post_exp = method.post_exp
 
     exp.utils.process_initialize(exp,run,var,stim,user)
@@ -210,6 +225,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             exp.utils.update_time(run)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
+            exp.pre_block(exp,run,stim,var,user)
 
             while run.block_on:
                 run.trial = (run.block*run.trialsperblock)+run.btrial
@@ -222,13 +238,14 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     exp.pre_trial(exp,run,stim,var,user)
                     exp.present_trial(exp,run,stim,var,user)
                     exp.prompt_response(exp,run,stim,var,user)
-                    exp.post_trial(exp,run,stim,var,user);
+                    exp.post_trial(exp,run,stim,var,user)
 
                 exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
                 exp.utils.record_data(exp,run,var,stim,user)
 
                 run.btrial += 1
 
+            exp.post_block(exp,run,stim,var,user)
             if not run.exper_is_go:
                 break;
             # End while-block loop
@@ -236,6 +253,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             break;
     # End block loop
     exp.utils.update_time(run)
+    exp.post_exp(exp,run,stim,var,user)
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 
