@@ -41,6 +41,8 @@ from waveio import wavread
 class exp:
     '''Experimental settings
     '''
+    exp_name = 'psylab'
+    exp_about = 'www.psy-lab.us'
     name = ''
     host = socket.gethostname()
     subjID = ''
@@ -49,7 +51,7 @@ class exp:
     settingsFilePath = ''
     frontend = None
     debug = False
-    logFile = 'exper_logfile_$date.log'
+    logFile = exp_name + '_logfile_$date.log'
     logFile_unexpanded = ''
     method = 'constant'
     recordData = True
@@ -75,7 +77,7 @@ class exp:
 
     def prompt_response(self,exp,run,stim,var,user):
         while True:
-            ret = exp.gui.get_input(None, "Exper!","Enter Response: ")
+            ret = exp.gui.get_input(None, exp.exp_name+"!","Enter Response: ")
             # Check for valid response
             if ret in exp.validKeys_:
                 # Its good. Record response
@@ -85,15 +87,15 @@ class exp:
             elif ret in exp.quitKeys:
                 # User wants to exit. Break out of block, exper loops
                 run.block_on = False
-                run.exper_is_go = False
+                run.psylab_is_go = False
                 break
 
     def prompt_condition(self,exp,run,stim,var,user):
         while True:
-            ret = exp.term.get_input(None, "Exper!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
+            ret = exp.term.get_input(None, exp.exp_name+"!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
             if ret in exp.quitKeys:
                 run.block_on = False
-                run.exper_is_go = False
+                run.psylab_is_go = False
                 break
             elif ret.isdigit():
                 iret = int(ret) - 1
@@ -164,7 +166,7 @@ class run:
     condition = 0  # Current condition
     block_on = True
     trial_on = True
-    exper_is_go = True
+    psylab_is_go = True
     response = ''
 
 
@@ -409,11 +411,11 @@ def menu_condition(exp,run,var,stim,user):
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
         disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
-        ret = exp.term.get_input(parent=None, title = 'Exper!', prompt = disp)
+        ret = exp.term.get_input(parent=None, title = exp.exp_name+"!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
         elif ret in exp.quitKeys:
-            run.exper_is_go = False
+            run.psylab_is_go = False
             break;
         elif ret in ['c']:
             sel = []
@@ -422,13 +424,13 @@ def menu_condition(exp,run,var,stim,user):
             for s in sel:
                 var.orderarray.append(int(s)-1)
             var.nblocks = len(var.orderarray)
-            run.exper_is_go = True
+            run.psylab_is_go = True
             break;
         elif ret in ['s']:
             for s in sel:
                 var.orderarray.append(int(s)-1)
             var.nblocks = len(var.orderarray)
-            run.exper_is_go = True
+            run.psylab_is_go = True
             break;
 
 

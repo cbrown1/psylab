@@ -30,7 +30,7 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-'''Method of constant stimuli
+'''Method of constant stimuli for PsyLab
 
 '''
 

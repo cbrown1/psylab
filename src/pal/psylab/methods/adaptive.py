@@ -30,7 +30,7 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-'''Adaptive tracking method
+'''Adaptive tracking method for PsyLab
 
 '''
 # TODO: change vals to types, so we can specify the type on initialize error
@@ -63,10 +63,7 @@ dynamic_vars_sys = {
            }
 
 def step(cur_step,exp,run,stim,var,user):
-    if cur_step == -1:
-        var.dynamic['value'] -= var.dynamic['steps'][var.dynamic['reversal']]
-    elif cur_step == 1:
-        var.dynamic['value'] += var.dynamic['steps'][var.dynamic['reversal']]
+    var.dynamic['value'] += cur_step * var.dynamic['steps'][var.dynamic['reversal']]
 
 
 def track(correct, exp,run,stim,var,user):

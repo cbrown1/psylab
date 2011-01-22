@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# An Exper settings file!
+# A PsyLab settings file!
 
 import os
 import numpy as np
@@ -18,8 +18,9 @@ def setup(exp,run,stim,var,user):
 
     # General Experimental Variables
     run.trialsperblock = 10    # The number of trials at each treatment or block
-    exp.name = '_SomeExperiment'
+    exp.name = '_QuietThresholds'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
+
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'tk'
@@ -28,14 +29,10 @@ def setup(exp,run,stim,var,user):
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
     exp.cacheTrials = False
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid responses
+    exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = 'CI Pilot data'
-    exp.comments = '''ci_fmam: CI Pilot data
-    When processing involves speech in lf region, freq is the lowpass cutoff of
-    the acoustic speech, and atten is a /-delimited list of attenuation values
-    for broadband, 200 and 150Hz lp. For tones, freq is the downward shift of
-    mean f0, and atten is a /-delimited list of attenuation values for shifts
-    of 0, -25, -50, -75,-100 & -125.
+    exp.comments = '''qt: Quiet Thresholds
+    Derives quiet thresholds for pure tones.
     '''
 
     """STIMULUS SETS
@@ -82,30 +79,6 @@ def setup(exp,run,stim,var,user):
                 are enough stimulus files available. default is False
     """
 
-    stim.sets['CUNYf'] = {
-                              'type':   'soundfiles',
-                              'path':   os.path.join(basedir,'stim','CUNYf'),
-                              'fs'  :   44100,
-                              'text':   os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
-                              'txtfmt': 'file kw text',
-                              'mask':   '*.wav; *.WAV',
-                              'load':   'auto',  # 'auto' = Load stimuli automatically (default)
-                              'order':  '1:10', #
-                              'repeat': True,    # If we run out of files, should we start over?
-                              'equate': 3,  # A custom value
-                            };
-    stim.sets['Babble'] = {
-                              'type':   'soundfiles',
-                              'path':   os.path.join(basedir,'stim','babble'),
-                              'fs'  :   44100,
-                              'mask':   '*.wav; *.WAV',
-                              'load':   'manual',  # 'manual' = Just get names, don't load
-                              'order':  'random', #
-                              'repeat': True,    #
-                            };
-    stim.sets['SSNoise'] = {
-                              'type': 'manual',
-                              };
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -150,97 +123,28 @@ def setup(exp,run,stim,var,user):
     var.factvars.append( {  'name' : 'freq',
                             'type' : 'manual',
                           'levels' : [
-                                        '0',
-                                        '-25',
-                                        '-50',
-                                        '-75',
-                                        '-100',
-                                        '-125',
+                                        '125',
+                                        '250',
+                                        '500',
+                                        '1000',
+                                        '2000',
+                                        '4000',
                                       ]
                         });
 
-    var.factvars.append( {  'name' : 'processing',
-                            'type' : 'manual',
-                          'levels' : [
-                                        'E',
-                                        'E/A',
-                                        'E/Tfmam',
-                                      ]
-                        });
 
-    var.factvars.append( {  'name' : 'excursion',
-                            'type' : 'manual',     # This variable will be processed manually in stimgen (default behavior)
-                          'levels' : [
-                                        '1',
-                                        '.5',
-                                      ]
-                        });
-
-    var.factvars.append( {  'name' : 'target',
-                            'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
-                          'levels' : [
-                                        'CUNYf',
-                                      ]
-                        });
-
-    var.factvars.append( {  'name' : 'masker',
-                            'type' : 'stim',
-                          'levels' : [
-                                        'Babble',
-                                      ]
-                        });
-
-    var.factvars.append( {  'name' : 'snr',
-                            'type' : 'manual',
-                          'levels' : [
-                                        '3',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'freq',
-                            'type' : 'manual',
-                          'levels' : [
-                                        '300',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'processing',
-                            'type' : 'manual',
-                          'levels' : [
-                                        'E',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'excursion',
-                            'type' : 'manual',
-                          'levels' : [
-                                        '1',
-                                        '3',
-                                        '5',
-                                        '7',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'target',
-                            'type' : 'stim',
-                          'levels' : [
-                                        'CUNYf',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'masker',
-                            'type' : 'stim',
-                          'levels' : [
-                                        'Babble',
-                                      ]
-                        });
-
-    var.listvars.append( {  'name' : 'snr',
-                            'type' : 'manual',
-                          'levels' : [
-                                        '3',
-                                      ]
-                        });
+    var.dynamic = { 'name': 'level',    # Name of the dynamic variable
+                    'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (len = #revs)
+                    'downs': 2,          # Number of 'downs'
+                    'ups': 1,            # Number of 'ups'
+                    'val_start': 20,     # Starting value
+                    'val_floor': 0,      # Floor
+                    'val_ceil': 0,       # Ceiling
+                    'val_floor_n': 3,    # Number of consecutive floor values to quit at
+                    'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
+                    'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
+                    'max_trials': 60,    # Maximum number of trials to run
+                   }
 
     """CONDITION PRESENTATION ORDER
         Use 'prompt' to prompt for condition on each block, 'random' to randomize
@@ -276,14 +180,14 @@ def prompt_response(exp,run,stim,var,user):
     while True:
         # The prompt is the trial feedback.
         p = "  Trial "+ str(run.trial+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        ret = exp.term.get_input(None, "Exper!",p)
+        ret = exp.term.get_input(None, exp.exp_name+"!",p)
         if ret in exp.validKeys_:
             run.response = ret
             exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
         elif ret in exp.quitKeys:
             run.block_on = False
-            run.exper_is_go = False
+            run.psylab_is_go = False
             break;
 
 '''PRE_TRIAL

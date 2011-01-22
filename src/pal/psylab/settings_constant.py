@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# An Exper settings file!
+# A PsyLab settings file!
 
 import os
 import numpy as np
@@ -20,7 +20,6 @@ def setup(exp,run,stim,var,user):
     run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_SomeExperiment'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'tk'
@@ -243,19 +242,6 @@ def setup(exp,run,stim,var,user):
                                       ]
                         });
 
-    var.dynamic = { 'name': 'level',    # Name of the dynamic variable
-                    'steps': [5, 5, 2, 2, 2, 2, 2, 2],     # Stepsizes to use at each reversal (len = #revs)
-                    'downs': 2,          # Number of 'downs'
-                    'ups': 1,            # Number of 'ups'
-                    'val_start': 20,      # Starting value
-                    'val_floor': 0,      # Floor
-                    'val_ceil': 0,       # Ceiling
-                    'val_floor_n': 3,    # Number of consecutive floor values to quit at
-                    'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
-                    'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
-                    'max_trials': 0,     # Maximum number of trials to run
-                   }
-
     """CONDITION PRESENTATION ORDER
         Use 'prompt' to prompt for condition on each block, 'random' to randomize
         condition order, 'menu' to be able to choose from a list of conditions at
@@ -290,14 +276,14 @@ def prompt_response(exp,run,stim,var,user):
     while True:
         # The prompt is the trial feedback.
         p = "  Trial "+ str(run.trial+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        ret = exp.term.get_input(None, "Exper!",p)
+        ret = exp.term.get_input(None, exp.exp_name+"!",p)
         if ret in exp.validKeys_:
             run.response = ret
             exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
         elif ret in exp.quitKeys:
             run.block_on = False
-            run.exper_is_go = False
+            run.psylab_is_go = False
             break;
 
 '''PRE_TRIAL

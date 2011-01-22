@@ -195,12 +195,12 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     else:
         if not exp.recordData:
             print "WARNING: No data will be recorded!"
-    if run.exper_is_go == False:
-        print "Exper cancelled at user request"
+    if run.psylab_is_go == False:
+        print exp.exp_name+" cancelled at user request"
         return;
-    ret = exp.gui.get_yesno(None, title = 'Exper!', prompt = "Ready to begin testing?")
+    ret = exp.gui.get_yesno(None, title = exp.exp_name+"!", prompt = "Ready to begin testing?")
     if not ret:
-        print "Exper cancelled at user request"
+        print exp.exp_name+" cancelled at user request"
         return;
 
     exp.pre_exp(exp,run,var,stim,user)
@@ -212,14 +212,14 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         logstr += str(cond+1) + " "
     logstr += "]\n"
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
-    run.exper_is_go = True
+    run.psylab_is_go = True
     exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,stim,var,user)
         else:
             run.condition = var.orderarray[run.block]
-        if run.exper_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
+        if run.psylab_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
             if run.block != run.startblock: run.btrial = 0;
             else: run.btrial = run.starttrial - 1;
             run.block_on = True
@@ -248,10 +248,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                 run.btrial += 1
 
             exp.post_block(exp,run,stim,var,user)
-            if not run.exper_is_go:
+            if not run.psylab_is_go:
                 break;
             # End while-block loop
-        if not run.exper_is_go:
+        if not run.psylab_is_go:
             break;
     # End block loop
     exp.utils.update_time(run)
