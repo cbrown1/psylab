@@ -102,23 +102,23 @@ class exp:
                     break
 
     def present_trial(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
     def pre_exp(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
     def pre_block(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
     def post_trial(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
     def post_block(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
     def post_exp(self,exp,run,stim,var,user):
-		pass
-	
+        pass
+
 
 class var:
     '''Experiment variable settings
@@ -136,6 +136,7 @@ class var:
     order = 'natural'
     order_ = 0
     debug = False
+    dynamic = {}
 
 
 class stim:

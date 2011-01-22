@@ -34,6 +34,10 @@
 
 '''
 
+def initialize(exp,run,stim,var,user):
+    pass
+
+
 def pre_exp(exp, run, var, stim, user):
     # Check if there are enough stimuli
 	# Move to settingsfile? Are stim issues really method related?

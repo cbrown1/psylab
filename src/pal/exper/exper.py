@@ -131,56 +131,56 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
     exp.settingsFilePath = os.path.join(exp.settingsPath,exp.settingsFile)
     sys.path.append(exp.settingsPath)
-    settings = __import__(exp.settingsBase)
+    exp.settings = __import__(exp.settingsBase)
 
-    settings.setup(exp,run,stim,var,user)
+    exp.settings.setup(exp,run,stim,var,user)
 
     try:
         methodi = __import__('methods',globals(), locals(), exp.method)
     except ImportError:
         raise Exception, "Unknown experimental method: " + exp.method
     method = getattr(methodi, exp.method)
-    print method
+    method.initialize(exp,run,stim,var,user)
 
     exp.utils.get_frontend(exp, exp.frontend)
 
-	# Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp
-    if hasattr(settings, 'pre_exp'):
-        exp.pre_exp = settings.pre_exp
+    # Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp
+    if hasattr(exp.settings, 'pre_exp'):
+        exp.pre_exp = exp.settings.pre_exp
     elif hasattr(method, 'pre_exp'):
         exp.pre_exp = method.pre_exp
 
-    if hasattr(settings, 'pre_block'):
-        exp.pre_block = settings.pre_block
+    if hasattr(exp.settings, 'pre_block'):
+        exp.pre_block = exp.settings.pre_block
     elif hasattr(method, 'pre_block'):
         exp.pre_block = method.pre_block
 
-    if hasattr(settings, 'prompt_condition'):
-        exp.prompt_condition = settings.prompt_condition
+    if hasattr(exp.settings, 'prompt_condition'):
+        exp.prompt_condition = exp.settings.prompt_condition
 
-    if hasattr(settings, 'pre_trial'):
-        exp.pre_trial = settings.pre_trial
+    if hasattr(exp.settings, 'pre_trial'):
+        exp.pre_trial = exp.settings.pre_trial
     else:
-        raise Exception, "Function `pre_trial` must be specified in settings file"
+        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
 
-    if hasattr(settings, 'present_trial'):
-        exp.present_trial = settings.present_trial
+    if hasattr(exp.settings, 'present_trial'):
+        exp.present_trial = exp.settings.present_trial
 
-    if hasattr(settings, 'prompt_response'):
-        exp.prompt_response = settings.prompt_response
+    if hasattr(exp.settings, 'prompt_response'):
+        exp.prompt_response = exp.settings.prompt_response
 
-    if hasattr(settings, 'post_trial'):
-        exp.post_trial = settings.post_trial
+    if hasattr(exp.settings, 'post_trial'):
+        exp.post_trial = exp.settings.post_trial
     elif hasattr(method, 'post_trial'):
         exp.post_trial = method.post_trial
 
-    if hasattr(settings, 'post_block'):
-        exp.post_block = settings.post_block
+    if hasattr(exp.settings, 'post_block'):
+        exp.post_block = exp.settings.post_block
     elif hasattr(method, 'post_block'):
         exp.post_block = method.post_block
 
-    if hasattr(settings, 'post_exp'):
-        exp.post_exp = settings.post_exp
+    if hasattr(exp.settings, 'post_exp'):
+        exp.post_exp = exp.settings.post_exp
     elif hasattr(method, 'post_exp'):
         exp.post_exp = method.post_exp
 
