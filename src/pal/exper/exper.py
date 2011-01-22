@@ -142,10 +142,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     method = getattr(methodi, exp.method)
     print method
 
-    exp.utils.get_frontend(exp, frontend)
+    exp.utils.get_frontend(exp, exp.frontend)
 	
 	# Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp 
-
     if hasattr(settings, 'pre_exp'):
         exp.pre_exp = settings.pre_exp
     elif hasattr(method, 'pre_exp'):
@@ -209,6 +208,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     # Begin block loop
     exp.utils.update_time(run)
     logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
+    logstr += "Running conditions: [ "
+    for cond in var.orderarray:
+        logstr += str(cond+1) + " "
+    logstr += "]\n"
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
     run.exper_is_go = True
     exp.utils.record_data(exp,run,var,stim,user, header=True)
