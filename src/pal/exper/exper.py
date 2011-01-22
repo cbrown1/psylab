@@ -143,8 +143,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     print method
 
     exp.utils.get_frontend(exp, exp.frontend)
-	
-	# Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp 
+
+	# Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp
     if hasattr(settings, 'pre_exp'):
         exp.pre_exp = settings.pre_exp
     elif hasattr(method, 'pre_exp'):
@@ -157,18 +157,18 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     if hasattr(settings, 'prompt_condition'):
         exp.prompt_condition = settings.prompt_condition
-    
+
     if hasattr(settings, 'pre_trial'):
         exp.pre_trial = settings.pre_trial
     else:
         raise Exception, "Function `pre_trial` must be specified in settings file"
-    
+
     if hasattr(settings, 'present_trial'):
         exp.present_trial = settings.present_trial
 
     if hasattr(settings, 'prompt_response'):
         exp.prompt_response = settings.prompt_response
-    
+
     if hasattr(settings, 'post_trial'):
         exp.post_trial = settings.post_trial
     elif hasattr(method, 'post_trial'):
@@ -207,8 +207,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     # Begin block loop
     exp.utils.update_time(run)
-    logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
-    logstr += "Running conditions: [ "
+    logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\nConditions (%s): [ " % (run.date, run.time, exp.name, exp.subjID, var.order)
     for cond in var.orderarray:
         logstr += str(cond+1) + " "
     logstr += "]\n"
@@ -226,9 +225,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
+            exp.pre_block(exp,run,stim,var,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
-            exp.pre_block(exp,run,stim,var,user)
 
             while run.block_on:
                 run.trial = (run.block*run.trialsperblock)+run.btrial
@@ -241,8 +240,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     exp.pre_trial(exp,run,stim,var,user)
                     exp.present_trial(exp,run,stim,var,user)
                     exp.prompt_response(exp,run,stim,var,user)
-                    exp.post_trial(exp,run,stim,var,user)
 
+                exp.post_trial(exp,run,stim,var,user)
                 exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
                 exp.utils.record_data(exp,run,var,stim,user)
 
