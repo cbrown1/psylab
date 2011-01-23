@@ -24,7 +24,7 @@ def setup(exp,run,var,stim,user):
 
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
-    exp.frontend = 'tk'
+    exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
     exp.recordData = True
@@ -147,6 +147,7 @@ def setup(exp,run,var,stim,user):
                     'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
                     'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
                     'max_trials': 60,    # Maximum number of trials to run
+                    'vals_to_avg': 6,    # The number of values to average
                    }
 
     """CONDITION PRESENTATION ORDER
@@ -185,7 +186,7 @@ def setup(exp,run,var,stim,user):
 def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
+        p = var.dynamic['cur_rev'] + "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
         ret = exp.term.get_input(None, exp.exp_name+"!",p)
         if str(ret) in exp.validKeys_:
             run.response = ret
@@ -217,6 +218,10 @@ def pre_trial(exp,run,var,stim,user):
 
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
+
+def post_block(exp,run,var,stim,user):
+    print "Mean: " + str(np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))+", Std: " + str(np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))
+    print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
 
 def present_trial(exp,run,var,stim,user):
     pass

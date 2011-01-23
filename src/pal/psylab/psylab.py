@@ -177,7 +177,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     if hasattr(exp.settings, 'post_trial'):
         exp.post_trial = exp.settings.post_trial
     elif hasattr(method, 'post_trial'):
-        print "Method post_trial!"
         exp.post_trial = method.post_trial
 
     if hasattr(exp.settings, 'post_block'):
@@ -253,6 +252,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
                     run.btrial += 1
 
+            exp.utils.update_time(run)
             exp.post_block(exp,run,var,stim,user)
             if not run.psylab_is_go:
                 break;

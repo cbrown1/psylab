@@ -48,26 +48,33 @@ dynamic_vars_user = {
             'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
             'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
             'max_trials': 0,     # Maximum number of trials to run
+            'vals_to_avg': 0,    # The number of values to average
            }
 dynamic_vars_sys = {
-            'msg': '',           # Description of why the block ended
+            'msg': "",           # Description of why the block ended
             'val_floor_count': 0,# Number of consecutive floor trials
             'val_ceil_count': 0, # Number of consecutive ceiling trials
             'value': 0,          # Current dynamic value
             'values': [],        # Array of values
             'values_track': [],  # 0 = no change, -1 = reversal/dn, 1 = reversal/up
-            'values_rev': [],    # Current reversal count
+            'values_rev': [],    # Values at reversals
             'prev_dir': 0,       # Previous direction; -1 = dn, 1 = up
             'init_dir': 0,       # Initial direction; -1 = dn, 1 = up
             'cur_ups': 0,        # Counter for current number of ups
             'cur_dns': 0,        # Counter for current number of downs
             'cur_step': 0,       # Whether to step this trial; -1 = dn, 1 = up, 0 = none
             'correct': 0,        # The correct response
+            'cur_rev': "",       # For each trial, one of:
+                                 #  ' ' for no change
+                                 #  'v' for start dn
+                                 #  '^' for start up
+                                 #  '+' for rev dn
+                                 #  '-' for rev up
            }
 
 def step(cur_step,exp,run,var,stim,user):
-    # If there are no reversals yet, use first step
     if len(var.dynamic['values_rev']) == 0:
+        # If there are no reversals yet, use first step
         var.dynamic['value'] += cur_step * var.dynamic['steps'][0]
     else:
         var.dynamic['value'] += cur_step * var.dynamic['steps'][len(var.dynamic['values_rev'])-1]
@@ -85,20 +92,20 @@ def track(correct, exp,run,var,stim,user):
             var.dynamic['cur_dns'] = 0                     #  Reset dns
             if var.dynamic['prev_dir'] == -1:              #  If previous direction was dn
                 var.dynamic['values_track'].append(0)      #   No reversal
-                print " ",
+                var.dynamic['cur_rev'] = " "
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['values_track'].append(0)      #   Don't record this as a change
                 var.dynamic['init_dir'] = -1               #   Set initial direction
-                print "v",
+                var.dynamic['cur_rev'] = "v"
             else:                                       #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['values_track'].append(-1)     #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
-                print "-",
+                var.dynamic['cur_rev'] = "-"
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
-            print " ",
+            var.dynamic['cur_rev'] = " "
     else:
         var.dynamic['cur_dns'] = 0                         # Reset dns
         var.dynamic['cur_ups'] += 1                        # Increment ups
@@ -107,20 +114,20 @@ def track(correct, exp,run,var,stim,user):
             var.dynamic['cur_ups'] = 0                     #  Reset ups
             if var.dynamic['prev_dir'] == 1:               #  If previous direction was up
                 var.dynamic['values_track'].append(0)      #   No reversal
-                print " ",
+                var.dynamic['cur_rev'] = " ",
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(0)      #   Don't record this as a change
                 var.dynamic['init_dir'] = 1                #   Set initial direction
-                print "^",
+                var.dynamic['cur_rev'] = "^"
             else:                                       #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(1)      #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
-                print "+",
+                var.dynamic['cur_rev'] = "+"
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
-            print " ",
+            var.dynamic['cur_rev'] = " "
 
 
 def finish_trial(exp, run, var, stim, user):
@@ -152,7 +159,7 @@ def finish_trial(exp, run, var, stim, user):
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
         elif len(var.dynamic['values_rev']) == len(var.dynamic['steps']):
             run.block_on = False
-            var.dynamic['msg'] = '%g reversals reached' % var.dynamic['val_floor_n']
+            var.dynamic['msg'] = '%g reversals reached' % len(var.dynamic['steps'])
 
 def initialize(exp, run, var, stim, user):
     for key,val in dynamic_vars_user.items():
@@ -165,6 +172,7 @@ def initialize(exp, run, var, stim, user):
     else:
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
+    var.dynamic['cur_rev'] = " "
 
 def post_trial(exp, run, var, stim, user):
     '''Move this function to settingsfile
