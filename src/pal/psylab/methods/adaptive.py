@@ -35,7 +35,9 @@
 '''
 # TODO: change vals to types, so we can specify the type on initialize error
 dynamic_vars_user = {
-            'name': '',         # Name of the dynamic variable
+            'name': '',          # Name of the dynamic variable
+            'units': '',         # Units of the dynamic variable
+            'intervals': 2,      # Number of intervals
             'steps': [0, 0],     # Stepsizes to use at each reversal (len = #revs)
             'downs': 2,          # Number of 'downs'
             'ups': 1,            # Number of 'ups'
@@ -60,34 +62,43 @@ dynamic_vars_sys = {
             'cur_ups': 0,        # Counter for current number of ups
             'cur_dns': 0,        # Counter for current number of downs
             'cur_step': 0,       # Whether to step this trial; -1 = dn, 1 = up, 0 = none
+            'correct': 0,        # The correct response
            }
 
-def step(cur_step,exp,run,stim,var,user):
-    var.dynamic['value'] += cur_step * var.dynamic['steps'][var.dynamic['reversal']]
+def step(cur_step,exp,run,var,stim,user):
+    # If there are no reversals yet, use first step
+    if len(var.dynamic['values_rev']) == 0:
+        var.dynamic['value'] += cur_step * var.dynamic['steps'][0]
+    else:
+        var.dynamic['value'] += cur_step * var.dynamic['steps'][len(var.dynamic['values_rev'])-1]
 
 
-def track(correct, exp,run,stim,var,user):
+def track(correct, exp,run,var,stim,user):
     '''correct should be a simple bool
     '''
     var.dynamic['values'].append(var.dynamic['value'])
     if correct:
         var.dynamic['cur_dns'] += 1                        # Increment dns
         var.dynamic['cur_ups'] = 0                         # Reset ups
-        if var.dynamic['cur_dns'] == var.dynamic['dns']:      # If we have the right number of dns
+        if var.dynamic['cur_dns'] == var.dynamic['downs']: # If we have the right number of dns
             var.dynamic['cur_step'] = -1                   #  Set current step
             var.dynamic['cur_dns'] = 0                     #  Reset dns
             if var.dynamic['prev_dir'] == -1:              #  If previous direction was dn
                 var.dynamic['values_track'].append(0)      #   No reversal
+                print " ",
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['values_track'].append(0)      #   Don't record this as a change
                 var.dynamic['init_dir'] = -1               #   Set initial direction
+                print "v",
             else:                                       #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['values_track'].append(-1)     #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
+                print "-",
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
+            print " ",
     else:
         var.dynamic['cur_dns'] = 0                         # Reset dns
         var.dynamic['cur_ups'] += 1                        # Increment ups
@@ -96,16 +107,20 @@ def track(correct, exp,run,stim,var,user):
             var.dynamic['cur_ups'] = 0                     #  Reset ups
             if var.dynamic['prev_dir'] == 1:               #  If previous direction was up
                 var.dynamic['values_track'].append(0)      #   No reversal
+                print " ",
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(0)      #   Don't record this as a change
                 var.dynamic['init_dir'] = 1                #   Set initial direction
+                print "^",
             else:                                       #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(1)      #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
+                print "+",
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
+            print " ",
 
 
 def finish_trial(exp, run, var, stim, user):
@@ -129,41 +144,33 @@ def finish_trial(exp, run, var, stim, user):
         var.dynamic['val_ceil_count'] = 0
 
     if run.block_on:
-        if var.dynamic['run_n_trials'] > 0 and run.trials == var.dynamic['run_n_trials']:
+        if var.dynamic['run_n_trials'] > 0 and run.trial == var.dynamic['run_n_trials']:
             run.block_on = False
             var.dynamic['msg'] = '%g trials reached' % var.dynamic['run_n_trials']
-        elif var.dynamic['max_trials'] > 0 and run.trials == var.dynamic['max_trials']:
+        elif var.dynamic['max_trials'] > 0 and run.trial == var.dynamic['max_trials']:
             run.block_on = False
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
         elif len(var.dynamic['values_rev']) == len(var.dynamic['steps']):
             run.block_on = False
             var.dynamic['msg'] = '%g reversals reached' % var.dynamic['val_floor_n']
 
-def initialize(exp, run, stim, var, user):
-    # Check that user has set required dynamic vars
-    for key,val in dynamic_vars_user:
+def initialize(exp, run, var, stim, user):
+    for key,val in dynamic_vars_user.items():
         if not var.dynamic.has_key(key):
             raise Exception, "Dynamic variable not set: var.dynamic['" + key + "']"
-    # Append other dynamic vars
-    for key,val in dynamic_vars_sys:
+    for key,val in dynamic_vars_sys.items():
         var.dynamic[key] = val
-    # Consider: Put custom step in var.dynamic
     if hasattr(exp.settings, 'step'):
-        exp.dynamic.step = exp.settings.step
-    else
-        exp.dynamic.step = step
-
-def pre_exp(exp, run, var, stim, user):
-    pass
-
-def post_exp(exp, run, var, stim, user):
-    pass
+        exp.dynamic_step = exp.settings.step
+    else:
+        exp.dynamic_step = step
+    var.dynamic['value'] = var.dynamic['val_start']
 
 def post_trial(exp, run, var, stim, user):
     '''Move this function to settingsfile
     '''
-    track(run.response==user.interval, exp, run, var, stim, user)
-    exp.dynamic.step(var.dynamic['cur_step'], exp, run, var, stim, user)
+    track(str(run.response)==str(var.dynamic['correct']), exp, run, var, stim, user)
+    exp.dynamic_step(var.dynamic['cur_step'], exp, run, var, stim, user)
     finish_trial(exp, run, var, stim, user)
 
     run.trial_on = False

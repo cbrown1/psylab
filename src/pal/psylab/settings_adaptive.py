@@ -4,12 +4,13 @@
 
 import os
 import numpy as np
+import pal
 
-def setup(exp,run,stim,var,user):
+def setup(exp,run,var,stim,user):
 
     # Crash Recovery
-    run.startblock = 1;
-    run.starttrial = 1;
+    run.startblock = 1
+    run.starttrial = 1
 
     if os.name == 'posix':
         basedir = r'/home/code-breaker/Python'
@@ -19,7 +20,7 @@ def setup(exp,run,stim,var,user):
     # General Experimental Variables
     run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_QuietThresholds'
-    exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
+    exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
 
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
@@ -30,8 +31,8 @@ def setup(exp,run,stim,var,user):
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
     exp.cacheTrials = False
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
-    exp.note = 'CI Pilot data'
-    exp.comments = '''qt: Quiet Thresholds
+    exp.note = 'A demonstration of the adaptive method'
+    exp.comments = '''Quiet Thresholds
     Derives quiet thresholds for pure tones.
     '''
 
@@ -133,13 +134,15 @@ def setup(exp,run,stim,var,user):
                         });
 
 
-    var.dynamic = { 'name': 'level',    # Name of the dynamic variable
+    var.dynamic = { 'name': 'level',     # Name of the dynamic variable
+                    'units': 'dB',       # Units of the dynamic variable
+                    'intervals': 2,      # Number of intervals
                     'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (len = #revs)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
-                    'val_start': 20,     # Starting value
+                    'val_start': 70,     # Starting value
                     'val_floor': 0,      # Floor
-                    'val_ceil': 0,       # Ceiling
+                    'val_ceil': 80,      # Ceiling
                     'val_floor_n': 3,    # Number of consecutive floor values to quit at
                     'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
                     'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
@@ -154,7 +157,7 @@ def setup(exp,run,stim,var,user):
         make the first item in the print range 'random' to randomize the specified
         range.
     """
-    var.order = 'menu';
+    var.order = 'menu'
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -166,8 +169,11 @@ def setup(exp,run,stim,var,user):
     '''USER VARIABLES
         Add any additional variables you need here
     '''
-    user.prebuff = 150;
-    user.postbuff = 150;
+    user.prebuff = 150
+    user.postbuff = 150
+    user.fs = 44100
+    user.dur = 500 # ms
+    user.isi = 250 # ms
 
 
 '''CUSTOM PROMPT
@@ -176,16 +182,16 @@ def setup(exp,run,stim,var,user):
     if you want to cancel the experiment, set both run.block_on and
     run.pylab_is_go to False
 '''
-def prompt_response(exp,run,stim,var,user):
+def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        p = "  Trial "+ str(run.trial+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
+        p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
         ret = exp.term.get_input(None, exp.exp_name+"!",p)
-        if ret in exp.validKeys_:
+        if str(ret) in exp.validKeys_:
             run.response = ret
             exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
-        elif ret in exp.quitKeys:
+        elif str(ret) in exp.quitKeys:
             run.block_on = False
             run.psylab_is_go = False
             break;
@@ -197,8 +203,20 @@ def prompt_response(exp,run,stim,var,user):
     var.current['varname']. The stimulus waveform can be played back
     using exp.utils.wavplay.
 '''
-def pre_trial(exp,run,stim,var,user):
-    stim.stimarray = np.zeros((1))
+def pre_trial(exp,run,var,stim,user):
+    var.dynamic['correct'] = np.random.random_integers(1,var.dynamic['intervals'])
+    tone = pal.signal.tone(int(var.current['freq']), user.fs, user.dur)
+    tone = pal.signal.ramps(tone, user.fs)
+    tone = pal.signal.atten(tone, 90-int(var.dynamic['value']))
+    quiet = np.zeros(tone.size)
+    isi = np.zeros(user.isi/1000*user.fs)
+    if var.dynamic['correct'] == 1:
+        stim.stimarray = tone #np.vstack((tone, isi, quiet))
+    else:
+        stim.stimarray = tone #np.vstack((quiet, isi, tone))
 
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
+
+def present_trial(exp,run,var,stim,user):
+    pass

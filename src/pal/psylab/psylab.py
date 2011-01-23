@@ -70,7 +70,7 @@ def configure(settingsFile = None, frontend = None):
     sys.path.append(exp.settingsPath)
     settings = __import__(exp.settingsBase)
 
-    settings.setup(exp,run,stim,var,user)
+    settings.setup(exp,run,var,stim,user)
 
     exp.gui.show_config( exp, run, stim, var, user )
 
@@ -96,7 +96,7 @@ def list_conditions(settingsFile = None, frontend = None):
     sys.path.append(exp.settingsPath)
     settings = __import__(exp.settingsBase)
 
-    settings.setup(exp,run,stim,var,user)
+    settings.setup(exp,run,var,stim,user)
 
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
@@ -113,11 +113,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
-    if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open Exper Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        if settingsFile == '':
-            print "Exper cancelled at user request"
-            return;
+    #if settingsFile == None:
+    #    settingsFile = exp.term.get_file(None, "Open Exper Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+    #    if settingsFile == '':
+    #        print "Exper cancelled at user request"
+    #        return;
+    settingsFile = 'settings_adaptive.py'
+    subjectID = 4
 
     if subjectID == None:
         exp.subjID = exp.term.get_input(parent=None, title = 'Exper!', prompt = 'Enter a Subject ID:')
@@ -133,14 +135,17 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     sys.path.append(exp.settingsPath)
     exp.settings = __import__(exp.settingsBase)
 
-    exp.settings.setup(exp,run,stim,var,user)
+    var.factvars[:] = []
+    var.listvars[:] = []
+
+    exp.settings.setup(exp,run,var,stim,user)
 
     try:
         methodi = __import__('methods',globals(), locals(), exp.method)
     except ImportError:
         raise Exception, "Unknown experimental method: " + exp.method
     method = getattr(methodi, exp.method)
-    method.initialize(exp,run,stim,var,user)
+    method.initialize(exp,run,var,stim,user)
 
     exp.utils.get_frontend(exp, exp.frontend)
 
@@ -172,6 +177,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     if hasattr(exp.settings, 'post_trial'):
         exp.post_trial = exp.settings.post_trial
     elif hasattr(method, 'post_trial'):
+        print "Method post_trial!"
         exp.post_trial = method.post_trial
 
     if hasattr(exp.settings, 'post_block'):
@@ -216,7 +222,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
-            exp.prompt_condition(exp,run,stim,var,user)
+            exp.prompt_condition(exp,run,var,stim,user)
         else:
             run.condition = var.orderarray[run.block]
         if run.psylab_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
@@ -225,7 +231,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
-            exp.pre_block(exp,run,stim,var,user)
+            exp.pre_block(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
 
@@ -237,17 +243,17 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     if stim.sets[s]['type'] != 'manual':
                         exp.utils.get_current_stimulus(stim, s)
                 while run.trial_on:
-                    exp.pre_trial(exp,run,stim,var,user)
-                    exp.present_trial(exp,run,stim,var,user)
-                    exp.prompt_response(exp,run,stim,var,user)
+                    exp.pre_trial(exp,run,var,stim,user)
+                    exp.present_trial(exp,run,var,stim,user)
+                    exp.prompt_response(exp,run,var,stim,user)
 
-                exp.post_trial(exp,run,stim,var,user)
-                exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
-                exp.utils.record_data(exp,run,var,stim,user)
+                    exp.post_trial(exp,run,var,stim,user)
+                    exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
+                    exp.utils.record_data(exp,run,var,stim,user)
 
-                run.btrial += 1
+                    run.btrial += 1
 
-            exp.post_block(exp,run,stim,var,user)
+            exp.post_block(exp,run,var,stim,user)
             if not run.psylab_is_go:
                 break;
             # End while-block loop
@@ -255,7 +261,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             break;
     # End block loop
     exp.utils.update_time(run)
-    exp.post_exp(exp,run,stim,var,user)
+    exp.post_exp(exp,run,var,stim,user)
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 

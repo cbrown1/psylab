@@ -34,7 +34,7 @@
 
 '''
 
-def initialize(exp,run,stim,var,user):
+def initialize(exp,run,var,stim,user):
     pass
 
 

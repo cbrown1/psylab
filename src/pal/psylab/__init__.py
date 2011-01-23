@@ -33,4 +33,4 @@
 __version__ = '0.1'
 __author__ = 'Christopher Brown <c-b@asu.edu>'
 
-from exper import run, configure, list_conditions
+from psylab import run, configure, list_conditions

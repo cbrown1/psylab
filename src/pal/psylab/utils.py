@@ -75,7 +75,7 @@ class exp:
     frontendTypes = ['qt', 'tk']
     from frontends import term
 
-    def prompt_response(self,exp,run,stim,var,user):
+    def prompt_response(self,exp,run,var,stim,user):
         while True:
             ret = exp.gui.get_input(None, exp.exp_name+"!","Enter Response: ")
             # Check for valid response
@@ -90,7 +90,7 @@ class exp:
                 run.psylab_is_go = False
                 break
 
-    def prompt_condition(self,exp,run,stim,var,user):
+    def prompt_condition(self,exp,run,var,stim,user):
         while True:
             ret = exp.term.get_input(None, exp.exp_name+"!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
             if ret in exp.quitKeys:
@@ -103,22 +103,22 @@ class exp:
                     run.condition = iret
                     break
 
-    def present_trial(self,exp,run,stim,var,user):
+    def present_trial(self,exp,run,var,stim,user):
         pass
 
-    def pre_exp(self,exp,run,stim,var,user):
+    def pre_exp(self,exp,run,var,stim,user):
         pass
 
-    def pre_block(self,exp,run,stim,var,user):
+    def pre_block(self,exp,run,var,stim,user):
         pass
 
-    def post_trial(self,exp,run,stim,var,user):
+    def post_trial(self,exp,run,var,stim,user):
         pass
 
-    def post_block(self,exp,run,stim,var,user):
+    def post_block(self,exp,run,var,stim,user):
         pass
 
-    def post_exp(self,exp,run,stim,var,user):
+    def post_exp(self,exp,run,var,stim,user):
         pass
 
 
