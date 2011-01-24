@@ -30,17 +30,6 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-"""Gustav - A Python script to run psychophysical experiments
-
-    The goal of Gustav is to handle the routines that are common across
-    experiments (like the psychophysical procedure, keeping track of
-    responses, writing to data files, etc), to allow the experimenter to
-    worry about the things that are unique to each experiment (like the
-    design, stimulus generation, etc.).
-
-    See settings.py for more information.
-"""
-
 import os
 from random import shuffle
 import sys

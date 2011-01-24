@@ -32,10 +32,10 @@
 #
 
 '''
-PsyLab - Psychoacoustics Lab
+PsyLab - Psychophysics Lab
 
 A loose collection of modules useful for various aspects of running
-psychoacoustics experiments, although several will be more generally
+psychophysics experiments, although several will be more generally
 useful.
 
 '''

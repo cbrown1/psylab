@@ -30,6 +30,28 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
+"""Gustav - A Python module to run psychophysical experiments
+
+    The goal of Gustav is to handle the routines that are common across
+    experiments (like the psychophysical procedure, keeping track of
+    responses, writing to data files, etc), to allow the experimenter to
+    worry about the things that are unique to each experiment (like the
+    design, stimulus generation, etc.).
+
+    See one of the settings.py files for more information.
+	
+	The main functions in Gustav are:
+	
+	    run - runs an experiment
+	    
+	    configure [not currently working] - intended to be a gui to help 
+	    with experimental design
+	    
+	    list_conditions - simply lists all of the conditions in an 
+	    experiment, along with all of the corresponding condition levels
+	
+"""
+
 __version__ = '0.1'
 __author__ = 'Christopher Brown <c-b@asu.edu>'
 
