@@ -733,3 +733,22 @@ def str_to_range(s):
     else:
         return sorted(result)
 
+if sys.platform == 'linux2':
+    import termios
+    TERMIOS = termios
+    def getchar():
+        #Returns a single character from standard input
+        import tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+elif sys.platform == "win32":
+    from msvcrt import getch
+    def getchar():
+        ch = getch()
+        return ch

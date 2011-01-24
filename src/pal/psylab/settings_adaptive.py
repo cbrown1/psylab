@@ -15,7 +15,7 @@ def setup(exp,run,var,stim,user):
     if os.name == 'posix':
         basedir = r'/home/code-breaker/Python'
     else:
-        basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
+        basedir = r'C:\Users\code-breaker\Documents\Python'
 
     # General Experimental Variables
     run.trialsperblock = 10    # The number of trials at each treatment or block
@@ -186,11 +186,13 @@ def setup(exp,run,var,stim,user):
 def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        p = var.dynamic['cur_rev'] + "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
-        ret = exp.term.get_input(None, exp.exp_name+"!",p)
+        p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
+        #ret = exp.term.get_input(None, exp.exp_name+"!",p)
+        exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True) # Since there's no other feedback, log trial info manually
+        ret = exp.utils.getchar()
         if str(ret) in exp.validKeys_:
             run.response = ret
-            exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
+            #exp.utils.log(exp,run,var,stim,user, ret, exp.logFile, True) # Since there's no other feedback, log trial info manually
             break
         elif str(ret) in exp.quitKeys:
             run.block_on = False
@@ -222,7 +224,8 @@ def pre_trial(exp,run,var,stim,user):
 
 def post_trial(exp, run, var, stim, user):
     exp.method.adaptive_post_trial(exp, run, var, stim, user)
-
+    exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'] + "\n", exp.logFile, True)
+	
 def post_block(exp,run,var,stim,user):
     print "Mean: " + str(np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))+", Std: " + str(np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))
     print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
