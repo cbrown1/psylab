@@ -30,9 +30,9 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-"""Experiment - A Python script to run psychophysical experiments
+"""PsyLab - A Python script to run psychophysical experiments
 
-    The goal of Experiment is to handle the routines that are common across
+    The goal of PsyLab is to handle the routines that are common across
     experiments (like the psychophysical procedure, keeping track of
     responses, writing to data files, etc), to allow the experimenter to
     worry about the things that are unique to each experiment (like the
@@ -140,25 +140,27 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     exp.settings.setup(exp,run,var,stim,user)
 
+
+    exp.method_str = exp.method
     try:
-        methodi = __import__('methods',globals(), locals(), exp.method)
+        methodi = __import__('methods',globals(), locals(), exp.method_str)
     except ImportError:
-        raise Exception, "Unknown experimental method: " + exp.method
-    method = getattr(methodi, exp.method)
-    method.initialize(exp,run,var,stim,user)
+        raise Exception, "Unknown experimental method: " + exp.method_str
+    exp.method = getattr(methodi, exp.method_str)
+    exp.method.initialize(exp,run,var,stim,user)
 
     exp.utils.get_frontend(exp, exp.frontend)
 
     # Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp
     if hasattr(exp.settings, 'pre_exp'):
         exp.pre_exp = exp.settings.pre_exp
-    elif hasattr(method, 'pre_exp'):
-        exp.pre_exp = method.pre_exp
+    elif hasattr(exp.method, 'pre_exp'):
+        exp.pre_exp = exp.method.pre_exp
 
     if hasattr(exp.settings, 'pre_block'):
         exp.pre_block = exp.settings.pre_block
-    elif hasattr(method, 'pre_block'):
-        exp.pre_block = method.pre_block
+    elif hasattr(exp.method, 'pre_block'):
+        exp.pre_block = exp.method.pre_block
 
     if hasattr(exp.settings, 'prompt_condition'):
         exp.prompt_condition = exp.settings.prompt_condition
@@ -176,18 +178,18 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     if hasattr(exp.settings, 'post_trial'):
         exp.post_trial = exp.settings.post_trial
-    elif hasattr(method, 'post_trial'):
-        exp.post_trial = method.post_trial
+    elif hasattr(exp.method, 'post_trial'):
+        exp.post_trial = exp.method.post_trial
 
     if hasattr(exp.settings, 'post_block'):
         exp.post_block = exp.settings.post_block
-    elif hasattr(method, 'post_block'):
-        exp.post_block = method.post_block
+    elif hasattr(exp.method, 'post_block'):
+        exp.post_block = exp.method.post_block
 
     if hasattr(exp.settings, 'post_exp'):
         exp.post_exp = exp.settings.post_exp
-    elif hasattr(method, 'post_exp'):
-        exp.post_exp = method.post_exp
+    elif hasattr(exp.method, 'post_exp'):
+        exp.post_exp = exp.method.post_exp
 
     exp.utils.process_initialize(exp,run,var,stim,user)
     exp.recordData = recordData

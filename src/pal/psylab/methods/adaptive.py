@@ -174,11 +174,12 @@ def initialize(exp, run, var, stim, user):
     var.dynamic['value'] = var.dynamic['val_start']
     var.dynamic['cur_rev'] = " "
 
-def post_trial(exp, run, var, stim, user):
-    '''Move this function to settingsfile
-    '''
+def adaptive_post_trial(exp, run, var, stim, user):
     track(str(run.response)==str(var.dynamic['correct']), exp, run, var, stim, user)
     exp.dynamic_step(var.dynamic['cur_step'], exp, run, var, stim, user)
     finish_trial(exp, run, var, stim, user)
 
     run.trial_on = False
+
+def post_trial(exp, run, var, stim, user):
+    adaptive_post_trial(exp, run, var, stim, user)

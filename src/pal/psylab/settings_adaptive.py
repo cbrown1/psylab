@@ -195,6 +195,7 @@ def prompt_response(exp,run,var,stim,user):
         elif str(ret) in exp.quitKeys:
             run.block_on = False
             run.psylab_is_go = False
+            var.dynamic['msg'] = "Cancelled by user"
             break;
 
 '''PRE_TRIAL
@@ -218,6 +219,9 @@ def pre_trial(exp,run,var,stim,user):
 
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
+
+def post_trial(exp, run, var, stim, user):
+    exp.method.adaptive_post_trial(exp, run, var, stim, user)
 
 def post_block(exp,run,var,stim,user):
     print "Mean: " + str(np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))+", Std: " + str(np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))
