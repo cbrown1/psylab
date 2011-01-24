@@ -30,7 +30,7 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-'''Adaptive tracking method for PsyLab
+'''Adaptive tracking method for Gustav
 
 '''
 # TODO: change vals to types, so we can specify the type on initialize error

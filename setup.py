@@ -5,13 +5,13 @@ from setuptools import setup
 import sys
 sys.path.append("src")
 
-import pal
-version = pal.__version__
+import psylab
+version = psylab.__version__
 
-packages = ['pal%s' % (p) for p in ['',
+packages = ['psylab%s' % (p) for p in ['',
                                     '.array',
                                     '.dataview',
-                                    '.exper',
+                                    '.gustav',
                                     '.hardware',
                                     '.misc',
                                     '.signal',
@@ -20,7 +20,7 @@ requires=[
 'numpy (>=1.2)',
 ]
 
-setup(name='PAL',
+setup(name='PsyLab',
       version=version,
       description='PsychoAcoustics Lab',
       long_description='''\
@@ -30,8 +30,8 @@ setup(name='PAL',
       author_email='c-b@asu.edu',
       maintainer='Christopher Brown',
       maintainer_email='c-b@asu.edu',
-      url='http://www.gitorious.com/pal',
-      package_dir = {'pal': 'src/pal'},
+      url='http://www.gitorious.com/psylab',
+      package_dir = {'psylab': 'src/psylab'},
       packages = packages,
       requires = requires,
       platforms = ['any'],

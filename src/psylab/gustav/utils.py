@@ -41,8 +41,7 @@ from waveio import wavread
 class exp:
     '''Experimental settings
     '''
-    exp_name = 'psylab'
-    exp_about = 'www.psy-lab.us'
+    exp_name = 'gustav'
     name = ''
     host = socket.gethostname()
     subjID = ''
@@ -85,9 +84,9 @@ class exp:
                 # Exit while-True loop
                 break
             elif ret in exp.quitKeys:
-                # User wants to exit. Break out of block, exper loops
+                # User wants to exit. Break out of block, gustav loops
                 run.block_on = False
-                run.psylab_is_go = False
+                run.gustav_is_go = False
                 break
 
     def prompt_condition(self,exp,run,var,stim,user):
@@ -95,7 +94,7 @@ class exp:
             ret = exp.term.get_input(None, exp.exp_name+"!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
             if ret in exp.quitKeys:
                 run.block_on = False
-                run.psylab_is_go = False
+                run.gustav_is_go = False
                 break
             elif ret.isdigit():
                 iret = int(ret) - 1
@@ -166,7 +165,7 @@ class run:
     condition = 0  # Current condition
     block_on = True
     trial_on = True
-    psylab_is_go = True
+    gustav_is_go = True
     response = ''
 
 
@@ -415,7 +414,7 @@ def menu_condition(exp,run,var,stim,user):
         if ret in conditions:
             sel.append(ret)
         elif ret in exp.quitKeys:
-            run.psylab_is_go = False
+            run.gustav_is_go = False
             break;
         elif ret in ['c']:
             sel = []
@@ -424,13 +423,13 @@ def menu_condition(exp,run,var,stim,user):
             for s in sel:
                 var.orderarray.append(int(s)-1)
             var.nblocks = len(var.orderarray)
-            run.psylab_is_go = True
+            run.gustav_is_go = True
             break;
         elif ret in ['s']:
             for s in sel:
                 var.orderarray.append(int(s)-1)
             var.nblocks = len(var.orderarray)
-            run.psylab_is_go = True
+            run.gustav_is_go = True
             break;
 
 
@@ -444,7 +443,7 @@ def get_current_stimulus(stim, stimset):
     stim.current[stimset]['txt'] = stim.sets[stimset]['tokens'][stim.current[stimset]['ind2']]['text']
     stim.current[stimset]['kw'] = stim.sets[stimset]['tokens'][stim.current[stimset]['ind2']]['kw']
     if stim.sets[stimset]['load'] == 'auto':
-        if stim.sets[stimset]['type'] == 'soundfiles':  # Check for manual done in exper
+        if stim.sets[stimset]['type'] == 'soundfiles':  # Check for manual done in gustav
             if stim.debug:
                 stim.current[stimset]['data'] = [0]
             else:

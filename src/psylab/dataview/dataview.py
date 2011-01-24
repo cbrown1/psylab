@@ -45,7 +45,7 @@ import numpy as np
 import csv
 from itertools import product
 from scipy.stats import nanmean, nanstd
-import pal.stats
+import psylab.stats
 
 class Dataset:
     """Representation of a set of data with one dependent variable.
@@ -77,14 +77,14 @@ class Dataset:
     comments = ""
 
     def anova_between(self):
-        return pal.stats.anova.anova_between(self.data, self.ivs)
+        return psylab.stats.anova.anova_between(self.data, self.ivs)
 
     def anova_within(self, looks=None):
         if looks == None:
-            return pal.stats.anova.anova_within(self.data,
+            return psylab.stats.anova.anova_within(self.data,
                                                 factors=self.ivs)
         else:
-            return pal.stats.anova.anova_within(self.data,
+            return psylab.stats.anova.anova_within(self.data,
                                                 looks_index=self.index_from_var[looks],
                                                 factors=self.ivs)
 
@@ -334,11 +334,11 @@ def from_arrays(labels=None, *args):
         dependent variable.
 
         >>> import numpy as np
-        >>> import pal
+        >>> import psylab
         >>> a = np.array("a1 a1 a2 a2".split(" "))
         >>> b = np.array("b1 b2 b1 b2".split(" "))
         >>> dv = np.array([1,2,3,4])
-        >>> d = pal.dataview.from_arrays(("A", "B", "dv"), a, b, dv)
+        >>> d = psylab.dataview.from_arrays(("A", "B", "dv"), a, b, dv)
         >>> d.labels
         (('A', ('a1', 'a2')), ('B', ('b1', 'b2')), ('dv', None))
         >>> d.data

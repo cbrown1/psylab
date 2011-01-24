@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# A PsyLab settings file!
+# A Gustav settings file!
 
 import os
 import numpy as np
@@ -283,7 +283,7 @@ def prompt_response(exp,run,stim,var,user):
             break
         elif ret in exp.quitKeys:
             run.block_on = False
-            run.psylab_is_go = False
+            run.gustav_is_go = False
             break;
 
 '''PRE_TRIAL

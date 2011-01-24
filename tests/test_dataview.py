@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.append(os.path.join("..","src"))
-import pal
+import psylab
 import numpy as np
 
 if __name__ == "__main__":
 
     print "Dataset demo [get all data]:"
 
-    d = pal.dataview.from_csv("data/small_2x3.csv", dv="score")
+    d = psylab.dataview.from_csv("data/small_2x3.csv", dv="score")
 
     print "Independent variables:",
     print d.ivs
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print "Dataset demo [get only 1 variable]:"
 
     # Now, specify a list of IV's to use (in this case, only 1: 'size')
-    d = pal.dataview.from_csv("data/small_2x3.csv", "score", ['size'])
+    d = psylab.dataview.from_csv("data/small_2x3.csv", "score", ['size'])
 
     print "Independent variables:",
     print d.ivs
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     print "DatasetView demo [get specified variable levels]:"
 
     # Read all data
-    d = pal.dataview.from_csv("data/three.csv", dv="dv")
+    d = psylab.dataview.from_csv("data/three.csv", dv="dv")
     # Create a view of the data where a = a1, and b = b1 | b2
     # This will give us a mean property with 2 values,
     # one for all scores in a1b1, one for scores in a1b2
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print "DatasetView demo [Using 'looks' variable]:"
 
     # Read all data
-    d = pal.dataview.from_csv("data/1f_within.csv", dv="dv")
+    d = psylab.dataview.from_csv("data/1f_within.csv", dv="dv")
     print "Variables in dataset: ",
     print d.ivs
     # First, don't specify a looks variable

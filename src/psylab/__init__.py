@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler;
+# All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +31,20 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-__version__ = '0.1'
-__author__ = 'Christopher Brown <c-b@asu.edu>'
+'''
+PsyLab - Psychoacoustics Lab
 
-from psylab import run, configure, list_conditions
+A loose collection of modules useful for various aspects of running
+psychoacoustics experiments, although several will be more generally
+useful.
+
+'''
+
+__version__ = '0.3'
+
+from array import array, nanproduct, nanmean
+from dataview import dataview
+from misc import csv_inspect, formatplot
+import signal
+import stats
+import gustav

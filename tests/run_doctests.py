@@ -1,6 +1,6 @@
 import sys, os
 sys.path.append(os.path.join("..","src"))
 
-import doctest, pal
+import doctest, psylab
 
-doctest.testmod(pal)
+doctest.testmod(psylab)

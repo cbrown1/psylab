@@ -34,7 +34,7 @@
 import numpy as np
 from scipy import stats
 from itertools import combinations, product
-from pal import nanproduct
+from psylab import nanproduct
 
 def anova_table(anova_data):
     """Generates a nicely formatted anova summary table

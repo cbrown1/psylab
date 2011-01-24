@@ -30,9 +30,9 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 #
 
-"""PsyLab - A Python script to run psychophysical experiments
+"""Gustav - A Python script to run psychophysical experiments
 
-    The goal of PsyLab is to handle the routines that are common across
+    The goal of Gustav is to handle the routines that are common across
     experiments (like the psychophysical procedure, keeping track of
     responses, writing to data files, etc), to allow the experimenter to
     worry about the things that are unique to each experiment (like the
@@ -60,9 +60,9 @@ def configure(settingsFile = None, frontend = None):
 
     # Settings File
     if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open Exper Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         if settingsFile == '':
-            print "Exper cancelled at user request"
+            print ""+exp.exp_name+" cancelled at user request"
             return;
     exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
     exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
@@ -86,9 +86,9 @@ def list_conditions(settingsFile = None, frontend = None):
 
     # Settings File
     if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open Exper Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         if settingsFile == '':
-            print "Exper cancelled at user request"
+            print ""+exp.exp_name+" cancelled at user request"
             return;
     exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
     exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
@@ -114,17 +114,17 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
     #if settingsFile == None:
-    #    settingsFile = exp.term.get_file(None, "Open Exper Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+    #    settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
     #    if settingsFile == '':
-    #        print "Exper cancelled at user request"
+    #        print ""+exp.exp_name+" cancelled at user request"
     #        return;
     settingsFile = 'settings_adaptive.py'
     subjectID = 4
 
     if subjectID == None:
-        exp.subjID = exp.term.get_input(parent=None, title = 'Exper!', prompt = 'Enter a Subject ID:')
+        exp.subjID = exp.term.get_input(parent=None, title = exp.exp_name+"!", prompt = 'Enter a Subject ID:')
         if exp.subjID == '':
-            print "No Subject ID entered, Exper cancelled at user request"
+            print "No Subject ID entered, "+exp.exp_name+" cancelled at user request"
             return;
     else:
         exp.subjID = str(subjectID)
@@ -202,7 +202,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     else:
         if not exp.recordData:
             print "WARNING: No data will be recorded!"
-    if run.psylab_is_go == False:
+    if run.gustav_is_go == False:
         print exp.exp_name+" cancelled at user request"
         return;
     ret = exp.gui.get_yesno(None, title = exp.exp_name+"!", prompt = "Ready to begin testing?")
@@ -219,14 +219,14 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         logstr += str(cond+1) + " "
     logstr += "]\n"
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
-    run.psylab_is_go = True
+    run.gustav_is_go = True
     exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
         else:
             run.condition = var.orderarray[run.block]
-        if run.psylab_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
+        if run.gustav_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
             if run.block != run.startblock: run.btrial = 0;
             else: run.btrial = run.starttrial - 1;
             run.block_on = True
@@ -256,10 +256,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
             exp.utils.update_time(run)
             exp.post_block(exp,run,var,stim,user)
-            if not run.psylab_is_go:
+            if not run.gustav_is_go:
                 break;
             # End while-block loop
-        if not run.psylab_is_go:
+        if not run.gustav_is_go:
             break;
     # End block loop
     exp.utils.update_time(run)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# A PsyLab settings file!
+# A Gustav settings file!
 
 import os
 import numpy as np
-import pal
+import psylab
 
 def setup(exp,run,var,stim,user):
 
@@ -196,7 +196,7 @@ def prompt_response(exp,run,var,stim,user):
             break
         elif str(ret) in exp.quitKeys:
             run.block_on = False
-            run.psylab_is_go = False
+            run.gustav_is_go = False
             var.dynamic['msg'] = "Cancelled by user"
             break;
 
@@ -209,9 +209,9 @@ def prompt_response(exp,run,var,stim,user):
 '''
 def pre_trial(exp,run,var,stim,user):
     var.dynamic['correct'] = np.random.random_integers(1,var.dynamic['intervals'])
-    tone = pal.signal.tone(int(var.current['freq']), user.fs, user.dur)
-    tone = pal.signal.ramps(tone, user.fs)
-    tone = pal.signal.atten(tone, 90-int(var.dynamic['value']))
+    tone = psylab.signal.tone(int(var.current['freq']), user.fs, user.dur)
+    tone = psylab.signal.ramps(tone, user.fs)
+    tone = psylab.signal.atten(tone, 90-int(var.dynamic['value']))
     quiet = np.zeros(tone.size)
     isi = np.zeros(user.isi/1000*user.fs)
     if var.dynamic['correct'] == 1:
