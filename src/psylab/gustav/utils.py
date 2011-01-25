@@ -754,6 +754,7 @@ if os.name == "posix":
         """Clear the console.
         """
         os.system('clear')
+
 elif os.name in ("nt", "dos", "ce"):
     from msvcrt import getch
     def getchar():
@@ -766,4 +767,15 @@ elif os.name in ("nt", "dos", "ce"):
         """Clear the console.
         """
         os.system('CLS')
+
+elif os.name == "mac":
+    def getchar():
+        '''Returns a single character from standard input
+        '''
+        # Nope. Try the posix function, since osx seems to have termios
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
 
