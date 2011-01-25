@@ -298,3 +298,9 @@ def pre_trial(exp,run,stim,var,user):
 
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
+
+
+if __name__ == '__main__':
+    import inspect
+    fname = inspect.getfile( inspect.currentframe() )
+    psylab.gustav.run(settingsFile=fname)

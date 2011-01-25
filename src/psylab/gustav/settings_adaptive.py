@@ -243,3 +243,9 @@ def post_block(exp,run,var,stim,user):
 
 def present_trial(exp,run,var,stim,user):
     pass
+
+
+if __name__ == '__main__':
+    import inspect
+    fname = inspect.getfile( inspect.currentframe() )
+    psylab.gustav.run(settingsFile=fname)
