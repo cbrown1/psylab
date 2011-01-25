@@ -410,6 +410,7 @@ def menu_condition(exp,run,var,stim,user):
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
         disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
+        clearscreen()
         ret = exp.term.get_input(parent=None, title = exp.exp_name+"!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
@@ -732,11 +733,13 @@ def str_to_range(s):
     else:
         return sorted(result)
 
-if sys.platform == 'linux2':
+# System-specific functions
+if os.name == "posix":
     import termios
     TERMIOS = termios
     def getchar():
-        #Returns a single character from standard input
+        '''Returns a single character from standard input
+        '''
         import tty, termios
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
@@ -746,8 +749,33 @@ if sys.platform == 'linux2':
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
-elif sys.platform == "win32":
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('clear')
+
+elif os.name in ("nt", "dos", "ce"):
     from msvcrt import getch
     def getchar():
+        '''Returns a single character from standard input
+        '''
         ch = getch()
         return ch
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('CLS')
+
+elif os.name == "mac":
+    def getchar():
+        '''Returns a single character from standard input
+        '''
+        # Nope. Try the posix function, since osx seems to have termios
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
+

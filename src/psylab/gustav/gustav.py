@@ -136,7 +136,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     except ImportError:
         raise Exception, "Unknown experimental method: " + exp.method_str
     exp.method = getattr(methodi, exp.method_str)
-    exp.method.initialize(exp,run,var,stim,user)
 
     exp.utils.get_frontend(exp, exp.frontend)
 
@@ -221,6 +220,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
+            exp.method.initialize(exp,run,var,stim,user)
             exp.pre_block(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
