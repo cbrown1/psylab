@@ -201,9 +201,9 @@ def prompt_response(exp,run,var,stim,user):
             break;
 
 '''PRE_TRIAL
-    This function gets called on every trial to generate the stimulus, do
-    any other processing you need, and present the stimulus. All settings
-    and variables are available. For the current level of a variable, use
+    This function gets called on every trial to generate the stimulus, and
+    do any other processing you need. All settings and variables are
+    available. For the current level of a variable, use
     var.current['varname']. The stimulus waveform can be played back
     using exp.utils.wavplay.
 '''
@@ -225,9 +225,20 @@ def pre_trial(exp,run,var,stim,user):
 def post_trial(exp, run, var, stim, user):
     exp.method.adaptive_post_trial(exp, run, var, stim, user)
     exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'] + "\n", exp.logFile, True)
-	
+
 def post_block(exp,run,var,stim,user):
-    print "Mean: " + str(np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))+", Std: " + str(np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:]))
+    if var.dynamic['good_run']:
+        # If this is a good run (exited normally), compute mean and sd
+        # values_rev is a list of the values at each reversal
+        # vals_to_avg is the number of values to average
+        # take the last (*-1) vals_to_avg of values_rev
+        mean = np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
+        sd = np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
+    else:
+        # otherwise, nan's
+        mean = np.nan
+        sd = np.nan
+    print "Mean: " + str(mean)+", Std: " + str(sd)
     print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
 
 def present_trial(exp,run,var,stim,user):

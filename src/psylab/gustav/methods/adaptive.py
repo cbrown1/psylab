@@ -34,7 +34,7 @@
 
 '''
 # TODO: change vals to types, so we can specify the type on initialize error
-dynamic_vars_user = {
+dynamic_vars_user = {            # These vals should be set by experimenter
             'name': '',          # Name of the dynamic variable
             'units': '',         # Units of the dynamic variable
             'intervals': 2,      # Number of intervals
@@ -50,7 +50,7 @@ dynamic_vars_user = {
             'max_trials': 0,     # Maximum number of trials to run
             'vals_to_avg': 0,    # The number of values to average
            }
-dynamic_vars_sys = {
+dynamic_vars_sys = {             # These vals are used for tracking
             'msg': "",           # Description of why the block ended
             'val_floor_count': 0,# Number of consecutive floor trials
             'val_ceil_count': 0, # Number of consecutive ceiling trials
@@ -64,7 +64,8 @@ dynamic_vars_sys = {
             'cur_dns': 0,        # Counter for current number of downs
             'cur_step': 0,       # Whether to step this trial; -1 = dn, 1 = up, 0 = none
             'correct': 0,        # The correct response
-            'cur_rev': "",       # For each trial, one of:
+            'good_run': False,   # True if the run did finished normally, otherwise False
+            'cur_rev': " ",      # For each trial, one of:
                                  #  ' ' for no change
                                  #  'v' for start dn
                                  #  '^' for start up
@@ -114,7 +115,7 @@ def track(correct, exp,run,var,stim,user):
             var.dynamic['cur_ups'] = 0                     #  Reset ups
             if var.dynamic['prev_dir'] == 1:               #  If previous direction was up
                 var.dynamic['values_track'].append(0)      #   No reversal
-                var.dynamic['cur_rev'] = " ",
+                var.dynamic['cur_rev'] = " "
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(0)      #   Don't record this as a change
@@ -153,12 +154,15 @@ def finish_trial(exp, run, var, stim, user):
     if run.block_on:
         if var.dynamic['run_n_trials'] > 0 and run.trial == var.dynamic['run_n_trials']:
             run.block_on = False
+            var.dynamic['good_run'] = True
             var.dynamic['msg'] = '%g trials reached' % var.dynamic['run_n_trials']
         elif var.dynamic['max_trials'] > 0 and run.trial == var.dynamic['max_trials']:
             run.block_on = False
+            var.dynamic['good_run'] = True
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
         elif len(var.dynamic['values_rev']) == len(var.dynamic['steps']):
             run.block_on = False
+            var.dynamic['good_run'] = True
             var.dynamic['msg'] = '%g reversals reached' % len(var.dynamic['steps'])
 
 def initialize(exp, run, var, stim, user):
@@ -172,7 +176,11 @@ def initialize(exp, run, var, stim, user):
     else:
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
-    var.dynamic['cur_rev'] = " "
+    var.dynamic['values'] = []
+    var.dynamic['values_track'] = []
+    var.dynamic['values_rev'] = []
+    var.dynamic['values_rev'] = []
+
 
 def adaptive_post_trial(exp, run, var, stim, user):
     track(str(run.response)==str(var.dynamic['correct']), exp, run, var, stim, user)
