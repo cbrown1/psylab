@@ -53,6 +53,7 @@ class exp:
     logFile = exp_name + '_logfile_$date.log'
     logFile_unexpanded = ''
     method = 'constant'
+    prompt = ''
     recordData = True
     responseMethod = 'key' # 'key' or 'text'. If key, be sure to set'validresponses'
     validKeys = '1, 2'  # list of valid responses
@@ -64,7 +65,7 @@ class exp:
     dataFile_unexpanded =''
     stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
-    cacheTrials = False
+    cacheTrials = False             # Unimplemented
     quitKeys = ['q', '/']
     responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
     methodTypes = ['constant', 'staircase']

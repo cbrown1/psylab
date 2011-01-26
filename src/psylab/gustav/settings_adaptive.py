@@ -21,7 +21,7 @@ def setup(exp,run,var,stim,user):
     run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_QuietThresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-
+    exp.prompt = 'Which interval?' # Prompt for subject
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'qt'
