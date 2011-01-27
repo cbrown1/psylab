@@ -147,7 +147,7 @@ def finish_trial(exp, run, var, stim, user):
         var.dynamic['val_ceil_count'] += 1
         if var.dynamic['val_ceil_count'] == var.dynamic['val_ceil_n']:
             run.block_on = False
-            var.dynamic['msg'] = '%g consecutive ceiling trials reached' % var.dynamic['val_ceiling_n']
+            var.dynamic['msg'] = '%g consecutive ceiling trials reached' % var.dynamic['val_ceil_n']
     else:
         var.dynamic['val_ceil_count'] = 0
 

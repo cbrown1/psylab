@@ -5,6 +5,7 @@
 import os
 import numpy as np
 import psylab
+import adaptiveForm
 
 def setup(exp,run,var,stim,user):
 
@@ -185,11 +186,10 @@ def setup(exp,run,var,stim,user):
 """
 def prompt_response(exp,run,var,stim,user):
     while True:
-        # The prompt is the trial feedback.
-        p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
-        #ret = exp.term.get_input(None, exp.exp_name+"!",p)
-        exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True) # Since there's no other feedback, log trial info manually
-        ret = exp.utils.getchar()
+        #ret = exp.utils.getchar()
+        exp.interface.app.processEvents()
+        ret = exp.interface.get_char()
+
         if str(ret) in exp.validKeys_:
             run.response = ret
             #exp.utils.log(exp,run,var,stim,user, ret, exp.logFile, True) # Since there's no other feedback, log trial info manually
@@ -218,16 +218,37 @@ def pre_trial(exp,run,var,stim,user):
         stim.stimarray = tone #np.vstack((tone, isi, quiet))
     else:
         stim.stimarray = tone #np.vstack((quiet, isi, tone))
+    p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
+    #ret = exp.term.get_input(None, exp.exp_name+"!",p)
+    print p,
+    #exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True) # Since there's no other feedback, log trial info manually
 
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
 
-	
+
 def post_trial(exp, run, var, stim, user):
     exp.method.adaptive_post_trial(exp, run, var, stim, user)
     exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'] + "\n", exp.logFile, True)
+    if run.block_on:
+        if str(var.dynamic['correct']).lower() == run.response.lower():
+            exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
+        else:
+            exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
 
-	
+def pre_exp(exp,run,var,stim,user):
+    exp.interface = adaptiveForm.AdaptiveInterfact(exp, run, exp.validKeys_)
+
+
+def post_exp(exp,run,var,stim,user):
+    exp.interface.dialog.close()
+
+
+def pre_block(exp,run,var,stim,user):
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.blocks))
+    #exp.interface.dialog.processEvents()
+
+
 def post_block(exp,run,var,stim,user):
     if var.dynamic['good_run']:
         # If this is a good run (exited normally), compute mean and sd
@@ -243,7 +264,7 @@ def post_block(exp,run,var,stim,user):
     print "Mean: " + str(mean)+", Std: " + str(sd)
     print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
 
-	
+
 def present_trial(exp,run,var,stim,user):
     pass
 
