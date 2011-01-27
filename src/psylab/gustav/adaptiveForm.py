@@ -47,14 +47,21 @@ class MessageBox(QtGui.QDialog):
 
         vbox.addLayout(bbox)
 
+        cbox = QtGui.QHBoxLayout()
+
+        self.blocks = QtGui.QLabel("")
+        cbox.addWidget(self.blocks)
+
+        cbox.addStretch(1)
+        
         cancelButton = QtGui.QPushButton("Cancel")
         cancelButton .clicked.connect(self.closeEvent)
-        cbox = QtGui.QHBoxLayout()
-        cbox.addStretch(1)
         cbox.addWidget(cancelButton)
 
         vbox.addLayout(cbox)
 
+        
+        
         self.setLayout(vbox)
 
         self.exp = exp
@@ -179,6 +186,8 @@ app = QtGui.QApplication(sys.argv)
 dialog = MessageBox(exp, run, keyDown, keyUp)
 dialog.show()
 dialog.setFixedSize(dialog.width(),dialog.height()) # <- Must be done after show
+
+dialog.blocks.setText("Block %g of %g" % (run.block+1, run.blocks))
 app.processEvents()
 
 # Getting/setting the position:
