@@ -13,15 +13,20 @@ altDown = False
 
 class MessageBox(QtGui.QDialog):
     def __init__(self, exp, run, keyDown, keyUp, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QtGui.QDialog.__init__(self, parent, QtCore.Qt.WindowTitleHint)
+        self.setWindowIcon(QtGui.QIcon('shs_head16.png'))
+        
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
 
         self.task = QtGui.QLabel(exp.prompt)
+        f = self.task.font()
+        f.setPointSize(14);
+        self.task.setFont(f)
         vbox.addWidget(self.task)
         bbox = QtGui.QHBoxLayout()
         self.default_button_stylesheet = "QPushButton {background-color: white; "
-        self.default_button_stylesheet_nobg = "font-size: 20px; font-weight: bold; border: 3px solid gray; border-radius: 10px;} QPushButton:pressed {background-color: lightGray;}"
+        self.default_button_stylesheet_nobg = "font-size: 20px; font-weight: bold; border: 4px solid gray; border-radius: 10px;} QPushButton:pressed {background-color: lightGray;}"
         self.default_button_stylesheet += self.default_button_stylesheet_nobg
         self.button_dict = {}
         self.button_dict["1"] = QtGui.QPushButton("1")
