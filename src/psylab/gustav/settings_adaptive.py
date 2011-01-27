@@ -177,12 +177,12 @@ def setup(exp,run,var,stim,user):
     user.isi = 250 # ms
 
 
-'''CUSTOM PROMPT
+"""CUSTOM PROMPT
     If you want a custom response prompt, define a function for it
     here. run.response should receive the response as a string, and
     if you want to cancel the experiment, set both run.block_on and
     run.pylab_is_go to False
-'''
+"""
 def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
@@ -200,13 +200,13 @@ def prompt_response(exp,run,var,stim,user):
             var.dynamic['msg'] = "Cancelled by user"
             break;
 
-'''PRE_TRIAL
+"""PRE_TRIAL
     This function gets called on every trial to generate the stimulus, and
     do any other processing you need. All settings and variables are
     available. For the current level of a variable, use
     var.current['varname']. The stimulus waveform can be played back
     using exp.utils.wavplay.
-'''
+"""
 def pre_trial(exp,run,var,stim,user):
     var.dynamic['correct'] = np.random.random_integers(1,var.dynamic['intervals'])
     tone = psylab.signal.tone(int(var.current['freq']), user.fs, user.dur)
@@ -222,10 +222,12 @@ def pre_trial(exp,run,var,stim,user):
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
 
+	
 def post_trial(exp, run, var, stim, user):
     exp.method.adaptive_post_trial(exp, run, var, stim, user)
     exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'] + "\n", exp.logFile, True)
 
+	
 def post_block(exp,run,var,stim,user):
     if var.dynamic['good_run']:
         # If this is a good run (exited normally), compute mean and sd
@@ -241,6 +243,7 @@ def post_block(exp,run,var,stim,user):
     print "Mean: " + str(mean)+", Std: " + str(sd)
     print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
 
+	
 def present_trial(exp,run,var,stim,user):
     pass
 

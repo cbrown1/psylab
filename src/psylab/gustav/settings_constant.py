@@ -259,19 +259,19 @@ def setup(exp,run,stim,var,user):
     """
     var.ignore = []
 
-    '''USER VARIABLES
+    """USER VARIABLES
         Add any additional variables you need here
-    '''
+    """
     user.prebuff = 150;
     user.postbuff = 150;
 
 
-'''CUSTOM PROMPT
+"""CUSTOM PROMPT
     If you want a custom response prompt, define a function for it
     here. run.response should receive the response as a string, and
     if you want to cancel the experiment, set both run.block_on and
     run.pylab_is_go to False
-'''
+"""
 def prompt_response(exp,run,stim,var,user):
     while True:
         # The prompt is the trial feedback.
@@ -286,13 +286,13 @@ def prompt_response(exp,run,stim,var,user):
             run.gustav_is_go = False
             break;
 
-'''PRE_TRIAL
+"""PRE_TRIAL
     This function gets called on every trial to generate the stimulus, do
     any other processing you need, and present the stimulus. All settings
     and variables are available. For the current level of a variable, use
     var.current['varname']. The stimulus waveform can be played back
     using exp.utils.wavplay.
-'''
+"""
 def pre_trial(exp,run,stim,var,user):
     stim.stimarray = np.zeros((1))
 
