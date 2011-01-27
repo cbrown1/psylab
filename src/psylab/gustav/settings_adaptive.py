@@ -218,7 +218,7 @@ def pre_trial(exp,run,var,stim,user):
         stim.stimarray = tone #np.vstack((tone, isi, quiet))
     else:
         stim.stimarray = tone #np.vstack((quiet, isi, tone))
-    p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
+    p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + " " + var.dynamic['units'] + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
     #ret = exp.term.get_input(None, exp.exp_name+"!",p)
     print p,
     #exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True) # Since there's no other feedback, log trial info manually
@@ -245,7 +245,7 @@ def post_exp(exp,run,var,stim,user):
 
 
 def pre_block(exp,run,var,stim,user):
-    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.blocks))
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
     #exp.interface.dialog.processEvents()
 
 
