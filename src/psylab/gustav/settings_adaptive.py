@@ -189,10 +189,8 @@ def prompt_response(exp,run,var,stim,user):
         #ret = exp.utils.getchar()
         exp.interface.app.processEvents()
         ret = exp.interface.get_char()
-
         if str(ret) in exp.validKeys_:
             run.response = ret
-            #exp.utils.log(exp,run,var,stim,user, ret, exp.logFile, True) # Since there's no other feedback, log trial info manually
             break
         elif str(ret) in exp.quitKeys:
             run.block_on = False
@@ -220,21 +218,20 @@ def pre_trial(exp,run,var,stim,user):
         stim.stimarray = tone #np.vstack((quiet, isi, tone))
     p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + " " + var.dynamic['units'] + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
     #ret = exp.term.get_input(None, exp.exp_name+"!",p)
-    print p,
-    #exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True) # Since there's no other feedback, log trial info manually
-
+    exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
 
     stim.clipped = len(stim.stimarray[stim.stimarray>1])
 
 
 def post_trial(exp, run, var, stim, user):
     exp.method.adaptive_post_trial(exp, run, var, stim, user)
-    exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'] + "\n", exp.logFile, True)
-    if run.block_on:
+    if run.gustav_is_go:
+        exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'], exp.logFile, True)
         if str(var.dynamic['correct']).lower() == run.response.lower():
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
         else:
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
+    exp.utils.log(exp,run,var,stim,user,  "\n", exp.logFile, True)
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = adaptiveForm.AdaptiveInterfact(exp, run, exp.validKeys_)
@@ -246,19 +243,13 @@ def post_exp(exp,run,var,stim,user):
 
 def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
-    #exp.interface.dialog.processEvents()
 
 
 def post_block(exp,run,var,stim,user):
     if var.dynamic['good_run']:
-        # If this is a good run (exited normally), compute mean and sd
-        # values_rev is a list of the values at each reversal
-        # vals_to_avg is the number of values to average
-        # take the last (*-1) vals_to_avg of values_rev
         mean = np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
         sd = np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
     else:
-        # otherwise, nan's
         mean = np.nan
         sd = np.nan
     print "Mean: " + str(mean)+", Std: " + str(sd)

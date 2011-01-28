@@ -66,10 +66,9 @@ class AdaptiveInterfact():
             self.setModal=False
 
         def closeEvent(self, event):
-            self.exp.waitingForResponse = False
-            self.run.trial_on = False
-            self.run.block_on = False
-            self.run.gustav_is_go = False
+            # fake a quit:
+            self.waitingForResponse = True
+            self.keyDown(self.exp, self.run, ord(self.exp.quitKeys[0]))
 
         def keyPressEvent(self, event):
             self.keyDown(self.exp, self.run, event.key())
@@ -84,13 +83,11 @@ class AdaptiveInterfact():
             if self.waitingForResponse:
                 if key < 256:
                     thiskey = chr(key).lower()
-                    if thiskey in exp.quitKeys:
+                    if thiskey in self.exp.quitKeys:
                         # Close Gustav...
-                        exp.waitingForResponse = False
-                        run.block_on = False
-                        run.gustav_is_go = False
-                        #dialog.close() # <- move this to settingsfile
-                    elif thiskey in exp.validKeys_:
+                        self.char = thiskey
+                        self.waitingForResponse = False
+                    elif thiskey in self.exp.validKeys_:
                         self.char = thiskey
                         self.waitingForResponse = False
 
@@ -102,12 +99,14 @@ class AdaptiveInterfact():
             elif key == QtCore.Qt.Key_Alt:
                 altDown = False
 
+
     # End AdaptiveDialog
 
     def get_char(self):
         """Waits modally for a keypress
         """
         self.dialog.waitingForResponse = True
+        sys.stdout.flush() # In case the output of a prior print statement has been buffered
         while self.dialog.waitingForResponse:
             self.app.processEvents()
             time.sleep(.1)
