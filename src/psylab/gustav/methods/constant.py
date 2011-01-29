@@ -34,8 +34,8 @@
 
 '''
 
-def initialize(exp,run,var,stim,user):
-    pass
+#def initialize(exp,run,var,stim,user):
+#    pass
 
 
 def pre_exp(exp, run, var, stim, user):

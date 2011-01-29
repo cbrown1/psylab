@@ -106,20 +106,26 @@ class exp:
     def present_trial(self,exp,run,var,stim,user):
         pass
 
-    def pre_exp(self,exp,run,var,stim,user):
+    def pre_exp(exp,run,var,stim,user):
         pass
 
-    def pre_block(self,exp,run,var,stim,user):
+    def pre_block(exp,run,var,stim,user):
         pass
 
-    def post_trial(self,exp,run,var,stim,user):
+    def post_trial(exp,run,var,stim,user):
         pass
 
-    def post_block(self,exp,run,var,stim,user):
+    def post_block(exp,run,var,stim,user):
         pass
 
-    def post_exp(self,exp,run,var,stim,user):
+    def post_exp(exp,run,var,stim,user):
         pass
+
+    pre_exp_ = [pre_exp]
+    pre_block_ = [pre_block]
+    post_trial_ = [post_trial]
+    post_block_ = [post_block]
+    post_exp_ = [post_exp]
 
 
 class var:
@@ -176,9 +182,45 @@ class user:
     pass
 
 
-def process_initialize(exp,run,var,stim,user):
+def initialize_experiment(exp,run,var,stim,user):
     '''Do stuff necessary for the start of an experiment
     '''
+    exp.utils.get_frontend(exp, exp.frontend)
+    # Pull in any custom functions, first from exp, then method, then settings.
+    if hasattr(exp.method, 'pre_exp'):
+        exp.pre_exp_.append(exp.method.pre_exp)
+    if hasattr(exp.settings, 'pre_exp'):
+        exp.pre_exp_.append(exp.settings.pre_exp)
+    if hasattr(exp.method, 'pre_block'):
+        exp.pre_block_.append(exp.method.pre_block)
+    if hasattr(exp.settings, 'pre_block'):
+        exp.pre_block_.append(exp.settings.pre_block)
+
+    if hasattr(exp.settings, 'prompt_condition'):
+        exp.prompt_condition = exp.settings.prompt_condition
+
+    if hasattr(exp.settings, 'pre_trial'):
+        exp.pre_trial = exp.settings.pre_trial
+    else:
+        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
+
+    if hasattr(exp.settings, 'present_trial'):
+        exp.present_trial = exp.settings.present_trial
+    if hasattr(exp.settings, 'prompt_response'):
+        exp.prompt_response = exp.settings.prompt_response
+    if hasattr(exp.method, 'post_trial'):
+        exp.post_trial_.append(exp.method.post_trial)
+    if hasattr(exp.settings, 'post_trial'):
+        exp.post_trial_.append(exp.settings.post_trial)
+    if hasattr(exp.method, 'post_block'):
+        exp.post_block_.append(exp.method.post_block)
+    if hasattr(exp.settings, 'post_block'):
+        exp.post_block_.append(exp.settings.post_block)
+    if hasattr(exp.method, 'post_exp'):
+        exp.post_exp_.append(exp.method.post_exp)
+    if hasattr(exp.settings, 'post_exp'):
+        exp.post_exp_.append(exp.settings.post_exp)
+
     exp.utils.process_stimuli(stim)
     exp.utils.process_variables(var)
     stim.debug = exp.debug

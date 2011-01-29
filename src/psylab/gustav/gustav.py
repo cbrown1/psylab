@@ -137,49 +137,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         raise Exception, "Unknown experimental method: " + exp.method_str
     exp.method = getattr(methodi, exp.method_str)
 
-    exp.utils.get_frontend(exp, exp.frontend)
+    exp.utils.initialize_experiment(exp,run,var,stim,user)
 
-    # Pull in any custom functions. Generally, the order of precedence is: Settings > Method > Exp
-    if hasattr(exp.settings, 'pre_exp'):
-        exp.pre_exp = exp.settings.pre_exp
-    elif hasattr(exp.method, 'pre_exp'):
-        exp.pre_exp = exp.method.pre_exp
-
-    if hasattr(exp.settings, 'pre_block'):
-        exp.pre_block = exp.settings.pre_block
-    elif hasattr(exp.method, 'pre_block'):
-        exp.pre_block = exp.method.pre_block
-
-    if hasattr(exp.settings, 'prompt_condition'):
-        exp.prompt_condition = exp.settings.prompt_condition
-
-    if hasattr(exp.settings, 'pre_trial'):
-        exp.pre_trial = exp.settings.pre_trial
-    else:
-        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
-
-    if hasattr(exp.settings, 'present_trial'):
-        exp.present_trial = exp.settings.present_trial
-
-    if hasattr(exp.settings, 'prompt_response'):
-        exp.prompt_response = exp.settings.prompt_response
-
-    if hasattr(exp.settings, 'post_trial'):
-        exp.post_trial = exp.settings.post_trial
-    elif hasattr(exp.method, 'post_trial'):
-        exp.post_trial = exp.method.post_trial
-
-    if hasattr(exp.settings, 'post_block'):
-        exp.post_block = exp.settings.post_block
-    elif hasattr(exp.method, 'post_block'):
-        exp.post_block = exp.method.post_block
-
-    if hasattr(exp.settings, 'post_exp'):
-        exp.post_exp = exp.settings.post_exp
-    elif hasattr(exp.method, 'post_exp'):
-        exp.post_exp = exp.method.post_exp
-
-    exp.utils.process_initialize(exp,run,var,stim,user)
     exp.recordData = recordData
     if exp.recordData:
         if exp.dataString_Trial == '' or exp.dataString_Trial == None:
@@ -198,8 +157,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         print exp.exp_name+" cancelled at user request"
         return;
 
-    exp.pre_exp(exp,run,var,stim,user)
-
+    for f in exp.pre_exp_: f(exp,run,var,stim,user)
+    print len(exp.post_trial_)
     # Begin block loop
     exp.utils.update_time(run)
     logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\nConditions (%s): [ " % (run.date, run.time, exp.name, exp.subjID, var.order)
@@ -220,8 +179,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
-            exp.method.initialize(exp,run,var,stim,user)
-            exp.pre_block(exp,run,var,stim,user)
+            #exp.method.initialize(exp,run,var,stim,user)
+            for f in exp.pre_block_: f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
             exp.utils.record_data(exp,run,var,stim,user, block=True)
 
@@ -237,14 +196,14 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     exp.present_trial(exp,run,var,stim,user)
                     exp.prompt_response(exp,run,var,stim,user)
 
-                    exp.post_trial(exp,run,var,stim,user)
+                    for f in exp.post_trial_: f(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
                     exp.utils.record_data(exp,run,var,stim,user)
 
                     run.btrial += 1
 
             exp.utils.update_time(run)
-            exp.post_block(exp,run,var,stim,user)
+            for f in exp.post_block_: f(exp,run,var,stim,user)
             if not run.gustav_is_go:
                 break;
             # End while-block loop
@@ -252,7 +211,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             break;
     # End block loop
     exp.utils.update_time(run)
-    exp.post_exp(exp,run,var,stim,user)
+    for f in exp.post_exp_: f(exp,run,var,stim,user)
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 

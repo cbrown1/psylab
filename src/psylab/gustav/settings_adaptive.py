@@ -159,7 +159,7 @@ def setup(exp,run,var,stim,user):
         make the first item in the print range 'random' to randomize the specified
         range.
     """
-    var.order = 'menu'
+    var.order = 'natural'
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -220,45 +220,30 @@ def pre_trial(exp,run,var,stim,user):
     #ret = exp.term.get_input(None, exp.exp_name+"!",p)
     exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
 
-    stim.clipped = len(stim.stimarray[stim.stimarray>1])
-
-
 def post_trial(exp, run, var, stim, user):
-    exp.method.adaptive_post_trial(exp, run, var, stim, user)
     if run.gustav_is_go:
-        exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_rev'], exp.logFile, True)
+        exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_status'], exp.logFile, True)
         if str(var.dynamic['correct']).lower() == run.response.lower():
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
         else:
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
-    exp.utils.log(exp,run,var,stim,user,  "\n", exp.logFile, True)
+    exp.utils.log(exp,run,var,stim,user, "\n", exp.logFile, True)
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = adaptiveForm.AdaptiveInterfact(exp, run, exp.validKeys_)
 
-
 def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
-
 
 def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
 
-
 def post_block(exp,run,var,stim,user):
-    if var.dynamic['good_run']:
-        mean = np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
-        sd = np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
-    else:
-        mean = np.nan
-        sd = np.nan
-    print "Mean: " + str(mean)+", Std: " + str(sd)
+    print "Mean: " + str(var.dynamic['mean'])+", Std: " + str(var.dynamic['sd'])
     print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
-
 
 def present_trial(exp,run,var,stim,user):
     pass
-
 
 if __name__ == '__main__':
     import inspect
