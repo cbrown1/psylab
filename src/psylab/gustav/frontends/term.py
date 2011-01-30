@@ -2,6 +2,7 @@
 
 import Tkinter
 import tkFileDialog, tkSimpleDialog, tkMessageBox
+import os
 
 name = 'term'
 
@@ -43,15 +44,6 @@ def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
     else:
         return fname
 
-def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
-    """Opens a simple prompt for user input, returns a string
-    """
-    try:
-        ret = raw_input(prompt)
-    except EOFError:
-        ret = ''
-    return ret
-
 def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = [], current = 0, editable = False):
     """Opens a simple prompt to choose an item from a list, returns a string
     """
@@ -84,4 +76,62 @@ def show_message(parent=None, title = 'Title', message = 'Message', msgtype = 'I
         print message
     else:
         print msgtype + ": "+ message
+
+
+def get_string(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+    """Opens a simple prompt for user input, returns a string
+    """
+    try:
+        ret = raw_input(prompt)
+    except EOFError:
+        ret = ''
+    return ret
+
+
+# System-specific functions
+if os.name in ["posix", "mac"]:
+    import termios
+    TERMIOS = termios
+    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        import tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
+        #os.system('clear')
+
+elif os.name in ("nt", "dos", "ce"):
+    from msvcrt import getch
+    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        ch = getch()
+        return ch
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('CLS')
+
+elif os.name == "mac":
+    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        # Nope. Try the posix function, since osx seems to have termios
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
 

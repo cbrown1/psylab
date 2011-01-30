@@ -3,9 +3,11 @@
 # A Gustav settings file!
 
 import os
+import datetime
 import numpy as np
 import psylab
 import adaptiveForm
+from inspect import getmembers
 
 def setup(exp,run,var,stim,user):
 
@@ -134,11 +136,10 @@ def setup(exp,run,var,stim,user):
                                       ]
                         });
 
-
     var.dynamic = { 'name': 'level',     # Name of the dynamic variable
                     'units': 'dB',       # Units of the dynamic variable
                     'intervals': 2,      # Number of intervals
-                    'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (len = #revs)
+                    'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (#revs = len)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
                     'val_start': 70,     # Starting value
@@ -216,7 +217,8 @@ def pre_trial(exp,run,var,stim,user):
         stim.stimarray = tone #np.vstack((tone, isi, quiet))
     else:
         stim.stimarray = tone #np.vstack((quiet, isi, tone))
-    p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + " " + var.dynamic['units'] + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
+    p = "  Trial %2g, dyn: %g %s, Int: %g, Resp: " % (run.trial+1, var.dynamic['value'], var.dynamic['units'], var.dynamic['correct'])
+    #p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + " " + var.dynamic['units'] + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
     #ret = exp.term.get_input(None, exp.exp_name+"!",p)
     exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
 
@@ -238,14 +240,48 @@ def post_exp(exp,run,var,stim,user):
 def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
 
-def post_block(exp,run,var,stim,user):
-    print "Mean: " + str(var.dynamic['mean'])+", Std: " + str(var.dynamic['sd'])
-    print "Block " + str(run.block+1) + " ended at " + run.time + ": " + var.dynamic['msg'] + "\n"
-
 def present_trial(exp,run,var,stim,user):
     pass
+
+def write_data_as_class(exp,run,var,stim,user):
+    import codecs
+    if os.path.isfile("test_writedata.py"):
+        f = codecs.open("test_writedata.py", encoding='utf-8', mode='a')
+    else:
+        f = codecs.open("test_writedata.py", encoding='utf-8', mode='w')
+        f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav\n\n")
+    f.write(u"class run_%s():\n" % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+    f.write(u"    name = '%s'\n" % exp.name)
+    f.write(u"    note = '%s'\n" % exp.note)
+    f.write(u"    subjid = '%s'\n" % exp.subjID)
+
+    f.write(u"    variables = {\n")
+    for key, val in var.current.items():
+        f.write(u"        '%s' = %r,\n" % (key, val))
+    f.write(u"    }\n")
+
+    items = getmembers(user)
+    f.write(u"    user = {\n")
+    for key, val in items:
+        if key[:2] != "__":
+            f.write(u"        '%s' = %r,\n" % (key, val))
+    f.write(u"    }\n")
+
+    f.write(u"    dynamic = {\n")
+    for key, val in var.dynamic.items():
+        if key not in exp.method.dynamic_vars_track:
+            f.write(u"        '%s' = %r,\n" % (key, val))
+    f.write(u"    }\n\n")
+    f.close()
+
+def post_block(exp,run,var,stim,user):
+    # TODO: Print conditions/levels. Also, use logging instead of print
+    p = "Mean: %g, SD: %g\nBlock %g ended at %s: %s\n" % (var.dynamic['mean'], var.dynamic['sd'], run.block+1, run.time, var.dynamic['msg'])
+    exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
+    write_data_as_class(exp,run,var,stim,user)
 
 if __name__ == '__main__':
     import inspect
     fname = inspect.getfile( inspect.currentframe() )
     psylab.gustav.run(settingsFile=fname)
+

@@ -37,7 +37,8 @@
 import numpy as np
 
 # TODO: change vals to types, so we can specify the type on initialize error
-dynamic_vars_user = {            # These vals should be set by experimenter
+# TODO: Make varnames more consistent (block, trial, etc)
+dynamic_vars_user = {            # These must be set by experimenter
             'name': '',          # Name of the dynamic variable
             'units': '',         # Units of the dynamic variable
             'intervals': 2,      # Number of intervals
@@ -53,30 +54,32 @@ dynamic_vars_user = {            # These vals should be set by experimenter
             'max_trials': 0,     # Maximum number of trials to run
             'vals_to_avg': 0,    # The number of values to average
            }
-dynamic_vars_sys = {             # These vals are used for tracking
+dynamic_vars_block = {           # Might be useful for stimgen or at end of block
             'msg': "",           # Description of why the block ended
-            'val_floor_count': 0,# Number of consecutive floor trials
-            'val_ceil_count': 0, # Number of consecutive ceiling trials
-            'value': 0,          # Current dynamic value
             'values': [],        # Array of values
             'values_track': [],  # 0 = no change, -1 = reversal/dn, 1 = reversal/up
             'values_rev': [],    # Values at reversals
+            'good_run': False,   # True if the run did finished normally, otherwise False
+           }
+dynamic_vars_track = {           # These vals are used for tracking
+            'value': 0,          # Current dynamic value
+            'val_floor_count': 0,# Number of consecutive floor trials
+            'val_ceil_count': 0, # Number of consecutive ceiling trials
             'prev_dir': 0,       # Previous direction; -1 = dn, 1 = up
             'init_dir': 0,       # Initial direction; -1 = dn, 1 = up
             'cur_ups': 0,        # Counter for current number of ups
             'cur_dns': 0,        # Counter for current number of downs
             'cur_step': 0,       # Whether to step this trial; -1 = dn, 1 = up, 0 = none
             'correct': 0,        # The correct response
-            'good_run': False,   # True if the run did finished normally, otherwise False
-            'cur_correct': True, # Whether the current response was correct
+            'cur_correct': False,# Whether the current response was correct
             'cur_status': " ",   # For each trial, one of:
                                  #  ' ' for no change
                                  #  'v' for start dn
                                  #  '^' for start up
-                                 #  '+' for rev dn
-                                 #  '-' for rev up
-                                 #  'fn' for floor trial, n
-                                 #  'cn' for ceiling up
+                                 #  '+n' for rev dn, n = reversal #
+                                 #  '-n' for rev up, n = reversal #
+                                 #  'fn' for floor trials, n = # consecutive floor
+                                 #  'cn' for ceiling trials
            }
 
 def step(cur_step,exp,run,var,stim,user):
@@ -109,7 +112,7 @@ def track(exp,run,var,stim,user):
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['values_track'].append(-1)     #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
-                var.dynamic['cur_status'] = "-"
+                var.dynamic['cur_status'] = "-%g" % len(var.dynamic['values_rev'])
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
             var.dynamic['cur_status'] = " "
@@ -131,7 +134,7 @@ def track(exp,run,var,stim,user):
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['values_track'].append(1)      #   Record reversal
                 var.dynamic['values_rev'].append(var.dynamic['value'])
-                var.dynamic['cur_status'] = "+"
+                var.dynamic['cur_status'] = "+%g" % len(var.dynamic['values_rev'])
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
             var.dynamic['cur_status'] = " "
@@ -143,7 +146,7 @@ def finish_trial(exp, run, var, stim, user):
     if var.dynamic['value'] == var.dynamic['val_floor']:
         if var.dynamic['cur_step'] == -1:
             var.dynamic['val_floor_count'] += 1
-            var.dynamic['cur_status'] = "f" + str(var.dynamic['val_floor_count'])
+            var.dynamic['cur_status'] = "f%g" % var.dynamic['val_floor_count']
         elif  not var.dynamic['cur_correct']:
             var.dynamic['val_floor_count'] = 0
         if var.dynamic['val_floor_count'] == var.dynamic['val_floor_n']:
@@ -154,7 +157,7 @@ def finish_trial(exp, run, var, stim, user):
     if var.dynamic['value'] == var.dynamic['val_ceil']:
         if var.dynamic['cur_step'] == 1:
             var.dynamic['val_ceil_count'] += 1
-            var.dynamic['cur_status'] = "c" + str(var.dynamic['val_ceil_count'])
+            var.dynamic['cur_status'] = "c%g" % var.dynamic['val_ceil_count']
         elif var.dynamic['cur_correct']:  # At ceil, correct, but not a step. So reset ceil_count
             var.dynamic['val_ceil_count'] = 0
         if var.dynamic['val_ceil_count'] == var.dynamic['val_ceil_n']:
@@ -178,11 +181,16 @@ def finish_trial(exp, run, var, stim, user):
             var.dynamic['msg'] = '%g reversals reached' % len(var.dynamic['steps'])
 
 def pre_block(exp, run, var, stim, user):
+    missing_vars = ''
     for key,val in dynamic_vars_user.items():
         if not var.dynamic.has_key(key):
-            raise Exception, "Dynamic variable not set: var.dynamic['" + key + "']"
-    for key,val in dynamic_vars_sys.items():
-        var.dynamic[key] = val
+            missing_vars += "var.dynamic['" + key + "']\n"
+    if missing_vars != '':
+            raise Exception, "The following dynamic variables must be set: \n\n%s" % missing_vars
+    d = var.dynamic.copy()
+    var.dynamic = dynamic_vars_block.copy()
+    var.dynamic.update(dynamic_vars_track.copy())
+    var.dynamic.update(d.copy())
     if hasattr(exp.settings, 'step'):
         exp.dynamic_step = exp.settings.step
     else:
@@ -191,7 +199,8 @@ def pre_block(exp, run, var, stim, user):
     var.dynamic['values'] = []
     var.dynamic['values_track'] = []
     var.dynamic['values_rev'] = []
-    var.dynamic['values_rev'] = []
+    var.dynamic['prev_dir'] = 0
+    var.dynamic['init_dir'] = 0
 
 def post_trial(exp, run, var, stim, user):
     var.dynamic['cur_correct'] = str(run.response)==str(var.dynamic['correct'])
