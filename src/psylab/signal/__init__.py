@@ -54,6 +54,7 @@ interp_lin - Interpolates a signal using linear interpolation
 interp_spline - Interpolates a signal using cubic spline interpolation
 lts - Computes a long-term spectrum of a signal
 magspec - Computes the magnitude spectrum of a signal
+mix - Mixes [adds] signals at specified offsets, zero padding as needed
 mls - Generates maximum-length sequences
 ms2samp - Converts milliseconds to samples
 normalize - Normalizes wavefiles, so that the overall peak is 1

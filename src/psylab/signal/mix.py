@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2010-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,29 +31,36 @@
 # 
 
 import numpy as np
+from zeropad import zeropad
 
-def mix( what, where, fs, offset ):
-    '''Mixes one array with another, at a specified offset in time
+def mix( signals, offsets=None ):
+    '''Mixes [adds] signals at specified offsets, zero padding as needed
+    
+        This function may be useful when you need to combine two or more signals
+        that may be of varying lengths, or when some amout of delay is needed. 
         
         Parameters
         ----------
-        what : array
-            The array to copy
+        signals : list of ndarrays
+            A list of ndarrays to be combined.
 
-        where : array
-            The array to paste into
-            
-        fs : scalar
-            The sampling frequency
+        offsets : list of scalars
+            A list of offset values, in samples. Should be either `None` for no 
+            offsets, or a list that must be the same length as signals. 
         
-        offset : scalar
-            The position, in ms to paste
-
         Returns
         -------
         out : array
-            The two input arrays combined
+            The input arrays combined
+
     '''
-    prepad = np.zeros(np.round((offset/1000.)*fs))
-    postpad = np.zeros(where.shape[0] - ( prepad.shape[0] + what.shape[0]))
-    return np.hstack((prepad, what, postpad)) + where
+    out = np.zeros(1)    
+    if offsets is None:
+        offsets = list(np.zeros(len(signals)))
+    
+    for sig,off in zip(signals,offsets):
+        prepad = np.zeros(off)
+        this = np.hstack((prepad, sig))
+        this,out = zeropad(this,out)
+        out = out + this
+    return out
