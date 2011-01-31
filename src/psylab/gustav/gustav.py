@@ -90,7 +90,7 @@ def list_conditions(settingsFile = None, frontend = None):
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
 
-
+# TODO: recordData should be a s
 def run(settingsFile = None, subjectID = None, frontend = None, recordData = True):
 
     var = utils.var()
@@ -167,7 +167,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     logstr += "]\n"
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
     run.gustav_is_go = True
-    exp.utils.record_data(exp,run,var,stim,user, header=True)
+    if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
@@ -182,7 +182,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             #exp.method.initialize(exp,run,var,stim,user)
             for f in exp.pre_block_: f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
-            exp.utils.record_data(exp,run,var,stim,user, block=True)
+            if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, block=True)
 
             while run.block_on:
                 run.trial = (run.block*run.trialsperblock)+run.btrial
@@ -198,7 +198,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
                     for f in exp.post_trial_: f(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
-                    exp.utils.record_data(exp,run,var,stim,user)
+                    if exp.recordData: exp.utils.record_data(exp,run,var,stim,user)
 
                     run.btrial += 1
 

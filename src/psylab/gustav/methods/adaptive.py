@@ -33,7 +33,8 @@
 '''Adaptive tracking method for Gustav
 
 '''
-
+import os, codecs
+from inspect import getmembers
 import numpy as np
 
 # TODO: change vals to types, so we can specify the type on initialize error
@@ -218,3 +219,35 @@ def post_block(exp, run, var, stim, user):
         var.dynamic['mean'] = np.nan
         var.dynamic['sd'] = np.nan
 
+def record_block_data(exp,run,var,stim,user):
+    if os.path.isfile(exp.dataFile):
+        f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
+    else:
+        f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
+        f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav\n\n")
+    f.write(u"class block_%s_%s():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
+    f.write(u"    name = '%s'\n" % exp.name)
+    f.write(u"    note = '%s'\n" % exp.note)
+    f.write(u"    subjid = '%s'\n" % exp.subjID)
+    f.write(u"    date = '%s'\n" % run.date)
+    f.write(u"    time = '%s'\n" % run.time)
+    f.write(u"    host = '%s'\n" % exp.host)
+
+    f.write(u"    variables = {\n")
+    for key, val in var.current.items():
+        f.write(u"        '%s' : %r,\n" % (key, val))
+    f.write(u"    }\n")
+
+    items = getmembers(user)
+    f.write(u"    user = {\n")
+    for key, val in items:
+        if key[:2] != "__":
+            f.write(u"        '%s' : %r,\n" % (key, val))
+    f.write(u"    }\n")
+
+    f.write(u"    dynamic = {\n")
+    for key, val in var.dynamic.items():
+        if key not in exp.method.dynamic_vars_track:
+            f.write(u"        '%s' : %r,\n" % (key, val))
+    f.write(u"    }\n\n")
+    f.close()
