@@ -52,6 +52,7 @@ gammatone - Computes the filter coefficients for a bank of Gammatone filters [UN
 hcomplex - Generates harmonic complexes
 interp_lin - Interpolates a signal using linear interpolation
 interp_spline - Interpolates a signal using cubic spline interpolation
+lts - Computes a long-term spectrum of a signal
 magspec - Computes the magnitude spectrum of a signal
 mls - Generates maximum-length sequences
 ms2samp - Converts milliseconds to samples
@@ -95,6 +96,7 @@ from f0 import f0
 from freq_compression import freq_compress
 from gammatone import gammatone, filterbank
 from interp import interp_bad, interp_lin, interp_spline
+from lts import lts
 from magspec import magspec
 from mix import mix
 from ms2samp import ms2samp

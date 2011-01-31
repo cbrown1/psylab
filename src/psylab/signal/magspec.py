@@ -31,6 +31,7 @@
 # 
 
 import numpy as np
+from lts import lts
 
 def magspec(wave,fs,fftsize=8192):
     '''Computes the magnitude spectrum of a signal
@@ -39,10 +40,11 @@ def magspec(wave,fs,fftsize=8192):
         values, and an array of magnitude values, suitable for plotting. The 
         magnitude spectrum is in dB (20*log10).
     '''
-    amp=np.abs(np.fft.fft(wave,fftsize));
-    fsize = np.round(len(amp)/2.)-1;
-    outamp= amp[0:np.round(len(amp)/2)-1];
-    outamp=20*np.log10(outamp);
+    #amp=np.abs(np.fft.fft(wave,fftsize));
+    #fsize = np.round(len(amp)/2.)-1;
+    #outamp= amp[0:np.round(len(amp)/2)-1];
+    
+    outamp = 20*np.log10(lts(wave, fftsize))
     #outamp=20*log10(outamp/max(outamp));
     f = np.linspace(1, fs/2, fsize);
     return f,outamp;
