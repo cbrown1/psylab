@@ -46,5 +46,5 @@ def magspec(wave,fs,fftsize=8192):
     
     outamp = 20*np.log10(lts(wave, fftsize))
     #outamp=20*log10(outamp/max(outamp));
-    f = np.linspace(1, fs/2, fsize);
-    return f,outamp;
+    f = np.linspace(1, fs/2, (fftsize/2)+1)
+    return f,outamp

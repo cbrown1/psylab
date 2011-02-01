@@ -99,7 +99,7 @@ def compensate(y, fs, compensation):
     for i in range(len(CMn)-1):
         b = (CMdB[i+1]*CMn[i]-CMdB[i]*CMn[i+1])/(CMn[i]-CMn[i+1]);
         k = (CMdB[i]-CMdB[i+1])/(CMn[i]-CMn[i+1]);
-        for j in range(CMn[i],CMn[i+1]):
+        for j in range(int(CMn[i]),int(CMn[i+1])):
             ExtendedCMdB[j] =  k * j + b;
             ExtendedCMdB[nsamples - j + 1] =  k * j + b;
 

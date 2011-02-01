@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2008-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,6 @@ from scipy.signal import filter_design as filters, lfilter, filtfilt
 
 from atten import atten
 from compensate import compensate
-from delay import delay
 from envelope import envelope
 from equate import equate
 from frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
