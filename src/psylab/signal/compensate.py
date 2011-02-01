@@ -40,7 +40,7 @@ def compensate(y, fs, compensation):
         pairs of frequency (in Hz), and attenuation (in dB) values.
 
         This is useful for compensating for the frequency response of
-        headphones, etc..
+        headphones, etc.
         
         Parameters
         ----------
@@ -105,14 +105,18 @@ def compensate(y, fs, compensation):
 
     if y.ndim > 1:
         passes = y.shape[1]
+        out = np.zeros((nsamples, passes))
+        for i in range(passes):
+            fftout = np.fft.fft(y);
+            Amp = np.abs(fftout);
+            Phs = np.angle(fftout);
+            AdjustedAmp = Amp * 10 ** (ExtendedCMdB/20.);
+            out[:, i] = np.real(np.fft.ifft(AdjustedAmp * np.exp(1j*Phs)))  # compose time-domain signal
     else:
-        passes = 1
-
-    out = np.zeros((nsamples, passes))
-    for i in range(passes):
         fftout = np.fft.fft(y);
         Amp = np.abs(fftout);
         Phs = np.angle(fftout);
         AdjustedAmp = Amp * 10 ** (ExtendedCMdB/20.);
-        out[:, i] = np.real(np.fft.ifft(AdjustedAmp * np.exp(1j*Phs)))  # compose time-domain signal
+        out = np.real(np.fft.ifft(AdjustedAmp * np.exp(1j*Phs)))  # compose time-domain signal
+
     return out

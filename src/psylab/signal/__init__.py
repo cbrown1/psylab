@@ -37,7 +37,7 @@ signal processing.
 Functions include:
 
 atten - Attenuates input array by a dB value
-compensate - Shapes the input array in the frequency domain [UNTESTED]
+compensate - Shapes the input array in the frequency domain
 envelope - Extracts the amplitude envelope from a signal
 equate - Equates wavefiles in rms
 erbs2f - Converts erb numbers to frequency values
