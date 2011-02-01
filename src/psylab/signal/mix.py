@@ -47,9 +47,9 @@ def mix( *args, **kwargs ):
 
         offsets : list of scalars
             An optional list of offset values, in samples. Should be either
-            ommitted or set to `None` for no offsets. If the list is shorter
-            in length than the number of input arrays, it will be padded with
-            zeros. If it is longer, it will be truncated.
+            ommitted or set to `None` for no offsets. The list will be zero-
+            padded If it is shorter in length than the number of input arrays,
+            and truncated if it is longer.
 
         Returns
         -------
@@ -60,15 +60,15 @@ def mix( *args, **kwargs ):
         --------
 
         >>>import numpy as np
-        >>>a = np.array((1,1,1))
-        >>>b = np.array((2,2,2,2,2))
-        >>>c = np.array((3,3,3,3,3,3,3,3,3,3))
+        >>>a = np.ones(3)  # 3 one's: array([ 1.,  1.,  1.])
+        >>>b = np.ones(5)*4  # 5 four's
+        >>>c = np.ones(10)*-3  # 10 negative three's
         >>>mix(a,b)
         array([ 3.,  3.,  3.,  2.,  2.])
         >>>mix(a,b,offsets=[1]) # offset a by 1
         array([ 2.,  3.,  3.,  3.,  2.])
         >>>mix(a,b,c,offsets=[0,5]) # offset a by 0 and b by 5
-        array([ 4.,  4.,  4.,  3.,  3.,  5.,  5.,  5.,  5.,  5.])
+        array([-2., -2., -2., -3., -3.,  1.,  1.,  1.,  1.,  1.])
 
     '''
     out = np.zeros(1)
