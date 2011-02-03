@@ -776,3 +776,50 @@ def str_to_range(s):
     else:
         return sorted(result)
 
+# System-specific functions
+if os.name in ["posix", "mac"]:
+    import termios
+    TERMIOS = termios
+    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        import tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
+        #os.system('clear')
+
+elif os.name in ("nt", "dos", "ce"):
+    from msvcrt import getch
+    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        ch = getch()
+        return ch
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('CLS')
+
+elif os.name == "mac":
+    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        '''Returns a single character from standard input
+        '''
+        # Nope. Try the posix function, since osx seems to have termios
+
+    def clearscreen():
+        """Clear the console.
+        """
+        os.system('tput clear')
+

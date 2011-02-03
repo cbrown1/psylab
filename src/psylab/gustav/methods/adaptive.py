@@ -58,8 +58,8 @@ dynamic_vars_user = {            # These must be set by experimenter
 dynamic_vars_block = {           # Might be useful for stimgen or at end of block
             'msg': "",           # Description of why the block ended
             'values': [],        # Array of values
-            'values_track': [],  # 0 = no change, -1 = reversal/dn, 1 = reversal/up
-            'values_rev': [],    # Values at reversals
+            'track': [],         # 0 = no change, -1 = reversal/dn, 1 = reversal/up
+            'values_at_rev': [], # Values at reversals
             'good_run': False,   # True if the run did finished normally, otherwise False
            }
 dynamic_vars_track = {           # These vals are used for tracking
@@ -84,11 +84,11 @@ dynamic_vars_track = {           # These vals are used for tracking
            }
 
 def step(cur_step,exp,run,var,stim,user):
-    if len(var.dynamic['values_rev']) == 0:
+    if len(var.dynamic['values_at_rev']) == 0:
         # If there are no reversals yet, use first step
         var.dynamic['value'] += cur_step * var.dynamic['steps'][0]
     else:
-        var.dynamic['value'] += cur_step * var.dynamic['steps'][len(var.dynamic['values_rev'])-1]
+        var.dynamic['value'] += cur_step * var.dynamic['steps'][len(var.dynamic['values_at_rev'])-1]
     var.dynamic['value'] = max(var.dynamic['value'], var.dynamic['val_floor'])
     var.dynamic['value'] = min(var.dynamic['value'], var.dynamic['val_ceil'])
 
@@ -102,42 +102,44 @@ def track(exp,run,var,stim,user):
             var.dynamic['cur_step'] = -1                   #  Set current step
             var.dynamic['cur_dns'] = 0                     #  Reset dns
             if var.dynamic['prev_dir'] == -1:              #  If previous direction was dn
-                var.dynamic['values_track'].append(0)      #   No reversal
+                var.dynamic['track'].append(0)             #   No reversal
                 var.dynamic['cur_status'] = " "
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
-                var.dynamic['values_track'].append(0)      #   Don't record this as a change
+                var.dynamic['track'].append(0)             #   Don't record this as a change
                 var.dynamic['init_dir'] = -1               #   Set initial direction
                 var.dynamic['cur_status'] = "v"
-            else:                                       #  Otherwise, its a reversal
+            else:                                          #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
-                var.dynamic['values_track'].append(-1)     #   Record reversal
-                var.dynamic['values_rev'].append(var.dynamic['value'])
-                var.dynamic['cur_status'] = "-%g" % len(var.dynamic['values_rev'])
+                var.dynamic['track'].append(-1)            #   Record reversal
+                var.dynamic['values_at_rev'].append(var.dynamic['value'])
+                var.dynamic['cur_status'] = "-%g" % len(var.dynamic['values_at_rev'])
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
+            var.dynamic['track'].append(0)                 #   No reversal
             var.dynamic['cur_status'] = " "
     else:
         var.dynamic['cur_dns'] = 0                         # Reset dns
         var.dynamic['cur_ups'] += 1                        # Increment ups
-        if var.dynamic['cur_ups'] == var.dynamic['ups']:      # If we have the right number of ups
+        if var.dynamic['cur_ups'] == var.dynamic['ups']:   # If we have the right number of ups
             var.dynamic['cur_step'] = 1                    #  Set current step
             var.dynamic['cur_ups'] = 0                     #  Reset ups
             if var.dynamic['prev_dir'] == 1:               #  If previous direction was up
-                var.dynamic['values_track'].append(0)      #   No reversal
+                var.dynamic['track'].append(0)             #   No reversal
                 var.dynamic['cur_status'] = " "
             elif var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
-                var.dynamic['values_track'].append(0)      #   Don't record this as a change
+                var.dynamic['track'].append(0)             #   Don't record this as a change
                 var.dynamic['init_dir'] = 1                #   Set initial direction
                 var.dynamic['cur_status'] = "^"
             else:                                          #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
-                var.dynamic['values_track'].append(1)      #   Record reversal
-                var.dynamic['values_rev'].append(var.dynamic['value'])
-                var.dynamic['cur_status'] = "+%g" % len(var.dynamic['values_rev'])
+                var.dynamic['track'].append(1)             #   Record reversal
+                var.dynamic['values_at_rev'].append(var.dynamic['value'])
+                var.dynamic['cur_status'] = "+%g" % len(var.dynamic['values_at_rev'])
         else:
             var.dynamic['cur_step'] = 0                    #  No current step
+            var.dynamic['track'].append(0)                 #   No reversal
             var.dynamic['cur_status'] = " "
 
 
@@ -176,7 +178,7 @@ def finish_trial(exp, run, var, stim, user):
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
-        elif len(var.dynamic['values_rev']) == len(var.dynamic['steps']):
+        elif len(var.dynamic['values_at_rev']) == len(var.dynamic['steps']):
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = '%g reversals reached' % len(var.dynamic['steps'])
@@ -198,8 +200,8 @@ def pre_block(exp, run, var, stim, user):
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
     var.dynamic['values'] = []
-    var.dynamic['values_track'] = []
-    var.dynamic['values_rev'] = []
+    var.dynamic['track'] = []
+    var.dynamic['values_at_rev'] = []
     var.dynamic['prev_dir'] = 0
     var.dynamic['init_dir'] = 0
 
@@ -213,8 +215,8 @@ def post_trial(exp, run, var, stim, user):
 
 def post_block(exp, run, var, stim, user):
     if var.dynamic['good_run']:
-        var.dynamic['mean'] = np.mean(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
-        var.dynamic['sd'] = np.std(var.dynamic['values_rev'][var.dynamic['vals_to_avg']*-1:])
+        var.dynamic['mean'] = np.mean(var.dynamic['values_at_rev'][var.dynamic['vals_to_avg']*-1:])
+        var.dynamic['sd'] = np.std(var.dynamic['values_at_rev'][var.dynamic['vals_to_avg']*-1:])
     else:
         var.dynamic['mean'] = np.nan
         var.dynamic['sd'] = np.nan
@@ -225,29 +227,29 @@ def record_block_data(exp,run,var,stim,user):
     else:
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
         f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav\n\n")
-    f.write(u"class block_%s_%s():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
-    f.write(u"    name = '%s'\n" % exp.name)
-    f.write(u"    note = '%s'\n" % exp.note)
-    f.write(u"    subjid = '%s'\n" % exp.subjID)
-    f.write(u"    date = '%s'\n" % run.date)
-    f.write(u"    time = '%s'\n" % run.time)
-    f.write(u"    host = '%s'\n" % exp.host)
+    f.write(u"block_%s_%s = {\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
+    f.write(u"    'name' : '%s',\n" % exp.name)
+    f.write(u"    'note' : '%s',\n" % exp.note)
+    f.write(u"    'subjid' : '%s',\n" % exp.subjID)
+    f.write(u"    'date' : '%s',\n" % run.date)
+    f.write(u"    'time' : '%s',\n" % run.time)
+    f.write(u"    'host' : '%s',\n" % exp.host)
 
-    f.write(u"    variables = {\n")
+    f.write(u"    'variables' : {\n")
     for key, val in var.current.items():
         f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    }\n")
+    f.write(u"    },\n")
 
     items = getmembers(user)
-    f.write(u"    user = {\n")
+    f.write(u"    'user' : {\n")
     for key, val in items:
         if key[:2] != "__":
             f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    }\n")
+    f.write(u"    },\n")
 
-    f.write(u"    dynamic = {\n")
+    f.write(u"    'dynamic' : {\n")
     for key, val in var.dynamic.items():
         if key not in exp.method.dynamic_vars_track:
             f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    }\n\n")
+    f.write(u"    },\n}\n\n")
     f.close()

@@ -78,7 +78,7 @@ def show_message(parent=None, title = 'Title', message = 'Message', msgtype = 'I
         print msgtype + ": "+ message
 
 
-def get_string(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
     """Opens a simple prompt for user input, returns a string
     """
     try:

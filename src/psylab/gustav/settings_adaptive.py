@@ -17,7 +17,8 @@ def setup(exp,run,var,stim,user):
         basedir = r'/home/code-breaker/Python'
     else:
         basedir = r'C:\Users\code-breaker\Documents\Python'
-
+        basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
+		
     # General Experimental Variables
     run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_QuietThresholds'
