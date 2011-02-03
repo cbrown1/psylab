@@ -140,13 +140,11 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     exp.recordData = recordData
     if exp.recordData:
-        # TODO: This doesn't really work, because exp creates the functions by default.
-        # We really need a way to check if function comes from method or settings.
         if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
             if (exp.dataString_Trial == None or exp.dataString_Trial == ''):
                 if (exp.dataString_Block == None or exp.dataString_Block == ''):
                     if (exp.dataString_Exp == None or exp.dataString_Exp == ''):
-                        raise Exception, "Can't record data, because no available method has been specified:\nexp.dataString_Trial, exp.dataString_Block, exp.dataString_Exp, save_data_trial, save_data_block, save_data_exp"
+                        raise Exception, "Can't record data, because no available method has been specified.\nYou must specify at least one of the following:\nStrings exp.dataString_Trial, exp.dataString_Block, exp.dataString_Exp\nFunctions: save_data_trial, save_data_block, save_data_exp"
 
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
@@ -204,13 +202,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
                     for f in exp.post_trial_: f(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
-                    if exp.recordData: exp.save_data_trial(exp,run,var,stim,user)
+                    exp.utils.save_data(exp,run,var,stim,user, 'trial')
 
                     run.btrial += 1
 
             exp.utils.update_time(run)
             for f in exp.post_block_: f(exp,run,var,stim,user)
-            if exp.recordData: exp.save_data_block(exp,run,var,stim,user)
+            exp.utils.save_data(exp,run,var,stim,user, 'block')
             if not run.gustav_is_go:
                 break;
             # End while-block loop
@@ -219,7 +217,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     # End block loop
     exp.utils.update_time(run)
     for f in exp.post_exp_: f(exp,run,var,stim,user)
-    if exp.recordData: exp.save_data_exp(exp,run,var,stim,user)
+    exp.utils.save_data(exp,run,var,stim,user, 'exp')
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 

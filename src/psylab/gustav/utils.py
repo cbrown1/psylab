@@ -69,6 +69,7 @@ class exp:
     cacheTrials = False             # Unimplemented
     quitKeys = ['q', '/']
     responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
+    disable_functions = []          # Experimenter can add function names as strings to disable them
     methodTypes = ['constant', 'staircase']
     stimLoadTypes = ['auto', 'manual']
     stimTypes = ['soundfiles', 'manual']
@@ -122,15 +123,15 @@ class exp:
     def post_exp(exp,run,var,stim,user):
         pass
 
-    def save_data_trial(self,exp,run,var,stim,user):
+    def save_data_trial_(self,exp,run,var,stim,user):
         if exp.dataString_Trial is not None and exp.dataString_Trial != '':
             exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user), exp.dataFile)
 
-    def save_data_block(self,exp,run,var,stim,user):
+    def save_data_block_(self,exp,run,var,stim,user):
         if exp.dataString_Block is not None and exp.dataString_Block != '':
             exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user), exp.dataFile)
 
-    def save_data_exp(self,exp,run,var,stim,user):
+    def save_data_exp_(self,exp,run,var,stim,user):
         if exp.dataString_Exp is not None and exp.dataString_Exp != '':
             exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Exp, exp, run, var, stim, user), exp.dataFile)
 
@@ -574,31 +575,23 @@ def write_data(data, filename):
         f.write(data)
         f.close()
 
-def write_data_old(data, filename, onlyIfNew = True):
-    '''Saves data to a file
-    '''
-    if not (onlyIfNew and os.path.isfile(filename)):
-        if os.path.isfile(filename):
-            text_file = open(filename, "a")
-        else:
-            text_file = open(filename, "w")
-        text_file.write(data)
-        text_file.close()
-
-def record_data_old(exp,run,var,stim,user, header=False, block=False):
-    '''Expand data, write to file
-    '''
+def save_data(exp,run,var,stim,user, which):
     if exp.recordData:
-        if block:
-            if exp.dataString_Block != '':
-                thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user)
-                exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = False)
-        else:
-            if header:
-                thisdataString = exp.utils.get_expanded_vars_in_string(exp.dataString_Trial, exp, run, var, stim, user)
-            else:
-                thisdataString = exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user)
-            exp.utils.write_data(thisdataString, filename = exp.dataFile, onlyIfNew = header)
+		if which == 'trial':
+			if hasattr(exp, 'save_data_trial') and 'save_data_trial' not in exp.disable_functions:
+				exp.save_data_trial(exp,run,var,stim,user)
+			else:
+				exp.save_data_trial_(exp,run,var,stim,user)
+		elif which == 'block':
+			if hasattr(exp, 'save_data_block') and 'save_data_block' not in exp.disable_functions:
+				exp.save_data_block(exp,run,var,stim,user)
+			else:
+				exp.save_data_block_(exp,run,var,stim,user)
+		elif which == 'exp':
+			if hasattr(exp, 'save_data_exp') and 'save_data_exp' not in exp.disable_functions:
+				exp.save_data_exp(exp,run,var,stim,user)
+			else:
+				exp.save_data_exp_(exp,run,var,stim,user)
 
 
 def get_frontend(exp, frontend):
