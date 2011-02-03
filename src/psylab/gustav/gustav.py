@@ -129,7 +129,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     exp.settings.setup(exp,run,var,stim,user)
 
-
     exp.method_str = exp.method
     try:
         methodi = __import__('methods',globals(), locals(), exp.method_str)
@@ -141,9 +140,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     exp.recordData = recordData
     if exp.recordData:
+        # TODO: This doesn't really work, because exp creates the functions by default.
+        # We really need a way to check if function comes from method or settings.
         if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
-            if exp.dataString_Trial == '' or exp.dataString_Trial == None:
-                raise Exception, "Can't record data, because no available method has been specified:\nexp.dataString_Trial, save_data_trial, save_data_block, save_data_exp"
+            if (exp.dataString_Trial == None or exp.dataString_Trial == ''):
+                if (exp.dataString_Block == None or exp.dataString_Block == ''):
+                    if (exp.dataString_Exp == None or exp.dataString_Exp == ''):
+                        raise Exception, "Can't record data, because no available method has been specified:\nexp.dataString_Trial, exp.dataString_Block, exp.dataString_Exp, save_data_trial, save_data_block, save_data_exp"
 
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
