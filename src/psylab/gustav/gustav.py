@@ -141,8 +141,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     exp.recordData = recordData
     if exp.recordData:
-        if exp.dataString_Trial == '' or exp.dataString_Trial == None:
-            raise Exception, "Can't record data, variable not set: exp.dataString_Trial"
+        if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
+            if exp.dataString_Trial == '' or exp.dataString_Trial == None:
+                raise Exception, "Can't record data, because no available method has been specified:\nexp.dataString_Trial, save_data_trial, save_data_block, save_data_exp"
 
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
@@ -167,7 +168,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     logstr += "]\n"
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
     run.gustav_is_go = True
-    if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, header=True)
+    # TODO: handle datafile headers
+    #exp.utils.record_data(exp,run,var,stim,user, header=True)
     for run.block in range(run.startblock-1,var.nblocks):
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
@@ -182,7 +184,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             #exp.method.initialize(exp,run,var,stim,user)
             for f in exp.pre_block_: f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
-            if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, block=True)
+
+            #if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, block=True)
 
             while run.block_on:
                 run.trial = (run.block*run.trialsperblock)+run.btrial
@@ -198,12 +201,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
                     for f in exp.post_trial_: f(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
-                    if exp.recordData: exp.utils.record_data(exp,run,var,stim,user)
+                    if exp.recordData: exp.save_data_trial(exp,run,var,stim,user)
 
                     run.btrial += 1
 
             exp.utils.update_time(run)
             for f in exp.post_block_: f(exp,run,var,stim,user)
+            if exp.recordData: exp.save_data_block(exp,run,var,stim,user)
             if not run.gustav_is_go:
                 break;
             # End while-block loop
@@ -212,6 +216,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     # End block loop
     exp.utils.update_time(run)
     for f in exp.post_exp_: f(exp,run,var,stim,user)
+    if exp.recordData: exp.save_data_exp(exp,run,var,stim,user)
     logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
     exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 

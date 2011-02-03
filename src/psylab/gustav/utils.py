@@ -34,6 +34,7 @@ import os, sys, fnmatch
 import numpy as np
 import socket
 import datetime
+import codecs
 from time import sleep
 from inspect import getmembers
 from waveio import wavread
@@ -121,6 +122,18 @@ class exp:
     def post_exp(exp,run,var,stim,user):
         pass
 
+    def save_data_trial(self,exp,run,var,stim,user):
+        if exp.dataString_Trial is not None and exp.dataString_Trial != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user), exp.dataFile)
+
+    def save_data_block(self,exp,run,var,stim,user):
+        if exp.dataString_Block is not None and exp.dataString_Block != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user), exp.dataFile)
+
+    def save_data_exp(self,exp,run,var,stim,user):
+        if exp.dataString_Exp is not None and exp.dataString_Exp != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Exp, exp, run, var, stim, user), exp.dataFile)
+
     pre_exp_ = [pre_exp]
     pre_block_ = [pre_block]
     post_trial_ = [post_trial]
@@ -186,7 +199,8 @@ def initialize_experiment(exp,run,var,stim,user):
     '''Do stuff necessary for the start of an experiment
     '''
     exp.utils.get_frontend(exp, exp.frontend)
-    # Pull in any custom functions, first from exp, then method, then settings.
+    # For the following functions, run exp version first, then method (if present), then settings:
+    # pre_exp, pre_block, post_trial, post_block, post_exp
     if hasattr(exp.method, 'pre_exp'):
         exp.pre_exp_.append(exp.method.pre_exp)
     if hasattr(exp.settings, 'pre_exp'):
@@ -195,19 +209,6 @@ def initialize_experiment(exp,run,var,stim,user):
         exp.pre_block_.append(exp.method.pre_block)
     if hasattr(exp.settings, 'pre_block'):
         exp.pre_block_.append(exp.settings.pre_block)
-
-    if hasattr(exp.settings, 'prompt_condition'):
-        exp.prompt_condition = exp.settings.prompt_condition
-
-    if hasattr(exp.settings, 'pre_trial'):
-        exp.pre_trial = exp.settings.pre_trial
-    else:
-        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
-
-    if hasattr(exp.settings, 'present_trial'):
-        exp.present_trial = exp.settings.present_trial
-    if hasattr(exp.settings, 'prompt_response'):
-        exp.prompt_response = exp.settings.prompt_response
     if hasattr(exp.method, 'post_trial'):
         exp.post_trial_.append(exp.method.post_trial)
     if hasattr(exp.settings, 'post_trial'):
@@ -220,6 +221,35 @@ def initialize_experiment(exp,run,var,stim,user):
         exp.post_exp_.append(exp.method.post_exp)
     if hasattr(exp.settings, 'post_exp'):
         exp.post_exp_.append(exp.settings.post_exp)
+
+    # For save_data functions, look for any present in settings first, then look in method.
+    # But only run one each.
+    if hasattr(exp.settings, 'save_data_trial'):
+        exp.save_data_trial = exp.settings.save_data_trial
+    elif hasattr(exp.method, 'save_data_trial'):
+        exp.save_data_trial = exp.method.save_data_trial
+    if hasattr(exp.settings, 'save_data_block'):
+        exp.save_data_block = exp.settings.save_data_block
+    elif hasattr(exp.method, 'save_data_block'):
+        exp.save_data_block = exp.method.save_data_block
+    if hasattr(exp.settings, 'save_data_exp'):
+        exp.save_data_exp = exp.settings.save_data_exp
+    elif hasattr(exp.method, 'save_data_exp'):
+        exp.save_data_exp = exp.method.save_data_exp
+
+    # A few unique situation:
+    if hasattr(exp.settings, 'present_trial'):
+        exp.present_trial = exp.settings.present_trial
+    if hasattr(exp.settings, 'prompt_response'):
+        exp.prompt_response = exp.settings.prompt_response
+    if hasattr(exp.settings, 'prompt_condition'):
+        exp.prompt_condition = exp.settings.prompt_condition
+
+    if hasattr(exp.settings, 'pre_trial'):
+        exp.pre_trial = exp.settings.pre_trial
+    else:
+        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
+
 
     exp.utils.process_stimuli(stim)
     exp.utils.process_variables(var)
@@ -529,15 +559,22 @@ def log(exp,run,var,stim,user, message, tofile=None, toconsole = True):
         if toconsole:
             print(message),
         if tofile is not None and tofile is not '':
-            if not os.path.isfile(tofile):
-                text_file = open(tofile, "w")
-            else:
-                text_file = open(tofile, "a")
-            text_file.write(message)
-            text_file.close()
+            write_data(message, tofile)
 
 
-def write_data(data, filename, onlyIfNew = True):
+def write_data(data, filename):
+    '''Saves data to a file
+    '''
+    if os.path.isfile(exp.dataFile):
+        f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
+    else:
+        f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
+        f.write(u"# -*- coding: utf-8 -*-\n\n")
+
+        f.write(data)
+        f.close()
+
+def write_data_old(data, filename, onlyIfNew = True):
     '''Saves data to a file
     '''
     if not (onlyIfNew and os.path.isfile(filename)):
@@ -548,8 +585,7 @@ def write_data(data, filename, onlyIfNew = True):
         text_file.write(data)
         text_file.close()
 
-
-def record_data(exp,run,var,stim,user, header=False, block=False):
+def record_data_old(exp,run,var,stim,user, header=False, block=False):
     '''Expand data, write to file
     '''
     if exp.recordData:

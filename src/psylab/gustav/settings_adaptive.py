@@ -18,7 +18,7 @@ def setup(exp,run,var,stim,user):
     else:
         basedir = r'C:\Users\code-breaker\Documents\Python'
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
-		
+
     # General Experimental Variables
     run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_QuietThresholds'
@@ -29,9 +29,11 @@ def setup(exp,run,var,stim,user):
     exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
-    exp.recordData = True # if recordData==manual, you should respect this bool
-    exp.recordData_method = 'manual' # 'manual', 'auto'
+    exp.recordData = True # if you use custom save_data functions, you should respect this bool
     exp.dataFile = os.path.join(basedir,'data','$name.py')
+    exp.dataString_Trial = ''
+    exp.dataString_Block = ''
+    exp.dataString_Exp = ''
     exp.cacheTrials = False
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = 'A demonstration of the adaptive method'
@@ -247,10 +249,9 @@ def post_block(exp,run,var,stim,user):
     # TODO: Print conditions/levels
     p = "Mean: %g, SD: %g\nBlock %g ended at %s: %s\n\n" % (var.dynamic['mean'], var.dynamic['sd'], run.block+1, run.time, var.dynamic['msg'])
     exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
-    exp.method.record_block_data(exp,run,var,stim,user)
+    #exp.method.record_block_data(exp,run,var,stim,user)
 
 if __name__ == '__main__':
     import inspect
     fname = inspect.getfile( inspect.currentframe() )
     psylab.gustav.run(settingsFile=fname)
-

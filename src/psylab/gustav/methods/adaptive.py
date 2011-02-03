@@ -221,7 +221,7 @@ def post_block(exp, run, var, stim, user):
         var.dynamic['mean'] = np.nan
         var.dynamic['sd'] = np.nan
 
-def record_block_data(exp,run,var,stim,user):
+def save_data_block(exp,run,var,stim,user):
     if os.path.isfile(exp.dataFile):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
     else:
