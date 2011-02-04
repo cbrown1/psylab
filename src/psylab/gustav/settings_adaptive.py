@@ -24,16 +24,15 @@ def setup(exp,run,var,stim,user):
     exp.name = '_QuietThresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.prompt = 'Which interval?' # Prompt for subject
-    exp.consoleString_Trial = ''; #Write this string to the console after every trial
-    exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
+    exp.logConsole = True
     exp.debug = True
-    exp.recordData = True # if you use custom save_data functions, you should respect this bool
+    exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.py')
-    exp.dataString_Trial = ''
-    exp.dataString_Block = ''
-    exp.dataString_Exp = ''
+    exp.dataString_trial = ''
+    exp.dataString_block = ''
+    exp.dataString_exp = ''
     exp.cacheTrials = False
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = 'A demonstration of the adaptive method'
@@ -219,19 +218,13 @@ def pre_trial(exp,run,var,stim,user):
         stim.stimarray = tone #np.vstack((tone, isi, quiet))
     else:
         stim.stimarray = tone #np.vstack((quiet, isi, tone))
-    p = "  Trial %2g, dyn: %g %s, Int: %g, Resp: " % (run.trial+1, var.dynamic['value'], var.dynamic['units'], var.dynamic['correct'])
-    #p = "  Trial "+ str(run.trial+1) + ", dyn: " + str(var.dynamic['value']) + " " + var.dynamic['units'] + ", Interval: " + str(var.dynamic['correct']) + ", Resp: "
-    #ret = exp.term.get_input(None, exp.exp_name+"!",p)
-    exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
 
 def post_trial(exp, run, var, stim, user):
     if run.gustav_is_go:
-        exp.utils.log(exp,run,var,stim,user, run.response + " " + var.dynamic['cur_status'], exp.logFile, True)
         if str(var.dynamic['correct']).lower() == run.response.lower():
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
         else:
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
-    exp.utils.log(exp,run,var,stim,user, "\n", exp.logFile, True)
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = adaptiveForm.AdaptiveInterfact(exp, run, exp.validKeys_)
@@ -244,12 +237,6 @@ def pre_block(exp,run,var,stim,user):
 
 def present_trial(exp,run,var,stim,user):
     pass
-
-def post_block(exp,run,var,stim,user):
-    # TODO: Print conditions/levels
-    p = "Mean: %g, SD: %g\nBlock %g ended at %s: %s\n\n" % (var.dynamic['mean'], var.dynamic['sd'], run.block+1, run.time, var.dynamic['msg'])
-    exp.utils.log(exp,run,var,stim,user, p, exp.logFile, True)
-    #exp.method.record_block_data(exp,run,var,stim,user)
 
 if __name__ == '__main__':
     import inspect

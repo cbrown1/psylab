@@ -49,9 +49,9 @@ def configure(settingsFile = None, frontend = None):
 
     # Settings File
     if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         if settingsFile == '':
-            print ""+exp.exp_name+" cancelled at user request"
+            print "Gustav cancelled at user request"
             return;
     exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
     exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
@@ -75,9 +75,9 @@ def list_conditions(settingsFile = None, frontend = None):
 
     # Settings File
     if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         if settingsFile == '':
-            print ""+exp.exp_name+" cancelled at user request"
+            print "Gustav cancelled at user request"
             return;
     exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
     exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
@@ -111,9 +111,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     subjectID = 4
 
     if subjectID == None:
-        exp.subjID = exp.term.get_input(parent=None, title = exp.exp_name+"!", prompt = 'Enter a Subject ID:')
+        exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
         if exp.subjID == '':
-            print "No Subject ID entered, "+exp.exp_name+" cancelled at user request"
+            print "No Subject ID entered, Gustav cancelled at user request"
             return;
     else:
         exp.subjID = str(subjectID)
@@ -141,10 +141,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     exp.recordData = recordData
     if exp.recordData:
         if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
-            if (exp.dataString_Trial == None or exp.dataString_Trial == ''):
-                if (exp.dataString_Block == None or exp.dataString_Block == ''):
-                    if (exp.dataString_Exp == None or exp.dataString_Exp == ''):
-                        raise Exception, "Can't record data, because no available method has been specified.\nYou must specify at least one of the following:\nStrings exp.dataString_Trial, exp.dataString_Block, exp.dataString_Exp\nFunctions: save_data_trial, save_data_block, save_data_exp"
+            if (exp.dataString_trial == None or exp.dataString_trial == ''):
+                if (exp.dataString_block == None or exp.dataString_block == ''):
+                    if (exp.dataString_exp == None or exp.dataString_exp == ''):
+                        raise Exception, "Can't record data, because no available method has been specified.\nYou must specify at least one of the following:\nStrings exp.dataString_trial, exp.dataString_block, exp.dataString_exp\nFunctions: save_data_trial, save_data_block, save_data_exp"
 
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
@@ -152,22 +152,18 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         if not exp.recordData:
             print "WARNING: No data will be recorded!"
     if run.gustav_is_go == False:
-        print exp.exp_name+" cancelled at user request"
+        print "Gustav cancelled at user request"
         return;
-    ret = exp.gui.get_yesno(None, title = exp.exp_name+"!", prompt = "Ready to begin testing?")
+    ret = exp.gui.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
     if not ret:
-        print exp.exp_name+" cancelled at user request"
+        print "Gustav cancelled at user request"
         return;
 
-    for f in exp.pre_exp_: f(exp,run,var,stim,user)
-    print len(exp.post_trial_)
-    # Begin block loop
+    for f in exp.pre_exp_:
+        if f.func_name not in exp.disable_functions:
+            f(exp,run,var,stim,user)
     exp.utils.update_time(run)
-    logstr = "\nTesting started on %s at %s. Exp: %s. Subject: %s.\nConditions (%s): [ " % (run.date, run.time, exp.name, exp.subjID, var.order)
-    for cond in var.orderarray:
-        logstr += str(cond+1) + " "
-    logstr += "]\n"
-    exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
+    exp.utils.log(exp,run,var,stim,user, 'pre_exp')
     run.gustav_is_go = True
     # TODO: handle datafile headers
     #exp.utils.record_data(exp,run,var,stim,user, header=True)
@@ -182,13 +178,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
-            #exp.method.initialize(exp,run,var,stim,user)
-            for f in exp.pre_block_: f(exp,run,var,stim,user)
-            exp.utils.log(exp,run,var,stim,user, exp.consoleString_Block, tofile=None, toconsole = True)
-
-            #if exp.recordData: exp.utils.record_data(exp,run,var,stim,user, block=True)
+            for f in exp.pre_block_:
+                if f.func_name not in exp.disable_functions:
+                    f(exp,run,var,stim,user)
+            exp.utils.log(exp,run,var,stim,user, 'pre_block')
 
             while run.block_on:
+                # TODO: trialsperblock is method (constant) specific, and does not belong here. run.trial should be computed in methods
                 run.trial = (run.block*run.trialsperblock)+run.btrial
                 run.trial_on = True
 
@@ -197,17 +193,23 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                         exp.utils.get_current_stimulus(stim, s)
                 while run.trial_on:
                     exp.pre_trial(exp,run,var,stim,user)
+                    exp.utils.log(exp,run,var,stim,user, 'pre_trial')
                     exp.present_trial(exp,run,var,stim,user)
                     exp.prompt_response(exp,run,var,stim,user)
 
-                    for f in exp.post_trial_: f(exp,run,var,stim,user)
-                    exp.utils.log(exp,run,var,stim,user, exp.consoleString_Trial, tofile=None, toconsole = True)
+                    for f in exp.post_trial_:
+                        if f.func_name not in exp.disable_functions:
+                            f(exp,run,var,stim,user)
+                    exp.utils.log(exp,run,var,stim,user, 'post_trial')
                     exp.utils.save_data(exp,run,var,stim,user, 'trial')
 
                     run.btrial += 1
 
             exp.utils.update_time(run)
-            for f in exp.post_block_: f(exp,run,var,stim,user)
+            for f in exp.post_block_:
+                if f.func_name not in exp.disable_functions:
+                    f(exp,run,var,stim,user)
+            exp.utils.log(exp,run,var,stim,user, 'post_block')
             exp.utils.save_data(exp,run,var,stim,user, 'block')
             if not run.gustav_is_go:
                 break;
@@ -216,10 +218,11 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             break;
     # End block loop
     exp.utils.update_time(run)
-    for f in exp.post_exp_: f(exp,run,var,stim,user)
+    for f in exp.post_exp_:
+        if f.func_name not in exp.disable_functions:
+            f(exp,run,var,stim,user)
+    exp.utils.log(exp,run,var,stim,user, 'post_exp')
     exp.utils.save_data(exp,run,var,stim,user, 'exp')
-    logstr = "Testing ended on %s at %s. Exp: %s. Subject: %s.\n" % (run.date, run.time, exp.name, exp.subjID)
-    exp.utils.log(exp,run,var,stim,user, logstr, exp.logFile)
 
 if __name__ == '__main__':
     settingsFile = None

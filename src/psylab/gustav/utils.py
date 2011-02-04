@@ -42,7 +42,6 @@ from waveio import wavread
 class exp:
     '''Experimental settings
     '''
-    exp_name = 'gustav'
     name = ''
     host = socket.gethostname()
     subjID = ''
@@ -51,19 +50,25 @@ class exp:
     settingsFilePath = ''
     frontend = None
     debug = False
-    logFile = exp_name + '_logfile_$date.log'
-    logFile_unexpanded = ''
     method = 'constant'
     prompt = ''
-    recordData = True
     responseMethod = 'key' # 'key' or 'text'. If key, be sure to set'validresponses'
     validKeys = '1, 2'  # list of valid responses
-    consoleString_Trial = 'Trial: $trial ; Condition: $condition of $conditions ; Response: $response\n' #Write this string to the console after every trial
-    consoleString_Block = "Block $block ; $currentvarsvals[' ; ']\n" #Write this string to the console after every block
-    dataString_Trial = '$subj,$date,$trial,$block,$condition,$currentvars[],$response\n' #Write this string to datafile after every trial
-    dataString_Block = '' #Write this string to datafile after every block
+    logString_pre_trial = '' #Write this string to the console before every trial
+    logString_post_trial = '' #Write this string to the console after every trial
+    logString_pre_block = "" #Write this string to the console before every block
+    logString_post_block = "" #Write this string to the console after every block
+    logString_pre_exp = "" #Write this string to the console before every block
+    logString_post_exp = "" #Write this string to the console after every block
+    logFile = 'gustav_logfile_$date.log'
+    logFile_unexpanded = ''
+    logConsole = True
+    dataString_trial = '' #Write this string to datafile after every trial
+    dataString_block = '' #Write this string to datafile after every block
+    dataString_exp = ''   #Write this string to datafile at exp end
     dataFile ='$name.csv'
     dataFile_unexpanded =''
+    recordData = True
     stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
     cacheTrials = False             # Unimplemented
@@ -79,7 +84,7 @@ class exp:
 
     def prompt_response(self,exp,run,var,stim,user):
         while True:
-            ret = exp.gui.get_input(None, exp.exp_name+"!","Enter Response: ")
+            ret = exp.gui.get_input(None, "Gustav!","Enter Response: ")
             # Check for valid response
             if ret in exp.validKeys_:
                 # Its good. Record response
@@ -94,7 +99,7 @@ class exp:
 
     def prompt_condition(self,exp,run,var,stim,user):
         while True:
-            ret = exp.term.get_input(None, exp.exp_name+"!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
+            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
             if ret in exp.quitKeys:
                 run.block_on = False
                 run.gustav_is_go = False
@@ -124,16 +129,16 @@ class exp:
         pass
 
     def save_data_trial_(self,exp,run,var,stim,user):
-        if exp.dataString_Trial is not None and exp.dataString_Trial != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Trial, exp, run, var, stim, user), exp.dataFile)
+        if exp.dataString_trial is not None and exp.dataString_trial != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_trial, exp, run, var, stim, user), exp.dataFile)
 
     def save_data_block_(self,exp,run,var,stim,user):
-        if exp.dataString_Block is not None and exp.dataString_Block != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Block, exp, run, var, stim, user), exp.dataFile)
+        if exp.dataString_block is not None and exp.dataString_block != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_block, exp, run, var, stim, user), exp.dataFile)
 
     def save_data_exp_(self,exp,run,var,stim,user):
-        if exp.dataString_Exp is not None and exp.dataString_Exp != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_Exp, exp, run, var, stim, user), exp.dataFile)
+        if exp.dataString_exp is not None and exp.dataString_exp != '':
+            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_exp, exp, run, var, stim, user), exp.dataFile)
 
     pre_exp_ = [pre_exp]
     pre_block_ = [pre_block]
@@ -250,7 +255,6 @@ def initialize_experiment(exp,run,var,stim,user):
         exp.pre_trial = exp.settings.pre_trial
     else:
         raise Exception, "Function `pre_trial` must be specified in exp.settings file"
-
 
     exp.utils.process_stimuli(stim)
     exp.utils.process_variables(var)
@@ -485,7 +489,7 @@ def menu_condition(exp,run,var,stim,user):
         disp += "%11s - clear condition list\n" % 'c'
         disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
         clearscreen()
-        ret = exp.term.get_input(parent=None, title = exp.exp_name+"!", prompt = disp)
+        ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
         elif ret in exp.quitKeys:
@@ -552,46 +556,46 @@ def update_time(run):
     run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
-def log(exp,run,var,stim,user, message, tofile=None, toconsole = True):
-    '''Writes info to a log file, to the console, or both
+def log(exp,run,var,stim,user, event):
+    '''Writes info to the console, to a log file, or both
     '''
-    if message != '':
-        message = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
-        if toconsole:
+    if hasattr(exp, 'logString_'+event) and getattr(exp, 'logString_'+event) is not None:
+        message = exp.utils.get_expanded_vals_in_string(getattr(exp, 'logString_'+event), exp, run, var, stim, user)
+        if exp.logConsole:
             print(message),
-        if tofile is not None and tofile is not '':
-            write_data(message, tofile)
+        if exp.logFile is not None and exp.logFile is not '':
+            write_data(message, exp.logFile)
 
 
 def write_data(data, filename):
-    '''Saves data to a file
+    '''Data IO.
     '''
-    if os.path.isfile(exp.dataFile):
-        f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
+    if os.path.isfile(filename):
+        f = codecs.open(filename, encoding='utf-8', mode='a')
     else:
-        f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
+        f = codecs.open(filename, encoding='utf-8', mode='w')
         f.write(u"# -*- coding: utf-8 -*-\n\n")
 
-        f.write(data)
-        f.close()
+    f.write(data)
+    f.close()
 
 def save_data(exp,run,var,stim,user, which):
     if exp.recordData:
-		if which == 'trial':
-			if hasattr(exp, 'save_data_trial') and 'save_data_trial' not in exp.disable_functions:
-				exp.save_data_trial(exp,run,var,stim,user)
-			else:
-				exp.save_data_trial_(exp,run,var,stim,user)
-		elif which == 'block':
-			if hasattr(exp, 'save_data_block') and 'save_data_block' not in exp.disable_functions:
-				exp.save_data_block(exp,run,var,stim,user)
-			else:
-				exp.save_data_block_(exp,run,var,stim,user)
-		elif which == 'exp':
-			if hasattr(exp, 'save_data_exp') and 'save_data_exp' not in exp.disable_functions:
-				exp.save_data_exp(exp,run,var,stim,user)
-			else:
-				exp.save_data_exp_(exp,run,var,stim,user)
+        if which == 'trial' and 'save_data_trial' not in exp.disable_functions:
+            if hasattr(exp, 'save_data_trial'):
+                exp.save_data_trial(exp,run,var,stim,user)
+            else:
+                exp.save_data_trial_(exp,run,var,stim,user)
+        elif which == 'block' and 'save_data_block' not in exp.disable_functions:
+            if hasattr(exp, 'save_data_block'):
+                exp.save_data_block(exp,run,var,stim,user)
+            else:
+                exp.save_data_block_(exp,run,var,stim,user)
+        elif which == 'exp' and 'save_data_exp' not in exp.disable_functions:
+            if hasattr(exp, 'save_data_exp'):
+                exp.save_data_exp(exp,run,var,stim,user)
+            else:
+                exp.save_data_exp_(exp,run,var,stim,user)
 
 
 def get_frontend(exp, frontend):
@@ -689,6 +693,10 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         if key[:2] != "__":
             outstr = outstr.replace("$user["+str(key)+"]", str(val))
 
+    if hasattr(var,'dynamic'):
+        for key, val in var.dynamic.items():
+            outstr = outstr.replace("$dynamic["+str(key)+"]", str(val))
+
     return outstr
 
 def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
@@ -735,6 +743,10 @@ def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
     for key, val in items:
         if key[:2] != "__":
             outstr = outstr.replace("$user["+str(key)+"]", str(key))
+
+    if hasattr(var,'dynamic'):
+        for key, val in var.dynamic.items():
+            outstr = outstr.replace("$dynamic["+str(key)+"]", str(key))
 
     return outstr
 

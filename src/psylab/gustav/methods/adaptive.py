@@ -221,6 +221,16 @@ def post_block(exp, run, var, stim, user):
         var.dynamic['mean'] = np.nan
         var.dynamic['sd'] = np.nan
 
+
+def pre_exp(exp, run, var, stim, user):
+    exp.logString_pre_exp = "Experiment $name started at $time\n"
+    exp.logString_pre_block = " Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_trial = "  Trial $trial, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
+    exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
+    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n\n"
+    exp.logString_post_exp = "Experiment $name ended at $time\n"
+
+
 def save_data_block(exp,run,var,stim,user):
     if os.path.isfile(exp.dataFile):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')

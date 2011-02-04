@@ -62,7 +62,7 @@ class AdaptiveInterfact():
             self.exp = exp
             self.run = run
 
-            self.setWindowTitle(exp.exp_name)
+            self.setWindowTitle("Gustav!")
             self.setModal=False
 
         def closeEvent(self, event):
