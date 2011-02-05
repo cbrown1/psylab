@@ -224,11 +224,11 @@ def post_block(exp, run, var, stim, user):
 
 def pre_exp(exp, run, var, stim, user):
     exp.logString_pre_exp = "Experiment $name started at $time\n"
-    exp.logString_pre_block = " Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_block = "\n Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_pre_trial = "  Trial $trial, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
     exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
-    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n\n"
-    exp.logString_post_exp = "Experiment $name ended at $time\n"
+    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_post_exp = "\nExperiment $name ended at $time\n"
 
 
 def save_data_block(exp,run,var,stim,user):

@@ -58,14 +58,15 @@ class exp:
     logString_post_trial = '' #Write this string to the console after every trial
     logString_pre_block = "" #Write this string to the console before every block
     logString_post_block = "" #Write this string to the console after every block
-    logString_pre_exp = "" #Write this string to the console before every block
-    logString_post_exp = "" #Write this string to the console after every block
+    logString_pre_exp = "" #Write this string to the console at start of exp
+    logString_post_exp = "" #Write this string to the console at end of exp
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ''
     logConsole = True
     dataString_trial = '' #Write this string to datafile after every trial
     dataString_block = '' #Write this string to datafile after every block
     dataString_exp = ''   #Write this string to datafile at exp end
+    dataString_header = ''   #Write this string to datafile if the file is new
     dataFile ='$name.csv'
     dataFile_unexpanded =''
     recordData = True
