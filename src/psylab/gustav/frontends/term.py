@@ -6,7 +6,7 @@ import os
 
 name = 'term'
 
-def show_config(exp,run,stim,var,user):
+def show_config(exp,run,var,stim,user):
     print "Sorry, there is no terminal version of the Experiment Configuration Dialog."
 
 def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("All files (*.*)")):

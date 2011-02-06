@@ -234,7 +234,7 @@ def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
 
 def pre_block(exp,run,var,stim,user):
-    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.nblocks))
 
 def present_trial(exp,run,var,stim,user):
     pass

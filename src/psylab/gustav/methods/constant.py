@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2008-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -41,13 +41,13 @@
 
 def pre_exp(exp, run, var, stim, user):
     exp.logString_pre_exp = "Experiment $name started at $time\n"
-    exp.logString_pre_block = "\n Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_pre_trial = "  Trial $trial_block, "
-    exp.logString_post_trial = "Response: $response\n"
-    exp.logString_post_block = " Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_trial = ""
+    exp.logString_post_trial = ""
+    exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_exp = "\nExperiment $name ended at $time\n"
     run.block = var.constant['startblock']-1
-    if run.block == var.nblocks - 1:
+    if run.block == run.nblocks - 1:
         run.gustav_is_go = False
     # Check if there are enough stimuli
     # Move to settingsfile? Are stim issues really method related?

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2008-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,9 @@ def configure(settingsFile = None, frontend = None):
     sys.path.append(exp.settingsPath)
     settings = __import__(exp.settingsBase)
 
-    settings.setup(exp,run,var,stim,user)
+    settings.setup( exp, run, var, stim, user)
 
-    exp.gui.show_config( exp, run, stim, var, user )
+    exp.gui.show_config( exp, run, var, stim, user )
 
 
 def list_conditions(settingsFile = None, frontend = None):
@@ -85,7 +85,7 @@ def list_conditions(settingsFile = None, frontend = None):
     sys.path.append(exp.settingsPath)
     settings = __import__(exp.settingsBase)
 
-    settings.setup(exp,run,var,stim,user)
+    settings.setup( exp, run, var, stim, user)
 
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
@@ -126,7 +126,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     var.factvars[:] = []
     var.listvars[:] = []
 
-    exp.settings.setup(exp,run,var,stim,user)
+    exp.settings.setup( exp, run, var, stim, user )
 
     exp.method_str = exp.method
     try:
@@ -167,12 +167,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     run.trials_exp = 0
     # TODO: handle datafile headers
 
-#    for run.block in range(run.startblock-1,var.nblocks):
-#        if var.order == 'prompt':
-#            exp.prompt_condition(exp,run,var,stim,user)
-#        else:
-#            run.condition = var.orderarray[run.block]
-#        if run.gustav_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
     while run.gustav_is_go:
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
@@ -181,7 +175,7 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         if var.order == 'prompt' or run.condition+1 not in var.ignore:
             run.trials_block = 0;
             run.block_on = True
-            exp.utils.get_current_variables(var, stim, run.condition)
+            exp.utils.get_current_variables(var, run.condition)
             exp.utils.update_time(run)
             for f in exp.pre_block_:
                 if f.func_name not in exp.disable_functions:
@@ -215,15 +209,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             exp.utils.log(exp,run,var,stim,user, 'post_block')
             exp.utils.save_data(exp,run,var,stim,user, 'block')
             run.block += 1
-            if var.order != 'prompt' and run.block == var.nblocks - 1:
+            if var.order != 'prompt' and run.block == run.nblocks:
                 run.gustav_is_go = False
 
-            # TODO: Try commenting out these four (five) lines. Should be OK, but we'll see.
-            if not run.gustav_is_go:
-                break;
-            # End while-block loop
-        if not run.gustav_is_go:
-            break;
     # End gustav_is_go loop
     exp.utils.update_time(run)
     for f in exp.post_exp_:

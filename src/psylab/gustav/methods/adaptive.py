@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2008-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -224,10 +224,10 @@ def post_block(exp, run, var, stim, user):
 
 def pre_exp(exp, run, var, stim, user):
     exp.logString_pre_exp = "Experiment $name started at $time\n"
-    exp.logString_pre_block = "\n Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_pre_trial = "  Trial $trial_block, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
     exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
-    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_exp = "\nExperiment $name ended at $time\n"
 
 

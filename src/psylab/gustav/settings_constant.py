@@ -23,7 +23,7 @@ def setup(exp,run,var,stim,user):
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
     exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
-    exp.frontend = 'tk'
+    exp.frontend = 'term'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
     exp.recordData = True
@@ -279,14 +279,14 @@ def setup(exp,run,var,stim,user):
     if you want to cancel the experiment, set both run.block_on and
     run.pylab_is_go to False
 """
-def prompt_response(exp,run,stim,var,user):
+def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        #p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        #ret = exp.term.get_input(None, exp.exp_name+"!",p)
+        p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
+        ret = exp.term.get_input(None, "Gustav!",p)
 
         #TODO: Switch to get_char
-        ret = exp.term.get_input(None, "Gustav!","How many keywords? ")
+        #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
         if ret in exp.validKeys_:
             run.response = ret
             #exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
@@ -303,7 +303,7 @@ def prompt_response(exp,run,stim,var,user):
     var.current['varname']. The stimulus waveform can be played back
     using exp.utils.wavplay.
 """
-def pre_trial(exp,run,stim,var,user):
+def pre_trial(exp,run,var,stim,user):
     stim.stimarray = np.zeros((1))
 
 

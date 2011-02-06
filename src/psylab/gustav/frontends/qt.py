@@ -8,15 +8,15 @@ STDOUT = sys.stdout
 
 name = 'qt'
 
-def show_config(exp,run,stim,var,user):
+def show_config(exp,run,var,stim,user):
     app = QtGui.QApplication([])
-    config = ConfigDialog(app,exp,run,stim,var,user)
+    config = ConfigDialog(app,exp,run,var,stim,user)
     config.show()
     app.exec_()
 
 class ConfigDialog(QtGui.QWidget):
 
-    def __init__(self, app,exp,run,stim,var,user):
+    def __init__(self, app,exp,run,var,stim,user):
         self.exp = exp
         self.run = run
         self.stim = stim

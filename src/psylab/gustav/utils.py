@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2008-2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2008-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ class user:
     pass
 
 
-def initialize_experiment(exp,run,var,stim,user):
+def initialize_experiment( exp, run, var, stim, user):
     '''Do stuff necessary for the start of an experiment
     '''
     exp.utils.get_frontend(exp, exp.frontend)
@@ -258,6 +258,7 @@ def initialize_experiment(exp,run,var,stim,user):
 
     exp.utils.process_stimuli(stim)
     exp.utils.process_variables(var)
+    run.nblocks = var.nblocks
     stim.debug = exp.debug
     var.debug = exp.debug
     if exp.recordData:
@@ -450,7 +451,7 @@ def process_stimuli(stim):
 # End process_stimuli
 
 
-def get_current_variables(var, stim, condition):
+def get_current_variables(var, condition):
     '''Get current levels of each variable for a given condition
     '''
     var.current = {}
@@ -508,13 +509,13 @@ def menu_condition(exp,run,var,stim,user):
             sel = np.random.permutation(sel).tolist()
             for s in sel:
                 var.orderarray.append(int(s)-1)
-            var.nblocks = len(var.orderarray)
+            run.nblocks = len(var.orderarray)
             run.gustav_is_go = True
             break;
         elif ret in ['s']:
             for s in sel:
                 var.orderarray.append(int(s)-1)
-            var.nblocks = len(var.orderarray)
+            run.nblocks = len(var.orderarray)
             run.gustav_is_go = True
             break;
 
@@ -683,8 +684,9 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
     outstr = outstr.replace("$subj", exp.subjID)
     outstr = outstr.replace("$trial_block", str(run.trials_block+1))
     outstr = outstr.replace("$trial", str(run.trials_exp+1))
+    outstr = outstr.replace("$blocks", str(run.nblocks))
     outstr = outstr.replace("$block", str(run.block+1))
-    outstr = outstr.replace("$conditions", str(var.nlevels_total)) # must be before condition, otherwise '$conditions' -> '1s'
+    outstr = outstr.replace("$conditions", str(var.nlevels_total))
     outstr = outstr.replace("$condition", str(run.condition+1))
     outstr = outstr.replace("$time", run.time)
     outstr = outstr.replace("$date", run.date)
