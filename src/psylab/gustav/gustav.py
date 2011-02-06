@@ -90,7 +90,6 @@ def list_conditions(settingsFile = None, frontend = None):
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
 
-# TODO: recordData should be a s
 def run(settingsFile = None, subjectID = None, frontend = None, recordData = True):
 
     var = utils.var()

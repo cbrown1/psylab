@@ -31,8 +31,9 @@ def setup(exp,run,var,stim,user):
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.py')
     exp.dataString_trial = ''
-    exp.dataString_block = ''
+    exp.dataString_block = "user = { '$currentvarsvals[' : "
     exp.dataString_exp = ''
+    exp.dataString_header = ''
     exp.cacheTrials = False
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = 'A demonstration of the adaptive method'

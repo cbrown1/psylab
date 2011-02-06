@@ -237,29 +237,16 @@ def save_data_block(exp,run,var,stim,user):
     else:
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
         f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav\n\n")
-    f.write(u"block_%s_%s = {\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
-    f.write(u"    'name' : '%s',\n" % exp.name)
-    f.write(u"    'note' : '%s',\n" % exp.note)
-    f.write(u"    'subjid' : '%s',\n" % exp.subjID)
-    f.write(u"    'date' : '%s',\n" % run.date)
-    f.write(u"    'time' : '%s',\n" % run.time)
-    f.write(u"    'host' : '%s',\n" % exp.host)
-
-    f.write(u"    'variables' : {\n")
-    for key, val in var.current.items():
-        f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    },\n")
-
-    items = getmembers(user)
-    f.write(u"    'user' : {\n")
-    for key, val in items:
-        if key[:2] != "__":
-            f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    },\n")
-
-    f.write(u"    'dynamic' : {\n")
-    for key, val in var.dynamic.items():
-        if key not in exp.method.dynamic_vars_track:
-            f.write(u"        '%s' : %r,\n" % (key, val))
-    f.write(u"    },\n}\n\n")
+    f.write(u"class block_%s_%s ():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
+    indent='    '
+    f.write(exp.utils.obj_to_str(exp.name,'name',indent))
+    f.write(exp.utils.obj_to_str(exp.note,'note',indent))
+    f.write(exp.utils.obj_to_str(exp.subjID,'subjID',indent))
+    f.write(exp.utils.obj_to_str(run.date,'date',indent))
+    f.write(exp.utils.obj_to_str(run.time,'time',indent))
+    f.write(exp.utils.obj_to_str(exp.host,'host',indent))
+    f.write(exp.utils.obj_to_str(var.current,'variables',indent))
+    f.write(exp.utils.obj_to_str(user,'user',indent))
+    f.write(exp.utils.obj_to_str(var.dynamic,'dynamic',indent))
+    f.write(u"\n")
     f.close()

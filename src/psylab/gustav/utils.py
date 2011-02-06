@@ -35,6 +35,7 @@ import numpy as np
 import socket
 import datetime
 import codecs
+import types
 from time import sleep
 from inspect import getmembers
 from waveio import wavread
@@ -54,19 +55,20 @@ class exp:
     prompt = ''
     responseMethod = 'key' # 'key' or 'text'. If key, be sure to set'validresponses'
     validKeys = '1, 2'  # list of valid responses
-    logString_pre_trial = '' #Write this string to the console before every trial
-    logString_post_trial = '' #Write this string to the console after every trial
-    logString_pre_block = "" #Write this string to the console before every block
-    logString_post_block = "" #Write this string to the console after every block
-    logString_pre_exp = "" #Write this string to the console at start of exp
-    logString_post_exp = "" #Write this string to the console at end of exp
+    logString_pre_trial = '' #Write this string to the console and/or logfile before every trial
+    logString_post_trial = ''#Write this string to the console and/or logfileafter every trial
+    logString_pre_block = "" #Write this string to the console and/or logfilebefore every block
+    logString_post_block = ""#Write this string to the console and/or logfileafter every block
+    logString_pre_exp = ""   #Write this string to the console and/or logfileat start of exp
+    logString_post_exp = ""  #Write this string to the console and/or logfileat end of exp
+    logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new (variables expand to names, not values)
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ''
     logConsole = True
     dataString_trial = '' #Write this string to datafile after every trial
     dataString_block = '' #Write this string to datafile after every block
     dataString_exp = ''   #Write this string to datafile at exp end
-    dataString_header = ''   #Write this string to datafile if the file is new
+    dataString_header = '#A data file for Gustav\n\n'#Write this string to datafile if the file is new  (variables expand to names, not values)
     dataFile ='$name.csv'
     dataFile_unexpanded =''
     recordData = True
@@ -76,7 +78,7 @@ class exp:
     quitKeys = ['q', '/']
     responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
     disable_functions = []          # Experimenter can add function names as strings to disable them
-    methodTypes = ['constant', 'staircase']
+    methodTypes = ['constant', 'staircase'] # TODO: remove methodTypes
     stimLoadTypes = ['auto', 'manual']
     stimTypes = ['soundfiles', 'manual']
     varTypes = ['stim', 'manual', 'dynamic']
@@ -261,18 +263,25 @@ def initialize_experiment(exp,run,var,stim,user):
     exp.utils.process_variables(var)
     stim.debug = exp.debug
     var.debug = exp.debug
-    datapath = os.path.split(exp.dataFile)
-    if not os.path.isdir(datapath[0]):
-        print "Creating datafile path: " + datapath[0]
-        os.makedirs(datapath[0])
+    if exp.recordData:
+        datapath = os.path.split(exp.dataFile)
+        if not os.path.isdir(datapath[0]):
+            print "Creating datafile path: " + datapath[0]
+            os.makedirs(datapath[0])
+        exp.dataFile_unexpanded = exp.dataFile
+        exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
+        if not os.path.isfile(exp.dataFile):
+            exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp, run, var, stim, user)
+            write_data(exp.dataString_header, exp.dataFile)
     logpath = os.path.split(exp.logFile)
     if not os.path.isdir(logpath[0]):
         print "Creating logfile path: " + logpath[0]
         os.makedirs(logpath[0])
-    exp.dataFile_unexpanded = exp.dataFile
-    exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
     exp.logFile_unexpanded = exp.logFile
     exp.logFile = get_expanded_vals_in_string(exp.logFile, exp, run, var, stim, user)
+    if not os.path.isfile(exp.logFile):
+        exp.logString_header = get_expanded_vals_in_string(exp.logString_header, exp, run, var, stim, user)
+        write_data(exp.logString_header, exp.logFile)
     exp.validKeys_ = exp.validKeys.split(',')
     # Make a list of the stimuli that are actually used
     for v in range(len(var.factvars)):
@@ -580,6 +589,7 @@ def write_data(data, filename):
     f.write(data)
     f.close()
 
+
 def save_data(exp,run,var,stim,user, which):
     if exp.recordData:
         if which == 'trial' and 'save_data_trial' not in exp.disable_functions:
@@ -611,6 +621,33 @@ def get_frontend(exp, frontend):
     except ImportError:
         raise Exception, "Could not import frontend "+frontend
     exp.gui = getattr(gui, frontend)
+
+def obj_to_str(obj, name, indent=''):
+    """Returns formatted, python-callable string representations of objects
+        including classes, dicts, lists, and other built-in var types
+    """
+    if isinstance(obj, dict):
+        outstr = "%s%s = {\n" % (indent, name)
+        for key, val in obj.items():
+            if key[:2] != "__":
+                outstr += "%s    '%s' : %r,\n" % (indent, key,val)
+        outstr += "%s}\n" % indent
+    elif isinstance(obj, list):
+        outstr = "%s%s = [\n" % (indent, name)
+        for val in obj:
+            outstr += "%s    %r,\n" % (indent, val)
+        outstr += "%s]\n" % indent
+    elif isinstance(obj,(types.ClassType,types.InstanceType)):
+        outstr = "%sclass %s():\n" % (indent, name)
+        items = getmembers(obj)
+        for key, val in items:
+            if key[:2] != "__":
+                outstr += "%s    %s = %r\n" % (indent, key,val)
+        outstr += "%s\n" % indent
+    else:
+        outstr = "%s%s = %r\n" % (indent, name, obj)
+
+    return outstr
 
 def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
     """Replaces all variable references with the specified variable's current value
@@ -671,35 +708,53 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
 
         got_cv = True # TODO: Look into generators
         while got_cv:
-            exp, delim = get_arg(outstr,"$currentvarsvals")
-            if exp != "":
+            expr, delim = get_arg(outstr,"$currentvarsvals")
+            if expr != "":
                 if delim == "":
                     delim = ","
-                outstr = outstr.replace(exp, delim.join(currentvarsvals))
+                outstr = outstr.replace(expr, delim.join(currentvarsvals))
             else:
                 got_cv = False
 
         got_cv = True
         while got_cv:
-            exp, delim = get_arg(outstr,"$currentvars")
-            if exp != "":
+            expr, delim = get_arg(outstr,"$currentvars")
+            if expr != "":
                 if delim == "":
                     delim = ","
-                outstr = outstr.replace(exp, delim.join(currentvars))
+                outstr = outstr.replace(expr, delim.join(currentvars))
             else:
                 got_cv = False
+
+    varlist = []
+    for key in var.varlist:
+        varlist.append(key)
+
+    got_cv = True
+    while got_cv:
+        expr, delim = get_arg(outstr,"@currentvars")
+        if expr != "":
+            if delim == "":
+                delim = ","
+            outstr = outstr.replace(expr, delim.join(varlist))
+        else:
+            got_cv = False
 
     items = getmembers(user)
     for key, val in items:
         if key[:2] != "__":
             outstr = outstr.replace("$user["+str(key)+"]", str(val))
+            outstr = outstr.replace("@user["+str(key)+"]", str(key))
 
     if hasattr(var,'dynamic'):
         for key, val in var.dynamic.items():
             outstr = outstr.replace("$dynamic["+str(key)+"]", str(val))
+            outstr = outstr.replace("@dynamic["+str(key)+"]", str(key))
 
     return outstr
 
+
+# Now that header is its own variable, this function is not needed
 def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
     """Replaces all variable references with the name of the specified variable
 
@@ -732,11 +787,11 @@ def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
 
     got_cv = True
     while got_cv:
-        exp, delim = get_arg(outstr,"$currentvars")
-        if exp != "":
+        expr, delim = get_arg(outstr,"$currentvars")
+        if expr != "":
             if delim == "":
                 delim = ","
-            outstr = outstr.replace(exp, delim.join(varlist))
+            outstr = outstr.replace(expr, delim.join(varlist))
         else:
             got_cv = False
 
