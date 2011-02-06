@@ -3,9 +3,11 @@
 # A Gustav settings file!
 
 import os
+import inspect
 import numpy as np
+import psylab
 
-def setup(exp,run,stim,var,user):
+def setup(exp,run,var,stim,user):
 
     # Crash Recovery
     run.startblock = 1;
@@ -17,7 +19,6 @@ def setup(exp,run,stim,var,user):
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
 
     # General Experimental Variables
-    run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_SomeExperiment'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.consoleString_Trial = ''; #Write this string to the console after every trial
@@ -242,6 +243,12 @@ def setup(exp,run,stim,var,user):
                                       ]
                         });
 
+    var.constant = {
+        'trialsperblock' : 10,
+        'startblock' : 1,
+        'starttrial' : 1,
+        }
+
     """CONDITION PRESENTATION ORDER
         Use 'prompt' to prompt for condition on each block, 'random' to randomize
         condition order, 'menu' to be able to choose from a list of conditions at
@@ -275,11 +282,14 @@ def setup(exp,run,stim,var,user):
 def prompt_response(exp,run,stim,var,user):
     while True:
         # The prompt is the trial feedback.
-        p = "  Trial "+ str(run.trial+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        ret = exp.term.get_input(None, exp.exp_name+"!",p)
+        #p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
+        #ret = exp.term.get_input(None, exp.exp_name+"!",p)
+
+        #TODO: Switch to get_char
+        ret = exp.term.get_input(None, "Gustav!","How many keywords? ")
         if ret in exp.validKeys_:
             run.response = ret
-            exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
+            #exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
         elif ret in exp.quitKeys:
             run.block_on = False
@@ -295,9 +305,6 @@ def prompt_response(exp,run,stim,var,user):
 """
 def pre_trial(exp,run,stim,var,user):
     stim.stimarray = np.zeros((1))
-
-
-    stim.clipped = len(stim.stimarray[stim.stimarray>1])
 
 
 if __name__ == '__main__':

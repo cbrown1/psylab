@@ -101,13 +101,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
 
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
-    #if settingsFile == None:
-    #    settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-    #    if settingsFile == '':
-    #        print ""+exp.exp_name+" cancelled at user request"
-    #        return;
-    settingsFile = 'settings_adaptive.py'
-    subjectID = 4
+    if settingsFile == None:
+        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        if settingsFile == '':
+            print ""+exp.exp_name+" cancelled at user request"
+            return;
+    #settingsFile = 'settings_adaptive.py'
+    #subjectID = 4
 
     if subjectID == None:
         exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
@@ -164,16 +164,22 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     exp.utils.update_time(run)
     exp.utils.log(exp,run,var,stim,user, 'pre_exp')
     run.gustav_is_go = True
+    run.trials_exp = 0
     # TODO: handle datafile headers
-    #exp.utils.record_data(exp,run,var,stim,user, header=True)
-    for run.block in range(run.startblock-1,var.nblocks):
+
+#    for run.block in range(run.startblock-1,var.nblocks):
+#        if var.order == 'prompt':
+#            exp.prompt_condition(exp,run,var,stim,user)
+#        else:
+#            run.condition = var.orderarray[run.block]
+#        if run.gustav_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
+    while run.gustav_is_go:
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
         else:
             run.condition = var.orderarray[run.block]
-        if run.gustav_is_go and ( var.order == 'prompt' or run.condition+1 not in var.ignore ):
-            if run.block != run.startblock: run.btrial = 0;
-            else: run.btrial = run.starttrial - 1;
+        if var.order == 'prompt' or run.condition+1 not in var.ignore:
+            run.trials_block = 0;
             run.block_on = True
             exp.utils.get_current_variables(var, stim, run.condition)
             exp.utils.update_time(run)
@@ -183,13 +189,10 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
             exp.utils.log(exp,run,var,stim,user, 'pre_block')
 
             while run.block_on:
-                # TODO: trialsperblock is method (constant) specific, and does not belong here. run.trial should be computed in methods
-                run.trial = (run.block*run.trialsperblock)+run.btrial
-                run.trial_on = True
-
                 for s in stim.stimvars:
                     if stim.sets[s]['type'] != 'manual':
                         exp.utils.get_current_stimulus(stim, s)
+                run.trial_on = True
                 while run.trial_on:
                     exp.pre_trial(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, 'pre_trial')
@@ -202,7 +205,8 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     exp.utils.log(exp,run,var,stim,user, 'post_trial')
                     exp.utils.save_data(exp,run,var,stim,user, 'trial')
 
-                    run.btrial += 1
+                    run.trials_block += 1
+                    run.trials_exp += 1
 
             exp.utils.update_time(run)
             for f in exp.post_block_:
@@ -210,12 +214,17 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
                     f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, 'post_block')
             exp.utils.save_data(exp,run,var,stim,user, 'block')
+            run.block += 1
+            if var.order != 'prompt' and run.block == var.nblocks - 1:
+                run.gustav_is_go = False
+
+            # TODO: Try commenting out these four (five) lines. Should be OK, but we'll see.
             if not run.gustav_is_go:
                 break;
             # End while-block loop
         if not run.gustav_is_go:
             break;
-    # End block loop
+    # End gustav_is_go loop
     exp.utils.update_time(run)
     for f in exp.post_exp_:
         if f.func_name not in exp.disable_functions:

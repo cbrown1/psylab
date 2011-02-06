@@ -170,11 +170,11 @@ def finish_trial(exp, run, var, stim, user):
         var.dynamic['val_ceil_count'] = 0
 
     if run.block_on:
-        if var.dynamic['run_n_trials'] > 0 and run.trial == var.dynamic['run_n_trials']:
+        if var.dynamic['run_n_trials'] > 0 and run.trials_block == var.dynamic['run_n_trials']:
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = '%g trials reached' % var.dynamic['run_n_trials']
-        elif var.dynamic['max_trials'] > 0 and run.trial == var.dynamic['max_trials']:
+        elif var.dynamic['max_trials'] > 0 and run.trials_block == var.dynamic['max_trials']:
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
@@ -225,7 +225,7 @@ def post_block(exp, run, var, stim, user):
 def pre_exp(exp, run, var, stim, user):
     exp.logString_pre_exp = "Experiment $name started at $time\n"
     exp.logString_pre_block = "\n Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_pre_trial = "  Trial $trial, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
+    exp.logString_pre_trial = "  Trial $trial_block, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
     exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
     exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_exp = "\nExperiment $name ended at $time\n"

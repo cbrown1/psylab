@@ -184,11 +184,8 @@ class run:
     '''
     time = ''
     date = ''
-    startblock = 1
-    starttrial = 1
-    trialsperblock = 1
-    btrial = 0     # Current trial count within a block
-    trial = 0      # Current total trial count
+    trials_block = 0     # Current trial count within a block
+    trials_exp = 0      # Current total trial count
     block = 0      # Current block (treatment) count
     blocks = 0     # Current total block count
     condition = 0  # Current condition
@@ -659,6 +656,7 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         $host            : The name of the machine that the exp is being run on
         $subj            : The subject id
         $trial           : The current trial number
+        $trial_block     : The current trial number within the current block
         $block           : The current block number
         $condition       : The current condition number
         $conditions      : The total number of conditions
@@ -683,7 +681,8 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
     outstr = outstr.replace("$comment", exp.comments)
     outstr = outstr.replace("$host", exp.host)
     outstr = outstr.replace("$subj", exp.subjID)
-    outstr = outstr.replace("$trial", str(run.trial+1))
+    outstr = outstr.replace("$trial_block", str(run.trials_block+1))
+    outstr = outstr.replace("$trial", str(run.trials_exp+1))
     outstr = outstr.replace("$block", str(run.block+1))
     outstr = outstr.replace("$conditions", str(var.nlevels_total)) # must be before condition, otherwise '$conditions' -> '1s'
     outstr = outstr.replace("$condition", str(run.condition+1))
@@ -766,7 +765,7 @@ def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
     outstr = instr.replace("$comment", "Comments")
     outstr = outstr.replace("$host", "Host")
     outstr = outstr.replace("$subj", "SubjID")
-    outstr = outstr.replace("$trial", "Trial")
+    outstr = outstr.replace("$trials", "Trial")
     outstr = outstr.replace("$block", "Block")
     outstr = outstr.replace("$conditions", "Conditions")
     outstr = outstr.replace("$condition", "Condition")

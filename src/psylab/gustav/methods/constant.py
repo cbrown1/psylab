@@ -37,19 +37,31 @@
 #def initialize(exp,run,var,stim,user):
 #    pass
 
+# TODO: add trialsperblock, startblock, starttrial
 
 def pre_exp(exp, run, var, stim, user):
+    exp.logString_pre_exp = "Experiment $name started at $time\n"
+    exp.logString_pre_block = "\n Block $block started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_trial = "  Trial $trial_block, "
+    exp.logString_post_trial = "Response: $response\n"
+    exp.logString_post_block = " Block $block ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_post_exp = "\nExperiment $name ended at $time\n"
+    run.block = var.constant['startblock']-1
+    if run.block == var.nblocks - 1:
+        run.gustav_is_go = False
     # Check if there are enough stimuli
-	# Move to settingsfile? Are stim issues really method related?
+    # Move to settingsfile? Are stim issues really method related?
     for stimset in stim.stimvars:
         if stim.sets[stimset]['type'] != 'manual':
             if not stim.sets[stimset]['repeat']:
-                if run.trialsperblock*var.nlevels_total > stim.sets[stimset]['n']:
+                if var.constant['trialsperblock']*var.nlevels_total > stim.sets[stimset]['n']:
                     raise Exception,  "Not enough stimulus files for stimset: " + stimset + "\nNeeded for design: " + str(run.trialsperblock*var.nlevels_total) + "\nAvailable: " + str(stim.sets[stimset]['n'])
 
 def post_trial(exp, run, var, stim, user):
-    run.stim_index = run.trial # Not used atm
-    if run.btrial == run.trialsperblock-1:
+    run.stim_index = run.trials_exp # Not used atm
+    if run.trials_block == var.constant['trialsperblock']-1:
         run.block_on = False
     run.trial_on = False
 
+def save_data_block(exp,run,var,stim,user):
+    pass

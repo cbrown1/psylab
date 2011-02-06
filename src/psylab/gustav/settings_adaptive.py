@@ -3,6 +3,7 @@
 # A Gustav settings file!
 
 import os
+import inspect
 import numpy as np
 import psylab
 import adaptiveForm
@@ -20,7 +21,6 @@ def setup(exp,run,var,stim,user):
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
 
     # General Experimental Variables
-    run.trialsperblock = 10    # The number of trials at each treatment or block
     exp.name = '_QuietThresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.prompt = 'Which interval?' # Prompt for subject
@@ -240,6 +240,5 @@ def present_trial(exp,run,var,stim,user):
     pass
 
 if __name__ == '__main__':
-    import inspect
     fname = inspect.getfile( inspect.currentframe() )
     psylab.gustav.run(settingsFile=fname)
