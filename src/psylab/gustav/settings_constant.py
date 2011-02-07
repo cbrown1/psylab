@@ -6,6 +6,7 @@ import os
 import inspect
 import numpy as np
 import psylab
+import qtForm_speech as theForm
 
 def setup(exp,run,var,stim,user):
 
@@ -42,43 +43,43 @@ def setup(exp,run,var,stim,user):
     """STIMULUS SETS
         If you generate all your stimuli on the fly, you don't need any of these.
 
-        The only required property is 'type', which should be either 'manual'
-        or 'soundfiles'. If it is manual, the experimenter is responsible for
+        The only required property is `type`, which should be either `manual`
+        or `soundfiles`. If it is manual, the experimenter is responsible for
         handling it.
 
-        If 'type is set to 'soundfiles', each set needs two additional settings:
+        If `type` is set to `soundfiles`, each set needs two additional settings:
 
-        'path' is the full path to the folder containing the files
+        `path` is the full path to the folder containing the files
 
-        'fs' is the playback sampling frequency
+        `fs` is the playback sampling frequency
 
         There are several optional settings for soundfiles:
 
-        'text' is the full path to a text file that specifies text for each token.
+        `text` is the full path to a text file that specifies text for each token.
                 There should be one line per token, and the format can be
                 specified (see below).
 
-        'txtfmt' If you're using a text file, you can specify the format here.
-                  You can specify 3 values, 'file', 'kw', and 'text'. The default
-                  format is 'file,kw,text' which in your file would look like:
-                  'CUNY001,4,They LOOKED UP at the BLUE SKY.' where CUNY001 is
+        `txtfmt` If you're using a text file, you can specify the format here.
+                  You can specify 3 values, `file`, `kw`, and `text`. The default
+                  format is `file,kw,text` which in your file would look like:
+                  `CUNY001,4,They LOOKED UP at the BLUE SKY.` where CUNY001 is
                   the filename [no extension], 4 is the number of keywords, and
                   the rest of the line is the text. The text should always be
                   last on the line, and the delimiter can be a comma or a space.
 
-        'mask' is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
+        `mask` is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
 
-        'load' is 'manual' to simply keep track of filenames, or 'auto' to load
-                stimuli automatically as well. default is 'auto'
+        `load` is `manual` to simply keep track of filenames, or `auto` to load
+                stimuli automatically as well. default is `auto`
 
-        'order' is the presentation order: 'random', 'natural', or a print
+        `order` is the presentation order: `random`, `natural`, or a print
                 range style string, which should be a comma-separated list of
                 values, which can be either a single number, or a colon-delimited
-                range. Make the first item in the list the string 'random' to
-                randomize the list. default is 'natural'
+                range. Make the first item in the list the string `random` to
+                randomize the list. default is `natural`
 
-        'repeat' is whether to run through the list again if we run out. If this
-                is True and 'order' is random, a new random order will be
+        `repeat` is whether to run through the list again if we run out. If this
+                is True and `order` is random, a new random order will be
                 generated each time. If this is false, you must ensure that there
                 are enough stimulus files available. default is False
     """

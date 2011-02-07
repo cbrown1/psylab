@@ -6,7 +6,8 @@ import os
 import inspect
 import numpy as np
 import psylab
-import adaptiveForm
+import qtForm_adaptive as theForm
+#import qtForm_speech as theForm
 
 def setup(exp,run,var,stim,user):
 
@@ -37,50 +38,50 @@ def setup(exp,run,var,stim,user):
     exp.cacheTrials = False
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = 'A demonstration of the adaptive method'
-    exp.comments = '''Quiet Thresholds
+    exp.comments = """Quiet Thresholds
     Derives quiet thresholds for pure tones.
-    '''
+    """
 
     """STIMULUS SETS
         If you generate all your stimuli on the fly, you don't need any of these.
 
-        The only required property is 'type', which should be either 'manual'
-        or 'soundfiles'. If it is manual, the experimenter is responsible for
+        The only required property is `type`, which should be either `manual`
+        or `soundfiles`. If it is manual, the experimenter is responsible for
         handling it.
 
-        If 'type is set to 'soundfiles', each set needs two additional settings:
+        If `type` is set to `soundfiles`, each set needs two additional settings:
 
-        'path' is the full path to the folder containing the files
+        `path` is the full path to the folder containing the files
 
-        'fs' is the playback sampling frequency
+        `fs` is the playback sampling frequency
 
         There are several optional settings for soundfiles:
 
-        'text' is the full path to a text file that specifies text for each token.
+        `text` is the full path to a text file that specifies text for each token.
                 There should be one line per token, and the format can be
                 specified (see below).
 
-        'txtfmt' If you're using a text file, you can specify the format here.
-                  You can specify 3 values, 'file', 'kw', and 'text'. The default
-                  format is 'file,kw,text' which in your file would look like:
-                  'CUNY001,4,They LOOKED UP at the BLUE SKY.' where CUNY001 is
+        `txtfmt` If you're using a text file, you can specify the format here.
+                  You can specify 3 values, `file`, `kw`, and `text`. The default
+                  format is `file,kw,text` which in your file would look like:
+                  `CUNY001,4,They LOOKED UP at the BLUE SKY.` where CUNY001 is
                   the filename [no extension], 4 is the number of keywords, and
                   the rest of the line is the text. The text should always be
                   last on the line, and the delimiter can be a comma or a space.
 
-        'mask' is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
+        `mask` is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
 
-        'load' is 'manual' to simply keep track of filenames, or 'auto' to load
-                stimuli automatically as well. default is 'auto'
+        `load` is `manual` to simply keep track of filenames, or `auto` to load
+                stimuli automatically as well. default is `auto`
 
-        'order' is the presentation order: 'random', 'natural', or a print
+        `order` is the presentation order: `random`, `natural`, or a print
                 range style string, which should be a comma-separated list of
                 values, which can be either a single number, or a colon-delimited
-                range. Make the first item in the list the string 'random' to
-                randomize the list. default is 'natural'
+                range. Make the first item in the list the string `random` to
+                randomize the list. default is `natural`
 
-        'repeat' is whether to run through the list again if we run out. If this
-                is True and 'order' is random, a new random order will be
+        `repeat` is whether to run through the list again if we run out. If this
+                is True and `order` is random, a new random order will be
                 generated each time. If this is false, you must ensure that there
                 are enough stimulus files available. default is False
     """
@@ -89,17 +90,17 @@ def setup(exp,run,var,stim,user):
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
 
-        Levels added as 'factvars' variables will be factorialized with each
+        Levels added as `factvars` variables will be factorialized with each
         other. So, if you have 2 fact variables A & B, each with 3 levels, you
         will end up with 9 conditions: A1B1, A1B2, A1B3, A2B1 etc..
 
-        Levels added as 'listvars' variables will simply be listed (in parallel
+        Levels added as `listvars` variables will simply be listed (in parallel
         with the corresponding levels from the other variables) in the order
-        specified. So, if you have 2 'listvars' variables A & B, each with 3
+        specified. So, if you have 2 `listvars` variables A & B, each with 3
         levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. All
-        'listvars' variables must have either the same number of levels, or
+        `listvars` variables must have either the same number of levels, or
         exactly one level. When only one level is specified, that level will
-        be used in all 'listvars' conditions. Eg., A1B1, A2B1, A3B1, etc.
+        be used in all `listvars` conditions. Eg., A1B1, A2B1, A3B1, etc.
 
         You can use both types of variables in the same experiment, but both
         factvars and listvars must contain exactly the same set of variable
@@ -108,16 +109,16 @@ def setup(exp,run,var,stim,user):
 
         Each variable (whether factvars or listvars) should have 3 properties:
 
-        'name' is the name of the variable, as a string
+        `name` is the name of the variable, as a string
 
-        'type' is either 'manual' or 'stim'. 'manual' variables are ones that
-                the experimenter will handle in the stimgen. 'stim' variables
+        `type` is either `manual` or `stim`. `manual` variables are ones that
+                the experimenter will handle in the stimgen. `stim` variables
                 are ones that will load stimulus files. One usecase would be
                 eg., if you preprocess your stimuli and want to read the same
                 files, but from different directories depending on the
                 treatment.
 
-        'levels' should be a list of strings that identify each level of interest
+        `levels` should be a list of strings that identify each level of interest
 
         for file in stim['masker_files']:
             masker,fs,enc = utils.wavread(file)
@@ -155,11 +156,11 @@ def setup(exp,run,var,stim,user):
                    }
 
     """CONDITION PRESENTATION ORDER
-        Use 'prompt' to prompt for condition on each block, 'random' to randomize
-        condition order, 'menu' to be able to choose from a list of conditions at
-        the start of a run, 'natural' to use natural order (1:end), or a
+        Use `prompt` to prompt for condition on each block, `random` to randomize
+        condition order, `menu` to be able to choose from a list of conditions at
+        the start of a run, `natural` to use natural order (1:end), or a
         print-range style string to specify the order ('1-10, 12, 15'). You can
-        make the first item in the print range 'random' to randomize the specified
+        make the first item in the print range `random` to randomize the specified
         range.
     """
     var.order = 'natural'
@@ -171,9 +172,9 @@ def setup(exp,run,var,stim,user):
     """
     var.ignore = []
 
-    '''USER VARIABLES
+    """USER VARIABLES
         Add any additional variables you need here
-    '''
+    """
     user.prebuff = 150
     user.postbuff = 150
     user.fs = 44100
@@ -228,7 +229,7 @@ def post_trial(exp, run, var, stim, user):
             exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
 
 def pre_exp(exp,run,var,stim,user):
-    exp.interface = adaptiveForm.AdaptiveInterfact(exp, run, exp.validKeys_)
+    exp.interface = theForm.Interface(exp, run, exp.validKeys_)
 
 def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()

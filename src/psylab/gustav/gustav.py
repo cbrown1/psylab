@@ -92,9 +92,9 @@ def list_conditions(settingsFile = None, frontend = None):
 
 def run(settingsFile = None, subjectID = None, frontend = None, recordData = True):
 
+    exp = utils.exp()
     var = utils.var()
     stim = utils.stim()
-    exp = utils.exp()
     run = utils.run()
     user = utils.user()
     exp.utils = utils
@@ -106,8 +106,6 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
         if settingsFile == '':
             print ""+exp.exp_name+" cancelled at user request"
             return;
-    #settingsFile = 'settings_adaptive.py'
-    #subjectID = 4
 
     if subjectID == None:
         exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
