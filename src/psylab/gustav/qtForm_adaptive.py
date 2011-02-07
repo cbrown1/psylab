@@ -135,3 +135,6 @@ class Interface():
         time.sleep(dur)
         self.dialog.button_dict[button].setStyleSheet(self.dialog.default_button_stylesheet)
         self.app.processEvents()
+
+    def updateInfo_BlockCount(self, s):
+        self.dialog.blocks.setText(s)

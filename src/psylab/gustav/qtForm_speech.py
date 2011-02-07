@@ -51,14 +51,14 @@ class Interface():
             f = self.expLabel.font()
             f.setPointSize(14)
             self.expLabel.setFont(f)
-            self.expLabel.setStyleSheet("QWidget { background-color: 'blue'; }")
+            self.expLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             vbox.addWidget(self.expLabel)
 
             self.blockLabel = QtGui.QLabel()
             f = self.blockLabel.font()
             f.setPointSize(14);
             self.blockLabel.setFont(f)
-            self.blockLabel.setStyleSheet("QWidget { background-color: 'green'; }")
+            self.blockLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             vbox.addWidget(self.blockLabel)
 
             self.trialLabel = QtGui.QLabel()
@@ -66,7 +66,7 @@ class Interface():
             f.setPointSize(16);
             self.trialLabel.setFont(f)
             self.trialLabel.setFixedHeight(60)
-            self.trialLabel.setStyleSheet("QWidget { background-color: 'darkYellow'; }")
+            self.trialLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             vbox.addWidget(self.trialLabel)
 
             scoreBox = QtGui.QHBoxLayout()
@@ -76,7 +76,7 @@ class Interface():
             f.setPointSize(14);
             self.trialScore.setFont(f)
             self.trialScore.setFixedHeight(60)
-            self.trialScore.setStyleSheet("QWidget { background-color: 'cyan'; }")
+            self.trialScore.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             scoreBox.addWidget(self.trialScore)
 
             self.blockScore = QtGui.QLabel()
@@ -84,7 +84,7 @@ class Interface():
             f.setPointSize(14);
             self.blockScore.setFont(f)
             self.blockScore.setFixedHeight(60)
-            self.blockScore.setStyleSheet("QWidget { background-color: 'magenta'; }")
+            self.blockScore.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             scoreBox.addWidget(self.blockScore)
 
             vbox.addLayout(scoreBox)
@@ -93,18 +93,18 @@ class Interface():
 
             self.blockVariables = QtGui.QLabel()
             f = self.blockVariables.font()
-            f.setPointSize(14);
+            f.setPointSize(11);
             self.blockVariables.setFont(f)
             self.blockVariables.setFixedHeight(120)
-            self.blockVariables.setStyleSheet("QWidget { background-color: 'cyan'; }")
+            self.blockVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             ConditionBox.addWidget(self.blockVariables)
 
             self.expVariables = QtGui.QLabel()
             f = self.expVariables.font()
-            f.setPointSize(14);
+            f.setPointSize(11);
             self.expVariables.setFont(f)
             self.expVariables.setFixedHeight(120)
-            self.expVariables.setStyleSheet("QWidget { background-color: 'magenta'; }")
+            self.expVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             ConditionBox.addWidget(self.expVariables)
 
             vbox.addLayout(ConditionBox)
@@ -180,7 +180,31 @@ class Interface():
         return curchar
 
     def showPlaying(self, playing):
-        self.isPlaying.setVisible(playing)
+        self.dialog.isPlaying.setVisible(playing)
+
+    def updateInfo_Exp(self, s):
+        self.dialog.expLabel.setText(s)
+
+    def updateInfo_Block(self, s):
+        self.dialog.blockLabel.setText(s)
+
+    def updateInfo_Trial(self, s):
+        self.dialog.trialLabel.setText(s)
+
+    def updateInfo_BlockScore(self, s):
+        self.dialog.blockScore.setText(s)
+
+    def updateInfo_TrialScore(self, s):
+        self.dialog.trialScore.setText(s)
+
+    def updateInfo_blockVariables(self, s):
+        self.dialog.blockVariables.setText(s)
+
+    def updateInfo_TrialVariables(self, s):
+        self.dialog.trialVariables.setText(s)
+
+    def updateInfo_BlockCount(self, s):
+        self.dialog.blocks.setText(s)
 
     def button_flash(self, button, color):
         """Flashes the specified button on and off several times with the specified color
