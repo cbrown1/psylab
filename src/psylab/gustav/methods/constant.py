@@ -43,7 +43,7 @@ def pre_exp(exp, run, var, stim, user):
     exp.logString_pre_exp = "Experiment $name started at $time\n"
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_pre_trial = ""
-    exp.logString_post_trial = ""
+    exp.logString_post_trial = " Trial $trial, Response: $response\n"
     exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_exp = "\nExperiment $name ended at $time\n"
     run.block = var.constant['startblock']-1

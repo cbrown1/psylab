@@ -60,9 +60,9 @@ dynamic_vars_block = {           # Might be useful for stimgen or at end of bloc
             'values': [],        # Array of values
             'track': [],         # 0 = no change, -1 = reversal/dn, 1 = reversal/up
             'values_at_rev': [], # Values at reversals
-            'good_run': False,   # True if the run did finished normally, otherwise False
+            'good_run': False,   # True if the run finished normally, otherwise False
            }
-dynamic_vars_track = {           # These vals are used for tracking
+dynamic_vars_track = {           # Tracking (prob not useful, so not accessible)
             'value': 0,          # Current dynamic value
             'val_floor_count': 0,# Number of consecutive floor trials
             'val_ceil_count': 0, # Number of consecutive ceiling trials
