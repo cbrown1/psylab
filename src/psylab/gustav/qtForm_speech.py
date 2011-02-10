@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# messagebox.py
+# qtForm_speech.py
 
 import sys
 from PyQt4 import QtGui, QtCore
@@ -97,6 +97,7 @@ class Interface():
             self.blockVariables.setFont(f)
             self.blockVariables.setFixedHeight(120)
             self.blockVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.blockVariables.setAlignment(QtCore.Qt.AlignTop)
             ConditionBox.addWidget(self.blockVariables)
 
             self.expVariables = QtGui.QLabel()
@@ -105,6 +106,7 @@ class Interface():
             self.expVariables.setFont(f)
             self.expVariables.setFixedHeight(120)
             self.expVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.expVariables.setAlignment(QtCore.Qt.AlignTop)
             ConditionBox.addWidget(self.expVariables)
 
             vbox.addLayout(ConditionBox)
@@ -200,8 +202,8 @@ class Interface():
     def updateInfo_blockVariables(self, s):
         self.dialog.blockVariables.setText(s)
 
-    def updateInfo_TrialVariables(self, s):
-        self.dialog.trialVariables.setText(s)
+    def updateInfo_expVariables(self, s):
+        self.dialog.expVariables.setText(s)
 
     def updateInfo_BlockCount(self, s):
         self.dialog.blocks.setText(s)

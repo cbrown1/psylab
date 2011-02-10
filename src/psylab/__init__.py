@@ -35,7 +35,7 @@
 PsyLab - Psychophysics Lab
 
 A loose collection of modules useful for various aspects of running
-psychophysics experiments, although several will be more generally
+psychophysical experiments, although several will be more generally
 useful.
 
 '''

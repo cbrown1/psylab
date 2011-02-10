@@ -318,6 +318,8 @@ def post_trial(exp,run,var,stim,user):
 def pre_exp(exp,run,var,stim,user):
     exp.interface = theForm.Interface(exp, run, exp.validKeys_)
     exp.interface.updateInfo_Exp(exp.name+", "+exp.note)
+    expvars = "Conditions: %r\nRecord Data: %r" % (var.orderarray, exp.recordData)
+    exp.interface.updateInfo_expVariables(expvars)
 
 def pre_block(exp,run,var,stim,user):
     exp.interface.updateInfo_BlockCount("Block %g of %g" % (run.block+1, run.nblocks))
