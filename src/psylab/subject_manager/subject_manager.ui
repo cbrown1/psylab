@@ -116,6 +116,12 @@
        <height>26</height>
       </rect>
      </property>
+     <property name="displayFormat">
+      <string>yyyy-MM-dd</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">
@@ -204,6 +210,12 @@
        <height>26</height>
       </rect>
      </property>
+     <property name="displayFormat">
+      <string>yyyy-MM-dd</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QDateEdit" name="add_consent_dateEdit">
      <property name="geometry">
@@ -213,6 +225,12 @@
        <width>140</width>
        <height>26</height>
       </rect>
+     </property>
+     <property name="displayFormat">
+      <string>yyyy-MM-dd</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="add_name_first_lineEdit">
@@ -613,7 +631,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>180</width>
+       <width>126</width>
        <height>251</height>
       </rect>
      </property>
