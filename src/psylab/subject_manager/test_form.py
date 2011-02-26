@@ -9,6 +9,7 @@ import datetime
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
+STDOUT = sys.stdout
 form_class, base_class = uic.loadUiType("subject_manager.ui")
 
 class MyWidget (QtGui.QWidget, form_class):
@@ -27,18 +28,72 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
+        self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
+        self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
 
+
+
+        self.add_init()
+
+    def edit_Process(self):
+        pass
+
+    def admin_init(self):
+        conn = sqlite3.connect(self.filename);
+        c = conn.cursor();
+
+        c.execute("""SELECT Protocol FROM Protocols""")
+        self.admin_protocols_listView.clear()
+        for row in c:
+            self.admin_protocols_listView.insertItem(-1, row[0])
+
+    def admin_protocols_add(self):
+        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol:')
+        if ret is not None:
+            self.admin_protocols_listWidget.insertItem(-1, ret)
+
+    def admin_protocols_remove(self):
+        if self.admin_protocols_listWidget.currentItem() is not None:
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'Are you sure you want to remove item:\n\n'+ self.admin_protocols_listWidget.currentItem().text())
+            if ret:
+                item = self.admin_protocols_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
+                item = None
+
+    def add_init(self):
         conn = sqlite3.connect(self.filename);
         c = conn.cursor();
         c.execute("""SELECT MAX(SubjN) FROM Subjects""");
         subn = c.fetchone();
-        self.add_subject_lineEdit.setText(str(subn[0]+1));
+        if subn[0] is None:
+            self.add_subject_lineEdit.setText('1')
+        else:
+            self.add_subject_lineEdit.setText(str(subn[0]+1));
+
+        c.execute("""SELECT EthnicID FROM EthnicIDs""")
+        self.add_ethnic_id_comboBox.clear()
+        for row in c:
+            self.add_ethnic_id_comboBox.insertItem(-1, row[0])
+
+        c.execute("""SELECT Race FROM Races""")
+        self.add_race_comboBox.clear()
+        for row in c:
+            self.add_race_comboBox.insertItem(-1, row[0])
+
+        c.execute("""SELECT Gender FROM Genders""")
+        self.add_gender_comboBox.clear()
+        for row in c:
+            self.add_gender_comboBox.insertItem(-1, row[0])
+
+        c.execute("""SELECT Protocol FROM Protocols""")
+        self.add_protocol_comboBox.clear()
+        for row in c:
+            self.add_protocol_comboBox.insertItem(-1, row[0])
+
+
         c.close();
         conn.close();
         self.doAge();
 
-    def edit_Process(self):
-        pass
 
     def add_Process(self):
         missing = [];
@@ -145,6 +200,56 @@ class MyWidget (QtGui.QWidget, form_class):
                 days = self.days_previous_month(today1.year, today1.month);
                 d = max(0, days - dob1.day) + today1.day;
         return y;
+
+    def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
+        """Opens a simple yes/no message box, returns a bool
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret = QtGui.QMessageBox.question(parent, title, prompt, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        sys.stdout = STDOUT
+        if ret == QtGui.QMessageBox.Yes:
+            return True
+        else:
+            return False
+
+    def get_file(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
+        """Opens a file dialog, returns file path as a string
+
+            To specify filetypes, use the (qt) format:
+            "Python or Plain Text Files (*.py *.txt);;All files (*.*)"
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None # Avoid the "Redirecting output to win32trace
+                            # remote collector" message from showing in stdout
+        ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
+        sys.stdout = STDOUT
+        return str(ret)
+
+    def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
+        """Opens a folder dialog, returns the path as a string
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret = QtGui.QFileDialog.getExistingDirectory(parent, title, default_dir)
+        sys.stdout = STDOUT
+        return str(ret)
+
+    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        """Opens a simple prompt for user input, returns a string
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret, ok = QtGui.QInputDialog.getText(parent, title, prompt)
+        sys.stdout = STDOUT
+        if ok:
+            return str(ret)
+        else:
+            return ''
 
 
 if __name__ == '__main__':
