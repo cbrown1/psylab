@@ -1,13 +1,15 @@
-/* 
-An SQL Schema file to create a basic subject database. The `Protocols` table is intended to hold 
-all of your IRB protocols, so that each subject can be searched/sorted on that, when it comes time 
-to report. 
+/*
+An SQL Schema file to create a basic subject database. The `Protocols` table
+is intended to hold all of your IRB protocols, so that subjects can be
+searched/sorted on that, when it comes time to report. The CustomVars table
+is for any additional info you want to store, eg `audio125`, `audio250`, etc.
+
 
 TO RUN:
 
 import sqlite3
 qry = open('New_DB_Schema.sql', 'r').read()
-conn = sqlite3.connect('/path/to/db')
+conn = sqlite3.connect('Subjects.db')
 c = conn.cursor()
 c.executescript(qry)
 conn.commit()
@@ -15,11 +17,11 @@ c.close()
 conn.close()
 */
 
--- The main table, to hold subject info
+-- The main table, to hold subject info. New fields will be added as needed
+-- for Protocols (a default is created here) and custom vars
 CREATE TABLE "Subjects" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "SubjN" INTEGER,
-    "Protocol" TEXT,
     "FName" TEXT,
     "LName" TEXT,
     "DOB" TEXT,
@@ -29,20 +31,8 @@ CREATE TABLE "Subjects" (
     "Phone" TEXT,
     "Race" TEXT,
     "EthnicID" TEXT,
-    "Consent" TEXT,
-    "Audiogram" TEXT,
-    "IEEE" TEXT,
-    "HINT" TEXT,
-    "CUNY" TEXT,
-    "CID" TEXT,
-    "NOTES" TEXT,
-    "Contact" TEXT
-);
-
--- A table to hold the list of IRB protocols
-CREATE TABLE "Protocols" (
-    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "Protocol" TEXT
+    "Contact" TEXT,
+    "Protocol_Default" TEXT
 );
 
 -- NIH 'Race' Categories
@@ -72,3 +62,23 @@ CREATE TABLE "Genders" (
 );
 INSERT INTO Genders (Gender) VALUES ('Female');
 INSERT INTO Genders (Gender) VALUES ('Male');
+
+-- A table to hold the list of IRB protocols
+CREATE TABLE "Protocols" (
+    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "Protocol" TEXT
+);
+INSERT INTO Protocols (Protocol) VALUES ('Default');
+
+-- A table to hold any custom user variables
+CREATE TABLE "CustomVars" (
+    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "CustomVar" TEXT
+);
+
+-- A table to hold any database admin data
+CREATE TABLE "Admin" (
+    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "Key" TEXT,
+    "Val" TEXT
+);

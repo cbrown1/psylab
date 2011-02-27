@@ -1,174 +1,404 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'subject_manager.ui'
-#
-# Created: Mon Feb 22 12:48:55 2010
-#      by: PyQt4 UI code generator 4.7
-#
-# WARNING! All changes made in this file will be lost!
+# calendar.py
 
-from PyQt4 import QtCore, QtGui
+import sys
+import sqlite3
+import datetime
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+from PyQt4 import uic
+STDOUT = sys.stdout
+form_class, base_class = uic.loadUiType("subject_manager_ui.ui")
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(562, 369)
-        self.tabWidget = QtGui.QTabWidget(Form)
-        self.tabWidget.setGeometry(QtCore.QRect(10, 10, 541, 311))
-        self.tabWidget.setObjectName("tabWidget")
-        self.tab = QtGui.QWidget()
-        self.tab.setObjectName("tab")
-        self.label = QtGui.QLabel(self.tab)
-        self.label.setGeometry(QtCore.QRect(10, 10, 81, 21))
-        self.label.setObjectName("label")
-        self.label_2 = QtGui.QLabel(self.tab)
-        self.label_2.setGeometry(QtCore.QRect(10, 40, 71, 16))
-        self.label_2.setObjectName("label_2")
-        self.label_3 = QtGui.QLabel(self.tab)
-        self.label_3.setGeometry(QtCore.QRect(10, 70, 61, 16))
-        self.label_3.setObjectName("label_3")
-        self.label_4 = QtGui.QLabel(self.tab)
-        self.label_4.setGeometry(QtCore.QRect(10, 100, 61, 16))
-        self.label_4.setObjectName("label_4")
-        self.label_5 = QtGui.QLabel(self.tab)
-        self.label_5.setGeometry(QtCore.QRect(10, 130, 61, 16))
-        self.label_5.setObjectName("label_5")
-        self.label_6 = QtGui.QLabel(self.tab)
-        self.label_6.setGeometry(QtCore.QRect(10, 160, 61, 16))
-        self.label_6.setObjectName("label_6")
-        self.birthdate_dateEdit = QtGui.QDateEdit(self.tab)
-        self.birthdate_dateEdit.setGeometry(QtCore.QRect(90, 130, 151, 21))
-        self.birthdate_dateEdit.setObjectName("birthdate_dateEdit")
-        self.label_7 = QtGui.QLabel(self.tab)
-        self.label_7.setGeometry(QtCore.QRect(300, 10, 61, 16))
-        self.label_7.setObjectName("label_7")
-        self.label_8 = QtGui.QLabel(self.tab)
-        self.label_8.setGeometry(QtCore.QRect(300, 40, 61, 16))
-        self.label_8.setObjectName("label_8")
-        self.label_9 = QtGui.QLabel(self.tab)
-        self.label_9.setGeometry(QtCore.QRect(300, 70, 61, 16))
-        self.label_9.setObjectName("label_9")
-        self.label_10 = QtGui.QLabel(self.tab)
-        self.label_10.setGeometry(QtCore.QRect(300, 100, 71, 16))
-        self.label_10.setObjectName("label_10")
-        self.label_11 = QtGui.QLabel(self.tab)
-        self.label_11.setGeometry(QtCore.QRect(300, 130, 81, 16))
-        self.label_11.setObjectName("label_11")
-        self.contact_add_checkBox = QtGui.QCheckBox(self.tab)
-        self.contact_add_checkBox.setGeometry(QtCore.QRect(300, 160, 221, 20))
-        self.contact_add_checkBox.setObjectName("contact_add_checkBox")
-        self.audiogram_dateEdit = QtGui.QDateEdit(self.tab)
-        self.audiogram_dateEdit.setGeometry(QtCore.QRect(380, 130, 151, 21))
-        self.audiogram_dateEdit.setObjectName("audiogram_dateEdit")
-        self.consent_dateEdit = QtGui.QDateEdit(self.tab)
-        self.consent_dateEdit.setGeometry(QtCore.QRect(380, 100, 151, 21))
-        self.consent_dateEdit.setObjectName("consent_dateEdit")
-        self.first_name_lineEdit = QtGui.QLineEdit(self.tab)
-        self.first_name_lineEdit.setGeometry(QtCore.QRect(90, 10, 181, 21))
-        self.first_name_lineEdit.setObjectName("first_name_lineEdit")
-        self.last_name_lineEdit = QtGui.QLineEdit(self.tab)
-        self.last_name_lineEdit.setGeometry(QtCore.QRect(90, 40, 181, 21))
-        self.last_name_lineEdit.setObjectName("last_name_lineEdit")
-        self.email_lineEdit = QtGui.QLineEdit(self.tab)
-        self.email_lineEdit.setGeometry(QtCore.QRect(90, 70, 181, 21))
-        self.email_lineEdit.setObjectName("email_lineEdit")
-        self.phone_lineEdit = QtGui.QLineEdit(self.tab)
-        self.phone_lineEdit.setGeometry(QtCore.QRect(90, 100, 181, 21))
-        self.phone_lineEdit.setObjectName("phone_lineEdit")
-        self.subject_lineEdit = QtGui.QLineEdit(self.tab)
-        self.subject_lineEdit.setGeometry(QtCore.QRect(90, 160, 131, 21))
-        self.subject_lineEdit.setObjectName("subject_lineEdit")
-        self.ethnic_id_comboBox = QtGui.QComboBox(self.tab)
-        self.ethnic_id_comboBox.setGeometry(QtCore.QRect(380, 10, 151, 21))
-        self.ethnic_id_comboBox.setObjectName("ethnic_id_comboBox")
-        self.race_comboBox = QtGui.QComboBox(self.tab)
-        self.race_comboBox.setGeometry(QtCore.QRect(380, 40, 151, 21))
-        self.race_comboBox.setObjectName("race_comboBox")
-        self.gender_comboBox = QtGui.QComboBox(self.tab)
-        self.gender_comboBox.setGeometry(QtCore.QRect(380, 70, 151, 21))
-        self.gender_comboBox.setObjectName("gender_comboBox")
-        self.add_pushButton = QtGui.QPushButton(self.tab)
-        self.add_pushButton.setGeometry(QtCore.QRect(442, 250, 81, 32))
-        self.add_pushButton.setObjectName("add_pushButton")
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QtGui.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.uid_comboBox = QtGui.QComboBox(self.tab_2)
-        self.uid_comboBox.setGeometry(QtCore.QRect(10, 10, 121, 26))
-        self.uid_comboBox.setObjectName("uid_comboBox")
-        self.ieee_lineEdit = QtGui.QLineEdit(self.tab_2)
-        self.ieee_lineEdit.setGeometry(QtCore.QRect(70, 60, 161, 22))
-        self.ieee_lineEdit.setObjectName("ieee_lineEdit")
-        self.cuny_lineEdit = QtGui.QLineEdit(self.tab_2)
-        self.cuny_lineEdit.setGeometry(QtCore.QRect(70, 90, 161, 22))
-        self.cuny_lineEdit.setObjectName("cuny_lineEdit")
-        self.hint_lineEdit = QtGui.QLineEdit(self.tab_2)
-        self.hint_lineEdit.setGeometry(QtCore.QRect(70, 120, 161, 22))
-        self.hint_lineEdit.setObjectName("hint_lineEdit")
-        self.notes_lineEdit = QtGui.QLineEdit(self.tab_2)
-        self.notes_lineEdit.setGeometry(QtCore.QRect(310, 60, 221, 51))
-        self.notes_lineEdit.setObjectName("notes_lineEdit")
-        self.cid_lineEdit = QtGui.QLineEdit(self.tab_2)
-        self.cid_lineEdit.setGeometry(QtCore.QRect(70, 150, 161, 22))
-        self.cid_lineEdit.setObjectName("cid_lineEdit")
-        self.label_14 = QtGui.QLabel(self.tab_2)
-        self.label_14.setGeometry(QtCore.QRect(10, 150, 61, 16))
-        self.label_14.setObjectName("label_14")
-        self.name_label = QtGui.QLabel(self.tab_2)
-        self.name_label.setGeometry(QtCore.QRect(150, 20, 241, 16))
-        self.name_label.setObjectName("name_label")
-        self.label_16 = QtGui.QLabel(self.tab_2)
-        self.label_16.setGeometry(QtCore.QRect(10, 60, 61, 16))
-        self.label_16.setObjectName("label_16")
-        self.label_17 = QtGui.QLabel(self.tab_2)
-        self.label_17.setGeometry(QtCore.QRect(10, 90, 61, 16))
-        self.label_17.setObjectName("label_17")
-        self.label_18 = QtGui.QLabel(self.tab_2)
-        self.label_18.setGeometry(QtCore.QRect(10, 120, 61, 16))
-        self.label_18.setObjectName("label_18")
-        self.label_19 = QtGui.QLabel(self.tab_2)
-        self.label_19.setGeometry(QtCore.QRect(260, 60, 61, 16))
-        self.label_19.setObjectName("label_19")
-        self.contact_edit_checkBox = QtGui.QCheckBox(self.tab_2)
-        self.contact_edit_checkBox.setGeometry(QtCore.QRect(260, 120, 221, 20))
-        self.contact_edit_checkBox.setObjectName("contact_edit_checkBox")
-        self.edit_save_pushButton = QtGui.QPushButton(self.tab_2)
-        self.edit_save_pushButton.setGeometry(QtCore.QRect(442, 250, 81, 32))
-        self.edit_save_pushButton.setObjectName("edit_save_pushButton")
-        self.tabWidget.addTab(self.tab_2, "")
-        self.close_pushButton = QtGui.QPushButton(Form)
-        self.close_pushButton.setGeometry(QtCore.QRect(450, 330, 91, 32))
-        self.close_pushButton.setObjectName("close_pushButton")
+class MyWidget (QtGui.QWidget, form_class):
+    filename = 'Subjects.db'
 
-        self.retranslateUi(Form)
-        self.tabWidget.setCurrentIndex(0)
-        QtCore.QObject.connect(self.close_pushButton, QtCore.SIGNAL("clicked()"), Form.close)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+    def __init__(self,parent=None):
+        QtGui.QWidget.__init__(self,parent)
+        self.setupUi(self)
+        self.setWindowTitle("Subject Manager")
+        self.filePath_label.setText(self.filename)
+        now = datetime.datetime.now()
+        eighteenyears = datetime.timedelta(days=18*365)
+        self.add_birthdate_dateEdit.setDate(now - eighteenyears)
+        #self.add_audiogram_dateEdit.setDate(now)
 
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("Form", "First Name", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("Form", "Last Name", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("Form", "Email", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_4.setText(QtGui.QApplication.translate("Form", "Phone #", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_5.setText(QtGui.QApplication.translate("Form", "Birthdate", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_6.setText(QtGui.QApplication.translate("Form", "Subject #", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_7.setText(QtGui.QApplication.translate("Form", "Ethnic ID", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_8.setText(QtGui.QApplication.translate("Form", "Race", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_9.setText(QtGui.QApplication.translate("Form", "Gender", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_10.setText(QtGui.QApplication.translate("Form", "Consent", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_11.setText(QtGui.QApplication.translate("Form", "Audiogram", None, QtGui.QApplication.UnicodeUTF8))
-        self.contact_add_checkBox.setText(QtGui.QApplication.translate("Form", "Consent to contact?", None, QtGui.QApplication.UnicodeUTF8))
-        self.add_pushButton.setText(QtGui.QApplication.translate("Form", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("Form", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_14.setText(QtGui.QApplication.translate("Form", "CID", None, QtGui.QApplication.UnicodeUTF8))
-        self.name_label.setText(QtGui.QApplication.translate("Form", "Name", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_16.setText(QtGui.QApplication.translate("Form", "IEEE", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_17.setText(QtGui.QApplication.translate("Form", "CUNY", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_18.setText(QtGui.QApplication.translate("Form", "HINT", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_19.setText(QtGui.QApplication.translate("Form", "Notes", None, QtGui.QApplication.UnicodeUTF8))
-        self.contact_edit_checkBox.setText(QtGui.QApplication.translate("Form", "Consent to contact?", None, QtGui.QApplication.UnicodeUTF8))
-        self.edit_save_pushButton.setText(QtGui.QApplication.translate("Form", "Save", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("Form", "Edit", None, QtGui.QApplication.UnicodeUTF8))
-        self.close_pushButton.setText(QtGui.QApplication.translate("Form", "Close", None, QtGui.QApplication.UnicodeUTF8))
+        self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
+        self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
+        self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
+        self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
+        self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
+        self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
+        self.connect(self.admin_custom_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_remove)
+        self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
 
+
+
+        self.add_init()
+        self.edit_protocol_populate()
+        self.admin_init()
+
+    def edit_Process(self):
+        pass
+
+    def edit_protocol_populate(self):
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT Protocol FROM Protocols""")
+        self.edit_protocol_listWidget.clear()
+        for row in c:
+            item = QtGui.QListWidgetItem(row[0])
+            item.setCheckState(QtCore.Qt.Unchecked)
+            item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsUserCheckable |
+                                    QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled )
+            self.edit_protocol_listWidget.insertItem(-1, item)
+        c.close()
+        conn.close()
+
+    def edit_custom_populate(self):
+        pass
+
+    def admin_init(self):
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT Protocol FROM Protocols""")
+        self.admin_protocols_listWidget.clear()
+        for row in c:
+            self.admin_protocols_listWidget.insertItem(-1, row[0])
+        c.execute("""SELECT CustomVar FROM CustomVars""")
+        self.admin_custom_listWidget.clear()
+        for row in c:
+            self.admin_custom_listWidget.insertItem(-1, row[0])
+        c.close()
+        conn.close()
+
+    def admin_create_db(self):
+        ret = self.get_file(title = 'Subject manager')
+        if ret != '':
+            self.filename = ret
+            self.filePath_label.setText(ret)
+            qry = open('New_DB_Schema.sql', 'r').read()
+            conn = sqlite3.connect(ret)
+            c = conn.cursor()
+            c.executescript(qry)
+            conn.commit()
+            c.close()
+            conn.close()
+            self.add_init()
+            self.edit_protocol_populate()
+            self.admin_init()
+
+    def admin_protocols_add(self):
+        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol name.\nSpaces will be replaced with _')
+        if ret != '':
+            self.admin_protocols_listWidget.insertItem(-1, ret)
+            conn = sqlite3.connect(self.filename);
+            c = conn.cursor();
+            c.execute("""INSERT INTO Protocols (Protocol) VALUES (\'%s\')""" % ret)
+            conn.commit()
+            c.close()
+            conn.close()
+            self.sqlite_column_add(self.filename, 'Subjects', 'Protocol_%s' % ret)
+            self.edit_protocol_populate()
+
+    def admin_protocols_remove(self):
+        if self.admin_protocols_listWidget.currentItem() is not None:
+            val = self.admin_protocols_listWidget.currentItem().text()
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove protocol:\n\n'+ val)
+            if ret:
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.execute("""Delete from Protocols where Protocol == \'%s\'""" % val)
+                c.close()
+                conn.commit()
+                conn.close()
+                item = self.admin_protocols_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
+                item = None
+                self.sqlite_column_delete(self.filename, 'Subjects', 'Protocol_%s' % val)
+                self.edit_protocol_populate()
+
+    def admin_custom_add(self):
+        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a custom variable name.\nSpaces will be replaced with _')
+        if ret != '':
+            self.admin_custom_listWidget.insertItem(-1, ret)
+            conn = sqlite3.connect(self.filename);
+            c = conn.cursor();
+            c.execute("""INSERT INTO CustomVars (CustomVar) VALUES (\'%s\')""" % ret)
+            conn.commit()
+            c.close()
+            conn.close()
+            self.sqlite_column_add(self.filename, 'Subjects', 'Custom_%s' % ret)
+            self.edit_custom_populate()
+
+    def admin_custom_remove(self):
+        if self.admin_custom_listWidget.currentItem() is not None:
+            val = self.admin_custom_listWidget.currentItem().text()
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove custom variable:\n\n'+ val)
+            if ret:
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.execute("""Delete from CustomVars where CustomVar == \'%s\'""" % val)
+                c.close()
+                conn.commit()
+                conn.close()
+                item = self.admin_custom_listWidget.takeItem(self.admin_custom_listWidget.currentRow())
+                item = None
+                self.sqlite_column_delete(self.filename, 'Subjects', 'Custom_%s' % val)
+                self.edit_custom_populate()
+
+    def add_init(self):
+        conn = sqlite3.connect(self.filename);
+        c = conn.cursor();
+        c.execute("""SELECT MAX(SubjN) FROM Subjects""");
+        subn = c.fetchone();
+        if subn[0] is None:
+            self.add_subject_lineEdit.setText('1')
+        else:
+            self.add_subject_lineEdit.setText(str(subn[0]+1));
+
+        c.execute("""SELECT EthnicID FROM EthnicIDs""")
+        self.add_ethnic_id_comboBox.clear()
+        for row in c:
+            self.add_ethnic_id_comboBox.insertItem(-1, row[0])
+
+        c.execute("""SELECT Race FROM Races""")
+        self.add_race_comboBox.clear()
+        for row in c:
+            self.add_race_comboBox.insertItem(-1, row[0])
+
+        c.execute("""SELECT Gender FROM Genders""")
+        self.add_gender_comboBox.clear()
+        for row in c:
+            self.add_gender_comboBox.insertItem(-1, row[0])
+
+        #c.execute("""SELECT Protocol FROM Protocols""")
+        #self.add_protocol_comboBox.clear()
+        #for row in c:
+        #    self.add_protocol_comboBox.insertItem(-1, row[0])
+
+
+        c.close();
+        conn.close();
+        self.doAge();
+
+
+    def add_Process(self):
+        missing = [];
+        if self.add_name_first_lineEdit.text()=='':
+            missing.append('First Name')
+        if self.add_name_last_lineEdit.text()=='':
+            missing.append('Last Name')
+        if self.add_birthdate_lineEdit.text()=='':
+            missing.append('Birthday')
+        if self.add_email_lineEdit.text()=='':
+            missing.append('Email')
+        if len(missing) > 0:
+            msg = "The following required fields were left blank:\n\n";
+            msg = "\n".join(missing)
+            reply = QtGui.QMessageBox.question(self, 'PAL', msg, QtGui.QMessageBox.Ok)
+            return
+        thisage = self.age(self.birth.text())
+        if int(thisage) < 18:
+            reply = QtGui.QMessageBox.critical(self, 'PAL',
+             "This subject appears to be under 18 years of age.\n\n" +
+             "Legally, authorization from a parent or guardian\n" +
+             "is required for them to participate.\n" +
+             "Do you want to continue?",
+             QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+            if reply == QtGui.QMessageBox.Cancel:
+                return;
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+#        c.execute("""SELECT Consent FROM Subjects WHERE FName=? AND LName=? AND DOB=?""",
+#                  (unicode(self.fname.text()),unicode(self.lname.text()),unicode(self.birth.text())));
+#        cns = c.fetchone();
+#        if len(cns) != "":
+#            reply = QtGui.QMessageBox.information(self, 'PAL',
+#             "This subject appears to be in the database.\n\n" +
+#             "A match was found based on first name,\n" +
+#             "last name, and birthdate.\n" +
+#             "Informed Consent was obtained on " + cns[0] +
+#             "Do you want to continue?",
+#             QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel);
+#            if reply == QtGui.QMessageBox.Cancel:
+#                return;
+        if self.contact.isChecked():
+            contact = 'Y';
+        else:
+            contact = 'N';
+        c.execute("""insert into subjects
+                  values (NULL,?,?,?,?,?,?,?,?,?,?,?,?,'','','','','',?)""",
+                  (unicode(self.add_subject_lineEdit.text()),
+                  unicode(self.fname.text()),
+                  unicode(self.lname.text()),
+                  unicode(self.birth.text()),
+                  unicode(self.age(self.birth.text())),
+                  unicode(self.gend.currentText()),
+                  unicode(self.email.text()),
+                  unicode(self.phone.text()),
+                  unicode(self.race.currentText()),
+                  unicode(self.ethn.currentText()),
+                  unicode(self.cons.text()),
+                  unicode(self.audio.text()),
+                  unicode(contact)
+                  ))
+        conn.commit()
+        c.execute("""SELECT MAX(SubjN) FROM Subjects""")
+        subn = c.fetchone()[0]
+        c.close()
+        conn.close()
+        if (str(subn) == self.add_subject_lineEdit.text()):
+            reply = QtGui.QMessageBox.question(self, 'PAL',
+             "Subject Number Confirmed:\n\n" + str(subn), QtGui.QMessageBox.Ok)
+        else:
+            reply = QtGui.QMessageBox.question(self, 'PAL',
+             "Something weird happened with\nthe subject number. Check with Chris\n\nEntered: " + self.add_subject_lineEdit.text() + '\nFound: ' + str(subn), QtGui.QMessageBox.Ok)
+        self.close()
+
+    def doAge(self):
+        thisage = self.age(self.add_birthdate_dateEdit.text());
+        if int(thisage) < 18:
+            self.add_age_label.setText(u"<font color='red'>Age: " + unicode(thisage) + "</font>");
+        else:
+            self.add_age_label.setText(u"<font color='green'>Age: " + unicode(thisage) + "</font>");
+
+    def days_previous_month(self, y, m):
+        from calendar import monthrange as _monthrange;
+        m -= 1;
+        if m == 0:
+            y -= 1;
+            m = 12;
+        _, days = _monthrange(y, m);
+        return days;
+
+    def age(self,dob):
+        time_format = "%Y-%m-%d";
+        today1 = datetime.date.today();
+        dob1 = datetime.datetime.strptime(str(dob), time_format);
+        y = today1.year - dob1.year;
+        m = today1.month - dob1.month;
+        d = today1.day - dob1.day;
+        while m <0 or d <0:
+            while m <0:
+                y -= 1;
+                m = 12 + m;  # m is negative
+            if d <0:
+                m -= 1;
+                days = self.days_previous_month(today1.year, today1.month);
+                d = max(0, days - dob1.day) + today1.day;
+        return y;
+
+    def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
+        """Opens a simple yes/no message box, returns a bool
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret = QtGui.QMessageBox.question(parent, title, prompt, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        sys.stdout = STDOUT
+        if ret == QtGui.QMessageBox.Yes:
+            return True
+        else:
+            return False
+
+    def get_file(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
+        """Opens a file dialog, returns file path as a string
+
+            To specify filetypes, use the (qt) format:
+            "Python or Plain Text Files (*.py *.txt);;All files (*.*)"
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None # Avoid the "Redirecting output to win32trace
+                            # remote collector" message from showing in stdout
+        ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
+        sys.stdout = STDOUT
+        return str(ret)
+
+    def get_file(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
+        """Opens a file dialog, returns file path as a string
+
+            To specify filetypes, use the (qt) format:
+            "Python or Plain Text Files (*.py *.txt);;All files (*.*)"
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None # Avoid the "Redirecting output to win32trace
+                            # remote collector" message from showing in stdout
+        ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
+        sys.stdout = STDOUT
+        return str(ret)
+
+    def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
+        """Opens a folder dialog, returns the path as a string
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret = QtGui.QFileDialog.getExistingDirectory(parent, title, default_dir)
+        sys.stdout = STDOUT
+        return str(ret)
+
+    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+        """Opens a simple prompt for user input, returns a string
+        """
+        if QtGui.QApplication.startingUp():
+            app = QtGui.QApplication([])
+        sys.stdout = None
+        ret, ok = QtGui.QInputDialog.getText(parent, title, prompt)
+        sys.stdout = STDOUT
+        if ok:
+            return str(ret)
+        else:
+            return ''
+
+    def sqlite_column_add(self, db_file, table, column):
+        conn = sqlite3.connect(db_file)
+        c = conn.cursor()
+        c.execute("""SELECT * FROM %s""" % table)
+        cols = [tuple[0] for tuple in c.description]
+        if column not in cols:
+            colstr_old = ",".join(cols)
+            cols.append(column)
+            colstr_new = ",".join(cols)
+            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr_new))
+            c.execute("""INSERT INTO %s_backup (%s) SELECT %s FROM %s""" % (table, colstr_old, colstr_old, table))
+            c.execute("""DROP TABLE %s;""" % table)
+            c.execute("""CREATE TABLE %s(%s);""" % (table, colstr_new))
+            c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr_new, table))
+            c.execute("""DROP TABLE %s_backup;""" % table)
+            conn.commit()
+        c.close()
+        conn.close()
+
+    def sqlite_column_delete(self, db_file, table, column):
+        conn = sqlite3.connect(db_file)
+        c = conn.cursor()
+        c.execute("""SELECT * FROM %s""" % table)
+        cols = [tuple[0] for tuple in c.description]
+        if column in cols:
+            cols.remove(column)
+            colstr = ",".join(cols)
+            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr))
+            c.execute("""INSERT INTO %s_backup SELECT %s FROM %s;\n""" % (table, colstr, table))
+            c.execute("""DROP TABLE %s;""" % table)
+            c.execute("""CREATE TABLE %s(%s);""" % (table, colstr))
+            c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr, table))
+            c.execute("""DROP TABLE %s_backup;""" % table)
+            conn.commit()
+        c.close()
+        conn.close()
+
+
+if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
+    form = MyWidget(None)
+    form.show()
+    tabtxt = ['Add','Edit','Browse','Reports','Admin']
+    for i in range(len(tabtxt)):
+        form.tabWidget.setTabText(i,tabtxt[i])
+    if len(sys.argv)>1:
+        form.tabWidget.setCurrentIndex(tabtxt.index(sys.argv[1]))
+    app.exec_()

@@ -162,75 +162,17 @@
       <string>Gender</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>155</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Consent</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_11">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>185</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Audiogram</string>
-     </property>
-    </widget>
     <widget class="QCheckBox" name="add_contact_add_checkBox">
      <property name="geometry">
       <rect>
        <x>250</x>
-       <y>210</y>
+       <y>150</y>
        <width>196</width>
        <height>26</height>
       </rect>
      </property>
      <property name="text">
       <string>Consent to be contacted?</string>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="add_audiogram_dateEdit">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>180</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>yyyy-MM-dd</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="add_consent_dateEdit">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>150</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>yyyy-MM-dd</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="add_name_first_lineEdit">
@@ -278,7 +220,7 @@
       <rect>
        <x>85</x>
        <y>15</y>
-       <width>90</width>
+       <width>64</width>
        <height>26</height>
       </rect>
      </property>
@@ -352,8 +294,8 @@
     <widget class="QLabel" name="add_age_label">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>215</y>
+       <x>255</x>
+       <y>185</y>
        <width>181</width>
        <height>16</height>
       </rect>
@@ -372,124 +314,9 @@
       <rect>
        <x>305</x>
        <y>10</y>
-       <width>121</width>
+       <width>96</width>
        <height>26</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="edit_ieee_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>45</y>
-       <width>200</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="cuny_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>75</y>
-       <width>200</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="edit_hint_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>105</y>
-       <width>200</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="edit_notes_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>165</y>
-       <width>200</width>
-       <height>52</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="edit_cid_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>135</y>
-       <width>200</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_14">
-     <property name="geometry">
-      <rect>
-       <x>225</x>
-       <y>140</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>CID</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_16">
-     <property name="geometry">
-      <rect>
-       <x>225</x>
-       <y>50</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>IEEE</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_17">
-     <property name="geometry">
-      <rect>
-       <x>225</x>
-       <y>80</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>CUNY</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_18">
-     <property name="geometry">
-      <rect>
-       <x>225</x>
-       <y>110</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>HINT</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_19">
-     <property name="geometry">
-      <rect>
-       <x>225</x>
-       <y>170</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Notes</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="edit_contact_checkBox">
@@ -560,7 +387,7 @@
        <x>0</x>
        <y>40</y>
        <width>216</width>
-       <height>126</height>
+       <height>196</height>
       </rect>
      </property>
      <property name="title">
@@ -615,9 +442,38 @@
        </rect>
       </property>
       <property name="text">
-       <string>Protocol</string>
+       <string>IRB Protocols:</string>
       </property>
      </widget>
+     <widget class="QListWidget" name="edit_protocol_listWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>115</y>
+        <width>136</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QDateEdit" name="add_birthdate_dateEdit_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>140</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="displayFormat">
+      <string>yyyy-MM-dd</string>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_5">
@@ -628,10 +484,13 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>25</y>
+       <y>5</y>
        <width>471</width>
        <height>226</height>
       </rect>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>
     </widget>
    </widget>
@@ -654,68 +513,176 @@
     <attribute name="title">
      <string>Admin</string>
     </attribute>
-    <widget class="QLabel" name="label_13">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>340</x>
-       <y>25</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Manage Protocols:</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="admin_protocols_add_pushButton">
-     <property name="geometry">
-      <rect>
-       <x>345</x>
-       <y>175</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>+</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="admin_protocols_remove_pushButton">
-     <property name="geometry">
-      <rect>
-       <x>375</x>
-       <y>175</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>-</string>
-     </property>
-    </widget>
-    <widget class="QListWidget" name="admin_protocols_listWidget">
-     <property name="geometry">
-      <rect>
-       <x>340</x>
-       <y>45</y>
-       <width>116</width>
+       <x>315</x>
+       <y>0</y>
+       <width>155</width>
        <height>131</height>
       </rect>
      </property>
+     <property name="title">
+      <string>IRB Protocols:</string>
+     </property>
+     <widget class="QPushButton" name="admin_protocols_remove_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>100</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_protocols_add_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>+</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="admin_protocols_listWidget">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>25</y>
+        <width>146</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="geometry">
+      <rect>
+       <x>315</x>
+       <y>135</y>
+       <width>155</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Custom Variables:</string>
+     </property>
+     <widget class="QPushButton" name="admin_custom_remove_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>100</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_custom_add_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>+</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="admin_custom_listWidget">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>25</y>
+        <width>146</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>155</width>
+       <height>266</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Database Management</string>
+     </property>
+     <widget class="QPushButton" name="admin_create_db_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>30</y>
+        <width>146</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Create New DB...</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_open_db_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>60</y>
+        <width>146</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open Existing DB...</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
