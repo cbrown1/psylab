@@ -1,9 +1,6 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# calendar.py
-
-import sys
+import sys, os
 import sqlite3
 import datetime
 from PyQt4 import QtGui
@@ -23,7 +20,7 @@ class MyWidget (QtGui.QWidget, form_class):
         now = datetime.datetime.now()
         eighteenyears = datetime.timedelta(days=18*365)
         self.add_birthdate_dateEdit.setDate(now - eighteenyears)
-        #self.add_audiogram_dateEdit.setDate(now)
+        self.edit_custom_tableWidget.setSortingEnabled(False)
 
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
@@ -34,11 +31,10 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.admin_custom_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_remove)
         self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
 
-
-
+        self.admin_init()
         self.add_init()
         self.edit_protocol_populate()
-        self.admin_init()
+        self.edit_custom_populate()
 
     def edit_Process(self):
         pass
@@ -58,13 +54,31 @@ class MyWidget (QtGui.QWidget, form_class):
         conn.close()
 
     def edit_custom_populate(self):
-        pass
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT CustomVar FROM CustomVars""")
+        self.edit_custom_tableWidget.clear()
+        self.edit_custom_tableWidget.setHorizontalHeaderLabels(["Name","Value"])
+        rowcount = 0
+        for row in c:
+            item = QtGui.QTableWidgetItem(row[0])
+            item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+            self.edit_custom_tableWidget.setRowCount(rowcount+1)
+            self.edit_custom_tableWidget.setItem(rowcount, 0, item)
+            rowcount += 1
+        c.close()
+        conn.close()
 
     def admin_init(self):
+
+        if not os.path.isfile(self.filename):
+            self.admin_create_db()
+
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         c.execute("""SELECT Protocol FROM Protocols""")
         self.admin_protocols_listWidget.clear()
+
         for row in c:
             self.admin_protocols_listWidget.insertItem(-1, row[0])
         c.execute("""SELECT CustomVar FROM CustomVars""")
@@ -75,7 +89,7 @@ class MyWidget (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_create_db(self):
-        ret = self.get_file(title = 'Subject manager')
+        ret = self.get_file(title = 'Subject Manager: Enter new database name:')
         if ret != '':
             self.filename = ret
             self.filePath_label.setText(ret)
@@ -93,6 +107,7 @@ class MyWidget (QtGui.QWidget, form_class):
     def admin_protocols_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol name.\nSpaces will be replaced with _')
         if ret != '':
+            ret = ret.replace(" ","_")
             self.admin_protocols_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
@@ -122,6 +137,7 @@ class MyWidget (QtGui.QWidget, form_class):
     def admin_custom_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a custom variable name.\nSpaces will be replaced with _')
         if ret != '':
+            ret = ret.replace(" ","_")
             self.admin_custom_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
@@ -177,7 +193,6 @@ class MyWidget (QtGui.QWidget, form_class):
         #self.add_protocol_comboBox.clear()
         #for row in c:
         #    self.add_protocol_comboBox.insertItem(-1, row[0])
-
 
         c.close();
         conn.close();
