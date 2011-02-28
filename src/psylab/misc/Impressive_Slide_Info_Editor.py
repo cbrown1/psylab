@@ -16,31 +16,30 @@ class MyWidget (QtGui.QWidget, form_class):
         self.slide_viewer_label.setSizePolicy(QtGui.QSizePolicy.Ignored,
                 QtGui.QSizePolicy.Ignored)
         self.slide_viewer_label.setScaledContents(True)
-        print "Got here"
-        
-        #self.scrollArea.setBackgroundRole(QtGui.QPalette.Dark)
-        #self.scrollArea.setWidget(self.slide_viewer_label)
-        #self.setCentralWidget(self.scrollArea)
         self.scrollArea.setWidgetResizable(True)
         
         self.connect(self.select_slides_pushButton, QtCore.SIGNAL("clicked()"), self.select_slides)
         
-        self.fileList = []
         #self.fileDir = r'C:\Documents and Settings\cabrown4\My Documents\_writing\2011 Talk - UofA Colloquium\slides'
         #self.fileMask = ['.png']
         #self.fileList = self.listDirectory(self.fileDir, self.fileMask)
         #self.load_image(self.fileList[0])
         self.fileDir = r''
         self.fileMask = ['.png']
-        self.fileList = []
+        self.fileList = {}
         
         
         
     def select_slides(self):
         self.fileDir = self.get_folder(title = 'Open Folder', default_dir = "")
         if self.fileDir != '':
-            self.fileList = self.listDirectory(self.fileDir, self.fileMask)
-            self.load_image(self.fileList[0])
+            fileList = self.listDirectory(self.fileDir, self.fileMask)
+            for file in fileList:
+                self.fileList[os.path.splitext(os.path.basename(file))[0]] = file
+            self.slide_selector_comboBox.clear()
+            for key,val in self.fileList.items():
+                self.slide_selector_comboBox.insertItem(-1, key)
+            self.load_image(self.fileList[os.path.splitext(os.path.basename(fileList[0]))[0]])
 
     
     def load_image(self, fileName):
