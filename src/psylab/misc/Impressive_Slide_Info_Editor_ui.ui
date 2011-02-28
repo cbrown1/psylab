@@ -13,26 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLabel" name="slide_viewer_label">
-   <property name="geometry">
-    <rect>
-     <x>315</x>
-     <y>5</y>
-     <width>320</width>
-     <height>240</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="folderPath_label">
+  <widget class="QLabel" name="folder_path_label">
    <property name="geometry">
     <rect>
      <x>5</x>
@@ -51,7 +32,7 @@
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QSlider" name="horizontalSlider">
+  <widget class="QSlider" name="slide_selector_horizontalSlider">
    <property name="geometry">
     <rect>
      <x>315</x>
@@ -64,7 +45,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="slide_selector_comboBox">
    <property name="geometry">
     <rect>
      <x>515</x>
@@ -74,7 +55,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="select_slides_pushButton">
    <property name="geometry">
     <rect>
      <x>515</x>
@@ -87,7 +68,7 @@
     <string>Folder...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="infoFile_save_pushButton">
    <property name="geometry">
     <rect>
      <x>580</x>
@@ -100,7 +81,7 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="exit_pushButton">
    <property name="geometry">
     <rect>
      <x>580</x>
@@ -113,7 +94,7 @@
     <string>Exit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="infoFile_select_pushButton">
    <property name="geometry">
     <rect>
      <x>515</x>
@@ -126,7 +107,7 @@
     <string>Info File...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="folderPath_label_2">
+  <widget class="QLabel" name="infoFile_Path_label">
    <property name="geometry">
     <rect>
      <x>5</x>
@@ -150,7 +131,7 @@
     <rect>
      <x>5</x>
      <y>185</y>
-     <width>296</width>
+     <width>306</width>
      <height>81</height>
     </rect>
    </property>
@@ -163,13 +144,55 @@
     <rect>
      <x>5</x>
      <y>5</y>
-     <width>296</width>
+     <width>306</width>
      <height>171</height>
     </rect>
    </property>
    <property name="title">
     <string>Page Properties</string>
    </property>
+  </widget>
+  <widget class="QScrollArea" name="scrollArea">
+   <property name="geometry">
+    <rect>
+     <x>315</x>
+     <y>0</y>
+     <width>321</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="widgetResizable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>319</width>
+      <height>239</height>
+     </rect>
+    </property>
+    <widget class="QLabel" name="slide_viewer_label">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>320</width>
+       <height>240</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>
