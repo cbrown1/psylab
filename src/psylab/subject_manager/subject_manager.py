@@ -89,7 +89,7 @@ class MyWidget (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_create_db(self):
-        ret = self.get_file(title = 'Subject Manager: Enter new database name:')
+        ret = self.get_newfile(title = 'Subject Manager: Enter new database name:')
         if ret != '':
             self.filename = ret
             self.filePath_label.setText(ret)
@@ -332,7 +332,7 @@ class MyWidget (QtGui.QWidget, form_class):
         sys.stdout = STDOUT
         return str(ret)
 
-    def get_file(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
+    def get_newfile(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
         """Opens a file dialog, returns file path as a string
 
             To specify filetypes, use the (qt) format:
@@ -342,7 +342,7 @@ class MyWidget (QtGui.QWidget, form_class):
             app = QtGui.QApplication([])
         sys.stdout = None # Avoid the "Redirecting output to win32trace
                             # remote collector" message from showing in stdout
-        ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
+        ret = QtGui.QFileDialog.getSaveFileName(parent, title, default_dir, file_types)
         sys.stdout = STDOUT
         return str(ret)
 
