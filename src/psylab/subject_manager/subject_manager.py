@@ -19,6 +19,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.filePath_label.setText(self.filename)
 
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
+        self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
         self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
@@ -186,14 +187,13 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_gender_comboBox.clear()
         for row in c:
             self.add_gender_comboBox.insertItem(-1, row[0])
-
-        #c.execute("""SELECT Protocol FROM Protocols""")
-        #self.add_protocol_comboBox.clear()
-        #for row in c:
-        #    self.add_protocol_comboBox.insertItem(-1, row[0])
-
+        
         c.close();
         conn.close();
+
+        now = datetime.datetime.now()
+        eighteenyears = datetime.timedelta(days=18*365)
+        self.add_birthdate_dateEdit.setDate(now - eighteenyears)
         self.doAge();
 
 
@@ -368,9 +368,9 @@ class MyWidget (QtGui.QWidget, form_class):
             return ''
 
     def select_tab(self, tabText):
-        for i in range(form.tabWidget.count()):
-            if form.tabWidget.tabText(i) == tabText:
-                form.tabWidget.setCurrentIndex(i)
+        for i in range(self.tabWidget.count()):
+            if self.tabWidget.tabText(i) == tabText:
+                self.tabWidget.setCurrentIndex(i)
 
 
     def sqlite_column_add(self, db_file, table, column):
