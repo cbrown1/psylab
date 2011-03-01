@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -469,7 +469,7 @@
        <rect>
         <x>10</x>
         <y>115</y>
-        <width>156</width>
+        <width>141</width>
         <height>76</height>
        </rect>
       </property>
@@ -491,7 +491,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QDateEdit" name="edit_birthdate_dateEdit">
+    <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -873,7 +873,7 @@
   <tabstop>edit_uid_comboBox</tabstop>
   <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_protocol_listWidget</tabstop>
-  <tabstop>edit_birthdate_dateEdit</tabstop>
+  <tabstop>edit_protocol_date_dateEdit</tabstop>
   <tabstop>edit_pushButton</tabstop>
   <tabstop>tableView</tabstop>
   <tabstop>admin_protocols_remove_pushButton</tabstop>
