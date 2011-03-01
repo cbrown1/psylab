@@ -8,7 +8,7 @@ STDOUT = sys.stdout
 form_class, base_class = uic.loadUiType("Impressive_Slide_Info_Editor_ui.ui")
 
 class MyWidget (QtGui.QWidget, form_class):
-    
+
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
@@ -17,19 +17,19 @@ class MyWidget (QtGui.QWidget, form_class):
                 QtGui.QSizePolicy.Ignored)
         self.slide_viewer_label.setScaledContents(True)
         self.scrollArea.setWidgetResizable(True)
-        
+
         self.connect(self.select_slides_pushButton, QtCore.SIGNAL("clicked()"), self.select_slides)
-        
+
         #self.fileDir = r'C:\Documents and Settings\cabrown4\My Documents\_writing\2011 Talk - UofA Colloquium\slides'
         #self.fileMask = ['.png']
         #self.fileList = self.listDirectory(self.fileDir, self.fileMask)
         #self.load_image(self.fileList[0])
         self.fileDir = r''
-        self.fileMask = ['.png']
+        self.fileMask = ['.png','.jpg','.JPG']
         self.fileList = {}
-        
-        
-        
+
+
+
     def select_slides(self):
         self.fileDir = self.get_folder(title = 'Open Folder', default_dir = "")
         if self.fileDir != '':
@@ -41,7 +41,7 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.slide_selector_comboBox.insertItem(-1, key)
             self.load_image(self.fileList[os.path.splitext(os.path.basename(fileList[0]))[0]])
 
-    
+
     def load_image(self, fileName):
         image = QtGui.QImage(fileName)
         if image.isNull():
@@ -50,10 +50,10 @@ class MyWidget (QtGui.QWidget, form_class):
             return
 
         self.slide_viewer_label.setPixmap(QtGui.QPixmap.fromImage(image))
-        
-    
-    def listDirectory(self, directory, fileExtList):                                        
-        "get list of file info objects for files of particular extensions" 
+
+
+    def listDirectory(self, directory, fileExtList):
+        "get list of file info objects for files of particular extensions"
         fileList = [os.path.normcase(f)
                     for f in os.listdir(directory)]
         if fileExtList is not None:
@@ -61,8 +61,8 @@ class MyWidget (QtGui.QWidget, form_class):
                        for f in fileList
                         if os.path.splitext(f)[1] in fileExtList]
         return fileList
-    
-    
+
+
     def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
         """Opens a simple yes/no message box, returns a bool
         """

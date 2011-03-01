@@ -17,14 +17,9 @@ class MyWidget (QtGui.QWidget, form_class):
         self.setupUi(self)
         self.setWindowTitle("Subject Manager")
         self.filePath_label.setText(self.filename)
-        now = datetime.datetime.now()
-        eighteenyears = datetime.timedelta(days=18*365)
-        self.add_birthdate_dateEdit.setDate(now - eighteenyears)
-        self.edit_custom_tableWidget.setSortingEnabled(False)
 
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
-        self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
         self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
@@ -33,13 +28,13 @@ class MyWidget (QtGui.QWidget, form_class):
 
         self.admin_init()
         self.add_init()
-        self.edit_protocol_populate()
+        self.add_edit_protocol_populate()
         self.edit_custom_populate()
 
     def edit_Process(self):
         pass
 
-    def edit_protocol_populate(self):
+    def add_edit_protocol_populate(self):
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         c.execute("""SELECT Protocol FROM Protocols""")
@@ -50,6 +45,7 @@ class MyWidget (QtGui.QWidget, form_class):
             item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsUserCheckable |
                                     QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled )
             self.edit_protocol_listWidget.insertItem(-1, item)
+            self.add_protocol_comboBox.insertItem(-1, row[0])
         c.close()
         conn.close()
 
@@ -70,7 +66,6 @@ class MyWidget (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_init(self):
-
         if not os.path.isfile(self.filename):
             self.admin_create_db()
 
@@ -89,19 +84,22 @@ class MyWidget (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_create_db(self):
-        ret = self.get_newfile(title = 'Subject Manager: Enter new database name:')
+        ret = self.get_newfile(title = 'Select existing DB file to open, or enter new filename to create:')
         if ret != '':
             self.filename = ret
             self.filePath_label.setText(ret)
-            qry = open('New_DB_Schema.sql', 'r').read()
-            conn = sqlite3.connect(ret)
-            c = conn.cursor()
-            c.executescript(qry)
-            conn.commit()
-            c.close()
-            conn.close()
+            if not os.path.isfile(self.filename):
+                qry = open('New_DB_Schema.sql', 'r').read()
+                conn = sqlite3.connect(ret)
+                c = conn.cursor()
+                c.executescript(qry)
+                conn.commit()
+                c.close()
+                conn.close()
+                self.select_tab('Admin')
             self.add_init()
-            self.edit_protocol_populate()
+            self.add_edit_protocol_populate()
+            self.edit_custom_populate()
             self.admin_init()
 
     def admin_protocols_add(self):
@@ -116,7 +114,7 @@ class MyWidget (QtGui.QWidget, form_class):
             c.close()
             conn.close()
             self.sqlite_column_add(self.filename, 'Subjects', 'Protocol_%s' % ret)
-            self.edit_protocol_populate()
+            self.add_edit_protocol_populate()
 
     def admin_protocols_remove(self):
         if self.admin_protocols_listWidget.currentItem() is not None:
@@ -132,7 +130,7 @@ class MyWidget (QtGui.QWidget, form_class):
                 item = self.admin_protocols_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
                 item = None
                 self.sqlite_column_delete(self.filename, 'Subjects', 'Protocol_%s' % val)
-                self.edit_protocol_populate()
+                self.add_edit_protocol_populate()
 
     def admin_custom_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a custom variable name.\nSpaces will be replaced with _')
@@ -369,6 +367,12 @@ class MyWidget (QtGui.QWidget, form_class):
         else:
             return ''
 
+    def select_tab(self, tabText):
+        for i in range(form.tabWidget.count()):
+            if form.tabWidget.tabText(i) == tabText:
+                form.tabWidget.setCurrentIndex(i)
+
+
     def sqlite_column_add(self, db_file, table, column):
         conn = sqlite3.connect(db_file)
         c = conn.cursor()
@@ -411,9 +415,6 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = MyWidget(None)
     form.show()
-    tabtxt = ['Add','Edit','Browse','Reports','Admin']
-    for i in range(len(tabtxt)):
-        form.tabWidget.setTabText(i,tabtxt[i])
     if len(sys.argv)>1:
-        form.tabWidget.setCurrentIndex(tabtxt.index(sys.argv[1]))
+        form.select_tab(sys.argv[1])
     app.exec_()
