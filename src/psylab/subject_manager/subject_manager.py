@@ -40,6 +40,7 @@ class MyWidget (QtGui.QWidget, form_class):
         c = conn.cursor()
         c.execute("""SELECT Protocol FROM Protocols""")
         self.edit_protocol_listWidget.clear()
+        self.add_protocol_comboBox.clear()
         for row in c:
             item = QtGui.QListWidgetItem(row[0])
             item.setCheckState(QtCore.Qt.Unchecked)
@@ -49,6 +50,7 @@ class MyWidget (QtGui.QWidget, form_class):
             self.add_protocol_comboBox.insertItem(-1, row[0])
         c.close()
         conn.close()
+        self.add_protocol_comboBox.setCurrentIndex(0)
 
     def edit_custom_populate(self):
         conn = sqlite3.connect(self.filename)

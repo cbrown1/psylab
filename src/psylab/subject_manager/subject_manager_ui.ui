@@ -29,82 +29,17 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
      <string>Add</string>
     </attribute>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>65</y>
-       <width>80</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>First Name</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>95</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Last Name</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>125</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Email</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>155</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Phone #</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_5">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>185</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Birthdate</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>15</y>
        <width>80</width>
        <height>16</height>
       </rect>
@@ -113,150 +48,12 @@
       <string>Subject #</string>
      </property>
     </widget>
-    <widget class="QDateEdit" name="add_birthdate_dateEdit">
-     <property name="geometry">
-      <rect>
-       <x>85</x>
-       <y>180</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>yyyy-MM-dd</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_7">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>65</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Ethnic ID</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_8">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>95</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Race</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>125</y>
-       <width>80</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Gender</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="add_contact_add_checkBox">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>150</y>
-       <width>196</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Consent to be contacted?</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="add_name_first_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>85</x>
-       <y>60</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="add_name_last_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>85</x>
-       <y>90</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="add_email_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>85</x>
-       <y>120</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="add_phone_lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>85</x>
-       <y>150</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="add_subject_lineEdit">
      <property name="geometry">
       <rect>
        <x>85</x>
-       <y>15</y>
+       <y>10</y>
        <width>64</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="add_ethnic_id_comboBox">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>60</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="add_race_comboBox">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>90</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="add_gender_comboBox">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>120</y>
-       <width>140</width>
        <height>26</height>
       </rect>
      </property>
@@ -274,41 +71,270 @@
       <string>Add</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_12">
+    <widget class="QGroupBox" name="groupBox_6">
      <property name="geometry">
       <rect>
-       <x>255</x>
-       <y>15</y>
-       <width>80</width>
-       <height>16</height>
+       <x>240</x>
+       <y>5</y>
+       <width>231</width>
+       <height>206</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Protocol</string>
+     <property name="title">
+      <string>Demographic Data</string>
      </property>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Email</string>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="add_birthdate_dateEdit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>135</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>yyyy-MM-dd</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>110</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Phone #</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="add_name_last_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>45</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>140</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Birthdate</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>50</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Last Name</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="add_email_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>75</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="add_phone_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>105</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>20</y>
+        <width>80</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>First Name</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="add_name_first_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>15</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="add_contact_add_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>180</y>
+        <width>196</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Consent to be contacted?</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="add_age_label">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>165</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Age</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QComboBox" name="add_protocol_comboBox">
+    <widget class="QGroupBox" name="groupBox_7">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>10</y>
-       <width>140</width>
-       <height>26</height>
+       <x>5</x>
+       <y>40</y>
+       <width>231</width>
+       <height>146</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QLabel" name="add_age_label">
-     <property name="geometry">
-      <rect>
-       <x>255</x>
-       <y>185</y>
-       <width>181</width>
-       <height>16</height>
-      </rect>
+     <property name="title">
+      <string>IRB/NIH Protocol Data</string>
      </property>
-     <property name="text">
-      <string>Age</string>
-     </property>
+     <widget class="QComboBox" name="add_protocol_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>20</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>55</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ethnic ID</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="add_gender_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>110</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="add_ethnic_id_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>50</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>85</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Race</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="add_race_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>80</y>
+        <width>140</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>115</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Gender</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>25</y>
+        <width>80</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Protocol</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
@@ -318,7 +344,7 @@
     <widget class="QComboBox" name="edit_uid_comboBox">
      <property name="geometry">
       <rect>
-       <x>305</x>
+       <x>320</x>
        <y>10</y>
        <width>96</width>
        <height>26</height>
@@ -364,9 +390,9 @@
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>245</x>
        <y>15</y>
-       <width>80</width>
+       <width>71</width>
        <height>16</height>
       </rect>
      </property>
@@ -377,20 +403,20 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>5</x>
        <y>40</y>
-       <width>216</width>
+       <width>231</width>
        <height>221</height>
       </rect>
      </property>
      <property name="title">
-      <string/>
+      <string>Demographic Data</string>
      </property>
      <widget class="QLabel" name="edit_name_label">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>20</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -403,7 +429,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>40</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -416,7 +442,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
+        <y>60</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -455,7 +481,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>70</y>
+        <y>75</y>
         <width>201</width>
         <height>26</height>
        </rect>
@@ -468,7 +494,7 @@
     <widget class="QDateEdit" name="edit_birthdate_dateEdit">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>15</x>
        <y>230</y>
        <width>140</width>
        <height>26</height>
@@ -481,68 +507,68 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="edit_name_label_2">
+    <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>45</y>
-       <width>196</width>
-       <height>16</height>
+       <x>240</x>
+       <y>40</y>
+       <width>231</width>
+       <height>196</height>
       </rect>
      </property>
-     <property name="text">
+     <property name="title">
       <string>Custom Variables</string>
      </property>
-    </widget>
-    <widget class="QTableWidget" name="edit_custom_tableWidget">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>60</y>
-       <width>251</width>
-       <height>176</height>
-      </rect>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>60</number>
-     </attribute>
-     <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>16</number>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>18</number>
-     </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>18</number>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>16</number>
-     </attribute>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>60</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Name</string>
+     <widget class="QTableWidget" name="edit_custom_tableWidget">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>15</y>
+        <width>221</width>
+        <height>176</height>
+       </rect>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Value</string>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
-     </column>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>60</number>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>16</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>18</number>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>18</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>16</number>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>60</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_5">
@@ -567,7 +593,7 @@
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>155</x>
+       <x>159</x>
        <y>0</y>
        <width>155</width>
        <height>131</height>
@@ -580,7 +606,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -603,7 +629,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -626,7 +652,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>86</height>
        </rect>
@@ -639,7 +665,7 @@
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>316</x>
        <y>0</y>
        <width>155</width>
        <height>131</height>
@@ -652,7 +678,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -675,7 +701,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -698,7 +724,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>86</height>
        </rect>
@@ -711,7 +737,7 @@
     <widget class="QGroupBox" name="groupBox_4">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>2</x>
        <y>0</y>
        <width>155</width>
        <height>131</height>
@@ -737,7 +763,7 @@
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>2</x>
        <y>135</y>
        <width>155</width>
        <height>131</height>
@@ -750,7 +776,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -773,7 +799,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -796,7 +822,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>86</height>
        </rect>
@@ -841,16 +867,6 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>add_subject_lineEdit</tabstop>
-  <tabstop>add_protocol_comboBox</tabstop>
-  <tabstop>add_name_first_lineEdit</tabstop>
-  <tabstop>add_name_last_lineEdit</tabstop>
-  <tabstop>add_email_lineEdit</tabstop>
-  <tabstop>add_phone_lineEdit</tabstop>
-  <tabstop>add_birthdate_dateEdit</tabstop>
-  <tabstop>add_ethnic_id_comboBox</tabstop>
-  <tabstop>add_race_comboBox</tabstop>
-  <tabstop>add_gender_comboBox</tabstop>
-  <tabstop>add_contact_add_checkBox</tabstop>
   <tabstop>add_pushButton</tabstop>
   <tabstop>close_pushButton</tabstop>
   <tabstop>edit_search_lineEdit</tabstop>
@@ -858,7 +874,6 @@
   <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_protocol_listWidget</tabstop>
   <tabstop>edit_birthdate_dateEdit</tabstop>
-  <tabstop>edit_custom_tableWidget</tabstop>
   <tabstop>edit_pushButton</tabstop>
   <tabstop>tableView</tabstop>
   <tabstop>admin_protocols_remove_pushButton</tabstop>
