@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -74,8 +74,8 @@
     <widget class="QGroupBox" name="groupBox_6">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>5</y>
+       <x>5</x>
+       <y>45</y>
        <width>231</width>
        <height>206</height>
       </rect>
@@ -234,8 +234,8 @@
     <widget class="QGroupBox" name="groupBox_7">
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>40</y>
+       <x>240</x>
+       <y>45</y>
        <width>231</width>
        <height>146</height>
       </rect>
@@ -404,7 +404,7 @@
      <property name="geometry">
       <rect>
        <x>5</x>
-       <y>40</y>
+       <y>45</y>
        <width>231</width>
        <height>221</height>
       </rect>
@@ -490,28 +490,51 @@
        <string>Consent to be contacted?</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>230</y>
-       <width>140</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="displayFormat">
-      <string>yyyy-MM-dd</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
+     <widget class="QPushButton" name="edit_protocol_date_remove_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>127</x>
+        <y>193</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {color: red; padding: 0px;}</string>
+      </property>
+      <property name="text">
+       <string>X</string>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
+        <width>116</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>yyyy-MM-dd</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>40</y>
+       <y>45</y>
        <width>231</width>
        <height>196</height>
       </rect>
@@ -867,25 +890,37 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>add_subject_lineEdit</tabstop>
+  <tabstop>add_name_first_lineEdit</tabstop>
+  <tabstop>add_name_last_lineEdit</tabstop>
+  <tabstop>add_email_lineEdit</tabstop>
+  <tabstop>add_phone_lineEdit</tabstop>
+  <tabstop>add_birthdate_dateEdit</tabstop>
+  <tabstop>add_contact_add_checkBox</tabstop>
+  <tabstop>add_protocol_comboBox</tabstop>
+  <tabstop>add_ethnic_id_comboBox</tabstop>
+  <tabstop>add_race_comboBox</tabstop>
+  <tabstop>add_gender_comboBox</tabstop>
   <tabstop>add_pushButton</tabstop>
-  <tabstop>close_pushButton</tabstop>
   <tabstop>edit_search_lineEdit</tabstop>
   <tabstop>edit_uid_comboBox</tabstop>
   <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_protocol_listWidget</tabstop>
   <tabstop>edit_protocol_date_dateEdit</tabstop>
+  <tabstop>edit_protocol_date_remove_pushButton</tabstop>
+  <tabstop>edit_custom_tableWidget</tabstop>
   <tabstop>edit_pushButton</tabstop>
   <tabstop>tableView</tabstop>
-  <tabstop>admin_protocols_remove_pushButton</tabstop>
-  <tabstop>admin_protocols_add_pushButton</tabstop>
-  <tabstop>admin_protocols_listWidget</tabstop>
-  <tabstop>admin_custom_remove_pushButton</tabstop>
-  <tabstop>admin_custom_add_pushButton</tabstop>
-  <tabstop>admin_custom_listWidget</tabstop>
   <tabstop>admin_create_db_pushButton</tabstop>
-  <tabstop>admin_reports_remove_pushButton</tabstop>
-  <tabstop>admin_reports_add_pushButton</tabstop>
   <tabstop>admin_reports_listWidget</tabstop>
+  <tabstop>admin_reports_add_pushButton</tabstop>
+  <tabstop>admin_reports_remove_pushButton</tabstop>
+  <tabstop>admin_protocols_listWidget</tabstop>
+  <tabstop>admin_protocols_add_pushButton</tabstop>
+  <tabstop>admin_protocols_remove_pushButton</tabstop>
+  <tabstop>admin_custom_listWidget</tabstop>
+  <tabstop>admin_custom_add_pushButton</tabstop>
+  <tabstop>admin_custom_remove_pushButton</tabstop>
+  <tabstop>close_pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

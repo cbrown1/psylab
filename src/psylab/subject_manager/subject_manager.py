@@ -21,9 +21,10 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
-        self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
-        self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.edit_protocol_dateChanged)
+        #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.edit_protocol_selected)
+        self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
+        self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.edit_protocol_dateChanged)
         self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
         self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
@@ -70,8 +71,8 @@ class MyWidget (QtGui.QWidget, form_class):
         for row in c:
             item = QtGui.QListWidgetItem(row[0])
             item.setCheckState(QtCore.Qt.Unchecked)
-            item.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable |
-                                    QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled )
+            item.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable | 
+                                    QtCore.Qt.ItemIsEnabled )
             self.edit_protocol_listWidget.insertItem(-1, item)
             self.add_protocol_comboBox.insertItem(-1, row[0])
             self.edit_subject_protocol_dict[row[0]] = ''
@@ -81,7 +82,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_protocol_listWidget.setCurrentRow(0)
 
 
-    def edit_protocol_selected(self, current_item):
+    def edit_protocol_selected(self, current, prev): #, current_item):
         if self.edit_protocol_listWidget.currentItem().checkState() == QtCore.Qt.Checked:
             self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" % (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
             self.edit_protocol_date_dateEdit.setDate(QtCore.QDate.fromString(self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()], "yyyy-MM-dd"))
