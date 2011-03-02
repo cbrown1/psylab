@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -77,7 +77,7 @@
        <x>5</x>
        <y>45</y>
        <width>231</width>
-       <height>206</height>
+       <height>211</height>
       </rect>
      </property>
      <property name="title">
@@ -87,7 +87,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>80</y>
+        <y>85</y>
         <width>80</width>
         <height>16</height>
        </rect>
@@ -100,7 +100,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>135</y>
+        <y>140</y>
         <width>140</width>
         <height>26</height>
        </rect>
@@ -116,7 +116,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>110</y>
+        <y>115</y>
         <width>80</width>
         <height>16</height>
        </rect>
@@ -129,7 +129,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>45</y>
+        <y>50</y>
         <width>140</width>
         <height>26</height>
        </rect>
@@ -139,7 +139,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>140</y>
+        <y>145</y>
         <width>80</width>
         <height>16</height>
        </rect>
@@ -152,7 +152,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>50</y>
+        <y>55</y>
         <width>80</width>
         <height>16</height>
        </rect>
@@ -165,7 +165,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>75</y>
+        <y>80</y>
         <width>140</width>
         <height>26</height>
        </rect>
@@ -175,7 +175,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>105</y>
+        <y>110</y>
         <width>140</width>
         <height>26</height>
        </rect>
@@ -198,7 +198,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>15</y>
+        <y>20</y>
         <width>140</width>
         <height>26</height>
        </rect>
@@ -208,7 +208,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>180</y>
+        <y>185</y>
         <width>196</width>
         <height>26</height>
        </rect>
@@ -221,7 +221,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>165</y>
+        <y>170</y>
         <width>91</width>
         <height>16</height>
        </rect>
@@ -501,7 +501,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>12</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -510,7 +510,7 @@
        <string notr="true">QPushButton {color: red; padding: 0px;}</string>
       </property>
       <property name="text">
-       <string>X</string>
+       <string>x</string>
       </property>
      </widget>
      <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
@@ -546,9 +546,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>15</y>
+        <y>20</y>
         <width>221</width>
-        <height>176</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -645,7 +645,7 @@
        <string notr="true">QPushButton {color: red; padding: 0px;}</string>
       </property>
       <property name="text">
-       <string>-</string>
+       <string>x</string>
       </property>
      </widget>
      <widget class="QPushButton" name="admin_protocols_add_pushButton">
@@ -717,7 +717,7 @@
        <string notr="true">QPushButton {color: red; padding: 0px;}</string>
       </property>
       <property name="text">
-       <string>-</string>
+       <string>x</string>
       </property>
      </widget>
      <widget class="QPushButton" name="admin_custom_add_pushButton">
@@ -815,7 +815,7 @@
        <string notr="true">QPushButton {color: red; padding: 0px;}</string>
       </property>
       <property name="text">
-       <string>-</string>
+       <string>x</string>
       </property>
      </widget>
      <widget class="QPushButton" name="admin_reports_add_pushButton">

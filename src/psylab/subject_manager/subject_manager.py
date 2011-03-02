@@ -24,24 +24,37 @@ class MyWidget (QtGui.QWidget, form_class):
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.edit_protocol_selected)
         self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
-        self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.edit_protocol_dateChanged)
+        #self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.edit_protocol_dateChanged)
+        self.connect(self.edit_protocol_date_dateEdit.calendarWidget(), QtCore.SIGNAL("clicked(const QDate&)"), self.edit_protocol_dateChanged)
+        self.connect(self.edit_protocol_date_remove_pushButton, QtCore.SIGNAL("clicked()"), self.edit_protocol_date_remove)
         self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
         self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
         self.connect(self.admin_custom_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_remove)
         self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
 
+
         self.edit_subject_protocol_dict = {}
+
+        # Hack! Use bg color to `hide` the date in the protocol datewidget when none has been selected
         palette = QtGui.QPalette(self.edit_protocol_date_dateEdit.palette())
-        
-        # Used to hide the date in the protocol datewidget when none has been selected
         self.datewidget_background_color = palette.color(QtGui.QPalette.Base).getRgb()
         self.datewidget_foreground_color = palette.color(QtGui.QPalette.WindowText).getRgb()
-        
+        self.datewidget_changed_programmatically = False
+
         self.admin_init()
         self.add_init()
         self.add_edit_protocol_populate()
         self.edit_custom_populate()
+
+    def edit_Init(self):
+        self.datewidget_changed_programmatically = True
+        self.edit_protocol_date_dateEdit.setDate(datetime.datetime.now())
+        self.datewidget_changed_programmatically = False
+        for i in range(self.edit_protocol_listWidget.count()):
+            item = self.edit_protocol_listWidget.item(i)
+            if self.edit_subject_protocol_dict[item.text()] != "":
+                self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
 
     def edit_Process(self):
         pass
@@ -71,7 +84,7 @@ class MyWidget (QtGui.QWidget, form_class):
         for row in c:
             item = QtGui.QListWidgetItem(row[0])
             item.setCheckState(QtCore.Qt.Unchecked)
-            item.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable | 
+            item.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable |
                                     QtCore.Qt.ItemIsEnabled )
             self.edit_protocol_listWidget.insertItem(-1, item)
             self.add_protocol_comboBox.insertItem(-1, row[0])
@@ -81,21 +94,36 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_protocol_comboBox.setCurrentIndex(0)
         self.edit_protocol_listWidget.setCurrentRow(0)
 
-
     def edit_protocol_selected(self, current, prev): #, current_item):
         if self.edit_protocol_listWidget.currentItem().checkState() == QtCore.Qt.Checked:
-            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" % (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
+            #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+                (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
             self.edit_protocol_date_dateEdit.setDate(QtCore.QDate.fromString(self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()], "yyyy-MM-dd"))
         else:
-            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" % (self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2]))
+            #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+                (self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2]))
+            self.datewidget_changed_programmatically = True # stupid datewidget doesn't know the difference
             self.edit_protocol_date_dateEdit.setDate(datetime.datetime.now())
-        
+            self.datewidget_changed_programmatically = False
+
     def edit_protocol_dateChanged(self, newdate):
-        self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" % (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
-        self.edit_protocol_listWidget.currentItem().setCheckState(2)
-        self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = self.edit_protocol_date_dateEdit.date().toString('yyyy-MM-dd')
-        
-        
+        if not self.datewidget_changed_programmatically:
+            self.edit_protocol_listWidget.currentItem().setCheckState(QtCore.Qt.Checked)
+            #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+                (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
+            self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = self.edit_protocol_date_dateEdit.date().toString('yyyy-MM-dd')
+
+    def edit_protocol_date_remove(self):
+        self.edit_protocol_listWidget.currentItem().setCheckState(QtCore.Qt.Unchecked)
+        self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = ""
+        #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+        self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;} QDateEdit::down-arrow {color: rgb(%i, %i, %i); padding: 0px;} " %
+            (self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2],
+             self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2]))
+
     def admin_init(self):
         if not os.path.isfile(self.filename):
             self.admin_create_db()
@@ -217,7 +245,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_gender_comboBox.clear()
         for row in c:
             self.add_gender_comboBox.insertItem(-1, row[0])
-        
+
         c.close();
         conn.close();
 
