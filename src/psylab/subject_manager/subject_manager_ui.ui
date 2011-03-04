@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -51,7 +51,7 @@
     <widget class="QLineEdit" name="add_subject_lineEdit">
      <property name="geometry">
       <rect>
-       <x>85</x>
+       <x>80</x>
        <y>10</y>
        <width>64</width>
        <height>26</height>
@@ -88,7 +88,7 @@
        <rect>
         <x>5</x>
         <y>85</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -99,9 +99,9 @@
      <widget class="QDateEdit" name="add_birthdate_dateEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>140</y>
-        <width>140</width>
+        <width>101</width>
         <height>26</height>
        </rect>
       </property>
@@ -117,7 +117,7 @@
        <rect>
         <x>5</x>
         <y>115</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -128,9 +128,9 @@
      <widget class="QLineEdit" name="add_name_last_lineEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>50</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -140,7 +140,7 @@
        <rect>
         <x>5</x>
         <y>145</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -153,7 +153,7 @@
        <rect>
         <x>5</x>
         <y>55</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -164,9 +164,9 @@
      <widget class="QLineEdit" name="add_email_lineEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>80</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -174,9 +174,9 @@
      <widget class="QLineEdit" name="add_phone_lineEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>110</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -186,7 +186,7 @@
        <rect>
         <x>5</x>
         <y>20</y>
-        <width>80</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
@@ -197,9 +197,9 @@
      <widget class="QLineEdit" name="add_name_first_lineEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>20</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -208,7 +208,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>185</y>
+        <y>175</y>
         <width>196</width>
         <height>26</height>
        </rect>
@@ -220,9 +220,9 @@
      <widget class="QLabel" name="add_age_label">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>170</y>
-        <width>91</width>
+        <x>175</x>
+        <y>145</y>
+        <width>51</width>
         <height>16</height>
        </rect>
       </property>
@@ -246,9 +246,9 @@
      <widget class="QComboBox" name="add_protocol_comboBox">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>20</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -258,7 +258,7 @@
        <rect>
         <x>5</x>
         <y>55</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -269,9 +269,9 @@
      <widget class="QComboBox" name="add_gender_comboBox">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>110</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -279,9 +279,9 @@
      <widget class="QComboBox" name="add_ethnic_id_comboBox">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>50</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -291,7 +291,7 @@
        <rect>
         <x>5</x>
         <y>85</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -302,9 +302,9 @@
      <widget class="QComboBox" name="add_race_comboBox">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>74</x>
         <y>80</y>
-        <width>140</width>
+        <width>146</width>
         <height>26</height>
        </rect>
       </property>
@@ -314,7 +314,7 @@
        <rect>
         <x>5</x>
         <y>115</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -327,7 +327,7 @@
        <rect>
         <x>5</x>
         <y>25</y>
-        <width>80</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
@@ -341,12 +341,12 @@
     <attribute name="title">
      <string>Edit</string>
     </attribute>
-    <widget class="QComboBox" name="edit_uid_comboBox">
+    <widget class="QComboBox" name="edit_subject_list_comboBox">
      <property name="geometry">
       <rect>
        <x>320</x>
        <y>10</y>
-       <width>96</width>
+       <width>146</width>
        <height>26</height>
       </rect>
      </property>
@@ -367,9 +367,9 @@
     <widget class="QLineEdit" name="edit_search_lineEdit">
      <property name="geometry">
       <rect>
-       <x>79</x>
+       <x>80</x>
        <y>10</y>
-       <width>126</width>
+       <width>151</width>
        <height>26</height>
       </rect>
      </property>
@@ -416,7 +416,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>30</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -429,7 +429,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>50</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -442,7 +442,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>70</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -455,7 +455,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>115</y>
         <width>196</width>
         <height>16</height>
        </rect>
@@ -468,9 +468,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>115</y>
+        <y>130</y>
         <width>141</width>
-        <height>76</height>
+        <height>61</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -481,7 +481,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>75</y>
+        <y>90</y>
         <width>201</width>
         <height>26</height>
        </rect>
@@ -902,7 +902,7 @@
   <tabstop>add_gender_comboBox</tabstop>
   <tabstop>add_pushButton</tabstop>
   <tabstop>edit_search_lineEdit</tabstop>
-  <tabstop>edit_uid_comboBox</tabstop>
+  <tabstop>edit_subject_list_comboBox</tabstop>
   <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_protocol_listWidget</tabstop>
   <tabstop>edit_protocol_date_dateEdit</tabstop>

@@ -21,6 +21,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
+        self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.edit_protocol_selected)
         self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
@@ -32,7 +33,6 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
         self.connect(self.admin_custom_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_remove)
         self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
-
 
         self.edit_subject_protocol_dict = {}
 
@@ -46,6 +46,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_init()
         self.add_edit_protocol_populate()
         self.edit_custom_populate()
+        self.edit_load_subject_list()
 
     def edit_Init(self):
         self.datewidget_changed_programmatically = True
@@ -55,6 +56,42 @@ class MyWidget (QtGui.QWidget, form_class):
             item = self.edit_protocol_listWidget.item(i)
             if self.edit_subject_protocol_dict[item.text()] != "":
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
+
+    def edit_load_subject_list(self):
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT SubjN,LName FROM Subjects""")
+        self.edit_subject_list_comboBox.clear()
+        for row in c:
+            self.edit_subject_list_comboBox.insertItem(-1, "%s, %s" % (row[0], row[1]))
+        c.close()
+        conn.close()
+
+    def edit_load_subject_data(self, info):
+        subn = info.split(", ")[0]
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT FName,LName,Email,Phone,Contact FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+        subject = c.fetchone()
+        if subject is not None:
+            self.edit_name_label.setText("%s %s" % (subject[0],subject[1]))
+            self.edit_email_label.setText("%s" % subject[2])
+            self.edit_phone_label.setText("%s" % subject[3])
+            self.edit_contact_checkBox.setChecked(bool(subject[4]))
+            c.execute("""SELECT Protocol FROM Protocols""")
+            protocols = c.fetchall()
+            for protocol in protocols:
+                c.execute("""SELECT Protocol_%s FROM Subjects WHERE SubjN == \'%s\'""" % (protocol[0],subn))
+                protocol_date = c.fetchone()
+                for i in range(self.edit_protocol_listWidget.count()):
+                    if protocol[0] == self.edit_protocol_listWidget.item(i).text():
+                        if protocol_date[0] is not None:
+                            self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
+                        else:
+                            self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+        c.close()
+        conn.close()
+
 
     def edit_Process(self):
         pass
@@ -97,9 +134,9 @@ class MyWidget (QtGui.QWidget, form_class):
     def edit_protocol_selected(self, current, prev): #, current_item):
         if self.edit_protocol_listWidget.currentItem().checkState() == QtCore.Qt.Checked:
             #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
-            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
                 (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
-            self.edit_protocol_date_dateEdit.setDate(QtCore.QDate.fromString(self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()], "yyyy-MM-dd"))
+            self.edit_protocol_date_dateEdit.setDate(QtCore.QDate.fromString(self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.currentItem().text())], "yyyy-MM-dd"))
         else:
             #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
             self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
@@ -112,7 +149,7 @@ class MyWidget (QtGui.QWidget, form_class):
         if not self.datewidget_changed_programmatically:
             self.edit_protocol_listWidget.currentItem().setCheckState(QtCore.Qt.Checked)
             #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
-            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
                 (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
             self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = self.edit_protocol_date_dateEdit.date().toString('yyyy-MM-dd')
 
@@ -229,7 +266,7 @@ class MyWidget (QtGui.QWidget, form_class):
         if subn[0] is None:
             self.add_subject_lineEdit.setText('1')
         else:
-            self.add_subject_lineEdit.setText(str(subn[0]+1));
+            self.add_subject_lineEdit.setText(unicode(int(subn[0])+1));
 
         c.execute("""SELECT EthnicID FROM EthnicIDs""")
         self.add_ethnic_id_comboBox.clear()

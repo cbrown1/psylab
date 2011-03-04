@@ -79,6 +79,7 @@ CREATE TABLE "CustomVars" (
 -- A table to hold any database admin data
 CREATE TABLE "Admin" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "Key" TEXT,
-    "Val" TEXT
+    "Name" TEXT,
+    "Value" TEXT
 );
+INSERT INTO Admin (Name,Value) VALUES ('version','0.1');
