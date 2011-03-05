@@ -89,6 +89,19 @@ class MyWidget (QtGui.QWidget, form_class):
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
                         else:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+        
+            c.execute("""SELECT CustomVar FROM CustomVars""")
+            vars = c.fetchall()
+            rowcount = 0
+            for var in vars:
+                print var[0]
+                c.execute("""SELECT Custom_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
+                customvar_this = c.fetchone()
+                item = QtGui.QTableWidgetItem(customvar_this[0])
+                for i in range(self.edit_custom_tableWidget.rowCount()):
+                    if var[0] == self.edit_custom_tableWidget.item(i,0).text():
+                        self.edit_custom_tableWidget.setItem(i, 1, item)
+        
         c.close()
         conn.close()
 
