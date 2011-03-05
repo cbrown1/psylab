@@ -94,7 +94,6 @@ class MyWidget (QtGui.QWidget, form_class):
             vars = c.fetchall()
             rowcount = 0
             for var in vars:
-                print var[0]
                 c.execute("""SELECT Custom_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
                 customvar_this = c.fetchone()
                 item = QtGui.QTableWidgetItem(customvar_this[0])
