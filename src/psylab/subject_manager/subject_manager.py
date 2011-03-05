@@ -64,7 +64,7 @@ class MyWidget (QtGui.QWidget, form_class):
         if search_field in [None, '']:
             query = """SELECT SubjN,FName,LName FROM Subjects"""
         else:
-            query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'*%s*\'""" % search_field
+            query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
         c.execute(query)
         self.edit_subject_list_comboBox.clear()
         ind = 0
@@ -87,6 +87,7 @@ class MyWidget (QtGui.QWidget, form_class):
             self.edit_contact_checkBox.setChecked(bool(subject[4]))
             c.execute("""SELECT Protocol FROM Protocols""")
             protocols = c.fetchall()
+            self.edit_subject_protocol_dict = {}
             for protocol in protocols:
                 c.execute("""SELECT Protocol_%s FROM Subjects WHERE SubjN == \'%s\'""" % (protocol[0],subn))
                 protocol_date = c.fetchone()
@@ -94,8 +95,10 @@ class MyWidget (QtGui.QWidget, form_class):
                     if protocol[0] == self.edit_protocol_listWidget.item(i).text():
                         if protocol_date[0] is not None:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
+                            self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())] = protocol_date[0]
                         else:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+                            self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())] = ""
 
             c.execute("""SELECT CustomVar FROM CustomVars""")
             vars = c.fetchall()
@@ -123,7 +126,37 @@ class MyWidget (QtGui.QWidget, form_class):
 
 
     def edit_Process(self):
-        pass
+        # Need new format: "UPDATE Subjects SET col1 = 'value1', col2 = 'value2', col3 = 'value3' WHERE ..."
+        subn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
+        keys = ["Contact"]
+        if self.edit_contact_checkBox.checkState() == QtCore.Qt.Checked:
+            vals = ["True"]
+        else:
+            vals = ["False"]
+        for k,v in self.edit_subject_protocol_dict.items():
+            keys.append(unicode(k))
+            if v == "":
+                vals.append("None")
+            else:
+                vals.append(unicode(v))
+        for i in range(self.edit_protocol_listWidget.count()):
+            keys.append("Protocol_%s" % unicode(self.edit_protocol_listWidget.item(i).text()))
+            #print self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())]
+            #if self.edit_protocol_listWidget.item(i).checkState() == QtCore.Qt.Checked:
+            #else:
+            #    vals.append("None")
+        for i in range(self.edit_custom_tableWidget.rowCount()):
+            keys.append("Custom_%s" % unicode(self.edit_custom_tableWidget.item(i,0).text()))
+            item = self.edit_custom_tableWidget.item(i,1)
+            if item:
+                vals.append(unicode(item.text()))
+            else:
+                vals.append("None")
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""UPDATE Subjects (%s) VALUES (%s) WHERE ;""" % (",".join(keys), ",".join(vals)))
+        c.close()
+        conn.close()
 
     def edit_custom_populate(self):
         conn = sqlite3.connect(self.filename)
