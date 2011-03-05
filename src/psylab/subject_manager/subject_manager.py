@@ -22,6 +22,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
+        self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
         #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.edit_protocol_selected)
         self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
@@ -57,18 +58,24 @@ class MyWidget (QtGui.QWidget, form_class):
             if self.edit_subject_protocol_dict[item.text()] != "":
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
 
-    def edit_load_subject_list(self):
+    def edit_load_subject_list(self, search_field=None):
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT SubjN,LName FROM Subjects""")
+        if search_field in [None, '']:
+            query = """SELECT SubjN,FName,LName FROM Subjects"""
+        else:
+            query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'*%s*\'""" % search_field
+        c.execute(query)
         self.edit_subject_list_comboBox.clear()
+        ind = 0
         for row in c:
-            self.edit_subject_list_comboBox.insertItem(-1, "%s, %s" % (row[0], row[1]))
+            self.edit_subject_list_comboBox.insertItem(ind, "%3s, %s %s" % (row[0], row[1], row[2]))
+            ind += 1
         c.close()
         conn.close()
 
     def edit_load_subject_data(self, info):
-        subn = info.split(", ")[0]
+        subn = unicode(info.split(", ")[0]).strip()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         c.execute("""SELECT FName,LName,Email,Phone,Contact FROM Subjects WHERE SubjN == \'%s\'""" % subn)
@@ -89,18 +96,28 @@ class MyWidget (QtGui.QWidget, form_class):
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
                         else:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
-        
+
             c.execute("""SELECT CustomVar FROM CustomVars""")
             vars = c.fetchall()
             rowcount = 0
             for var in vars:
                 c.execute("""SELECT Custom_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
                 customvar_this = c.fetchone()
-                item = QtGui.QTableWidgetItem(customvar_this[0])
-                for i in range(self.edit_custom_tableWidget.rowCount()):
-                    if var[0] == self.edit_custom_tableWidget.item(i,0).text():
-                        self.edit_custom_tableWidget.setItem(i, 1, item)
-        
+                if customvar_this[0] is not None:
+                    item = QtGui.QTableWidgetItem(customvar_this[0])
+                    for i in range(self.edit_custom_tableWidget.rowCount()):
+                        if var[0] == self.edit_custom_tableWidget.item(i,0).text():
+                            self.edit_custom_tableWidget.setItem(i, 1, item)
+        else:
+            self.edit_name_label.setText("")
+            self.edit_email_label.setText("")
+            self.edit_phone_label.setText("")
+            self.edit_contact_checkBox.setChecked(False)
+            for i in range(self.edit_protocol_listWidget.count()):
+                self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+            for i in range(self.edit_custom_tableWidget.rowCount()):
+                item = QtGui.QTableWidgetItem("")
+                self.edit_custom_tableWidget.setItem(i, 1, item)
         c.close()
         conn.close()
 
@@ -197,7 +214,7 @@ class MyWidget (QtGui.QWidget, form_class):
             self.filename = ret
             self.filePath_label.setText(ret)
             if not os.path.isfile(self.filename):
-                qry = open('New_DB_Schema.sql', 'r').read()
+                qry = open('New_DB_Schema_debug.sql', 'r').read()
                 conn = sqlite3.connect(ret)
                 c = conn.cursor()
                 c.executescript(qry)
@@ -492,7 +509,7 @@ class MyWidget (QtGui.QWidget, form_class):
             c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr_new))
             c.execute("""INSERT INTO %s_backup (%s) SELECT %s FROM %s""" % (table, colstr_old, colstr_old, table))
             c.execute("""DROP TABLE %s;""" % table)
-            c.execute("""CREATE TABLE %s(%s);""" % (table, colstr_new))
+            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, colstr_new))
             c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr_new, table))
             c.execute("""DROP TABLE %s_backup;""" % table)
             conn.commit()
@@ -510,7 +527,7 @@ class MyWidget (QtGui.QWidget, form_class):
             c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr))
             c.execute("""INSERT INTO %s_backup SELECT %s FROM %s;\n""" % (table, colstr, table))
             c.execute("""DROP TABLE %s;""" % table)
-            c.execute("""CREATE TABLE %s(%s);""" % (table, colstr))
+            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, colstr))
             c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr, table))
             c.execute("""DROP TABLE %s_backup;""" % table)
             conn.commit()

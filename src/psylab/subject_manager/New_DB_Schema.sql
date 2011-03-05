@@ -17,9 +17,10 @@ c.close()
 conn.close()
 */
 
--- The main table, to hold subject info. New fields will be added as needed
--- for Protocols (a default is created here) and custom vars
-CREATE TABLE "Subjects" (
+-- The main table, to hold subject info. Full-text searchable.
+-- New fields will be added as needed for Protocols (a default is created
+-- here) and custom vars.
+CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "SubjN" INTEGER,
     "FName" TEXT,
