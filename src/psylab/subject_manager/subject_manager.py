@@ -48,6 +48,8 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_edit_protocol_populate()
         self.edit_custom_populate()
         self.edit_load_subject_list()
+        self.show()
+        self.setFixedSize(self.width(),self.height()) # <- Must be done after show
 
     def edit_Init(self):
         self.datewidget_changed_programmatically = True
@@ -571,7 +573,6 @@ class MyWidget (QtGui.QWidget, form_class):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = MyWidget(None)
-    form.show()
     if len(sys.argv)>1:
         form.select_tab(sys.argv[1])
     app.exec_()
