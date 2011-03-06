@@ -128,35 +128,31 @@ class MyWidget (QtGui.QWidget, form_class):
 
 
     def edit_Process(self):
-        # Need new format: "UPDATE Subjects SET col1 = 'value1', col2 = 'value2', col3 = 'value3' WHERE ..."
+        query = "UPDATE Subjects SET "
         subn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
-        keys = ["Contact"]
-        if self.edit_contact_checkBox.checkState() == QtCore.Qt.Checked:
-            vals = ["True"]
-        else:
-            vals = ["False"]
         for k,v in self.edit_subject_protocol_dict.items():
-            keys.append(unicode(k))
-            if v == "":
-                vals.append("None")
+            if v != "":
+                query += "Protocol_%s = '%s', " % (k, v)
             else:
-                vals.append(unicode(v))
-        for i in range(self.edit_protocol_listWidget.count()):
-            keys.append("Protocol_%s" % unicode(self.edit_protocol_listWidget.item(i).text()))
-            #print self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())]
-            #if self.edit_protocol_listWidget.item(i).checkState() == QtCore.Qt.Checked:
-            #else:
-            #    vals.append("None")
+                query += "Protocol_%s = '%s', " % (k, "None")
         for i in range(self.edit_custom_tableWidget.rowCount()):
-            keys.append("Custom_%s" % unicode(self.edit_custom_tableWidget.item(i,0).text()))
-            item = self.edit_custom_tableWidget.item(i,1)
-            if item:
-                vals.append(unicode(item.text()))
+            if self.edit_custom_tableWidget.item(i,1):
+                query += "Custom_%s = '%s', " % (unicode(self.edit_custom_tableWidget.item(i,0).text()), unicode(self.edit_custom_tableWidget.item(i,1).text()))
             else:
-                vals.append("None")
+                query += "Custom_%s = '%s', " % (unicode(self.edit_custom_tableWidget.item(i,0).text()), "None")
+        if self.edit_contact_checkBox.checkState() == QtCore.Qt.Checked:
+            query += "Contact = 'True' "
+        else:
+            query += "Contact = 'False' "
+                
+        query += "WHERE SubjN = '%s';" % subn
+        
+        #print query
+        
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""UPDATE Subjects (%s) VALUES (%s) WHERE ;""" % (",".join(keys), ",".join(vals)))
+        c.execute(query)
+        conn.commit()
         c.close()
         conn.close()
 
