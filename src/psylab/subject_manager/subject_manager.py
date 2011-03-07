@@ -6,6 +6,9 @@ import datetime
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
+#from PySide import QtGui
+#from PySide import QtCore
+#from PyQt4 import uic
 STDOUT = sys.stdout
 form_class, base_class = uic.loadUiType("subject_manager_ui.ui")
 
@@ -21,18 +24,19 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
+        self.connect(self.edit_all_pushButton, QtCore.SIGNAL("clicked()"), self.edit_all)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
-        #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentRowChanged(int)"), self.edit_protocol_selected)
-        #self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.edit_protocol_selected)
+        self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
+        self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
+        self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
         self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
-        #self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.edit_protocol_dateChanged)
         self.connect(self.edit_protocol_date_dateEdit.calendarWidget(), QtCore.SIGNAL("clicked(const QDate&)"), self.edit_protocol_dateChanged)
         self.connect(self.edit_protocol_date_remove_pushButton, QtCore.SIGNAL("clicked()"), self.edit_protocol_date_remove)
         self.connect(self.admin_protocols_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_add)
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
-        self.connect(self.admin_custom_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_add)
-        self.connect(self.admin_custom_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_custom_remove)
+        self.connect(self.admin_user_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_add)
+        self.connect(self.admin_user_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_remove)
         self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
 
         self.edit_subject_protocol_dict = {}
@@ -42,11 +46,47 @@ class MyWidget (QtGui.QWidget, form_class):
         self.datewidget_background_color = palette.color(QtGui.QPalette.Base).getRgb()
         self.datewidget_foreground_color = palette.color(QtGui.QPalette.WindowText).getRgb()
         self.datewidget_changed_programmatically = False
+        dateedit_button_style = "QSpinBox::down-button {subcontrol-origin: border; subcontrol-position: bottom left; width: 16px; "
+        dateedit_button_style += "image: url(:/icons/calendar.png) 1; border-width: 1px; border-top-width: 0;} "
+        #dateedit_button_style += "QSpinBox::down-arrow {image: url(:/icons/calendar.png); width: 16px; height: 16px;}"
+        self.edit_protocol_date_dateEdit.setStyleSheet(dateedit_button_style)
+
+        self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
+        self.admin_protocols_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_protocols_remove_pushButton.setText("")
+        self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
+        self.admin_protocols_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_protocols_add_pushButton.setText("")
+
+        self.admin_user_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
+        self.admin_user_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_user_remove_pushButton.setText("")
+        self.admin_user_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
+        self.admin_user_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_user_add_pushButton.setText("")
+
+        self.admin_reports_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
+        self.admin_reports_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_reports_remove_pushButton.setText("")
+        self.admin_reports_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
+        self.admin_reports_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_reports_add_pushButton.setText("")
+
+        self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
+        self.edit_protocol_date_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.edit_protocol_date_remove_pushButton.setText("")
+
+        palette = QtGui.QPalette(self.edit_data_changed_label.palette())
+        h_back = palette.color(QtGui.QPalette.Highlight)
+        h_text = palette.color(QtGui.QPalette.HighlightedText)
+        self.edit_data_changed_label.setStyleSheet("QLabel {color: rgb(%i, %i, %i); background-color: rgb(%i, %i, %i); padding: 3px;border: 1px solid rgb(%i, %i, %i); border-radius: 2px;}" %
+            (h_text.red(), h_text.green(), h_text.blue(), h_back.red(), h_back.green(), h_back.blue(), h_text.red(), h_text.green(), h_text.blue()))
+        self.edit_data_changed_label.setVisible(False)
 
         self.admin_init()
         self.add_init()
         self.add_edit_protocol_populate()
-        self.edit_custom_populate()
+        self.edit_user_populate()
         self.edit_load_subject_list()
         self.show()
         self.setFixedSize(self.width(),self.height()) # <- Must be done after show
@@ -59,6 +99,7 @@ class MyWidget (QtGui.QWidget, form_class):
             item = self.edit_protocol_listWidget.item(i)
             if self.edit_subject_protocol_dict[item.text()] != "":
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
+        self.edit_data_changed_label.setVisible(False)
 
     def edit_load_subject_list(self, search_field=None):
         conn = sqlite3.connect(self.filename)
@@ -95,24 +136,24 @@ class MyWidget (QtGui.QWidget, form_class):
                 protocol_date = c.fetchone()
                 for i in range(self.edit_protocol_listWidget.count()):
                     if protocol[0] == self.edit_protocol_listWidget.item(i).text():
-                        if protocol_date[0] is not None:
+                        if protocol_date[0] not in [None, '']:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
                             self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())] = protocol_date[0]
                         else:
                             self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
                             self.edit_subject_protocol_dict[unicode(self.edit_protocol_listWidget.item(i).text())] = ""
 
-            c.execute("""SELECT CustomVar FROM CustomVars""")
+            c.execute("""SELECT UserVar FROM UserVars""")
             vars = c.fetchall()
             rowcount = 0
             for var in vars:
-                c.execute("""SELECT Custom_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
-                customvar_this = c.fetchone()
-                if customvar_this[0] is not None:
-                    item = QtGui.QTableWidgetItem(customvar_this[0])
-                    for i in range(self.edit_custom_tableWidget.rowCount()):
-                        if var[0] == self.edit_custom_tableWidget.item(i,0).text():
-                            self.edit_custom_tableWidget.setItem(i, 1, item)
+                c.execute("""SELECT User_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
+                uservar_this = c.fetchone()
+                if uservar_this[0] is not None:
+                    item = QtGui.QTableWidgetItem(uservar_this[0])
+                    for i in range(self.edit_user_tableWidget.rowCount()):
+                        if var[0] == self.edit_user_tableWidget.item(i,0).text():
+                            self.edit_user_tableWidget.setItem(i, 1, item)
         else:
             self.edit_name_label.setText("")
             self.edit_email_label.setText("")
@@ -120,11 +161,12 @@ class MyWidget (QtGui.QWidget, form_class):
             self.edit_contact_checkBox.setChecked(False)
             for i in range(self.edit_protocol_listWidget.count()):
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
-            for i in range(self.edit_custom_tableWidget.rowCount()):
+            for i in range(self.edit_user_tableWidget.rowCount()):
                 item = QtGui.QTableWidgetItem("")
-                self.edit_custom_tableWidget.setItem(i, 1, item)
+                self.edit_user_tableWidget.setItem(i, 1, item)
         c.close()
         conn.close()
+        self.edit_data_changed_label.setVisible(False)
 
 
     def edit_Process(self):
@@ -135,20 +177,21 @@ class MyWidget (QtGui.QWidget, form_class):
                 query += "Protocol_%s = '%s', " % (k, v)
             else:
                 query += "Protocol_%s = '%s', " % (k, "None")
-        for i in range(self.edit_custom_tableWidget.rowCount()):
-            if self.edit_custom_tableWidget.item(i,1):
-                query += "Custom_%s = '%s', " % (unicode(self.edit_custom_tableWidget.item(i,0).text()), unicode(self.edit_custom_tableWidget.item(i,1).text()))
+        for i in range(self.edit_user_tableWidget.rowCount()):
+            if self.edit_user_tableWidget.item(i,1):
+                query += "User_%s = '%s', " % (unicode(self.edit_user_tableWidget.item(i,0).text()), unicode(self.edit_user_tableWidget.item(i,1).text()))
             else:
-                query += "Custom_%s = '%s', " % (unicode(self.edit_custom_tableWidget.item(i,0).text()), "None")
+                query += "User_%s = '%s', " % (unicode(self.edit_user_tableWidget.item(i,0).text()), "None")
         if self.edit_contact_checkBox.checkState() == QtCore.Qt.Checked:
             query += "Contact = 'True' "
         else:
             query += "Contact = 'False' "
-                
+
         query += "WHERE SubjN = '%s';" % subn
-        
+
         #print query
-        
+
+        self.edit_data_changed_label.setVisible(False)
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         c.execute(query)
@@ -156,18 +199,18 @@ class MyWidget (QtGui.QWidget, form_class):
         c.close()
         conn.close()
 
-    def edit_custom_populate(self):
+    def edit_user_populate(self):
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT CustomVar FROM CustomVars""")
-        self.edit_custom_tableWidget.clear()
-        self.edit_custom_tableWidget.setHorizontalHeaderLabels(["Name","Value"])
+        c.execute("""SELECT UserVar FROM UserVars""")
+        self.edit_user_tableWidget.clear()
+        self.edit_user_tableWidget.setHorizontalHeaderLabels(["Name","Value"])
         rowcount = 0
         for row in c:
             item = QtGui.QTableWidgetItem(row[0])
             item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
-            self.edit_custom_tableWidget.setRowCount(rowcount+1)
-            self.edit_custom_tableWidget.setItem(rowcount, 0, item)
+            self.edit_user_tableWidget.setRowCount(rowcount+1)
+            self.edit_user_tableWidget.setItem(rowcount, 0, item)
             rowcount += 1
         c.close()
         conn.close()
@@ -207,19 +250,28 @@ class MyWidget (QtGui.QWidget, form_class):
 
     def edit_protocol_dateChanged(self, newdate):
         if not self.datewidget_changed_programmatically:
+            self.edit_data_changed_label.setVisible(True)
             self.edit_protocol_listWidget.currentItem().setCheckState(QtCore.Qt.Checked)
-            #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
+            #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::down-button {color: rgb(%i, %i, %i); padding: 0px;}" %
             self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
                 (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
             self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = self.edit_protocol_date_dateEdit.date().toString('yyyy-MM-dd')
 
     def edit_protocol_date_remove(self):
+        self.edit_data_changed_label.setVisible(True)
         self.edit_protocol_listWidget.currentItem().setCheckState(QtCore.Qt.Unchecked)
         self.edit_subject_protocol_dict[self.edit_protocol_listWidget.currentItem().text()] = ""
         #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
         self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;} QDateEdit::down-arrow {color: rgb(%i, %i, %i); padding: 0px;} " %
             (self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2],
              self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2]))
+
+    def edit_data_changed(self, obj):
+        self.edit_data_changed_label.setVisible(True)
+
+    def edit_all(self):
+        pass
+
 
     def admin_init(self):
         if not os.path.isfile(self.filename):
@@ -232,10 +284,10 @@ class MyWidget (QtGui.QWidget, form_class):
 
         for row in c:
             self.admin_protocols_listWidget.insertItem(-1, row[0])
-        c.execute("""SELECT CustomVar FROM CustomVars""")
-        self.admin_custom_listWidget.clear()
+        c.execute("""SELECT UserVar FROM UserVars""")
+        self.admin_user_listWidget.clear()
         for row in c:
-            self.admin_custom_listWidget.insertItem(-1, row[0])
+            self.admin_user_listWidget.insertItem(-1, row[0])
         c.close()
         conn.close()
 
@@ -255,7 +307,7 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.select_tab('Admin')
             self.add_init()
             self.add_edit_protocol_populate()
-            self.edit_custom_populate()
+            self.edit_user_populate()
             self.admin_init()
 
     def admin_protocols_add(self):
@@ -288,35 +340,35 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.sqlite_column_delete(self.filename, 'Subjects', 'Protocol_%s' % val)
                 self.add_edit_protocol_populate()
 
-    def admin_custom_add(self):
-        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a custom variable name.\nSpaces will be replaced with _')
+    def admin_user_add(self):
+        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name.\nSpaces will be replaced with _')
         if ret != '':
             ret = ret.replace(" ","_")
-            self.admin_custom_listWidget.insertItem(-1, ret)
+            self.admin_user_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
-            c.execute("""INSERT INTO CustomVars (CustomVar) VALUES (\'%s\')""" % ret)
+            c.execute("""INSERT INTO UserVars (UserVar) VALUES (\'%s\')""" % ret)
             conn.commit()
             c.close()
             conn.close()
-            self.sqlite_column_add(self.filename, 'Subjects', 'Custom_%s' % ret)
-            self.edit_custom_populate()
+            self.sqlite_column_add(self.filename, 'Subjects', 'User_%s' % ret)
+            self.edit_user_populate()
 
-    def admin_custom_remove(self):
-        if self.admin_custom_listWidget.currentItem() is not None:
-            val = self.admin_custom_listWidget.currentItem().text()
-            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove custom variable:\n\n'+ val)
+    def admin_user_remove(self):
+        if self.admin_user_listWidget.currentItem() is not None:
+            val = self.admin_user_listWidget.currentItem().text()
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove user variable:\n\n'+ val)
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from CustomVars where CustomVar == \'%s\'""" % val)
+                c.execute("""Delete from UserVars where UserVar == \'%s\'""" % val)
                 c.close()
                 conn.commit()
                 conn.close()
-                item = self.admin_custom_listWidget.takeItem(self.admin_custom_listWidget.currentRow())
+                item = self.admin_user_listWidget.takeItem(self.admin_user_listWidget.currentRow())
                 item = None
-                self.sqlite_column_delete(self.filename, 'Subjects', 'Custom_%s' % val)
-                self.edit_custom_populate()
+                self.sqlite_column_delete(self.filename, 'Subjects', 'User_%s' % val)
+                self.edit_user_populate()
 
     def add_init(self):
         conn = sqlite3.connect(self.filename);
@@ -528,19 +580,31 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.tabWidget.setCurrentIndex(i)
 
 
-    def sqlite_column_add(self, db_file, table, column):
+    def sqlite_column_add(self, db_file, table, column, default='ff123'):
+
+        """ALTER TABLE YourTable RENAME TO OldTable;
+        CREATE TABLE YourTable (/* old cols */, NewColumn DATETIME NOT NULL);
+        INSERT INTO YourTable SELECT *, '2000-01-01 00:00:00' FROM OldTable;
+        DROP TABLE OldTable;
+        """
         conn = sqlite3.connect(db_file)
         c = conn.cursor()
-        c.execute("""SELECT * FROM %s""" % table)
-        cols = [tuple[0] for tuple in c.description]
+        c.execute("""PRAGMA table_info(%s);""" % table)
+        col_create_list = []
+        cols = []
+        for row in c:
+            col_create_list.append("'%s' TEXT DEFAULT '%s'" % (row[1], row[2]))
+            cols.append(row[1])
         if column not in cols:
             colstr_old = ",".join(cols)
             cols.append(column)
             colstr_new = ",".join(cols)
+            col_create_list.append("'%s' TEXT DEFAULT '%s'" % (column, default))
+            col_create_str = ",".join(col_create_list)
             c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr_new))
             c.execute("""INSERT INTO %s_backup (%s) SELECT %s FROM %s""" % (table, colstr_old, colstr_old, table))
             c.execute("""DROP TABLE %s;""" % table)
-            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, colstr_new))
+            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, col_create_str))
             c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr_new, table))
             c.execute("""DROP TABLE %s_backup;""" % table)
             conn.commit()
@@ -550,15 +614,23 @@ class MyWidget (QtGui.QWidget, form_class):
     def sqlite_column_delete(self, db_file, table, column):
         conn = sqlite3.connect(db_file)
         c = conn.cursor()
-        c.execute("""SELECT * FROM %s""" % table)
-        cols = [tuple[0] for tuple in c.description]
+        c.execute("""PRAGMA table_info(%s);""" % table)
+        col_list = []
+        cols = []
+        rows = c.fetchall()
+        for row in rows:
+            cols.append(row[1])
         if column in cols:
+            for row in rows:
+                if row[1] != column:
+                    col_create_list.append("'%s' TEXT DEFAULT '%s'" % (row[1], row[2]))
+            col_create_str = ",".join(col_create_list)
             cols.remove(column)
             colstr = ",".join(cols)
             c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr))
             c.execute("""INSERT INTO %s_backup SELECT %s FROM %s;\n""" % (table, colstr, table))
             c.execute("""DROP TABLE %s;""" % table)
-            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, colstr))
+            c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, col_create_str))
             c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr, table))
             c.execute("""DROP TABLE %s_backup;""" % table)
             conn.commit()

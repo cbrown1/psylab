@@ -23,17 +23,17 @@ conn.close()
 CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "SubjN" INTEGER,
-    "FName" TEXT,
-    "LName" TEXT,
-    "DOB" TEXT,
-    "Today" TEXT,
-    "Gender" TEXT,
-    "Email" TEXT,
-    "Phone" TEXT,
-    "Race" TEXT,
-    "EthnicID" TEXT,
-    "Contact" TEXT,
-    "Protocol_Default" TEXT
+    "FName" TEXT  NOT NULL DEFAULT "",
+    "LName" TEXT NOT NULL DEFAULT "",
+    "DOB" TEXT NOT NULL DEFAULT "",
+    "Today" TEXT NOT NULL DEFAULT "",
+    "Gender" TEXT NOT NULL DEFAULT "",
+    "Email" TEXT NOT NULL DEFAULT "",
+    "Phone" TEXT NOT NULL DEFAULT "",
+    "Race" TEXT NOT NULL DEFAULT "",
+    "EthnicID" TEXT NOT NULL DEFAULT "",
+    "Contact" TEXT NOT NULL DEFAULT "",
+    "Protocol_Default" TEXT NOT NULL DEFAULT ""
 );
 
 -- NIH 'Race' Categories
@@ -72,9 +72,9 @@ CREATE TABLE "Protocols" (
 INSERT INTO Protocols (Protocol) VALUES ('Default');
 
 -- A table to hold any custom user variables
-CREATE TABLE "CustomVars" (
+CREATE TABLE "UserVars" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "CustomVar" TEXT
+    "UserVar" TEXT
 );
 
 -- A table to hold any database admin data
