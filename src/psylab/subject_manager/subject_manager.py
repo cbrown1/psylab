@@ -270,8 +270,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(True)
 
     def edit_all(self):
-        pass
-
+        edit_all_dialog = QtgGui.QDialog()
 
     def admin_init(self):
         if not os.path.isfile(self.filename):
@@ -403,12 +402,12 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_birthdate_dateEdit.setDate(now - eighteenyears)
         self.doAge();
 
-
     def add_Process(self):
+        # Check for missing data
         missing = [];
-        if self.add_name_first_lineEdit.text()=='':
+        if self.add_fname_lineEdit.text()=='':
             missing.append('First Name')
-        if self.add_name_last_lineEdit.text()=='':
+        if self.add_lname_lineEdit.text()=='':
             missing.append('Last Name')
         if self.add_birthdate_lineEdit.text()=='':
             missing.append('Birthday')
@@ -417,37 +416,55 @@ class MyWidget (QtGui.QWidget, form_class):
         if len(missing) > 0:
             msg = "The following required fields were left blank:\n\n";
             msg = "\n".join(missing)
-            reply = QtGui.QMessageBox.question(self, 'PAL', msg, QtGui.QMessageBox.Ok)
+            reply = QtGui.QMessageBox.question(self, 'Subject Manager', msg, QtGui.QMessageBox.Ok)
             return
-        thisage = self.age(self.birth.text())
+        # Check for adult
+        thisage = self.age(self.add_birthdate_lineEdit.text())
         if int(thisage) < 18:
-            reply = QtGui.QMessageBox.critical(self, 'PAL',
+            reply = QtGui.QMessageBox.critical(self, 'Subject Manager',
              "This subject appears to be under 18 years of age.\n\n" +
              "Legally, authorization from a parent or guardian\n" +
-             "is required for them to participate.\n" +
+             "is required for this individual to participate.\n" +
              "Do you want to continue?",
              QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
             if reply == QtGui.QMessageBox.Cancel:
                 return;
+        # Check for duplicate
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-#        c.execute("""SELECT Consent FROM Subjects WHERE FName=? AND LName=? AND DOB=?""",
-#                  (unicode(self.fname.text()),unicode(self.lname.text()),unicode(self.birth.text())));
-#        cns = c.fetchone();
-#        if len(cns) != "":
-#            reply = QtGui.QMessageBox.information(self, 'PAL',
-#             "This subject appears to be in the database.\n\n" +
-#             "A match was found based on first name,\n" +
-#             "last name, and birthdate.\n" +
-#             "Informed Consent was obtained on " + cns[0] +
-#             "Do you want to continue?",
-#             QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel);
-#            if reply == QtGui.QMessageBox.Cancel:
-#                return;
-        if self.contact.isChecked():
-            contact = 'Y';
+        c.execute("""SELECT SubjN FROM Subjects WHERE FName=? AND LName=? AND DOB=?""" %
+                  (unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_lineEdit.text())));
+        s = c.fetchone();
+        if len(s) != "":
+            reply = QtGui.QMessageBox.information(self, 'Subject Manager',
+             "This subject appears to be in the database.\n\n" +
+             "A match was found based on first name,\n" +
+             "last name, and birthdate.\n\n" +
+             "The subject number is %s.\n\n" +
+             "OK to add this subject anyway?" % cns[0],
+             QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+            if reply == QtGui.QMessageBox.Cancel:
+                return;
+        # Check for unique subject number
+        c.execute("""SELECT MAX(SubjN) FROM Subjects""")
+        subj_new = unicode(self.add_subject_lineEdit.text()).strip()
+        subj_db = unicode(int(c.fetchone()[0]) + 1)
+        if (subj_new == subj_db):
+            reply = QtGui.QMessageBox.question(self, 'Subject Manager',
+             "Subject Number Confirmed:\n\n" + subj_new, QtGui.QMessageBox.Ok)
         else:
-            contact = 'N';
+            subj_new = unicode(int(subj_new)+1)
+            reply = QtGui.QMessageBox.question(self, 'Subject Manager',
+             "The subject number entered is not unique.\nMaybe a subject was added very recently?\n\nThe new subject number is now: " + subj_new,
+              QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+            if reply == QtGui.QMessageBox.Cancel:
+                return;
+
+        # We can now gather data and enter it into db
+        if self.add_contact_checkBox.isChecked():
+            contact = 'True';
+        else:
+            contact = 'False';
         c.execute("""insert into subjects
                   values (NULL,?,?,?,?,?,?,?,?,?,?,?,?,'','','','','',?)""",
                   (unicode(self.add_subject_lineEdit.text()),
@@ -465,16 +482,8 @@ class MyWidget (QtGui.QWidget, form_class):
                   unicode(contact)
                   ))
         conn.commit()
-        c.execute("""SELECT MAX(SubjN) FROM Subjects""")
-        subn = c.fetchone()[0]
         c.close()
         conn.close()
-        if (str(subn) == self.add_subject_lineEdit.text()):
-            reply = QtGui.QMessageBox.question(self, 'PAL',
-             "Subject Number Confirmed:\n\n" + str(subn), QtGui.QMessageBox.Ok)
-        else:
-            reply = QtGui.QMessageBox.question(self, 'PAL',
-             "Something weird happened with\nthe subject number. Check with Chris\n\nEntered: " + self.add_subject_lineEdit.text() + '\nFound: ' + str(subn), QtGui.QMessageBox.Ok)
         self.close()
 
     def doAge(self):
@@ -601,7 +610,7 @@ class MyWidget (QtGui.QWidget, form_class):
             colstr_new = ",".join(cols)
             col_create_list.append("'%s' TEXT DEFAULT '%s'" % (column, default))
             col_create_str = ",".join(col_create_list)
-            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr_new))
+            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);""" % (table, colstr_new))
             c.execute("""INSERT INTO %s_backup (%s) SELECT %s FROM %s""" % (table, colstr_old, colstr_old, table))
             c.execute("""DROP TABLE %s;""" % table)
             c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, col_create_str))
@@ -627,8 +636,8 @@ class MyWidget (QtGui.QWidget, form_class):
             col_create_str = ",".join(col_create_list)
             cols.remove(column)
             colstr = ",".join(cols)
-            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);\n""" % (table, colstr))
-            c.execute("""INSERT INTO %s_backup SELECT %s FROM %s;\n""" % (table, colstr, table))
+            c.execute("""CREATE TEMPORARY TABLE %s_backup(%s);""" % (table, colstr))
+            c.execute("""INSERT INTO %s_backup SELECT %s FROM %s;""" % (table, colstr, table))
             c.execute("""DROP TABLE %s;""" % table)
             c.execute("""CREATE VIRTUAL TABLE %s USING FTS3(%s);""" % (table, col_create_str))
             c.execute("""INSERT INTO %s SELECT %s FROM %s_backup;""" % (table, colstr, table))

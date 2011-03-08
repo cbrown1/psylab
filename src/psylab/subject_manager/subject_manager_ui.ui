@@ -125,7 +125,7 @@
        <string>Phone #</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="add_name_last_lineEdit">
+     <widget class="QLineEdit" name="add_lname_lineEdit">
       <property name="geometry">
        <rect>
         <x>74</x>
@@ -194,7 +194,7 @@
        <string>First Name</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="add_name_first_lineEdit">
+     <widget class="QLineEdit" name="add_fname_lineEdit">
       <property name="geometry">
        <rect>
         <x>74</x>
@@ -204,7 +204,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QCheckBox" name="add_contact_add_checkBox">
+     <widget class="QCheckBox" name="add_contact_checkBox">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -653,7 +653,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>IRB Protocols:</string>
+      <string>IRB Protocols</string>
      </property>
      <widget class="QPushButton" name="admin_protocols_remove_pushButton">
       <property name="geometry">
@@ -725,7 +725,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>User Variables:</string>
+      <string>User Variables</string>
      </property>
      <widget class="QPushButton" name="admin_user_remove_pushButton">
       <property name="geometry">
@@ -959,12 +959,12 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>add_subject_lineEdit</tabstop>
-  <tabstop>add_name_first_lineEdit</tabstop>
-  <tabstop>add_name_last_lineEdit</tabstop>
+  <tabstop>add_fname_lineEdit</tabstop>
+  <tabstop>add_lname_lineEdit</tabstop>
   <tabstop>add_email_lineEdit</tabstop>
   <tabstop>add_phone_lineEdit</tabstop>
   <tabstop>add_birthdate_dateEdit</tabstop>
-  <tabstop>add_contact_add_checkBox</tabstop>
+  <tabstop>add_contact_checkBox</tabstop>
   <tabstop>add_protocol_comboBox</tabstop>
   <tabstop>add_ethnic_id_comboBox</tabstop>
   <tabstop>add_race_comboBox</tabstop>
