@@ -27,6 +27,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.edit_all_pushButton, QtCore.SIGNAL("clicked()"), self.edit_all)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
+        self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_load_subject_list)
         self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
         self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
         self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
@@ -102,12 +103,19 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(False)
 
     def edit_load_subject_list(self, search_field=None):
+        search_field = unicode(self.edit_search_lineEdit.text())
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         if search_field in [None, '']:
+            print "No search"
             query = """SELECT SubjN,FName,LName FROM Subjects"""
         else:
-            query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
+            if self.edit_search_exact_checkBox.checkState() == QtCore.Qt.Checked:
+                print "Exact search"
+                query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
+            else:
+                print "Wildcard search"
+                query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s*\'""" % search_field
         c.execute(query)
         self.edit_subject_list_comboBox.clear()
         ind = 0
@@ -235,7 +243,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_protocol_listWidget.setCurrentRow(0)
 
     def edit_protocol_selected(self, current, prev): #, current_item):
-        if self.edit_protocol_listWidget.currentItem().checkState() == QtCore.Qt.Checked:
+        if (self.edit_protocol_listWidget.currentItem() is not None) and (self.edit_protocol_listWidget.currentItem().checkState() == QtCore.Qt.Checked):
             #self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit::lineEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
             self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;}" %
                 (self.datewidget_foreground_color[0], self.datewidget_foreground_color[1], self.datewidget_foreground_color[2]))
@@ -396,6 +404,11 @@ class MyWidget (QtGui.QWidget, form_class):
 
         c.close();
         conn.close();
+        
+        self.add_fname_lineEdit.setText('')
+        self.add_lname_lineEdit.setText('')
+        self.add_email_lineEdit.setText('')
+        self.add_phone_lineEdit.setText('')
 
         now = datetime.datetime.now()
         eighteenyears = datetime.timedelta(days=18*365)
@@ -409,7 +422,7 @@ class MyWidget (QtGui.QWidget, form_class):
             missing.append('First Name')
         if self.add_lname_lineEdit.text()=='':
             missing.append('Last Name')
-        if self.add_birthdate_lineEdit.text()=='':
+        if self.add_birthdate_dateEdit.text()=='':
             missing.append('Birthday')
         if self.add_email_lineEdit.text()=='':
             missing.append('Email')
@@ -419,7 +432,7 @@ class MyWidget (QtGui.QWidget, form_class):
             reply = QtGui.QMessageBox.question(self, 'Subject Manager', msg, QtGui.QMessageBox.Ok)
             return
         # Check for adult
-        thisage = self.age(self.add_birthdate_lineEdit.text())
+        thisage = self.age(self.add_birthdate_dateEdit.text())
         if int(thisage) < 18:
             reply = QtGui.QMessageBox.critical(self, 'Subject Manager',
              "This subject appears to be under 18 years of age.\n\n" +
@@ -432,10 +445,10 @@ class MyWidget (QtGui.QWidget, form_class):
         # Check for duplicate
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT SubjN FROM Subjects WHERE FName=? AND LName=? AND DOB=?""" %
-                  (unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_lineEdit.text())));
+        c.execute("""SELECT SubjN FROM Subjects WHERE FName='%s' AND LName='%s' AND DOB='%s'""" %
+                  (unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_dateEdit.text())));
         s = c.fetchone();
-        if len(s) != "":
+        if s != None:
             reply = QtGui.QMessageBox.information(self, 'Subject Manager',
              "This subject appears to be in the database.\n\n" +
              "A match was found based on first name,\n" +
@@ -461,30 +474,33 @@ class MyWidget (QtGui.QWidget, form_class):
                 return;
 
         # We can now gather data and enter it into db
-        if self.add_contact_checkBox.isChecked():
-            contact = 'True';
-        else:
-            contact = 'False';
-        c.execute("""insert into subjects
-                  values (NULL,?,?,?,?,?,?,?,?,?,?,?,?,'','','','','',?)""",
-                  (unicode(self.add_subject_lineEdit.text()),
-                  unicode(self.fname.text()),
-                  unicode(self.lname.text()),
-                  unicode(self.birth.text()),
-                  unicode(self.age(self.birth.text())),
-                  unicode(self.gend.currentText()),
-                  unicode(self.email.text()),
-                  unicode(self.phone.text()),
-                  unicode(self.race.currentText()),
-                  unicode(self.ethn.currentText()),
-                  unicode(self.cons.text()),
-                  unicode(self.audio.text()),
-                  unicode(contact)
-                  ))
+        query_columns_list = ["SubjN", "FName", "LName", "DOB", "Today", "Gender", "Email", "Phone", "Race", "EthnicID", "Contact"]
+        
+        query_vals_list = [subj_new, unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_dateEdit.text()), 
+            unicode(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d')), unicode(self.add_gender_comboBox.currentText()), unicode(self.add_email_lineEdit.text()),
+            unicode(self.add_phone_lineEdit.text()), unicode(self.add_race_comboBox.currentText()), unicode(self.add_ethnic_id_comboBox.currentText()), unicode(self.add_contact_checkBox.checkState())]
+        
+        c.execute("""SELECT Protocol FROM Protocols""")
+        for row in c:
+            query_columns_list.append("Protocol_%s" % row[0])
+            if row[0] == self.add_protocol_comboBox.currentText():
+                query_vals_list.append(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d'))
+            else:
+                query_vals_list.append('')
+
+        c.execute("""SELECT UserVar FROM UserVars""")
+        for row in c:
+            query_columns_list.append("User_%s" % row[0])
+            query_vals_list.append('')
+         
+        #print "\'"+"\',\'".join(query_columns_list)+"\'"
+        #print "\'"+"\',\'".join(query_vals_list)+"\'"
+        c.execute("""INSERT INTO Subjects (\'%s\') VALUES (\'%s\')""" % ("\',\'".join(query_columns_list), "\',\'".join(query_vals_list)))
         conn.commit()
         c.close()
         conn.close()
-        self.close()
+        self.add_init()
+        #self.close()
 
     def doAge(self):
         thisage = self.age(self.add_birthdate_dateEdit.text());
