@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -344,9 +344,9 @@
     <widget class="QComboBox" name="edit_subject_list_comboBox">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>325</x>
        <y>5</y>
-       <width>146</width>
+       <width>141</width>
        <height>26</height>
       </rect>
      </property>
@@ -367,9 +367,9 @@
     <widget class="QLineEdit" name="edit_search_lineEdit">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>55</x>
        <y>5</y>
-       <width>116</width>
+       <width>121</width>
        <height>26</height>
       </rect>
      </property>
@@ -377,7 +377,7 @@
     <widget class="QLabel" name="label_20">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>10</y>
        <width>61</width>
        <height>16</height>
@@ -403,21 +403,115 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>0</x>
        <y>35</y>
-       <width>231</width>
-       <height>231</height>
+       <width>236</width>
+       <height>226</height>
       </rect>
      </property>
      <property name="title">
-      <string>Demographic Data</string>
+      <string/>
      </property>
+     <widget class="QCheckBox" name="edit_contact_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>90</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Contact?</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>22</y>
+        <width>226</width>
+        <height>66</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <widget class="QLabel" name="edit_name_label">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>5</y>
+         <width>216</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="edit_phone_label">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>45</y>
+         <width>216</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Phone</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="edit_email_label">
+       <property name="geometry">
+        <rect>
+         <x>5</x>
+         <y>25</y>
+         <width>216</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Email</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="edit_protocol_label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>5</y>
+        <width>126</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Demographic Data:</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="edit_protocol_listWidget">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>130</y>
+        <width>116</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
      <widget class="QLabel" name="edit_protocol_label">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>125</y>
-        <width>196</width>
+        <y>115</y>
+        <width>91</width>
         <height>16</height>
        </rect>
       </property>
@@ -425,36 +519,26 @@
        <string>IRB Protocols:</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="edit_protocol_listWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>142</y>
-        <width>141</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="edit_contact_checkBox">
+     <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>100</y>
-        <width>201</width>
-        <height>21</height>
+        <y>203</y>
+        <width>96</width>
+        <height>26</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Consent to be contacted?</string>
+      <property name="displayFormat">
+       <string>yyyy-MM-dd</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="edit_protocol_date_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>127</x>
+        <x>100</x>
         <y>205</y>
         <width>21</width>
         <height>21</height>
@@ -474,97 +558,26 @@
        <string>x</string>
       </property>
      </widget>
-     <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>202</y>
-        <width>116</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="displayFormat">
-       <string>yyyy-MM-dd</string>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QFrame" name="frame">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>25</y>
-        <width>221</width>
-        <height>66</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <widget class="QLabel" name="edit_name_label">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>10</y>
-         <width>211</width>
-         <height>11</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="edit_phone_label">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>50</y>
-         <width>211</width>
-         <height>11</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Phone</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="edit_email_label">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>30</y>
-         <width>211</width>
-         <height>11</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Email</string>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>235</x>
        <y>35</y>
-       <width>231</width>
+       <width>236</width>
        <height>206</height>
       </rect>
      </property>
      <property name="title">
-      <string>User Variables</string>
+      <string/>
      </property>
      <widget class="QTableWidget" name="edit_user_tableWidget">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
-        <width>221</width>
-        <height>176</height>
+        <y>20</y>
+        <width>226</width>
+        <height>181</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -608,6 +621,19 @@
        </property>
       </column>
      </widget>
+     <widget class="QLabel" name="edit_protocol_label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>5</y>
+        <width>126</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>User Data:</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QPushButton" name="edit_all_pushButton">
      <property name="geometry">
@@ -641,8 +667,8 @@
     <widget class="QCheckBox" name="edit_search_exact_checkBox">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>10</y>
+       <x>175</x>
+       <y>7</y>
        <width>61</width>
        <height>21</height>
       </rect>
@@ -666,7 +692,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>IRB Protocols</string>
+      <string>Manage IRB Protocols</string>
      </property>
      <widget class="QPushButton" name="admin_protocols_remove_pushButton">
       <property name="geometry">
@@ -738,7 +764,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>User Variables</string>
+      <string>Manage User Variables</string>
      </property>
      <widget class="QPushButton" name="admin_user_remove_pushButton">
       <property name="geometry">
@@ -810,7 +836,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>DB Management</string>
+      <string>Manage Database</string>
      </property>
      <widget class="QPushButton" name="admin_create_db_pushButton">
       <property name="geometry">
@@ -875,7 +901,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Reports</string>
+      <string>Manage Reports</string>
      </property>
      <widget class="QPushButton" name="admin_reports_remove_pushButton">
       <property name="geometry">
@@ -986,9 +1012,6 @@
   <tabstop>edit_search_lineEdit</tabstop>
   <tabstop>edit_subject_list_comboBox</tabstop>
   <tabstop>edit_contact_checkBox</tabstop>
-  <tabstop>edit_protocol_listWidget</tabstop>
-  <tabstop>edit_protocol_date_dateEdit</tabstop>
-  <tabstop>edit_protocol_date_remove_pushButton</tabstop>
   <tabstop>edit_user_tableWidget</tabstop>
   <tabstop>edit_pushButton</tabstop>
   <tabstop>admin_create_db_pushButton</tabstop>

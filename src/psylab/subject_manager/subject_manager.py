@@ -27,7 +27,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.edit_all_pushButton, QtCore.SIGNAL("clicked()"), self.edit_all)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
-        self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_load_subject_list)
+        self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
         self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
         self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
         self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
@@ -102,19 +102,20 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
         self.edit_data_changed_label.setVisible(False)
 
+    def edit_search_exact_clicked(self, state):
+        self.edit_load_subject_list()
+        self.edit_load_subject_data(self.edit_subject_list_comboBox.currentText())
+
     def edit_load_subject_list(self, search_field=None):
         search_field = unicode(self.edit_search_lineEdit.text())
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         if search_field in [None, '']:
-            print "No search"
             query = """SELECT SubjN,FName,LName FROM Subjects"""
         else:
             if self.edit_search_exact_checkBox.checkState() == QtCore.Qt.Checked:
-                print "Exact search"
                 query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
             else:
-                print "Wildcard search"
                 query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s*\'""" % search_field
         c.execute(query)
         self.edit_subject_list_comboBox.clear()
@@ -404,7 +405,7 @@ class MyWidget (QtGui.QWidget, form_class):
 
         c.close();
         conn.close();
-        
+
         self.add_fname_lineEdit.setText('')
         self.add_lname_lineEdit.setText('')
         self.add_email_lineEdit.setText('')
@@ -475,11 +476,11 @@ class MyWidget (QtGui.QWidget, form_class):
 
         # We can now gather data and enter it into db
         query_columns_list = ["SubjN", "FName", "LName", "DOB", "Today", "Gender", "Email", "Phone", "Race", "EthnicID", "Contact"]
-        
-        query_vals_list = [subj_new, unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_dateEdit.text()), 
+
+        query_vals_list = [subj_new, unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_dateEdit.text()),
             unicode(datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d')), unicode(self.add_gender_comboBox.currentText()), unicode(self.add_email_lineEdit.text()),
             unicode(self.add_phone_lineEdit.text()), unicode(self.add_race_comboBox.currentText()), unicode(self.add_ethnic_id_comboBox.currentText()), unicode(self.add_contact_checkBox.checkState())]
-        
+
         c.execute("""SELECT Protocol FROM Protocols""")
         for row in c:
             query_columns_list.append("Protocol_%s" % row[0])
@@ -492,7 +493,7 @@ class MyWidget (QtGui.QWidget, form_class):
         for row in c:
             query_columns_list.append("User_%s" % row[0])
             query_vals_list.append('')
-         
+
         #print "\'"+"\',\'".join(query_columns_list)+"\'"
         #print "\'"+"\',\'".join(query_vals_list)+"\'"
         c.execute("""INSERT INTO Subjects (\'%s\') VALUES (\'%s\')""" % ("\',\'".join(query_columns_list), "\',\'".join(query_vals_list)))
