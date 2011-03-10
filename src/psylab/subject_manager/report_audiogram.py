@@ -26,9 +26,11 @@ ap.text(1, 1.9, "Gender: %s" % 'Male')
 
 ap.add_line(Line2D([1, 7.5],[3, 3],color='k',lw=2))
 
-for i in np.arange(8.6,10.4,.4):
+for i in np.arange(8.6,10,.35):
     ap.add_line(Line2D([5,7.5],[i,i],color='k',lw=1))
     
+ap.text(5, 8.6, "Notes:")
+
 
 # Legend:
 lx = 1.4
