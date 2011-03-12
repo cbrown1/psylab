@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown; All Rights Reserved.
+# Copyright (c) 2010-2011 Christopher Brown; All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,30 +31,33 @@
 #
 
 """
-    wg1 - functions to control TDT WG1 waveform generators using the serial port
+    wg1 - functions to control TDT WG1 waveform generators
 
     Functions
     ---------
-    set_atten(device, atten, com='COM1')
-        Sets the specified attenuation level on the specified device.
+    set_shape(dev, shape, port='COM1')
+        Selects the waveform shape on the specified device.
 
-    get_atten(device, com='COM1')
-        Gets the current attenuation level on the specified device.
+    set_amp(dev, amp, port='COM1')
+        Sets the output waveform amplitude on the specified device.
 
-    set_mute(device, mute=False, com='COM1')
-        Sets the mute for the specified device. mute arg is a bool.
+    set_freq(dev, freq, port='COM1')
+        Sets the sinewave frequency on the specified device.
 
-    find_pa4(com='COM1')
-        Scans the first 32 device IDs, looking for PA4s.
+    clear(dev, port='COM1')
+        Clears the specified WG1 and resets it to the factory default setup.
+
+    set_onoff(dev, on=False, port='COM1')
+        Starts or stops the specified WG1.
+
+    get_status(dev, port='COM1')
+        Gets the status of the specified WG1
 
     Notes
     -----
-    To access pa4 modules via the serial port, set both jumpers on
-    the back of the OI1 to the RIGHT (jumpers to the left for AP2
-    control).
-
-    These functions are based on C code from the House Ear Institute,
-    provided by John Wygonski.
+    To access TDT modules via the serial port, set both jumpers on
+    the back of the OI1 to the RIGHT (can be accessed from the front
+    of the XBUS rack). Jumpers to the left for AP2 control.
 
     Tested on windows and linux.
 
@@ -64,36 +67,94 @@
 import serial
 
 class wg1():
+    class __command__():
+        def __init__(self):
+            self.data = [0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x20]
+            self.keys = ['ON','OFF','CLEAR','AMP', 'FREQ', 'SWEEP', 'PHASE', 'DCSHIFT', 'SHAPE', 'DUR', 'RF', 'STATUS']
+            self.index = 0
+        def __call__(self, key=None):
+            if key in self.keys:
+                return self.data[self.keys.index(key)]
+            else:
+                return None
+        def __iter__(self):
+            return self
+        def next(self):
+            if self.index == len(self.data):
+                raise StopIteration
+            else:
+                val = self.data[self.index]
+                self.index += 1
+                return val
+        def key(self, ind):
+            if ind in self.data:
+                return self.keys[self.data.index(ind)]
+            else:
+                return None
+        def keys(self):
+            return self.keys
 
-    ON      = 0x11
-    OFF     = 0x12
-    CLEAR   = 0x13
-    AMP     = 0x14
-    FREQ    = 0x15
-    SWEEP   = 0x16
-    PHASE   = 0x17
-    DCSHIFT = 0x18
-    SHAPE   = 0x19
-    DUR     = 0x1A
-    RF      = 0x1B
-    STATUS  = 0x20
-    
-    OFF     = 0
-    ON      = 1
-    RISING  = 2
-    FALLING = 3
-    
-    SHAPE = {
-    'GAUSS': 1,
-    'UNIFORM': 2,
-    'SINE': 3,
-    'WAVE': 4,
-    }
+    class __shape__():
+        def __init__(self):
+            self.data = [1, 2, 3, 4]
+            self.keys = ['GAUSS','UNIFORM','SINE','WAVE']
+            self.index = 0
+        def __call__(self, key=None):
+            if key in self.keys:
+                return self.data[self.keys.index(key)]
+            else:
+                return None
+        def __iter__(self):
+            return self
+        def next(self):
+            if self.index == len(self.data):
+                raise StopIteration
+            else:
+                val = self.data[self.index]
+                self.index += 1
+                return val
+        def key(self, ind):
+            if ind in self.data:
+                return self.keys[self.data.index(ind)]
+            else:
+                return None
+        def keys(self):
+            return self.keys
 
-    success = '\xc3'
+    class __status__():
+        def __init__(self):
+            self.data = [0, 1, 2, 3]
+            self.keys = ['OFF','ON','RISING','FALLING']
+            self.index = 0
+        def __call__(self, key=None):
+            if key in self.keys:
+                return self.data[self.keys.index(key)]
+            else:
+                return None
+        def __iter__(self):
+            return self
+        def next(self):
+            if self.index == len(self.data):
+                raise StopIteration
+            else:
+                val = self.data[self.index]
+                self.index += 1
+                return val
+        def key(self, ind):
+            if ind in self.data:
+                return self.keys[self.data.index(ind)]
+            else:
+                return None
+        def keys(self):
+            return self.keys
 
-    def set_shape(dev, shape, port='COM1'):
-        '''Sets the specified attenuation level on the specified device.
+    command = __command__()
+    shape = __shape__()
+    status = __status__()
+    SUCESS = '\xc3'
+
+    def set_shape(self, dev, shape, port='COM1'):
+        '''Selects the WG1 waveform shape on the specified device.
 
             Parameters
             ----------
@@ -101,8 +162,11 @@ class wg1():
                 The device ID. Device 1 is the first module in the first
                 xbus, etc.
 
-            atten : int
-                The amount of attenuation, in dB. Should be 0 <= 99.9
+            shape : str
+                One of:
+                    `GAUSS` : White noise sampled from a Gaussian distribution
+                    `UNIFORM` : White noise sampled from a Uniform distribution
+                    `SINE` : A pure tone
 
             port : str
                 The serial port to use. Default is 'COM1'. On my linux
@@ -113,18 +177,24 @@ class wg1():
             None. Raises exception on access error.
         '''
         d = chr(3+dev)
-        ch = chr(SHAPE[shape])
-        command = d + ch
+        b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
+        c = chr(self.command('SHAPE'))
+        if shape in self.shape.keys:
+            shapeval = self.shape(shape)
+
+        lo,hi = lohibytes(shapeval)
+        cs,j = lohibytes(ch+lo+hi)
+        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != success:
+        if ret != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
 
-    def set_amp(dev, amp, port='COM1'):
-        '''Sets the specified attenuation level on the specified device.
+    def set_amp(self, dev, amp, port='COM1'):
+        '''Sets the output waveform amplitude on the specified device.
 
             Parameters
             ----------
@@ -132,8 +202,8 @@ class wg1():
                 The device ID. Device 1 is the first module in the first
                 xbus, etc.
 
-            atten : int
-                The amount of attenuation, in dB. Should be 0 <= 99.9
+            amp : int
+                The amplitude of the output waveform. Should be 0 <= 99.9
 
             port : str
                 The serial port to use. Default is 'COM1'. On my linux
@@ -145,15 +215,14 @@ class wg1():
         '''
         d = chr(3+dev)         # device ID's start at 4
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
-        ch = AMP
-        c = chr(ch)
+        c = chr(self.command('AMP'))
         if amp >9.99:
             amp_clipped = 9.99
         elif amp < 0:
             amp_clipped = 0.
         else:
             amp_clipped = float(amp)
-        
+
         lo,hi = lohibytes(amp_clipped)
         cs,j = lohibytes(ch+lo+hi)
         command = d + b + c + chr(hi) + chr(lo) + chr(cs)
@@ -162,11 +231,11 @@ class wg1():
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != success:
+        if ret != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
 
-    def set_freq(dev, freq, port='COM1'):
-        '''Sets the specified attenuation level on the specified device.
+    def set_freq(self, dev, freq, port='COM1'):
+        '''Sets the sinewave frequency on the specified device.
 
             Parameters
             ----------
@@ -187,15 +256,14 @@ class wg1():
         '''
         d = chr(3+dev)         # device ID's start at 4
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
-        ch = FREQ
-        c = chr(ch)
+        c = chr(self.command('FREQ'))
         if freq >20000:
             freq_clipped = 20000
         elif freq < 0:
             freq_clipped = 0.
         else:
             freq_clipped = float(freq)
-        
+
         lo,hi = lohibytes(freq_clipped)
         cs,j = lohibytes(ch+lo+hi)
         command = d + b + c + chr(hi) + chr(lo) + chr(cs)
@@ -204,11 +272,11 @@ class wg1():
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != success:
+        if ret != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
 
-    def clear(dev, port='COM1'):
-        '''Sets the mute for the specified device. mute is a bool.
+    def clear(self, dev, port='COM1'):
+        '''Clears the specified WG1 and resets it to the factory default setup.
 
             Parameters
             ----------
@@ -227,17 +295,17 @@ class wg1():
             None.
         '''
         d = chr(3+dev)
-        ch = chr(CLEAR)
+        ch = chr(self.command('CLEAR'))
         command = d + ch
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != success:
+        if ret != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
 
-    def set_onoff(dev, on = False, port='COM1'):
+    def set_onoff(self, dev, on = False, port='COM1'):
         '''Sets the mute for the specified device. mute is a bool.
 
             Parameters
@@ -258,19 +326,19 @@ class wg1():
         '''
         d = chr(3+dev)
         if on:
-            ch = chr(ON)
+            ch = chr(self.command('ON'))
         else:
-            ch = chr(OFF)
+            ch = chr(self.command('OFF'))
         command = d + ch
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != success:
+        if ret != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
 
-    def find(port='COM1'):
+    def find(self, port='COM1'):
         '''Scans the first 32 device IDs, looking for PA4s.
 
             Parameters
@@ -286,20 +354,19 @@ class wg1():
 
         '''
         devlist = []
-        ch = commands['READ']
-        c = chr(ch)
+        c = chr(self.command('STATUS'))
         s = serial.Serial(port, baudrate=38400, timeout=.1)
         for dev in range(1,33):
             s.write(chr(3+dev) + c)
             ret = s.readline()
-            if ret != '' and ret[0] == success:
+            if ret != '' and ret[0] == self.SUCCESS:
                 devlist.append(dev)
 
         s.close()
         return devlist
 
-    def get_status(dev, port='COM1'):
-        '''Gets the current attenuation level on the specified device.
+    def get_status(self, dev, port='COM1'):
+        '''Gets the status of the specified device.
 
             Parameters
             ----------
@@ -313,23 +380,22 @@ class wg1():
 
             Returns
             -------
-            atten : float
-                The amount of attenuation, in dB. Will be 0 <= 99.9
+            status : float
+                The the status of the device.
         '''
         d = chr(3+dev)
-        ch = STATUS
-        c = chr(ch)
+        c = chr(self.command('STATUS'))
         command = d + c
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret == '' or ret[0] != success:
+        if ret == '' or ret[0] != self.SUCCESS:
             raise Exception, 'Error accessing hardware'
         return (ord(ret[2]) + ord(ret[1]) * 256) / 10.
 
-    def lohibytes(val):
+    def lohibytes(self, val):
         ha = hex(int(val))
         bytes = ha[2:].zfill(4)
         lo = int('0x%s' % bytes[2:4],16)
