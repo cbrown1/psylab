@@ -51,5 +51,9 @@ Depends on pyserial (http://sourceforge.net/projects/pyserial/)
 
 __version__ = '0.2'
 
+from xb1 import xb1
 from pa4 import pa4
 from wg1 import wg1
+xb1 = xb1()
+pa4 = pa4()
+wg1 = wg1()

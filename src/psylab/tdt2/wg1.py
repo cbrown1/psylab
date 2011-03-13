@@ -152,6 +152,9 @@ class wg1():
     shape = __shape__()
     status = __status__()
     SUCESS = '\xc3'
+    IDENT_REQUEST = 0x08
+    SNOP = 0x00
+    WG1_CODE = 0x08
 
     def set_shape(self, dev, shape, port='COM1'):
         '''Selects the WG1 waveform shape on the specified device.
@@ -354,18 +357,19 @@ class wg1():
 
         '''
         devlist = []
-        c = chr(self.command('STATUS'))
+        c = chr(self.IDENT_REQUEST)
         s = serial.Serial(port, baudrate=38400, timeout=.1)
         for dev in range(1,33):
-            s.write(chr(3+dev) + c)
+            s.write(chr(3+dev)+c)
             ret = s.readline()
-            if ret != '' and ret[0] == self.SUCCESS:
+            if ret != '' and ret == chr(self.WG1_CODE):
                 devlist.append(dev)
 
         s.close()
         return devlist
 
-    def get_status(self, dev, port='COM1'):
+
+    def get_status(dev, port='COM1'):
         '''Gets the status of the specified device.
 
             Parameters
