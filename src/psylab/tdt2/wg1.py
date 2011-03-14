@@ -151,7 +151,7 @@ class wg1():
     command = __command__()
     shape = __shape__()
     status = __status__()
-    SUCESS = '\xc3'
+    SUCCESS = '\xc3'
     IDENT_REQUEST = 0x08
     SNOP = 0x00
     WG1_CODE = 0x08
@@ -182,19 +182,19 @@ class wg1():
         d = chr(3+dev)
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
         c = chr(self.command('SHAPE'))
-        if shape in self.shape.keys:
-            shapeval = self.shape(shape)
+        shapeval = 1 #self.shape(shape)
 
-        lo,hi = lohibytes(shapeval)
-        cs,j = lohibytes(ch+lo+hi)
+
+        lo,hi = self.lohibytes(shapeval)
+        cs,j = self.lohibytes(self.command('SHAPE') + shapeval)
         command = d + b + c + chr(hi) + chr(lo) + chr(cs)
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def set_amp(self, dev, amp, port='COM1'):
         '''Sets the output waveform amplitude on the specified device.
@@ -220,22 +220,22 @@ class wg1():
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
         c = chr(self.command('AMP'))
         if amp >9.99:
-            amp_clipped = 9.99
+            amp_clipped = 999
         elif amp < 0:
-            amp_clipped = 0.
+            amp_clipped = 0
         else:
-            amp_clipped = float(amp)
+            amp_clipped = int(amp*100)
 
-        lo,hi = lohibytes(amp_clipped)
-        cs,j = lohibytes(ch+lo+hi)
-        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
-
+        lo,hi = self.lohibytes(amp_clipped)
+#        cs,j = self.lohibytes(self.command('AMP') + amp_clipped)
+#        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
+        command = d + c + chr(lo) + chr(hi)
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def set_freq(self, dev, freq, port='COM1'):
         '''Sets the sinewave frequency on the specified device.
@@ -261,22 +261,22 @@ class wg1():
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
         c = chr(self.command('FREQ'))
         if freq >20000:
-            freq_clipped = 20000
+            freq_clipped = 20000.
         elif freq < 0:
             freq_clipped = 0.
         else:
             freq_clipped = float(freq)
 
-        lo,hi = lohibytes(freq_clipped)
-        cs,j = lohibytes(ch+lo+hi)
+        lo,hi = self.lohibytes(freq_clipped)
+        cs,j = self.lohibytes(self.command('FREQ') + freq_clipped)
         command = d + b + c + chr(hi) + chr(lo) + chr(cs)
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def clear(self, dev, port='COM1'):
         '''Clears the specified WG1 and resets it to the factory default setup.
@@ -305,8 +305,8 @@ class wg1():
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def set_onoff(self, dev, on = False, port='COM1'):
         '''Sets the mute for the specified device. mute is a bool.
@@ -338,8 +338,8 @@ class wg1():
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def find(self, port='COM1'):
         '''Scans the first 32 device IDs, looking for PA4s.
@@ -369,7 +369,7 @@ class wg1():
         return devlist
 
 
-    def get_status(dev, port='COM1'):
+    def get_status(self, dev, port='COM1'):
         '''Gets the status of the specified device.
 
             Parameters
@@ -396,8 +396,8 @@ class wg1():
         ret = s.readline()
         s.close()
         if ret == '' or ret[0] != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
-        return (ord(ret[2]) + ord(ret[1]) * 256) / 10.
+            raise Exception, 'Hardware error'
+        return ord(ret[1])
 
     def lohibytes(self, val):
         ha = hex(int(val))

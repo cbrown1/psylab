@@ -92,7 +92,7 @@ class pa4():
         def keys(self):
             return self.keys
 
-    command = __command__
+    command = __command__()
     SUCCESS = '\xc3'
     IDENT_REQUEST = 0x08
     SNOP = 0x00
@@ -120,45 +120,17 @@ class pa4():
         '''
         d = chr(3+dev)         # device ID's start at 4
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
-        c = chr(command('ATTEN'))
-        lo,hi = lohibytes(atten * 10)
-        cs,j = lohibytes(ch+lo+hi)
+        c = chr(self.command('ATTEN'))
+        lo,hi = self.lohibytes(atten * 10)
+        cs,j = self.lohibytes(self.command('ATTEN') + (atten * 10))
         command = d + b + c + chr(hi) + chr(lo) + chr(cs)
 
         s = serial.Serial(port, baudrate=38400, timeout=1)
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
-
-    def find(self, port='COM1'):
-        '''Scans the first 32 device IDs, looking for PA4s.
-
-            Parameters
-            ----------
-            port : str
-                The serial port to use. Default is 'COM1'. On my linux
-                box, it is '/dev/ttyS0'
-
-            Returns
-            -------
-            devs : list
-                A list of PA4 device IDs
-
-        '''
-        devlist = []
-        c = chr(self.IDENT_REQUEST)
-        s = serial.Serial(port, baudrate=38400, timeout=.1)
-        for dev in range(1,33):
-            s.write(chr(3+dev)+c)
-            ret = s.readline()
-            if ret != '' and ret == chr(self.PA4_CODE):
-                devlist.append(dev)
-
-        s.close()
-        return devlist
-
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
     def get_atten(self, dev, port='COM1'):
         '''Gets the current attenuation level on the specified device.
@@ -190,6 +162,33 @@ class pa4():
             raise Exception, 'Error accessing hardware'
         return (ord(ret[2]) + ord(ret[1]) * 256) / 10.
 
+    def find(self, port='COM1'):
+        '''Scans the first 32 device IDs, looking for PA4s.
+
+            Parameters
+            ----------
+            port : str
+                The serial port to use. Default is 'COM1'. On my linux
+                box, it is '/dev/ttyS0'
+
+            Returns
+            -------
+            devs : list
+                A list of PA4 device IDs
+
+        '''
+        devlist = []
+        c = chr(self.IDENT_REQUEST)
+        s = serial.Serial(port, baudrate=38400, timeout=.1)
+        for dev in range(1,33):
+            s.write(chr(3+dev)+c)
+            ret = s.readline()
+            if ret != '' and ret == chr(self.PA4_CODE):
+                devlist.append(dev)
+
+        s.close()
+        return devlist
+
     def set_mute(self, dev, mute=False, port='COM1'):
         '''Sets the mute for the specified device. mute is a bool.
 
@@ -220,11 +219,10 @@ class pa4():
         s.write(command)
         ret = s.readline()
         s.close()
-        if ret != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
+        if ret[0] != self.SUCCESS:
+            raise Exception, 'Hardware error: %s' % ret[1:-2]
 
-
-    def lohibytes(val):
+    def lohibytes(self, val):
         ha = hex(int(val))
         bytes = ha[2:].zfill(4)
         lo = int('0x%s' % bytes[2:4],16)
