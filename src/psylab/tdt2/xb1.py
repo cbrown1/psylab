@@ -99,7 +99,7 @@ class xb1():
     VER_REQUEST = 0xD4
     ERR_ACK = 0xC2
 
-    def flush(self, port='COM1'):
+    def flush(self, port):
         s = serial.Serial(port, baudrate=38400, timeout=1)
         for i in range(20):
             s.write(chr(self.ERR_ACK))
@@ -107,7 +107,7 @@ class xb1():
             s.write(chr(self.SNOP))
 
 
-    def get_version(self, rackn, port='COM1'):
+    def get_version(self, rackn, port):
         '''Sets the specified attenuation level on the specified device.
 
             Parameters

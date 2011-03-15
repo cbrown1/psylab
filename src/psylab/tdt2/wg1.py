@@ -156,7 +156,7 @@ class wg1():
     SNOP = 0x00
     WG1_CODE = 0x08
 
-    def set_shape(self, dev, shape, port='COM1'):
+    def set_shape(self, dev, shape, port):
         '''Selects the WG1 waveform shape on the specified device.
 
             Parameters
@@ -179,24 +179,26 @@ class wg1():
             -------
             None. Raises exception on access error.
         '''
-        d = chr(3+dev)
+        if shape in self.shape.keys:
+            shapeval = self.shape(shape)
+        else:
+            raise Exception, '`shape` must be one of %r' % self.shape.keys
+        d = chr(3+dev)         # device ID's start at 4
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
         c = chr(self.command('SHAPE'))
-        shapeval = 1 #self.shape(shape)
-
-
-        lo,hi = self.lohibytes(shapeval)
-        cs,j = self.lohibytes(self.command('SHAPE') + shapeval)
-        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
-
         s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
+        s.write(d)
+        s.write(b)
+        s.write(c)
+        s.write(chr(shapeval))
+        s.write(chr(shapeval >> 8))
+        s.write(chr(self.command('SHAPE') + shapeval))
         ret = s.readline()
         s.close()
         if ret[0] != self.SUCCESS:
-            raise Exception, 'Hardware error: %s' % ret[1:-2]
+            raise Exception, '%s' % ret[1:-2]
 
-    def set_amp(self, dev, amp, port='COM1'):
+    def set_amp(self, dev, amp, port):
         '''Sets the output waveform amplitude on the specified device.
 
             Parameters
@@ -225,19 +227,21 @@ class wg1():
             amp_clipped = 0
         else:
             amp_clipped = int(amp*100)
-
         lo,hi = self.lohibytes(amp_clipped)
-#        cs,j = self.lohibytes(self.command('AMP') + amp_clipped)
-#        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
-        command = d + c + chr(lo) + chr(hi)
         s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
+        s.write(d)
+        s.write(b)
+        s.write(c)
+        s.write(chr(lo))
+        s.write(chr(hi))
+        cs_lo,cs_hi = self.lohibytes(self.command('AMP') + lo + hi)
+        s.write(chr(cs_lo))
         ret = s.readline()
         s.close()
         if ret[0] != self.SUCCESS:
-            raise Exception, 'Hardware error: %s' % ret[1:-2]
+            raise Exception, '%s' % ret[1:-2]
 
-    def set_freq(self, dev, freq, port='COM1'):
+    def set_freq(self, dev, freq, port):
         '''Sets the sinewave frequency on the specified device.
 
             Parameters
@@ -261,24 +265,26 @@ class wg1():
         b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
         c = chr(self.command('FREQ'))
         if freq >20000:
-            freq_clipped = 20000.
+            freq_clipped = 20000
         elif freq < 0:
-            freq_clipped = 0.
+            freq_clipped = 0
         else:
-            freq_clipped = float(freq)
-
+            freq_clipped = int(freq)
         lo,hi = self.lohibytes(freq_clipped)
-        cs,j = self.lohibytes(self.command('FREQ') + freq_clipped)
-        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
-
         s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
+        s.write(d)
+        s.write(b)
+        s.write(c)
+        s.write(chr(lo))
+        s.write(chr(hi))
+        cs_lo,cs_hi = self.lohibytes(self.command('FREQ') + lo + hi)
+        s.write(chr(cs_lo))
         ret = s.readline()
         s.close()
         if ret[0] != self.SUCCESS:
-            raise Exception, 'Hardware error: %s' % ret[1:-2]
+            raise Exception, '%s' % ret[1:-2]
 
-    def clear(self, dev, port='COM1'):
+    def clear(self, dev, port):
         '''Clears the specified WG1 and resets it to the factory default setup.
 
             Parameters
@@ -308,7 +314,7 @@ class wg1():
         if ret[0] != self.SUCCESS:
             raise Exception, 'Hardware error: %s' % ret[1:-2]
 
-    def set_onoff(self, dev, on = False, port='COM1'):
+    def on(self, dev, on, port):
         '''Sets the mute for the specified device. mute is a bool.
 
             Parameters
@@ -341,7 +347,7 @@ class wg1():
         if ret[0] != self.SUCCESS:
             raise Exception, 'Hardware error: %s' % ret[1:-2]
 
-    def find(self, port='COM1'):
+    def find(self, port):
         '''Scans the first 32 device IDs, looking for PA4s.
 
             Parameters
@@ -369,7 +375,7 @@ class wg1():
         return devlist
 
 
-    def get_status(self, dev, port='COM1'):
+    def get_status(self, dev, port):
         '''Gets the status of the specified device.
 
             Parameters

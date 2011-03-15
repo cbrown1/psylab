@@ -49,7 +49,23 @@ Tested on windows and linux.
 Depends on pyserial (http://sourceforge.net/projects/pyserial/)
 '''
 
+import serial
+
 __version__ = '0.2'
+
+def scan_ports():
+    """scan for available ports. return a list"""
+    available = []
+    for i in range(256):
+        try:
+            s = serial.Serial(i)
+            available.append( s.portstr )
+            s.close()   # explicit close 'cause of delayed GC in java
+        except serial.SerialException:
+            pass
+    return available
+
+port = scan_ports()[0]
 
 from xb1 import xb1
 from pa4 import pa4
@@ -57,3 +73,65 @@ from wg1 import wg1
 xb1 = xb1()
 pa4 = pa4()
 wg1 = wg1()
+
+def xb1_flush():
+    global port
+    xb1.flush(port)
+
+def xb1_version(rackn):
+    global port
+    ret = xb1.get_version(rackn, port)
+    return ret
+
+def xb1_device_name(dev):
+    global port
+    ret = xb1.get_device_name(dev, port)
+    return ret
+
+def wg1_shape(dev, shape):
+    global port
+    wg1.set_shape(dev, shape, port)
+
+def wg1_amp(dev, amp):
+    global port
+    wg1.set_amp(dev, amp, port)
+
+def wg1_freq(dev, freq):
+    global port
+    wg1.set_freq(dev, freq, port)
+
+def wg1_clear(dev):
+    global port
+    wg1.clear(dev, port)
+
+def wg1_on(dev, on = False):
+    global port
+    wg1.on(dev, on, port)
+
+def wg1_find():
+    global port
+    ret = wg1.find(port)
+    return ret
+
+def wg1_status(dev):
+    global port
+    ret = wg1.get_status(dev, port)
+    return ret
+
+def pa4_set_atten(dev, atten):
+    global port
+    pa4.set_atten(dev, atten, port)
+
+def pa4_get_atten(dev):
+    global port
+    ret = pa4.get_atten(dev, atten, port)
+    return ret
+
+def pa4_find():
+    global port
+    ret = pa4.find(port)
+    return ret
+
+def pa4_mute(dev, mute = False):
+    global port
+    pa4.set_mute(dev, mute, port)
