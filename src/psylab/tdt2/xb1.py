@@ -63,12 +63,12 @@
 
 import serial
 
-class pa4():
+class xb1():
 
-    class __command__():
+    class __device__():
         def __init__(self):
-            self.data = [0x15, 0x16, 0x18, 0x20]
-            self.keys = ['MUTE','NOMUTE','READ','ATTEN']
+            self.data = [ 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15]
+            self.keys = ['PA4','SW2','CG1','SD1','ET1','PI1','UI1','WG1','PF1','TG6','PI2','WG2','DA1','AD1','DD1','DA2','AD2','AD3']
             self.index = 0
         def __call__(self, key=None):
             if key in self.keys:
@@ -92,13 +92,22 @@ class pa4():
         def keys(self):
             return self.keys
 
-    command = __command__()
+    device = __device__()
     SUCCESS = '\xc3'
     IDENT_REQUEST = 0x08
     SNOP = 0x00
-    PA4_CODE = 0x01
+    VER_REQUEST = 0xD4
+    ERR_ACK = 0xC2
 
-    def set_atten(self, dev, atten, port='COM1'):
+    def flush(self, port='COM1'):
+        s = serial.Serial(port, baudrate=38400, timeout=1)
+        for i in range(20):
+            s.write(chr(self.ERR_ACK))
+        for i in range(20):
+            s.write(chr(self.SNOP))
+
+
+    def get_version(self, rackn, port='COM1'):
         '''Sets the specified attenuation level on the specified device.
 
             Parameters
@@ -118,51 +127,17 @@ class pa4():
             -------
             None. Raises exception on access error.
         '''
-        d = chr(3+dev)         # device ID's start at 4
-        b = chr(0x40 + 4)      # Number of bytes to follow (including checksum)
-        c = chr(self.command('ATTEN'))
-        lo,hi = self.lohibytes(atten * 10)
-        cs,j = self.lohibytes(self.command('ATTEN') + (atten * 10))
-        command = d + b + c + chr(hi) + chr(lo) + chr(cs)
-
         s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
+        s.write(chr(self.VER_REQUEST))
+        s.write(chr(rackn))
         ret = s.readline()
         s.close()
-        if ret[0] != self.SUCCESS:
-            raise Exception, 'Hardware error: %s' % ret[1:-2]
+        if ret != None or ret != '':
+            return unicode(ord(ret))
+        else:
+            return ''
 
-    def get_atten(self, dev, port='COM1'):
-        '''Gets the current attenuation level on the specified device.
-
-            Parameters
-            ----------
-            dev : int
-                The device ID. Device 1 is the first module in the first
-                xbus, etc.
-
-            port : str
-                The serial port to use. Default is 'COM1'. On my linux
-                box, it is '/dev/ttyS0'
-
-            Returns
-            -------
-            atten : float
-                The amount of attenuation, in dB. Will be 0 <= 99.9
-        '''
-        d = chr(3+dev)
-        c = chr(self.command('READ'))
-        command = d + c
-
-        s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
-        ret = s.readline()
-        s.close()
-        if ret == '' or ret[0] != self.SUCCESS:
-            raise Exception, 'Error accessing hardware'
-        return (ord(ret[2]) + ord(ret[1]) * 256) / 10.
-
-    def find(self, port='COM1'):
+    def get_device_name(self, dev, port='COM1'):
         '''Scans the first 32 device IDs, looking for PA4s.
 
             Parameters
@@ -177,52 +152,19 @@ class pa4():
                 A list of PA4 device IDs
 
         '''
-        devlist = []
         c = chr(self.IDENT_REQUEST)
         s = serial.Serial(port, baudrate=38400, timeout=.1)
-        for dev in range(1,33):
-            s.write(chr(3+dev)+c)
-            ret = s.readline()
-            if ret != '' and ret == chr(self.PA4_CODE):
-                devlist.append(dev)
-
-        s.close()
-        return devlist
-
-    def set_mute(self, dev, mute=False, port='COM1'):
-        '''Sets the mute for the specified device. mute is a bool.
-
-            Parameters
-            ----------
-            dev : int
-                The device ID. Device 1 is the first module in the first
-                xbus, etc.
-            mute : bool
-                True to mute device, False to unmute it.
-
-            port : str
-                The serial port to use. Default is 'COM1'. On my linux
-                box, it is '/dev/ttyS0'
-
-            Returns
-            -------
-            None.
-        '''
-        d = chr(3+dev)
-        if mute:
-            ch = chr(self.command('MUTE'))
-        else:
-            ch = chr(self.command('NOMUTE'))
-        command = d + ch
-
-        s = serial.Serial(port, baudrate=38400, timeout=1)
-        s.write(command)
+        s.write(chr(3+dev) + c)
         ret = s.readline()
-        s.close()
-        if ret[0] != self.SUCCESS:
-            raise Exception, 'Hardware error: %s' % ret[1:-2]
+        if ret != '':
+            ret_dev = unicode(self.device.key(ord(ret)))
+        else:
+            ret_dev = unicode('')
 
-    def lohibytes(self, val):
+        s.close()
+        return ret_dev
+
+    def lohibytes(val):
         ha = hex(int(val))
         bytes = ha[2:].zfill(4)
         lo = int('0x%s' % bytes[2:4],16)
