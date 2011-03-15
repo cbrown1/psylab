@@ -124,7 +124,7 @@ def pa4_set_atten(dev, atten):
 
 def pa4_get_atten(dev):
     global port
-    ret = pa4.get_atten(dev, atten, port)
+    ret = pa4.get_atten(dev, port)
     return ret
 
 def pa4_find():
