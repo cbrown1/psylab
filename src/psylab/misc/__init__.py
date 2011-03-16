@@ -34,7 +34,3 @@
 import csv_inspect
 import formatplot
 import pathtools
-try:
-    import pa4
-except ImportError, e:
-    print "Could not import pa4"

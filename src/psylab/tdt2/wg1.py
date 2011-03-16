@@ -35,22 +35,22 @@
 
     Functions
     ---------
-    set_shape(dev, shape, port='COM1')
+    set_shape(dev, shape, port)
         Selects the waveform shape on the specified device.
 
-    set_amp(dev, amp, port='COM1')
+    set_amp(dev, amp, port)
         Sets the output waveform amplitude on the specified device.
 
-    set_freq(dev, freq, port='COM1')
+    set_freq(dev, freq, port)
         Sets the sinewave frequency on the specified device.
 
-    clear(dev, port='COM1')
+    clear(dev, port)
         Clears the specified WG1 and resets it to the factory default setup.
 
-    set_onoff(dev, on=False, port='COM1')
+    on(dev, on, port)
         Starts or stops the specified WG1.
 
-    get_status(dev, port='COM1')
+    get_status(dev, port)
         Gets the status of the specified WG1
 
     Notes

@@ -35,16 +35,16 @@
 
     Functions
     ---------
-    set_atten(device, atten, com='COM1')
+    set_atten(device, atten, port)
         Sets the specified attenuation level on the specified device.
 
-    get_atten(device, com='COM1')
+    get_atten(device, port)
         Gets the current attenuation level on the specified device.
 
-    set_mute(device, mute=False, com='COM1')
+    set_mute(device, mute, port)
         Sets the mute for the specified device. mute arg is a bool.
 
-    find_pa4(com='COM1')
+    find_pa4(port)
         Scans the first 32 device IDs, looking for PA4s.
 
     Notes
