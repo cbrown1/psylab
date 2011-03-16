@@ -98,7 +98,7 @@ class pa4():
     SNOP = 0x00
     PA4_CODE = 0x01
 
-    def set_atten(self, dev, atten, port):
+    def pa4atten(self, dev, atten, port):
         '''Sets the specified attenuation level on the specified device.
 
             Parameters
@@ -132,7 +132,7 @@ class pa4():
         if ret[0] != self.SUCCESS:
             raise Exception, 'Hardware error: %s' % ret[1:-2]
 
-    def get_atten(self, dev, port):
+    def pa4read(self, dev, port):
         '''Gets the current attenuation level on the specified device.
 
             Parameters
@@ -162,7 +162,7 @@ class pa4():
             raise Exception, 'Error accessing hardware'
         return (ord(ret[2]) + ord(ret[1]) * 256) / 10.
 
-    def find(self, port):
+    def pa4find(self, port):
         '''Scans the first 32 device IDs, looking for PA4s.
 
             Parameters
@@ -189,7 +189,7 @@ class pa4():
         s.close()
         return devlist
 
-    def set_mute(self, dev, mute, port):
+    def pa4mute(self, dev, mute, port):
         '''Sets the mute for the specified device. mute is a bool.
 
             Parameters

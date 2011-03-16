@@ -96,10 +96,11 @@ class xb1():
     SUCCESS = '\xc3'
     IDENT_REQUEST = 0x08
     SNOP = 0x00
+    GTRIG = 0xD3
     VER_REQUEST = 0xD4
     ERR_ACK = 0xC2
 
-    def flush(self, port):
+    def xb1flush(self, port):
         s = serial.Serial(port, baudrate=38400, timeout=1)
         for i in range(20):
             s.write(chr(self.ERR_ACK))
@@ -107,7 +108,7 @@ class xb1():
             s.write(chr(self.SNOP))
 
 
-    def get_version(self, rackn, port):
+    def xb1version(self, rackn, port):
         '''Sets the specified attenuation level on the specified device.
 
             Parameters
@@ -137,7 +138,40 @@ class xb1():
         else:
             return ''
 
-    def get_device_name(self, dev, port='COM1'):
+
+    def xb1flush(self, port):
+        s = serial.Serial(port, baudrate=38400, timeout=1)
+        for i in range(20):
+            s.write(chr(self.ERR_ACK))
+        for i in range(20):
+            s.write(chr(self.SNOP))
+
+
+    def xb1gtrig(self, port):
+        '''Sets the specified attenuation level on the specified device.
+
+            Parameters
+            ----------
+            dev : int
+                The device ID. Device 1 is the first module in the first
+                xbus, etc.
+
+            atten : int
+                The amount of attenuation, in dB. Should be 0 <= 99.9
+
+            port : str
+                The serial port to use. Default is 'COM1'. On my linux
+                box, it is '/dev/ttyS0'
+
+            Returns
+            -------
+            None. Raises exception on access error.
+        '''
+        s = serial.Serial(port, baudrate=38400, timeout=1)
+        s.write(chr(self.GTRIG))
+        s.close()
+
+    def xb1devname(self, dev, port):
         '''Scans the first 32 device IDs, looking for PA4s.
 
             Parameters

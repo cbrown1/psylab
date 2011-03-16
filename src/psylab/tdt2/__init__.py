@@ -76,62 +76,78 @@ wg1 = wg1()
 
 def xb1_flush():
     global port
-    xb1.flush(port)
+    xb1.xb1flush(port)
 
 def xb1_version(rackn):
     global port
-    ret = xb1.get_version(rackn, port)
+    ret = xb1.xb1version(rackn, port)
     return ret
+
+def xb1_gtrig():
+    global port
+    xb1.xb1gtrig(port)
 
 def xb1_device_name(dev):
     global port
-    ret = xb1.get_device_name(dev, port)
+    ret = xb1.xb1devname(dev, port)
     return ret
 
 def wg1_shape(dev, shape):
     global port
-    wg1.set_shape(dev, shape, port)
+    wg1.wg1shape(dev, shape, port)
 
 def wg1_amp(dev, amp):
     global port
-    wg1.set_amp(dev, amp, port)
+    wg1.wg1amp(dev, amp, port)
+
+def wg1_swrt(dev, swrt):
+    global port
+    wg1.wg1swrt(dev, swrt, port)
+
+def wg1_dc(dev, dc):
+    global port
+    wg1.wg1dc(dev, dc, port)
+
+def wg1_rf(dev, rf):
+    global port
+    wg1.wg1amp(dev, rf, port)
 
 def wg1_freq(dev, freq):
     global port
-    wg1.set_freq(dev, freq, port)
+    wg1.wg1freq(dev, freq, port)
 
 def wg1_clear(dev):
     global port
-    wg1.clear(dev, port)
+    wg1.wg1clear(dev, port)
 
 def wg1_on(dev, on = False):
     global port
-    wg1.on(dev, on, port)
+    wg1.wg1on(dev, on, port)
 
 def wg1_find():
     global port
-    ret = wg1.find(port)
+    ret = wg1.wg1find(port)
     return ret
 
 def wg1_status(dev):
     global port
-    ret = wg1.get_status(dev, port)
+    ret = wg1.wg1status(dev, port)
     return ret
 
 def pa4_set_atten(dev, atten):
     global port
-    pa4.set_atten(dev, atten, port)
+    pa4.pa4atten(dev, atten, port)
 
 def pa4_get_atten(dev):
     global port
-    ret = pa4.get_atten(dev, port)
+    ret = pa4.pa4read(dev, port)
     return ret
 
 def pa4_find():
     global port
-    ret = pa4.find(port)
+    ret = pa4.pa4find(port)
     return ret
 
 def pa4_mute(dev, mute = False):
     global port
-    pa4.set_mute(dev, mute, port)
+    pa4.pa4mute(dev, mute, port)
