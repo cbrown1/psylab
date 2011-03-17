@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-import qt, tk
+import qt, tk, term
