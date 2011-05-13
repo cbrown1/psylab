@@ -44,7 +44,7 @@ __version__ = '0.3'
 
 from array import array, nanproduct, nanmean
 from dataview import dataview
-from misc import csv_inspect, formatplot, pathtools
+from misc import csv_inspect, plot_tools, path_tools
 import signal
 import stats
 import gustav

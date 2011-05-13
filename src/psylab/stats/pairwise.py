@@ -70,10 +70,6 @@ def pairwise_comparisons(data, comparisons, correction=None,
 
     """
 
-    if within:
-        ttest = stats.ttest_rel(sample_a, sample_b)
-    else:
-        ttest = stats.ttest_ind(sample_a, sample_b)
 
     if factors is None: #If factors aren't specified
         num_factors = len(data.shape) - 1
@@ -121,7 +117,13 @@ def pairwise_comparisons(data, comparisons, correction=None,
             sample_b.extend(data[j].flatten())
         sample_b = np.array(sample_b)
 
-        t,p = ttest(sample_a, sample_b)
+        if within:
+            t,p = stats.ttest_rel(sample_a, sample_b)
+        else:
+            t,p = stats.ttest_ind(sample_a, sample_b)
+
+
+        #t,p = ttest(sample_a, sample_b)
         if correction == None:
             adjp = p
         else:

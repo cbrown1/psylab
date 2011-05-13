@@ -37,7 +37,7 @@ def cumr2(x, y):
         
         Computes cumulative r**2 values on the two input vectors. This type 
         of function can be useful for finding the straight part of a line. 
-        The first value of the returned array is nan, the second is 1. 
+        
         
         Parameters
         ----------
@@ -48,8 +48,8 @@ def cumr2(x, y):
         
         Returns
         -------
-        r2 : scalar or array
-            Converted rau values
+        r2 : array
+            Cumulative r2 values. The first value is nan, the second is 1.
             
     '''
     last = len(x);

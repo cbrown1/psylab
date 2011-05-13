@@ -32,5 +32,5 @@
 #
 
 import csv_inspect
-import formatplot
-import pathtools
+import plot_tools
+import path_tools

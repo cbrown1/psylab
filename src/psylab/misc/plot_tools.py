@@ -34,7 +34,8 @@
 formatplot - A set of helper functions for formatting matplotlib figures
 """
 
-#from matplotlib import pyplot as pp
+from matplotlib import pyplot as pp
+import numpy as np
 
 def set_foregroundcolor(ax, color):
     '''For the specified axes, sets the color of the frame, major ticks,
@@ -90,3 +91,57 @@ def set_legendtitlefontsize(ax, fontsize):
     lh = ax.get_legend()
     if lh != None:
         lh.get_title().set_fontsize(fontsize)
+
+def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
+    """Draws a head, viewed from above, on the specified figure.
+    
+        Notes
+        -----
+       Coordinates and dimensions are in figure units ( 0 <= 1 ).
+       
+       The aspect ratio is always 1, meaning the head will always be a circle, 
+       and the size will always be the smaller of w and h.
+       
+       The Dutch part is optional.
+    """
+
+    if f is None:
+        f = pp.gcf()
+
+    hax = f.add_axes([x-(w/2.), y-(h/2.),  w, h])
+    hax.set_aspect('equal')
+    hax.set_xlim([0,1.1])
+    hax.set_ylim([0,1])
+    hax.set_xticks([],[])
+    hax.set_yticks([],[])
+    hax.patch.set_facecolor('None')
+    hax.set_frame_on(False)
+
+    ar = np.arange(np.pi/1000,np.pi/1000+np.pi*2,np.pi/1000)
+
+    # Head
+    h_head=pp.plot(.5+np.cos(ar)*.4,.5+np.sin(ar)*.4,lw=lw,color=c, axes=hax)
+    # Nose
+    h_nose=pp.plot(.5+np.cos(ar)/30,.5+.4+np.sin(np.ma.masked_greater(ar,np.pi))/20,color=c,lw=lw, axes=hax)
+    # Right ear
+    h_rear=pp.plot(.5+.4+.021+np.cos(np.ma.masked_inside(ar,np.pi-.5, np.pi+.5))/40,.5+np.sin(np.ma.masked_inside(ar,np.pi-.5, np.pi+.5))/12,color=c,lw=lw, axes=hax)
+    # Left ear
+    h_lear=pp.plot(.5-.4-.021+np.cos(np.ma.masked_outside(ar, .5, np.pi*2-.5))/40,.5+np.sin(np.ma.masked_outside(ar, .5, np.pi*2-.5))/12,color=c,lw=lw, axes=hax)
+
+    if dutchPart:
+        # The short side
+        hax.add_line(pp.Line2D([.35, .3], [.7, .75],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.35, .25], [.6, .65],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.35, .2], [.5, .55],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.35, .2], [.4, .42],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.35, .25],[.3, .3],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.35, .3], [.2, .2],linewidth=lw,color=c))
+
+        # The Comb-over
+        hax.add_line(pp.Line2D([.4, .45],[.7, .8],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.4, .6],[.6, .8],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.4, .7],[.5, .7],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.4, .8],[.4, .55],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.4, .8],[.3, .4],linewidth=lw,color=c))
+        hax.add_line(pp.Line2D([.4, .7],[.2, .25],linewidth=lw,color=c))
+

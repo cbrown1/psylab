@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pathproc
+path_tools
 
 Some convenience functions for extracting bits of info from filenames.
 The only usefulness of this module is to have all of these common tasks 

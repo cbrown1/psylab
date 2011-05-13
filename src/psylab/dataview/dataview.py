@@ -92,6 +92,8 @@ class Dataset:
         return [(x,self.index_from_var[x]) for x in self.ivs] + [(self.dv, len(self.data.shape)-1)]
 
     def indices_from_vars(self, d):
+        """Takes a dict in which keys are [str] var names and vals are lists of [str] levels
+        """
         collapsedIndex = [[Ellipsis] for x in self.data.shape]
         for group in d:
             i = self.index_from_var[group]
