@@ -37,6 +37,16 @@ formatplot - A set of helper functions for formatting matplotlib figures
 from matplotlib import pyplot as pp
 import numpy as np
 
+asu_colors = {}
+asu_colors['maroon'] = list(np.array((153,0,51))/255.)
+asu_colors['gold'] = list(np.array((255,179,16))/255.)
+asu_colors['grey'] = list(np.array((79,85,87))/255.)
+asu_colors['green'] = list(np.array((86, 142, 20))/255.)
+asu_colors['blue'] = list(np.array((0, 142, 214))/255.)
+asu_colors['orange'] = list(np.array((244, 124, 0))/255.)
+asu_colors['warmgrey'] = list(np.array((175, 165, 147))/255.)
+
+
 def set_foregroundcolor(ax, color):
     '''For the specified axes, sets the color of the frame, major ticks,
         tick labels, axis labels, title and legend

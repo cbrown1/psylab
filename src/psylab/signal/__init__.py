@@ -103,6 +103,7 @@ from ms2samp import ms2samp
 from normalize import normalize
 from ramps import ramps
 from rir import rir, fconv
+from rms import rms
 from samp2ms import samp2ms
 from smooth import smooth
 from specgram import specgram

@@ -439,7 +439,7 @@ def process_stimuli(stim):
                     if Goodfile:
                         thisn = {}
                         thisn['name'] = filename
-                        if 'text' in stim.sets[stimset]:
+                        if 'text' in stim.sets[stimset] and stim.sets[stimset]['text'] != '':
                             thisn['kw'] = thisset[os.path.splitext(filename)[0]]['kw']
                             thisn['text'] = thisset[os.path.splitext(filename)[0]]['text']
                         else:
@@ -492,6 +492,7 @@ def menu_condition(exp,run,var,stim,user):
         if not exp.recordData:
             disp += "  [NO DATA WILL BE RECORDED]"
         disp += ":\nCondition # - Add condition\n"
+        disp += "%11s - Add all conditions\n" % 'a'
         disp += "%11s - run exp using selected conditions in random order\n" % 'r'
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
@@ -500,6 +501,9 @@ def menu_condition(exp,run,var,stim,user):
         ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
+        elif ret in ['a']:
+            for cond in conditions:
+                sel.append(cond)
         elif ret in exp.quitKeys:
             run.gustav_is_go = False
             break;
