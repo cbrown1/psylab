@@ -235,8 +235,11 @@ def save_data_block(exp,run,var,stim,user):
     if os.path.isfile(exp.dataFile):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
     else:
+        print "SAVING NEW!"
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
-        f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav\n\n")
+        f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav!\n\n")
+        f.write(u"# Experiment: %s\n\n'''%s\n'''\n\n" % (exp.name, exp.comments))
+        
     f.write(u"class block_%s_%s ():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
     indent='    '
     f.write(exp.utils.obj_to_str(exp.name,'name',indent))
