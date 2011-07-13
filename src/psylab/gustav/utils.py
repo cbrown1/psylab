@@ -841,8 +841,8 @@ def str_to_range(s):
 
       The input should be a string of comma-delimited values, each of
       which can be either a number, or a colon-delimited range. If the
-      first token in the list is the string "random", then the
-      output list will be randomized before it is returned.
+      first token in the list is the string "random" or "r", then the
+      output list will be randomized before it is returned ("r,1:10").
 
       >>> str_to_range('1:5, 20, 22')
       [1, 2, 3, 4, 5, 20, 22]
@@ -851,7 +851,7 @@ def str_to_range(s):
     randomize = False
     tokens = [x.strip().split(":") for x in s.split(",")]
 
-    if tokens[0][0] == "random":
+    if tokens[0][0] in ["random","r","rand"]:
         randomize = True
         tokens = tokens[1:]
 

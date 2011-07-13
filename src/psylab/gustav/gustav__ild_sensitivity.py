@@ -26,7 +26,7 @@ def setup(exp,run,var,stim,user):
     # General Experimental Variables
     exp.name = '_ILD_x_freq'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    exp.prompt = 'Which is more to the left?' # Prompt for subject
+    exp.prompt = '<- = 1        |        2 = ->' # Prompt for subject
     exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.logConsole = True
@@ -102,7 +102,7 @@ def setup(exp,run,var,stim,user):
                               'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
                               'load':   'manual',  # 'auto' = Load stimuli automatically (default)
-                              'order':  '1:500', #
+                              'order':  'r,1:500', #
                               'repeat': True,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
                             };
@@ -152,7 +152,8 @@ def setup(exp,run,var,stim,user):
                             'type' : 'manual',   
                           'levels' : [
                                         'Natural',
-                                        'Flat',
+                                        'Flat_rms',
+                                        'Flat_max',
                                       ]
                         });
     
@@ -166,12 +167,13 @@ def setup(exp,run,var,stim,user):
     var.dynamic = { 'name': 'ild_coeff', # Name of the dynamic variable
                     'units': 'dB',       # Units of the dynamic variable
                     'intervals': 2,      # Number of intervals
-                    #'steps': [2, 2, 1, 1, 1, 1, 1, 1], # Stepsizes to use at each reversal (#revs = len)
-                    'steps': [2, 2], # Stepsizes to use at each reversal (#revs = len)
+                    'steps': [2, 2, 1, 1, 1, 1, 1, 1], # Stepsizes to use at each reversal (#revs = len)
+                    #'steps': [2, 2], # Stepsizes to use at each reversal (#revs = len)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
-                    'val_start': -10,     # Starting value
-                    'val_floor': -30,    # Floor
+                    'val_start': -16,    # Starting value
+                    #'val_start': 0,     # Starting value
+                    'val_floor': -40,    # Floor
                     'val_ceil': 0,       # Ceiling
                     'val_floor_n': 3,    # Number of consecutive floor values to quit at
                     'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
@@ -202,12 +204,27 @@ def setup(exp,run,var,stim,user):
     '''
     user.fs = 44100
     user.isi = 250 # ms
-    user.ild_nat = np.hstack((np.zeros(14), np.linspace(1,18,18)))
-    user.ild_flat = np.ones(32)*5.34375
-    user.cfs = np.array([   64. ,    97.5,   134.9,   176.5,   222.9,   274.6,   332.2,   396.4,   467.9,
-                           547.6,   636.5,   735.5,   845.9,   968.9,  1105.9,  1258.7,  1428.9,  1618.6,
-                          1830. ,  2065.6,  2328.2,  2620.8,  2947. ,  3310.4,  3715.4,  4166.8,  4669.8,
-                          5230.4,  5855.1,  6551.4,  7327.3,  8192. ,])
+    #user.ild_nat = np.hstack((np.zeros(14), np.linspace(1,18,18)))
+    # Starting values:
+        
+#    user.ild_nat = np.array([    1.57,   2.04,   1.58,   1.35,   1.16,   2.13,  -0.24,   3.01,
+#                                 2.92,   1.79,   4.1 ,   4.75,   3.88,   6.49,   3.9 ,   3.86,
+#                                 4.96,   6.99,  10.1 ,  15.16,  19.5 ,  21.38,  19.76,  17.58,
+#                                14.41,  13.2 ,  17.87,  17.05,  16.36,  22.64,  26.18,  34.09])
+#    user.cfs = np.array([   64. ,    97.5,   134.9,   176.5,   222.9,   274.6,   332.2,   396.4,   467.9,
+#                           547.6,   636.5,   735.5,   845.9,   968.9,  1105.9,  1258.7,  1428.9,  1618.6,
+#                          1830. ,  2065.6,  2328.2,  2620.8,  2947. ,  3310.4,  3715.4,  4166.8,  4669.8,
+#                          5230.4,  5855.1,  6551.4,  7327.3,  8192. ,])
+    user.ild_nat = np.array([    1.57,   1.48,  -0.47,  -2.26,   3.33,   1.99,   2.  ,   3.37,
+                                 3.89,   1.94,   3.84,   4.21,   3.34,   4.62,   4.48,   2.41,
+                                 2.85,   4.42,   5.33,   8.55,  12.32,  13.03,  13.27,  13.43,
+                                13.19,  12.95,  11.79,  14.29,  17.78,  22.05,  23.72,  29.18])
+    user.cfs = np.array([    128.  ,   166.31,   208.73,   255.7 ,   307.72,   365.32,
+                             429.11,   499.74,   577.95,   664.57,   760.48,   866.68,
+                             984.29,  1114.53,  1258.75,  1418.44,  1595.29,  1791.11,
+                            2007.97,  2248.1 ,  2514.01,  2808.46,  3134.53,  3495.61,
+                            3895.44,  4338.2 ,  4828.5 ,  5371.42,  5972.64,  6638.4 ,
+                            7375.63,  8192.  ])
 
 """CUSTOM PROMPT
     If you want a custom response prompt, define a function for it
@@ -239,54 +256,58 @@ def prompt_response(exp,run,var,stim,user):
 def pre_trial(exp,run,var,stim,user):
     fb_wf,fs = m.read_file(stim.current['CNC']['file'])
     if var.current['ILD_type'] == 'Natural':
-        ild_fun = psylab.signal.atten(user.ild_nat, -var.dynamic['value'])
-    elif var.current['ILD_type'] == 'Flat':
-        ild_fun = psylab.signal.atten(user.ild_flat, -var.dynamic['value'])
-    fb_wf = fb_wf[:,7:26]
-    ild_fun = ild_fun[7:26]
+        ild_fun = psylab.signal.atten(user.ild_nat_useable, np.abs(var.dynamic['value']))
+    elif var.current['ILD_type'] in [ 'Flat_rms', 'Flat_max' ]:
+        ild_fun = psylab.signal.atten(user.ild_flat_useable, np.abs(var.dynamic['value']))
+    fb_wf = fb_wf[:,user.useable_channels]
+    #ild_fun = ild_fun[user.useable_channels]
     
     fb_wf_ild_l_1 = fb_wf
     fb_wf_ild_r_1 = psylab.signal.atten(fb_wf, ild_fun)
     fb_wf_ild_l_2 = psylab.signal.atten(fb_wf, ild_fun)
     fb_wf_ild_r_2 = fb_wf
     
-    fb_wf_ild_l_1 = psylab.signal.vocoder(fb_wf_ild_l_1.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
-    fb_wf_ild_r_1 = psylab.signal.vocoder(fb_wf_ild_r_1.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
-    fb_wf_ild_l_2 = psylab.signal.vocoder(fb_wf_ild_l_2.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
-    fb_wf_ild_r_2 = psylab.signal.vocoder(fb_wf_ild_r_2.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
+    #fb_wf_ild_l_1 = psylab.signal.vocoder(fb_wf_ild_l_1.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
+    #fb_wf_ild_r_1 = psylab.signal.vocoder(fb_wf_ild_r_1.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
+    #fb_wf_ild_l_2 = psylab.signal.vocoder(fb_wf_ild_l_2.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
+    #fb_wf_ild_r_2 = psylab.signal.vocoder(fb_wf_ild_r_2.sum(axis=1), user.fs, 8, 350, 5500, noise=True, compression_ratio=1, gate=-5)
+    
+    fb_wf_ild_l_1 = fb_wf_ild_l_1.sum(axis=1)
+    fb_wf_ild_r_1 = fb_wf_ild_r_1.sum(axis=1)
+    fb_wf_ild_l_2 = fb_wf_ild_l_2.sum(axis=1)
+    fb_wf_ild_r_2 = fb_wf_ild_r_2.sum(axis=1)
+        
     
     isi = np.zeros(psylab.signal.ms2samp(user.isi,user.fs))
     var.dynamic['correct'] = np.random.randint(1, var.dynamic['intervals']+1)
     if var.dynamic['correct'] == 1:
-        channel_l = np.hstack((fb_wf_ild_l_1, isi, fb_wf_ild_l_2))
-        channel_r = np.hstack((fb_wf_ild_r_1, isi, fb_wf_ild_r_2))
-    else:
         channel_l = np.hstack((fb_wf_ild_l_2, isi, fb_wf_ild_l_1))
         channel_r = np.hstack((fb_wf_ild_r_2, isi, fb_wf_ild_r_1))
+    else:
+        channel_l = np.hstack((fb_wf_ild_l_1, isi, fb_wf_ild_l_2))
+        channel_r = np.hstack((fb_wf_ild_r_1, isi, fb_wf_ild_r_2))
         
     stim.out = np.vstack((channel_r, channel_l)).T # place channels in reverse order because of transpose
-    
-    s = exp.audiodev.open_array(stim.out,user.fs)
-    s.play()
-    exp.interface.button_light('1', 'yellow', float(fb_wf.shape[0])/user.fs)
-    time.sleep(user.isi/1000.)
-    exp.interface.button_light('2', 'yellow', float(fb_wf.shape[0])/user.fs)
+    #s = exp.audiodev.open_array(stim.out,user.fs)
+    #s.play()
+    #exp.interface.button_light('1', 'yellow', float(fb_wf.shape[0])/user.fs)
+    #time.sleep(user.isi/1000.)
+    #exp.interface.button_light('2', 'yellow', float(fb_wf.shape[0])/user.fs)
     
 def present_trial(exp, run, var, stim, user):
-    # TODO: settings.present_trial not being picked up by gustav
-    print "\n\n\n     PRESENT!!!\n\n\n"
-    s = exp.audiodev.open_array(stim.out,user.fs)
-    s.play()
-    exp.interface.button_light(0, 'yellow', len(stim.out)/user.fs)
-    time.sleep(user.isi/1000.)
-    exp.interface.button_light(1, 'yellow', len(stim.out)/user.fs)
+#    s = exp.audiodev.open_array(stim.out,user.fs)
+#    s.play()
+    exp.interface.button_light([1,2], 'yellow')
+    m.play_array(stim.out,user.fs)
+    exp.interface.button_light([1,2], 'green')
 
 def post_trial(exp, run, var, stim, user):
-    if run.gustav_is_go:
-        if str(var.dynamic['correct']).lower() == run.response.lower():
-            exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
-        else:
-            exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
+    exp.interface.button_light([1,2], None)
+    #if run.gustav_is_go:
+    #    if str(var.dynamic['correct']).lower() == run.response.lower():
+    #        exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'green')
+    #    else:
+    #        exp.interface.button_flash(str(var.dynamic['correct']).lower(), 'red')
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = theForm.adaptive_interface(exp, run, exp.validKeys_)
@@ -296,11 +317,17 @@ def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
 
 def pre_block(exp,run,var,stim,user):
-    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks))
-    
-
-def present_trial(exp,run,var,stim,user):
-    pass
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks+1))
+    # Only use bands available by CI users
+    user.useable_channels = np.where((user.cfs>350) & (user.cfs<5500))[0]
+    user.cfs_useable = user.cfs[user.useable_channels]
+    # Grab those corresponding ild values
+    user.ild_nat_useable = user.ild_nat[user.useable_channels]
+    # Now compute a flat ILD for that number of bands equal to the overal natural ild
+    if var.current['ILD_type'] == 'Flat_rms':
+        user.ild_flat_useable = np.ones(user.useable_channels.shape[0]) * (user.ild_nat_useable.sum()/user.useable_channels.shape[0])
+    elif var.current['ILD_type'] == 'Flat_max':
+        user.ild_flat_useable = np.ones(user.useable_channels.shape[0]) * (user.ild_nat_useable.max())
 
 if __name__ == '__main__':
     import inspect

@@ -5,12 +5,13 @@ import sys
 from PyQt4 import QtGui, QtCore
 import time
 
-class Interface():
+class adaptive_interface():
     def __init__(self, exp, run, choices):
         self.app = QtGui.QApplication([])
         self.dialog = self.Dialog(exp, run, choices)
         self.dialog.show()
         self.dialog.setFixedSize(self.dialog.width(),self.dialog.height()) # <- Must be done after show
+        self.app.processEvents()
 
     class Dialog(QtGui.QDialog):
 
@@ -25,7 +26,8 @@ class Interface():
 
             self.task = QtGui.QLabel(exp.prompt)
             f = self.task.font()
-            f.setPointSize(14);
+            f.setPointSize(14)
+            self.task.setAlignment(QtCore.Qt.AlignHCenter)
             self.task.setFont(f)
             vbox.addWidget(self.task)
             self.default_button_stylesheet = "QPushButton {background-color: white; "
@@ -114,26 +116,18 @@ class Interface():
         self.dialog.char = ''
         return curchar
 
-    def button_flash(self, button, color):
-        """Flashes the specified button on and off several times with the specified color
+    def button_light(self, button, color):
+        """Turns the specified button(s) on or off with the specified color (use None for off)
         """
-        stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
-        for i in range(3):
-            self.dialog.button_dict[button].setStyleSheet(stylesheet)
-            self.app.processEvents()
-            time.sleep(.12)
-            self.dialog.button_dict[button].setStyleSheet(self.dialog.default_button_stylesheet)
-            self.app.processEvents()
-            time.sleep(.06)
-
-    def button_light(self, button, color, dur):
-        """Turns the specified button on then off with the specified color
-        """
-        stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
-        self.dialog.button_dict[button].setStyleSheet(stylesheet)
         self.app.processEvents()
-        time.sleep(dur)
-        self.dialog.button_dict[button].setStyleSheet(self.dialog.default_button_stylesheet)
+        if color is None:
+            stylesheet = self.dialog.default_button_stylesheet
+        else:
+            stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
+        button = list(button)
+        #self.app.processEvents()
+        for b in button:
+            self.dialog.button_dict[str(b)].setStyleSheet(stylesheet)
         self.app.processEvents()
 
     def updateInfo_BlockCount(self, s):
