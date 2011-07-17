@@ -47,10 +47,17 @@ asu_colors['orange'] = list(np.array((244, 124, 0))/255.)
 asu_colors['warmgrey'] = list(np.array((175, 165, 147))/255.)
 
 
-def set_foregroundcolor(ax, color):
+def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
-        tick labels, axis labels, title and legend
+        tick labels, axis labels, title and legend. 
+        
+        Defaults to current axes.
     '''
+    
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
     for tl in ax.get_xticklines() + ax.get_yticklines():
         tl.set_color(color)
     for spine in ax.spines:
@@ -70,34 +77,80 @@ def set_foregroundcolor(ax, color):
         for lab in labels:
             lab.set_color(color)
 
-def set_backgroundcolor(ax, color):
+def set_backgroundcolor(ax, color=None):
     '''Sets the background color of the current axes (and legend).
         Use 'None' (with quotes) for transparent. To get transparent
         background on saved figures, use:
         pp.savefig("fig1.svg", transparent=True)
+        
+        Defaults to current axes.
     '''
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
     ax.patch.set_facecolor(color)
     lh = ax.get_legend()
     if lh != None:
         lh.legendPatch.set_facecolor(color)
 
-def set_framelinewidth(ax, width):
-    '''For the specified axes, sets the linewidth of the frame and major ticks
+def set_framelinewidth(ax, width=None):
+    '''For the specified axes, sets the linewidth of the frame and major ticks.
+         
+        Defaults to current axes.
     '''
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
     for tl in ax.get_xticklines() + ax.get_yticklines():
         tl.set_markeredgewidth(width)
     for spine in ax.spines:
         ax.spines[spine].set_linewidth(width)
 
-def set_ticklabelfontsize(ax, fontsize):
-    '''Sets the, uh, ticklabelfontsize.
+def set_fontsize(ax, fontsize=None):
+    '''Sets the fontsize for the most common figure text
+        (title, tick labels, axis labels, and legend text)
+        
+        Defaults to current axes.
     '''
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+    ax.axes.title.set_fontsize(fontsize)
+    ax.axes.xaxis.label.set_fontsize(fontsize)
+    ax.axes.yaxis.label.set_fontsize(fontsize)
+    lh = ax.get_legend()
+    if lh != None:
+        lh.get_title().set_fontsize(fontsize)
+        labels = lh.get_texts()
+        for lab in labels:
+            lab.set_fontsize(fontsize)
+
+def set_ticklabelfontsize(ax, fontsize=None):
+    '''Sets the, uh, ticklabelfontsize.
+    
+        Defaults to current axes.
+    '''
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
     for tick in ax.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
 
-def set_legendtitlefontsize(ax, fontsize):
+def set_legendtitlefontsize(ax, fontsize=None):
+    if color is None:
+        color = ax
+        ax = pp.gca()
+    
     lh = ax.get_legend()
     if lh != None:
         lh.get_title().set_fontsize(fontsize)
@@ -113,6 +166,8 @@ def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
        and the size will always be the smaller of w and h.
        
        The Dutch part is optional.
+       
+       Defaults to current figure.
     """
 
     if f is None:
