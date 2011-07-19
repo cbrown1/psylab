@@ -99,8 +99,8 @@ def set_framelinewidth(ax, width=None):
          
         Defaults to current axes.
     '''
-    if color is None:
-        color = ax
+    if width is None:
+        width = ax
         ax = pp.gca()
     
     for tl in ax.get_xticklines() + ax.get_yticklines():
@@ -114,8 +114,8 @@ def set_fontsize(ax, fontsize=None):
         
         Defaults to current axes.
     '''
-    if color is None:
-        color = ax
+    if fontsize is None:
+        fontsize = ax
         ax = pp.gca()
     
     for tick in ax.xaxis.get_major_ticks():
@@ -137,8 +137,8 @@ def set_ticklabelfontsize(ax, fontsize=None):
     
         Defaults to current axes.
     '''
-    if color is None:
-        color = ax
+    if fontsize is None:
+        fontsize = ax
         ax = pp.gca()
     
     for tick in ax.xaxis.get_major_ticks():
@@ -147,8 +147,8 @@ def set_ticklabelfontsize(ax, fontsize=None):
         tick.label1.set_fontsize(fontsize)
 
 def set_legendtitlefontsize(ax, fontsize=None):
-    if color is None:
-        color = ax
+    if fontsize is None:
+        fontsize = ax
         ax = pp.gca()
     
     lh = ax.get_legend()
