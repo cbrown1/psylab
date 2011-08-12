@@ -31,7 +31,7 @@
 #
 
 """
-formatplot - A set of helper functions for formatting matplotlib figures
+plot_tools - A set of helper functions for formatting matplotlib figures
 """
 
 from matplotlib import pyplot as pp
@@ -46,6 +46,27 @@ asu_colors['blue'] = list(np.array((0, 142, 214))/255.)
 asu_colors['orange'] = list(np.array((244, 124, 0))/255.)
 asu_colors['warmgrey'] = list(np.array((175, 165, 147))/255.)
 
+def ax_to_page(ax, page_width=8.5, page_height=11.):
+
+    axp = ax.get_position()
+    ax_width = axp.width * ax.figure.bbox_inches.width
+    ax_height = axp.height * ax.figure.bbox_inches.height
+    vertical_shift = 2.
+    
+    for n in range(1,101):
+        if n not in pp.get_fignums():
+            break
+    
+    fh = pp.figure(num=n,figsize=(page_width, page_height))
+    ah = fh.add_axes(ax)
+    
+    ah.set_position([(page_width/2.-ax_width/2)/page_width, 
+                       vertical_shift/page_height+(page_height/2-ax_height/2)/page_height, 
+                       ax_width/page_width, 
+                       ax_height/page_height])
+    ah.plot((1,2,3))
+
+    return fh
 
 def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
