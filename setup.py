@@ -12,6 +12,8 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.array',
                                     '.dataview',
                                     '.gustav',
+                                    '.gustav.methods',
+                                    '.gustav.frontends',
                                     '.misc',
                                     '.signal',
                                     '.stats']]
