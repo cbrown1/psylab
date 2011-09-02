@@ -33,15 +33,16 @@
 import numpy as np
 
 def zeropad( *args ):
-    '''Zero pads the shorter of two or more arrays
+    '''Zero pads two or more arrays to be the same length
         
         Ensures two or more arrays are the same length using zero-padding 
-        if necessary. Always works along the first dimension.
+        if necessary. Input arrays can be 1- or 2-dimensional, but the 
+        function always works along the first dimension of all arrays. 
     
         Parameters
         ----------
         args: tuple of arrays
-            Function takes any number of input arrays. At this point, only 1-d.
+            Function takes any number of 1- or 2-dimensional input arrays. 
 
         Returns
         -------
@@ -51,7 +52,7 @@ def zeropad( *args ):
         Example
         -------
         # Assume a, b, and c are arrays, possibly of varying length 
-        a,b,c = zeropad(a,b,c) # All three are now of same length
+        a,b,c = zeropad(a,b,c) # The first dimension of all three are now same length
     '''
     length = 0
     out = list(args)
@@ -61,6 +62,9 @@ def zeropad( *args ):
 
     for n in range(0, len(args)):
         if length > args[n].shape[0]:
-            out[n] = np.concatenate((args[n], np.zeros(length-args[n].shape[0])))
-    
+            if args[n].ndim == 1:
+                out[n] = np.concatenate((args[n], np.zeros(length-args[n].shape[0])))
+            else:
+                out[n] = np.concatenate((args[n], np.zeros((length-args[n].shape[0],args[n].shape[1]))))
+                
     return tuple(out)
