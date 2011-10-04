@@ -79,14 +79,11 @@ def set_foregroundcolor(ax, color=None):
         color = ax
         ax = pp.gca()
     
-    for tl in ax.get_xticklines() + ax.get_yticklines():
-        tl.set_color(color)
     for spine in ax.spines:
         ax.spines[spine].set_edgecolor(color)
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_color(color)
-    for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_color(color)
+        
+    ax.tick_params(colors=color)
+    
     ax.axes.xaxis.label.set_color(color)
     ax.axes.yaxis.label.set_color(color)
     ax.axes.title.set_color(color)
@@ -124,8 +121,7 @@ def set_framelinewidth(ax, width=None):
         width = ax
         ax = pp.gca()
     
-    for tl in ax.get_xticklines() + ax.get_yticklines():
-        tl.set_markeredgewidth(width)
+    ax.tick_params(width=width)
     for spine in ax.spines:
         ax.spines[spine].set_linewidth(width)
 
@@ -139,10 +135,7 @@ def set_fontsize(ax, fontsize=None):
         fontsize = ax
         ax = pp.gca()
     
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(fontsize)
-    for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(fontsize)
+    ax.tick_params(labelsize=fontsize)
     ax.axes.title.set_fontsize(fontsize)
     ax.axes.xaxis.label.set_fontsize(fontsize)
     ax.axes.yaxis.label.set_fontsize(fontsize)
@@ -162,10 +155,7 @@ def set_ticklabelfontsize(ax, fontsize=None):
         fontsize = ax
         ax = pp.gca()
     
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(fontsize)
-    for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(fontsize)
+    ax.tick_params(labelsize=fontsize)
 
 def set_legendtitlefontsize(ax, fontsize=None):
     if fontsize is None:
