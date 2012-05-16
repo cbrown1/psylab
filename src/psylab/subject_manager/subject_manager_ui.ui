@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1057,7 +1057,7 @@
      <property name="title">
       <string>Manage Database</string>
      </property>
-     <widget class="QPushButton" name="admin_create_db_pushButton">
+     <widget class="QPushButton" name="admin_db_create_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -1070,7 +1070,7 @@
        <string>Create/Open DB...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_create_db_pushButton_2">
+     <widget class="QPushButton" name="admin_db_export_subjects_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -1080,10 +1080,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Save Subject Data...</string>
+       <string>Export Subject Data...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_create_db_pushButton_3">
+     <widget class="QPushButton" name="admin_db_save_schema_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -1096,7 +1096,7 @@
        <string>Save Schema...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_create_db_pushButton_4">
+     <widget class="QPushButton" name="admin_db_load_schema_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -1251,7 +1251,7 @@
   <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_user_tableWidget</tabstop>
   <tabstop>edit_pushButton</tabstop>
-  <tabstop>admin_create_db_pushButton</tabstop>
+  <tabstop>admin_db_create_pushButton</tabstop>
   <tabstop>admin_reports_listWidget</tabstop>
   <tabstop>admin_reports_add_pushButton</tabstop>
   <tabstop>admin_reports_remove_pushButton</tabstop>
