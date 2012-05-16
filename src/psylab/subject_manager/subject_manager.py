@@ -3,8 +3,10 @@
 import sys, os
 import sqlite3
 import datetime
+import platform
 from PyQt4 import QtGui
 from PyQt4 import QtCore
+from PyQt4 import Qt
 from PyQt4 import uic
 #from PySide import QtGui
 #from PySide import QtCore
@@ -28,6 +30,9 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
         self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
+        self.connect(self.edit_search_back_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_back)
+        self.connect(self.edit_search_fwd_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_fwd)
+
         self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
         self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
         self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
@@ -41,6 +46,8 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.admin_create_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
 
         self.edit_subject_protocol_dict = {}
+        
+        self.edit_user_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
         # Hack! Use bg color to `hide` the date in the protocol datewidget when none has been selected
         palette = QtGui.QPalette(self.edit_protocol_date_dateEdit.palette())
@@ -83,6 +90,14 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setStyleSheet("QLabel {color: rgb(%i, %i, %i); background-color: rgb(%i, %i, %i); padding: 3px;border: 1px solid rgb(%i, %i, %i); border-radius: 2px;}" %
             (h_text.red(), h_text.green(), h_text.blue(), h_back.red(), h_back.green(), h_back.blue(), h_text.red(), h_text.green(), h_text.blue()))
         self.edit_data_changed_label.setVisible(False)
+        
+        self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
+        self.label_about.setText("<p><b>Subject Manager</b></p>" + 
+                                 "<p>Copyright 2011-2012 Christopher Brown</p>" + 
+                                 "<p>Python Version: " + platform.python_version() + "<br>" + 
+                                 "Qt Version: " + QtCore.QT_VERSION_STR + "<br>" + 
+                                 "PyQt Version: " + QtCore.PYQT_VERSION_STR + "<br>" +
+                                 "SQLite Version: " + sqlite3.sqlite_version + "</p>")
 
         self.admin_init()
         self.add_init()
@@ -126,6 +141,18 @@ class MyWidget (QtGui.QWidget, form_class):
         c.close()
         conn.close()
 
+    def edit_search_back(self):
+        index = self.edit_subject_list_comboBox.currentIndex()
+        if index > 0:
+            index -= 1
+        self.edit_subject_list_comboBox.setCurrentIndex(index)
+    
+    def edit_search_fwd(self):
+        index = self.edit_subject_list_comboBox.currentIndex()
+        if index < self.edit_subject_list_comboBox.count()-1:
+            index += 1
+        self.edit_subject_list_comboBox.setCurrentIndex(index)
+    
     def edit_load_subject_data(self, info):
         subn = unicode(info.split(", ")[0]).strip()
         conn = sqlite3.connect(self.filename)
