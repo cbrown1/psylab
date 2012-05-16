@@ -84,6 +84,14 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_protocol_date_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
         self.edit_protocol_date_remove_pushButton.setText("")
 
+        self.edit_search_back_pushButton.setIcon(QtGui.QIcon("icons/back.png"))
+        self.edit_search_back_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.edit_search_back_pushButton.setText("")
+
+        self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("icons/fwd.png"))
+        self.edit_search_fwd_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.edit_search_fwd_pushButton.setText("")
+
         palette = QtGui.QPalette(self.edit_data_changed_label.palette())
         h_back = palette.color(QtGui.QPalette.Highlight)
         h_text = palette.color(QtGui.QPalette.HighlightedText)
@@ -306,7 +314,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(True)
 
     def edit_all(self):
-        edit_all_dialog = QtgGui.QDialog()
+        edit_all_dialog = QtGui.QDialog()
 
     def admin_init(self):
         if not os.path.isfile(self.filename):
