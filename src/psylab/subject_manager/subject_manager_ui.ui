@@ -25,11 +25,11 @@
      <x>0</x>
      <y>0</y>
      <width>480</width>
-     <height>296</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -339,7 +339,7 @@
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
-     <string>Edit</string>
+     <string>Browse</string>
     </attribute>
     <widget class="QComboBox" name="edit_subject_list_comboBox">
      <property name="geometry">
@@ -406,14 +406,14 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>5</x>
        <y>35</y>
-       <width>236</width>
+       <width>231</width>
        <height>226</height>
       </rect>
      </property>
      <property name="title">
-      <string/>
+      <string>Demographic Data</string>
      </property>
      <widget class="QCheckBox" name="edit_contact_checkBox">
       <property name="geometry">
@@ -433,7 +433,7 @@
        <rect>
         <x>5</x>
         <y>22</y>
-        <width>226</width>
+        <width>221</width>
         <height>66</height>
        </rect>
       </property>
@@ -482,19 +482,6 @@
         <string>Email</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QLabel" name="edit_protocol_label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>5</y>
-        <width>126</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Demographic Data:</string>
-      </property>
      </widget>
      <widget class="QListWidget" name="edit_protocol_listWidget">
       <property name="geometry">
@@ -565,21 +552,21 @@
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
-       <x>235</x>
+       <x>240</x>
        <y>35</y>
-       <width>236</width>
+       <width>231</width>
        <height>206</height>
       </rect>
      </property>
      <property name="title">
-      <string/>
+      <string>User Data</string>
      </property>
      <widget class="QTableWidget" name="edit_user_tableWidget">
       <property name="geometry">
        <rect>
         <x>5</x>
         <y>20</y>
-        <width>226</width>
+        <width>221</width>
         <height>181</height>
        </rect>
       </property>
@@ -598,6 +585,9 @@
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>true</bool>
       </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
        <number>18</number>
       </attribute>
@@ -611,19 +601,6 @@
         <string>Value</string>
        </property>
       </column>
-     </widget>
-     <widget class="QLabel" name="edit_protocol_label_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>5</y>
-        <width>126</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>User Data:</string>
-      </property>
      </widget>
     </widget>
     <widget class="QPushButton" name="edit_all_pushButton">
@@ -917,7 +894,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -940,7 +917,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -963,7 +940,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>86</height>
        </rect>
@@ -989,7 +966,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>245</y>
+        <y>240</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1012,7 +989,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>245</y>
+        <y>240</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1035,7 +1012,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>221</height>
        </rect>
@@ -1061,7 +1038,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>24</height>
        </rect>
@@ -1074,7 +1051,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>50</y>
+        <y>45</y>
         <width>146</width>
         <height>24</height>
        </rect>
@@ -1087,7 +1064,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>75</y>
+        <y>70</y>
         <width>146</width>
         <height>24</height>
        </rect>
@@ -1100,7 +1077,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>100</y>
+        <y>95</y>
         <width>146</width>
         <height>24</height>
        </rect>
@@ -1126,7 +1103,7 @@
       <property name="geometry">
        <rect>
         <x>35</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1149,7 +1126,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>105</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1172,7 +1149,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>86</height>
        </rect>
@@ -1205,10 +1182,10 @@
   <widget class="QPushButton" name="close_pushButton">
    <property name="geometry">
     <rect>
-     <x>386</x>
-     <y>296</y>
-     <width>90</width>
-     <height>22</height>
+     <x>405</x>
+     <y>292</y>
+     <width>71</width>
+     <height>26</height>
     </rect>
    </property>
    <property name="text">
@@ -1220,7 +1197,7 @@
     <rect>
      <x>5</x>
      <y>300</y>
-     <width>371</width>
+     <width>386</width>
      <height>16</height>
     </rect>
    </property>

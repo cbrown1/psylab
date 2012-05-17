@@ -83,4 +83,14 @@ CREATE TABLE "Admin" (
     "Name" TEXT,
     "Value" TEXT
 );
+
+-- A table to reports Subject is whether it is an individual subject report
+CREATE TABLE "Reports" (
+    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT,
+    "Path" TEXT,
+    "Subject" TEXT
+);
+
+
 INSERT INTO Admin (Name,Value) VALUES ('version','0.1');

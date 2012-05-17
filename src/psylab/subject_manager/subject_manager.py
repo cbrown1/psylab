@@ -46,7 +46,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
         self.connect(self.admin_db_export_subjects_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_subjects)
 
-        
+        self.connect(self.self.admin_reports_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_add)
 
         self.edit_subject_protocol_dict = {}
         
@@ -452,6 +452,37 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.sqlite_column_delete(self.filename, 'Subjects', 'Protocol_%s' % val)
                 self.add_edit_protocol_populate()
 
+    def admin_reports_add(self):
+        ret = self.get_newfile(title = 'Select new db filename to dump subject data to:')
+        if (ret != '') and (os.path.isfile(ret)):
+        
+        ret_name = self.get_input(title = 'Subject Manager', prompt = 'Enter a report name.\nSpaces will be replaced with _',default=ret)
+        if ret_name != '':
+            ret_name = ret_name.replace(" ","_")
+            self.admin_protocols_listWidget.insertItem(-1, ret_name)
+            conn = sqlite3.connect(self.filename);
+            c = conn.cursor();
+            c.execute("""INSERT INTO Reports (Name, Path, Subject) VALUES (\'%s\', \'%s\', \'%s\')""" % ret_name,ret,'')
+            conn.commit()
+            c.close()
+            conn.close()
+            self.add_edit_report_populate()
+
+    def admin_reports_remove(self):
+        if self.admin_protocols_listWidget.currentItem() is not None:
+            val = self.admin_protocols_listWidget.currentItem().text()
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove protocol:\n\n'+ val)
+            if ret:
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.execute("""Delete from Protocols where Protocol == \'%s\'""" % val)
+                c.close()
+                conn.commit()
+                conn.close()
+                item = self.admin_protocols_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
+                item = None
+                self.add_edit_report_populate()
+                
     def admin_user_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name.\nSpaces will be replaced with _')
         if ret != '':
@@ -691,13 +722,13 @@ class MyWidget (QtGui.QWidget, form_class):
         sys.stdout = STDOUT
         return str(ret)
 
-    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
+    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:', default=''):
         """Opens a simple prompt for user input, returns a string
         """
         if QtGui.QApplication.startingUp():
             app = QtGui.QApplication([])
         sys.stdout = None
-        ret, ok = QtGui.QInputDialog.getText(parent, title, prompt)
+        ret, ok = QtGui.QInputDialog.getText(parent, title, prompt, QtGui.QLineEdit.Normal, default)
         sys.stdout = STDOUT
         if ok:
             return str(ret)
