@@ -15,6 +15,7 @@ STDOUT = sys.stdout
 form_class, base_class = uic.loadUiType("subject_manager_ui.ui")
 
 class MyWidget (QtGui.QWidget, form_class):
+    version = '0.1'
     filename = 'Subjects.db'
 
     def __init__(self,parent=None):
@@ -105,7 +106,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(False)
         
         self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
-        self.label_about.setText("<p><b>Subject Manager</b></p>" + 
+        self.label_about.setText("<p><b>Subject Manager  %s</b></p>" % self.version + 
                                  "<p>Copyright 2011-2012 Christopher Brown</p>" + 
                                  "<p>Python Version: " + platform.python_version() + "<br>" + 
                                  "Qt Version: " + QtCore.QT_VERSION_STR + "<br>" + 
@@ -171,13 +172,14 @@ class MyWidget (QtGui.QWidget, form_class):
         subn = unicode(info.split(", ")[0]).strip()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT FName,LName,Email,Phone,Contact FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+        c.execute("""SELECT FName,LName,Email,Phone,DOB,Contact FROM Subjects WHERE SubjN == \'%s\'""" % subn)
         subject = c.fetchone()
         if subject is not None:
             self.edit_name_label.setText("%s %s" % (subject[0],subject[1]))
             self.edit_email_label.setText("%s" % subject[2])
             self.edit_phone_label.setText("%s" % subject[3])
-            self.edit_contact_checkBox.setChecked(bool(subject[4]))
+            self.edit_dob_label.setText("%s" % subject[4])
+            self.edit_contact_checkBox.setChecked(bool(subject[5]))
             c.execute("""SELECT Protocol FROM Protocols""")
             protocols = c.fetchall()
             self.edit_subject_protocol_dict = {}
@@ -201,6 +203,11 @@ class MyWidget (QtGui.QWidget, form_class):
                 uservar_this = c.fetchone()
                 if uservar_this[0] is not None:
                     item = QtGui.QTableWidgetItem(uservar_this[0])
+                    for i in range(self.edit_user_tableWidget.rowCount()):
+                        if var[0] == self.edit_user_tableWidget.item(i,0).text():
+                            self.edit_user_tableWidget.setItem(i, 1, item)
+                else:
+                    item = QtGui.QTableWidgetItem("")
                     for i in range(self.edit_user_tableWidget.rowCount()):
                         if var[0] == self.edit_user_tableWidget.item(i,0).text():
                             self.edit_user_tableWidget.setItem(i, 1, item)
@@ -490,11 +497,11 @@ class MyWidget (QtGui.QWidget, form_class):
     def admin_reports_remove(self):
         if self.admin_reports_listWidget.currentItem() is not None:
             val = self.admin_reports_listWidget.currentItem().text()
-            ret = self.get_yesno(title = 'Subject Manager', prompt = 'Confirm!\nAre you sure you want to remove report:\n\n'+ val)
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'Confirm!\nAre you sure you want to remove report:\n\n'+ str(val).lstrip("!! "))
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from Reports where Name == \'%s\'""" % val)
+                c.execute("""Delete from Reports where Name == \'%s\'""" % str(val).lstrip("!! "))
                 c.close()
                 conn.commit()
                 conn.close()
@@ -525,6 +532,7 @@ class MyWidget (QtGui.QWidget, form_class):
             else:
                 item_a.setCheckState(QtCore.Qt.Unchecked)
             self.admin_reports_listWidget.insertItem(-1, item_a)
+        self.edit_reports_listWidget.item(0).setSelected(True)
         c.close()
         conn.close()
 
