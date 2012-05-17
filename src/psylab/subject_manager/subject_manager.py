@@ -32,6 +32,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
         self.connect(self.edit_search_back_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_back)
         self.connect(self.edit_search_fwd_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_fwd)
+        self.connect(self.edit_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.edit_reports_run)
 
         self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
         self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
@@ -46,7 +47,8 @@ class MyWidget (QtGui.QWidget, form_class):
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
         self.connect(self.admin_db_export_subjects_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_subjects)
 
-        self.connect(self.self.admin_reports_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_add)
+        self.connect(self.admin_reports_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_add)
+        self.connect(self.admin_reports_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_remove)
 
         self.edit_subject_protocol_dict = {}
         
@@ -115,6 +117,7 @@ class MyWidget (QtGui.QWidget, form_class):
         self.add_edit_protocol_populate()
         self.edit_user_populate()
         self.edit_load_subject_list()
+        self.admin_reports_populate()
         self.show()
         self.setFixedSize(self.width(),self.height()) # <- Must be done after show
 
@@ -319,6 +322,22 @@ class MyWidget (QtGui.QWidget, form_class):
     def edit_all(self):
         edit_all_dialog = QtGui.QDialog()
 
+    def edit_reports_run(self):
+        if self.edit_reports_listWidget.currentItem() is not None:
+            report = self.edit_reports_listWidget.currentItem().text()
+            conn = sqlite3.connect(self.filename)
+            c = conn.cursor()
+            c.execute("""SELECT Path FROM Reports WHERE Name == \'%s\'""" % report)
+            ret = c.fetchone()[0]
+            c.close()
+            conn.close()
+            subn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
+            import sys
+            sys.argv = [os.path.abspath(self.filename),subn]
+        
+            execfile(ret)
+
+
     def admin_init(self):
         if not os.path.isfile(self.filename):
             self.admin_create_db()
@@ -453,38 +472,65 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.add_edit_protocol_populate()
 
     def admin_reports_add(self):
-        ret = self.get_newfile(title = 'Select new db filename to dump subject data to:')
+        ret = self.get_file(title = 'Select a report (python script):')
         if (ret != '') and (os.path.isfile(ret)):
-        
-        ret_name = self.get_input(title = 'Subject Manager', prompt = 'Enter a report name.\nSpaces will be replaced with _',default=ret)
-        if ret_name != '':
-            ret_name = ret_name.replace(" ","_")
-            self.admin_protocols_listWidget.insertItem(-1, ret_name)
-            conn = sqlite3.connect(self.filename);
-            c = conn.cursor();
-            c.execute("""INSERT INTO Reports (Name, Path, Subject) VALUES (\'%s\', \'%s\', \'%s\')""" % ret_name,ret,'')
-            conn.commit()
-            c.close()
-            conn.close()
-            self.add_edit_report_populate()
+            base = os.path.basename(ret)
+            ret_name = self.get_input(title = 'Subject Manager', prompt = 'Enter a report name.\nSpaces will be replaced with _',default=base)
+            if ret_name != '':
+                ret_subj = self.get_yesno(title = 'Subject Manager', prompt = 'Is this a subject report?')
+                ret_name = ret_name.replace(" ","_")
+                conn = sqlite3.connect(self.filename);
+                c = conn.cursor();
+                c.execute("""INSERT INTO Reports (Name, Path, Subject) VALUES (\'%s\', \'%s\', \'%s\')""" % (ret_name,ret,ret_subj))
+                conn.commit()
+                c.close()
+                conn.close()
+                self.admin_reports_populate()
 
     def admin_reports_remove(self):
-        if self.admin_protocols_listWidget.currentItem() is not None:
-            val = self.admin_protocols_listWidget.currentItem().text()
-            ret = self.get_yesno(title = 'Subject Manager', prompt = 'All data will be permanently lost!\nAre you sure you want to remove protocol:\n\n'+ val)
+        if self.admin_reports_listWidget.currentItem() is not None:
+            val = self.admin_reports_listWidget.currentItem().text()
+            ret = self.get_yesno(title = 'Subject Manager', prompt = 'Confirm!\nAre you sure you want to remove report:\n\n'+ val)
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from Protocols where Protocol == \'%s\'""" % val)
+                c.execute("""Delete from Reports where Name == \'%s\'""" % val)
                 c.close()
                 conn.commit()
                 conn.close()
-                item = self.admin_protocols_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
+                item = self.admin_reports_listWidget.takeItem(self.admin_protocols_listWidget.currentRow())
                 item = None
-                self.add_edit_report_populate()
+                self.admin_reports_populate()
                 
+    def admin_reports_populate(self):
+        conn = sqlite3.connect(self.filename)
+        c = conn.cursor()
+        c.execute("""SELECT Name, Path, Subject FROM Reports""")
+        self.admin_reports_listWidget.clear()
+        self.edit_reports_listWidget.clear()
+        #self.add_protocol_comboBox.clear()
+        for row in c:
+            if  (os.path.isfile(row[1])):
+                item_a = QtGui.QListWidgetItem(row[0])
+            else:
+                item_a = QtGui.QListWidgetItem("!! "+row[0])
+            item_a.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable |
+                                    QtCore.Qt.ItemIsEnabled )
+            if row[2]=="True":
+                item_a.setCheckState(QtCore.Qt.Checked)
+                item_e = QtGui.QListWidgetItem(row[0])
+                item_e.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable |
+                                        QtCore.Qt.ItemIsEnabled )
+                self.edit_reports_listWidget.insertItem(-1, item_e)
+            else:
+                item_a.setCheckState(QtCore.Qt.Unchecked)
+            self.admin_reports_listWidget.insertItem(-1, item_a)
+        c.close()
+        conn.close()
+
+	
     def admin_user_add(self):
-        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name.\nSpaces will be replaced with _')
+        ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name with letters and numbers only.\nSpaces will be replaced with _')
         if ret != '':
             ret = ret.replace(" ","_")
             self.admin_user_listWidget.insertItem(-1, ret)
@@ -776,7 +822,7 @@ class MyWidget (QtGui.QWidget, form_class):
         conn = sqlite3.connect(db_file)
         c = conn.cursor()
         c.execute("""PRAGMA table_info(%s);""" % table)
-        col_list = []
+        col_create_list = []
         cols = []
         rows = c.fetchall()
         for row in rows:

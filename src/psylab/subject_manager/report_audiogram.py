@@ -17,13 +17,6 @@ ap.set_xlim([0, 8.5]) # Page coordinates are
 ap.set_ylim([0, 11])  # now in units of inches
 ap.invert_yaxis()
 
-ap.text(4.25, 1, "Psychoacoustics Lab",horizontalalignment='center')
-ap.text(7.5, 1.5, "Today's Date: %s" % '2011-03-08',horizontalalignment='right')
-
-ap.text(1, 1.5, "Patient Name: %s" % 'Joseph Smith')
-ap.text(1, 1.7, "Date of Birth: %s" % '1970-12-31')
-ap.text(1, 1.9, "Gender: %s" % 'Male')
-
 ap.add_line(Line2D([1, 7.5],[3, 3],color='k',lw=2))
 
 for i in np.arange(8.6,10,.35):
@@ -53,6 +46,10 @@ ap.add_patch(mpp.FancyArrowPatch((lx+2.97,ly+1.13), (lx+3.07,ly+1.23), arrowstyl
 
 
 def plot_data(ax, data, side):
+    from matplotlib import pyplot as pp
+    import matplotlib.patches as mpp
+    from matplotlib.lines import Line2D
+    import numpy as np
     da = np.asarray(data)
     
     # Derive this from the column names
@@ -99,13 +96,55 @@ def plot_data(ax, data, side):
     ax.set_ylabel('Threshold (Hearing Level)')
     ax.set_xlabel('Frequency (Hz)')
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 af = fh.add_axes([.2, .3, .5*11/8.5, .5*8.5/11])
 af.axhspan(0,20, fc='0.7', ec='None', alpha=0.5)
 
 #af.text(8,50,'V',horizontalalignment='center',verticalalignment='center', rotation=45,color='r',fontweight='bold', fontsize=14)
 #af.plot(8,50,marker='v',color='r')
 
-plot_data(af,[20, 25, 20, 30, 35, 65, 75, 90, 100,105,-50],'left')
-plot_data(af,[40, 55, 60, 80, 90, 95, 105, 105, -70,-70,-60],'right')
+filename = sys.argv[0]
+subn = sys.argv[1]
+conn = sqlite3.connect(filename)
+c = conn.cursor()
+c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+subject = c.fetchone()
+if subject is not None:
 
-fh.show()
+    ap.text(4.25, 1, "Psychoacoustics Lab",horizontalalignment='center')
+    ap.text(7.5, 1.5, "Date of Audiogram: %s" % subject[4],horizontalalignment='right')
+
+    ap.text(1, 1.5, "Patient Name: %s %s" % (subject[0],subject[1]))
+    ap.text(1, 1.7, "Date of Birth: %s" % subject[2])
+    ap.text(1, 1.9, "Gender: %s" % subject[3])
+
+    c.execute("""SELECT User_L125,User_L250,User_L500,User_L750,User_L1k,
+                 User_L15,User_L2k,User_L3k,User_L4k,User_L6k,User_L8k FROM Subjects WHERE SubjN == \'%s\'""" % (subn))
+    uservar_this = c.fetchone()
+    left = []
+    for var in uservar_this:
+        if is_number(var):
+            left.append(float(var))
+        else:
+            left.append(np.nan)
+    plot_data(af,left,'left')
+
+
+    c.execute("""SELECT User_R125,User_R250,User_R500,User_R750,User_R1k,
+                 User_R15,User_R2k,User_R3k,User_R4k,User_R6k,User_R8k FROM Subjects WHERE SubjN == \'%s\'""" % (subn))
+    uservar_this = c.fetchone()
+    right = []
+    for var in uservar_this:
+        if is_number(var):
+            right.append(float(var))
+        else:
+            right.append(np.nan)
+    plot_data(af,right,'right')
+
+    fh.show()
