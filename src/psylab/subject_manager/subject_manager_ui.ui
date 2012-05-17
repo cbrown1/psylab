@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -62,7 +62,7 @@
      <property name="geometry">
       <rect>
        <x>390</x>
-       <y>240</y>
+       <y>235</y>
        <width>81</width>
        <height>26</height>
       </rect>
@@ -87,7 +87,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>90</y>
+        <y>85</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -100,7 +100,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>145</y>
+        <y>140</y>
         <width>101</width>
         <height>26</height>
        </rect>
@@ -116,7 +116,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>120</y>
+        <y>115</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -129,7 +129,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>55</y>
+        <y>50</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -139,7 +139,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>150</y>
+        <y>145</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -152,7 +152,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>60</y>
+        <y>55</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -165,7 +165,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>85</y>
+        <y>80</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -175,7 +175,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>115</y>
+        <y>110</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -185,7 +185,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>20</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -198,7 +198,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -208,7 +208,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>180</y>
+        <y>175</y>
         <width>196</width>
         <height>26</height>
        </rect>
@@ -221,7 +221,7 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>150</y>
+        <y>145</y>
         <width>46</width>
         <height>16</height>
        </rect>
@@ -247,7 +247,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>25</y>
+        <y>20</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -257,7 +257,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>60</y>
+        <y>55</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -270,7 +270,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>115</y>
+        <y>110</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -280,7 +280,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>55</y>
+        <y>50</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -290,7 +290,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>90</y>
+        <y>85</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -303,7 +303,7 @@
       <property name="geometry">
        <rect>
         <x>74</x>
-        <y>85</y>
+        <y>80</y>
         <width>146</width>
         <height>26</height>
        </rect>
@@ -313,7 +313,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>120</y>
+        <y>115</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -326,7 +326,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>30</y>
+        <y>25</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -355,7 +355,7 @@
      <property name="geometry">
       <rect>
        <x>400</x>
-       <y>240</y>
+       <y>237</y>
        <width>71</width>
        <height>26</height>
       </rect>
@@ -409,30 +409,17 @@
        <x>5</x>
        <y>35</y>
        <width>231</width>
-       <height>226</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="title">
       <string>Demographic Data</string>
      </property>
-     <widget class="QCheckBox" name="edit_contact_checkBox">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>90</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Contact?</string>
-      </property>
-     </widget>
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>22</y>
+        <y>20</y>
         <width>221</width>
         <height>66</height>
        </rect>
@@ -461,7 +448,7 @@
         <rect>
          <x>5</x>
          <y>45</y>
-         <width>216</width>
+         <width>126</width>
          <height>16</height>
         </rect>
        </property>
@@ -482,71 +469,19 @@
         <string>Email</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QListWidget" name="edit_protocol_listWidget">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>130</y>
-        <width>116</width>
-        <height>76</height>
-       </rect>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="edit_protocol_label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>115</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Protocols:</string>
-      </property>
-     </widget>
-     <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>203</y>
-        <width>96</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="displayFormat">
-       <string>yyyy-MM-dd</string>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="edit_protocol_date_remove_pushButton">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>205</y>
-        <width>21</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton {color: red; padding: 0px;}</string>
-      </property>
-      <property name="text">
-       <string>x</string>
-      </property>
+      <widget class="QCheckBox" name="edit_contact_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>45</y>
+         <width>76</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Contact?</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_8">
@@ -555,7 +490,7 @@
        <x>240</x>
        <y>35</y>
        <width>231</width>
-       <height>206</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="title">
@@ -567,7 +502,7 @@
         <x>5</x>
         <y>20</y>
         <width>221</width>
-        <height>181</height>
+        <height>176</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -607,7 +542,7 @@
      <property name="geometry">
       <rect>
        <x>330</x>
-       <y>240</y>
+       <y>237</y>
        <width>71</width>
        <height>26</height>
       </rect>
@@ -619,9 +554,9 @@
     <widget class="QLabel" name="edit_data_changed_label">
      <property name="geometry">
       <rect>
-       <x>245</x>
-       <y>243</y>
-       <width>76</width>
+       <x>250</x>
+       <y>240</y>
+       <width>71</width>
        <height>21</height>
       </rect>
      </property>
@@ -873,6 +808,110 @@
       <string>&gt;</string>
      </property>
     </widget>
+    <widget class="QGroupBox" name="groupBox_9">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>130</y>
+       <width>114</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Protocols</string>
+     </property>
+     <widget class="QDateEdit" name="edit_protocol_date_dateEdit">
+      <property name="geometry">
+       <rect>
+        <x>4</x>
+        <y>99</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>yyyy-MM-dd</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="edit_protocol_listWidget">
+      <property name="geometry">
+       <rect>
+        <x>4</x>
+        <y>19</y>
+        <width>106</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="edit_protocol_date_remove_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>92</x>
+        <y>100</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {color: red; padding: 0px;}</string>
+      </property>
+      <property name="text">
+       <string>x</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_10">
+     <property name="geometry">
+      <rect>
+       <x>123</x>
+       <y>130</y>
+       <width>114</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Reports</string>
+     </property>
+     <widget class="QListWidget" name="edit_protocol_listWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>20</y>
+        <width>106</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="close_pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>65</x>
+        <y>100</y>
+        <width>46</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Run</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -1028,7 +1067,7 @@
        <x>2</x>
        <y>0</y>
        <width>155</width>
-       <height>266</height>
+       <height>131</height>
       </rect>
      </property>
      <property name="title">
@@ -1040,7 +1079,7 @@
         <x>5</x>
         <y>20</y>
         <width>146</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="text">
@@ -1051,9 +1090,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>45</y>
+        <y>47</y>
         <width>146</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="text">
@@ -1064,9 +1103,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>70</y>
+        <y>74</y>
         <width>146</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="text">
@@ -1077,9 +1116,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>95</y>
+        <y>101</y>
         <width>146</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="text">
@@ -1225,7 +1264,6 @@
   <tabstop>add_pushButton</tabstop>
   <tabstop>edit_search_lineEdit</tabstop>
   <tabstop>edit_subject_list_comboBox</tabstop>
-  <tabstop>edit_contact_checkBox</tabstop>
   <tabstop>edit_user_tableWidget</tabstop>
   <tabstop>edit_pushButton</tabstop>
   <tabstop>admin_db_create_pushButton</tabstop>
