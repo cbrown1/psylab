@@ -19,7 +19,7 @@ conn.close()
 
 -- The main table, to hold subject info. Full-text searchable.
 -- New fields will be added as needed for Protocols (a default is created
--- here) and custom vars.
+-- here) and user vars.
 CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "SubjN" INTEGER,
@@ -84,13 +84,13 @@ CREATE TABLE "Admin" (
     "Value" TEXT
 );
 
--- A table to reports Subject is whether it is an individual subject report
+-- A table for reports
 CREATE TABLE "Reports" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "Name" TEXT,
     "Path" TEXT,
+    "Args" TEXT,
     "Subject" TEXT
 );
-
 
 INSERT INTO Admin (Name,Value) VALUES ('version','0.1');

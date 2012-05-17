@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -52,19 +52,19 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>5</y>
+       <y>10</y>
        <width>64</width>
-       <height>26</height>
+       <height>21</height>
       </rect>
      </property>
     </widget>
     <widget class="QPushButton" name="add_pushButton">
      <property name="geometry">
       <rect>
-       <x>390</x>
-       <y>230</y>
+       <x>385</x>
+       <y>235</y>
        <width>81</width>
-       <height>26</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
@@ -100,9 +100,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>140</y>
+        <y>145</y>
         <width>101</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="displayFormat">
@@ -129,9 +129,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>50</y>
+        <y>55</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -165,9 +165,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>80</y>
+        <y>85</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -175,9 +175,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>110</y>
+        <y>115</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -198,9 +198,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>20</y>
+        <y>25</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -247,9 +247,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>20</y>
+        <y>25</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -270,9 +270,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>110</y>
+        <y>115</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -280,9 +280,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>50</y>
+        <y>55</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -303,9 +303,9 @@
       <property name="geometry">
        <rect>
         <x>79</x>
-        <y>80</y>
+        <y>85</y>
         <width>141</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
      </widget>
@@ -345,19 +345,19 @@
      <property name="geometry">
       <rect>
        <x>305</x>
-       <y>5</y>
+       <y>10</y>
        <width>116</width>
-       <height>26</height>
+       <height>21</height>
       </rect>
      </property>
     </widget>
     <widget class="QPushButton" name="edit_pushButton">
      <property name="geometry">
       <rect>
-       <x>400</x>
-       <y>230</y>
+       <x>395</x>
+       <y>235</y>
        <width>71</width>
-       <height>26</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
@@ -368,9 +368,9 @@
      <property name="geometry">
       <rect>
        <x>55</x>
-       <y>5</y>
+       <y>10</y>
        <width>126</width>
-       <height>26</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -472,7 +472,7 @@
       <widget class="QCheckBox" name="edit_contact_checkBox">
        <property name="geometry">
         <rect>
-         <x>140</x>
+         <x>145</x>
          <y>45</y>
          <width>76</width>
          <height>16</height>
@@ -485,9 +485,9 @@
       <widget class="QLabel" name="edit_dob_label">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>150</x>
          <y>5</y>
-         <width>61</width>
+         <width>71</width>
          <height>16</height>
         </rect>
        </property>
@@ -503,7 +503,7 @@
        <x>240</x>
        <y>35</y>
        <width>231</width>
-       <height>191</height>
+       <height>196</height>
       </rect>
      </property>
      <property name="title">
@@ -515,7 +515,7 @@
         <x>5</x>
         <y>20</y>
         <width>221</width>
-        <height>171</height>
+        <height>176</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -554,24 +554,11 @@
       </column>
      </widget>
     </widget>
-    <widget class="QPushButton" name="edit_all_pushButton">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>230</y>
-       <width>71</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Edit All...</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="edit_data_changed_label">
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>233</y>
+       <x>280</x>
+       <y>235</y>
        <width>71</width>
        <height>21</height>
       </rect>
@@ -840,9 +827,9 @@
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>99</y>
+        <y>104</y>
         <width>86</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="displayFormat">
@@ -858,7 +845,7 @@
         <x>4</x>
         <y>19</y>
         <width>106</width>
-        <height>76</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -869,7 +856,7 @@
       <property name="geometry">
        <rect>
         <x>92</x>
-        <y>100</y>
+        <y>104</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -907,7 +894,7 @@
         <x>5</x>
         <y>20</y>
         <width>106</width>
-        <height>76</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -918,9 +905,9 @@
       <property name="geometry">
        <rect>
         <x>65</x>
-        <y>100</y>
+        <y>104</y>
         <width>46</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -948,7 +935,7 @@
      <widget class="QPushButton" name="admin_protocols_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>35</x>
+        <x>100</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -971,7 +958,7 @@
      <widget class="QPushButton" name="admin_protocols_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>125</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -997,7 +984,7 @@
         <x>5</x>
         <y>20</y>
         <width>146</width>
-        <height>86</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -1020,8 +1007,8 @@
      <widget class="QPushButton" name="admin_user_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>35</x>
-        <y>235</y>
+        <x>100</x>
+        <y>240</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1043,8 +1030,8 @@
      <widget class="QPushButton" name="admin_user_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>235</y>
+        <x>125</x>
+        <y>240</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1095,7 +1082,7 @@
         <x>5</x>
         <y>20</y>
         <width>146</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1106,9 +1093,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>47</y>
+        <y>43</y>
         <width>146</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1119,9 +1106,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>74</y>
+        <y>66</y>
         <width>146</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1132,9 +1119,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>101</y>
+        <y>90</y>
         <width>146</width>
-        <height>26</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1145,9 +1132,9 @@
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>2</x>
        <y>130</y>
-       <width>155</width>
+       <width>311</width>
        <height>131</height>
       </rect>
      </property>
@@ -1157,7 +1144,7 @@
      <widget class="QPushButton" name="admin_reports_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>35</x>
+        <x>45</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1180,7 +1167,7 @@
      <widget class="QPushButton" name="admin_reports_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>70</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1205,8 +1192,8 @@
        <rect>
         <x>5</x>
         <y>20</y>
-        <width>146</width>
-        <height>86</height>
+        <width>91</width>
+        <height>81</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -1215,6 +1202,120 @@ number as input, and generate a report on that particular subject.</string>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="admin_reports_name_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>145</x>
+        <y>20</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Queries can be in the form &quot;FName:John OR LName:Smith&quot;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>105</x>
+        <y>20</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>105</x>
+        <y>45</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Script</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="admin_reports_script_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>145</x>
+        <y>45</y>
+        <width>136</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Queries can be in the form &quot;FName:John OR LName:Smith&quot;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_reports_script_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>285</x>
+        <y>45</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {color: green; padding: 0px;}</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>105</x>
+        <y>70</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Args</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="admin_reports_args_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>145</x>
+        <y>70</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Queries can be in the form &quot;FName:John OR LName:Smith&quot;</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="admin_reports_isSubject_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>95</y>
+        <width>171</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show in Browse Window</string>
       </property>
      </widget>
     </widget>
@@ -1242,9 +1343,9 @@ number as input, and generate a report on that particular subject.</string>
    <property name="geometry">
     <rect>
      <x>405</x>
-     <y>292</y>
+     <y>295</y>
      <width>71</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -1255,7 +1356,7 @@ number as input, and generate a report on that particular subject.</string>
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>300</y>
+     <y>298</y>
      <width>386</width>
      <height>16</height>
     </rect>
@@ -1269,19 +1370,19 @@ number as input, and generate a report on that particular subject.</string>
   </widget>
  </widget>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>add_subject_lineEdit</tabstop>
   <tabstop>add_fname_lineEdit</tabstop>
   <tabstop>add_lname_lineEdit</tabstop>
   <tabstop>add_email_lineEdit</tabstop>
   <tabstop>add_phone_lineEdit</tabstop>
   <tabstop>add_birthdate_dateEdit</tabstop>
-  <tabstop>add_contact_checkBox</tabstop>
   <tabstop>add_protocol_comboBox</tabstop>
   <tabstop>add_ethnic_id_comboBox</tabstop>
   <tabstop>add_race_comboBox</tabstop>
   <tabstop>add_gender_comboBox</tabstop>
+  <tabstop>add_contact_checkBox</tabstop>
   <tabstop>add_pushButton</tabstop>
+  <tabstop>add_subject_lineEdit</tabstop>
+  <tabstop>tabWidget</tabstop>
   <tabstop>edit_search_lineEdit</tabstop>
   <tabstop>edit_subject_list_comboBox</tabstop>
   <tabstop>edit_user_tableWidget</tabstop>
@@ -1297,6 +1398,18 @@ number as input, and generate a report on that particular subject.</string>
   <tabstop>admin_user_add_pushButton</tabstop>
   <tabstop>admin_user_remove_pushButton</tabstop>
   <tabstop>close_pushButton</tabstop>
+  <tabstop>edit_contact_checkBox</tabstop>
+  <tabstop>edit_search_exact_checkBox</tabstop>
+  <tabstop>edit_search_back_pushButton</tabstop>
+  <tabstop>edit_search_fwd_pushButton</tabstop>
+  <tabstop>edit_protocol_date_dateEdit</tabstop>
+  <tabstop>edit_protocol_listWidget</tabstop>
+  <tabstop>edit_protocol_date_remove_pushButton</tabstop>
+  <tabstop>edit_reports_listWidget</tabstop>
+  <tabstop>edit_reports_run_pushButton</tabstop>
+  <tabstop>admin_db_export_subjects_pushButton</tabstop>
+  <tabstop>admin_db_save_schema_pushButton</tabstop>
+  <tabstop>admin_db_load_schema_pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

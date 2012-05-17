@@ -33,17 +33,30 @@ CREATE TABLE "UserVars" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "UserVar" TEXT
 );
-INSERT INTO "UserVars" VALUES(1,'AUDIO125');
-INSERT INTO "UserVars" VALUES(2,'AUDIO250');
-INSERT INTO "UserVars" VALUES(4,'AUDIO500');
-INSERT INTO "UserVars" VALUES(5,'AUDIO750');
-INSERT INTO "UserVars" VALUES(6,'AUDIO1000');
-INSERT INTO "UserVars" VALUES(7,'AUDIO1500');
-INSERT INTO "UserVars" VALUES(8,'AUDIO2000');
-INSERT INTO "UserVars" VALUES(9,'AUDIO3000');
-INSERT INTO "UserVars" VALUES(10,'AUDIO4000');
-INSERT INTO "UserVars" VALUES(11,'AUDIO6000');
-INSERT INTO "UserVars" VALUES(12,'AUDIO8000');
+INSERT INTO "UserVars" VALUES(1,'L125');
+INSERT INTO "UserVars" VALUES(2,'L250');
+INSERT INTO "UserVars" VALUES(4,'L500');
+INSERT INTO "UserVars" VALUES(5,'L750');
+INSERT INTO "UserVars" VALUES(6,'L1k');
+INSERT INTO "UserVars" VALUES(7,'L15');
+INSERT INTO "UserVars" VALUES(8,'L2k');
+INSERT INTO "UserVars" VALUES(9,'L3k');
+INSERT INTO "UserVars" VALUES(10,'L4k');
+INSERT INTO "UserVars" VALUES(11,'L6k');
+INSERT INTO "UserVars" VALUES(12,'L8k');
+INSERT INTO "UserVars" VALUES(13,'R125');
+INSERT INTO "UserVars" VALUES(14,'R250');
+INSERT INTO "UserVars" VALUES(15,'R500');
+INSERT INTO "UserVars" VALUES(16,'R750');
+INSERT INTO "UserVars" VALUES(17,'R1k');
+INSERT INTO "UserVars" VALUES(18,'R15');
+INSERT INTO "UserVars" VALUES(19,'R2k');
+INSERT INTO "UserVars" VALUES(20,'R3k');
+INSERT INTO "UserVars" VALUES(21,'R4k');
+INSERT INTO "UserVars" VALUES(22,'R6k');
+INSERT INTO "UserVars" VALUES(23,'R8k');
+INSERT INTO "UserVars" VALUES(24,'Audio_Date');
+INSERT INTO "UserVars" VALUES(25,'Audio_Tester');
 CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "SubjN" INTEGER,
@@ -60,24 +73,51 @@ CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "Protocol_Binaural" TEXT NOT NULL,
     "Protocol_Reverb" TEXT NOT NULL,
     "Protocol_EAS" TEXT NOT NULL,
-    "User_AUDIO125" TEXT NOT NULL,
-    "User_AUDIO250" TEXT NOT NULL,
-    "User_AUDIO500" TEXT NOT NULL,
-    "User_AUDIO750" TEXT NOT NULL,
-    "User_AUDIO1000" TEXT NOT NULL,
-    "User_AUDIO1500" TEXT NOT NULL,
-    "User_AUDIO2000" TEXT NOT NULL,
-    "User_AUDIO3000" TEXT NOT NULL,
-    "User_AUDIO4000" TEXT NOT NULL,
-    "User_AUDIO6000" TEXT NOT NULL,
-    "User_AUDIO8000" TEXT NOT NULL
+    "User_L125" TEXT NOT NULL,
+    "User_L250" TEXT NOT NULL,
+    "User_L500" TEXT NOT NULL,
+    "User_L750" TEXT NOT NULL,
+    "User_L1k" TEXT NOT NULL,
+    "User_L15" TEXT NOT NULL,
+    "User_L2k" TEXT NOT NULL,
+    "User_L3k" TEXT NOT NULL,
+    "User_L4k" TEXT NOT NULL,
+    "User_L6k" TEXT NOT NULL,
+    "User_L8k" TEXT NOT NULL,
+    "User_R125" TEXT NOT NULL,
+    "User_R250" TEXT NOT NULL,
+    "User_R500" TEXT NOT NULL,
+    "User_R750" TEXT NOT NULL,
+    "User_R1k" TEXT NOT NULL,
+    "User_R15" TEXT NOT NULL,
+    "User_R2k" TEXT NOT NULL,
+    "User_R3k" TEXT NOT NULL,
+    "User_R4k" TEXT NOT NULL,
+    "User_R6k" TEXT NOT NULL,
+    "User_R8k" TEXT NOT NULL,
+    "User_Audio_Date" TEXT NOT NULL,
+    "User_Audio_Tester" TEXT NOT NULL
 );
-INSERT INTO "Subjects" VALUES(NULL,'1','John','Smith','1955-02-15','2011-03-04','Male','john.smith@hotmail.com','123-456-7890','White','Not Hispanic','True','','2011-03-04','','0','0','5','10','10','20','15','20','25','25','30');
-INSERT INTO "Subjects" VALUES(NULL,'2','Mary','Jones','1965-10-22','2011-03-04','Female','mary.jones@yahoo.com','111-222-3333','Black','Hispanic/Latino','True','2011-03-04','','','0','0','0','5','0','5','5','10','5','5','10');
+
+-- A table for reports
+CREATE TABLE "Reports" (
+    "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT,
+    "Path" TEXT,
+    "Args" TEXT,
+    "Subject" TEXT
+);
+INSERT INTO "Reports" VALUES(NULL,'Audio','report_audiogram.py','$db $SubjN','True');
+INSERT INTO "Reports" VALUES(NULL,'Enrollment','report_EnrollmentQuery.py','$db','False');
+
 CREATE TABLE "Admin" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "Name" TEXT,
     "Value" TEXT
 );
+INSERT INTO "Subjects" VALUES(NULL,'1','John','Smith','1955-02-15','2011-03-04','Male','john.smith@hotmail.com','123-456-7890','White','Not Hispanic','True','','2011-03-04','','5','5','5','10','10','20','15','20','25','25','30', '45','50','60','70','70','80','85','90','-110','-110','-70','2012-02-12','CAB');
+INSERT INTO "Subjects" VALUES(NULL,'2','Mary','Jones','1965-10-22','2011-03-04','Female','mary.jones@yahoo.com','111-222-3333','Black','Hispanic/Latino','True','2011-03-04','','','0','5','5','10','5','5','10','10','20','5','10', '0','0','0','0','5','5','0','10','15','10','5','2012-03-27','KHT');
+
 INSERT INTO "Admin" VALUES(1,'version','0.1');
+
 COMMIT;

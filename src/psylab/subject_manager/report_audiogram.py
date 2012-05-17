@@ -84,9 +84,9 @@ def plot_data(ax, data, side):
             ax.add_patch(ar)
 
             
-    ax.set_ylim([0, 110])
-    ax.yaxis.set_ticks(range(0, 110, 10))
-    ax.yaxis.set_ticklabels(range(0, 110, 10))
+    ax.set_ylim([-5, 115])
+    ax.yaxis.set_ticks(range(0, 120, 10))
+    ax.yaxis.set_ticklabels(range(0, 120, 10))
     ax.invert_yaxis()
     ax.set_xlim([0, 110])
     ax.xaxis.set_ticks(xpos)
@@ -104,7 +104,7 @@ def is_number(s):
         return False
 
 af = fh.add_axes([.2, .3, .5*11/8.5, .5*8.5/11])
-af.axhspan(0,20, fc='0.7', ec='None', alpha=0.5)
+af.axhspan(-5,20, fc='0.7', ec='None', alpha=0.5)
 
 #af.text(8,50,'V',horizontalalignment='center',verticalalignment='center', rotation=45,color='r',fontweight='bold', fontsize=14)
 #af.plot(8,50,marker='v',color='r')
@@ -113,12 +113,13 @@ filename = sys.argv[0]
 subn = sys.argv[1]
 conn = sqlite3.connect(filename)
 c = conn.cursor()
-c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date,User_Audio_Tester FROM Subjects WHERE SubjN == \'%s\'""" % subn)
 subject = c.fetchone()
 if subject is not None:
 
     ap.text(4.25, 1, "Psychoacoustics Lab",horizontalalignment='center')
-    ap.text(7.5, 1.5, "Date of Audiogram: %s" % subject[4],horizontalalignment='right')
+    ap.text(7.5, 1.5, "Tester: %s" % subject[5],horizontalalignment='right')
+    ap.text(7.5, 1.7, "Date of Audiogram: %s" % subject[4],horizontalalignment='right')
 
     ap.text(1, 1.5, "Patient Name: %s %s" % (subject[0],subject[1]))
     ap.text(1, 1.7, "Date of Birth: %s" % subject[2])
