@@ -1102,7 +1102,7 @@
        <string>Export Subject Data...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_db_save_schema_pushButton">
+     <widget class="QPushButton" name="admin_db_export_db_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
@@ -1112,7 +1112,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Save Schema...</string>
+       <string>Export Entire db...</string>
       </property>
      </widget>
      <widget class="QPushButton" name="admin_db_load_schema_pushButton">
@@ -1395,7 +1395,7 @@ number as input, and generate a report on that particular subject.</string>
   <tabstop>edit_reports_listWidget</tabstop>
   <tabstop>edit_reports_run_pushButton</tabstop>
   <tabstop>admin_db_export_subjects_pushButton</tabstop>
-  <tabstop>admin_db_save_schema_pushButton</tabstop>
+  <tabstop>admin_db_export_db_pushButton</tabstop>
   <tabstop>admin_db_load_schema_pushButton</tabstop>
  </tabstops>
  <resources/>

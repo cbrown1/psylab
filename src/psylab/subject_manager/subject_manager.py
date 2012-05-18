@@ -48,6 +48,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.admin_user_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_remove)
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
         self.connect(self.admin_db_export_subjects_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_subjects)
+        self.connect(self.admin_db_export_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_db)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run)
         self.connect(self.admin_reports_script_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_script_browse)
@@ -462,6 +463,19 @@ class SubjectManager (QtGui.QWidget, form_class):
             with open(ret, 'w') as f:
                 for line in _iterdump(conn, 'Subjects'):
                     f.write('%s\n' % line)
+    
+    def admin_export_db(self):
+        ret = self.get_newfile(title = 'Enter a new filename to create achive:', file_types = "All files types (*.zip)")
+        if ret != '':
+            import zipfile
+            con = sqlite3.connect(self.filename)
+            data = '\n'.join(con.iterdump())
+            con.close()
+            zf = zipfile.ZipFile(ret,
+                                 mode='w',
+                                 compression=zipfile.ZIP_DEFLATED)
+            zf.writestr('dump.sql', data)
+            zf.close()
     
     def admin_protocols_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol name.\nSpaces will be replaced with _')
