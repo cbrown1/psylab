@@ -46,10 +46,7 @@ ap.add_patch(mpp.FancyArrowPatch((lx+2.97,ly+1.13), (lx+3.07,ly+1.23), arrowstyl
 
 
 def plot_data(ax, data, side):
-    from matplotlib import pyplot as pp
-    import matplotlib.patches as mpp
-    from matplotlib.lines import Line2D
-    import numpy as np
+    global pp, mpp, Line2D, np
     da = np.asarray(data)
     
     # Derive this from the column names

@@ -1305,19 +1305,6 @@ number as input, and generate a report on that particular subject.</string>
        <string>Queries can be in the form &quot;FName:John OR LName:Smith&quot;</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="admin_reports_isSubject_checkBox">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>95</y>
-        <width>171</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Show in Browse Window</string>
-      </property>
-     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_4">
