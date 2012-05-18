@@ -22,6 +22,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
         self.setWindowTitle("Subject Manager")
+        self.setWindowIcon(QtGui.QIcon('images/report.png'))
         self.filePath_label.setText(self.filename)
 
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
@@ -66,43 +67,50 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.datewidget_foreground_color = palette.color(QtGui.QPalette.WindowText).getRgb()
         self.datewidget_changed_programmatically = False
         dateedit_button_style = "QSpinBox::down-button {subcontrol-origin: border; subcontrol-position: bottom left; width: 16px; "
-        dateedit_button_style += "image: url(:/icons/calendar.png) 1; border-width: 1px; border-top-width: 0;} "
-        #dateedit_button_style += "QSpinBox::down-arrow {image: url(:/icons/calendar.png); width: 16px; height: 16px;}"
+        dateedit_button_style += "image: url(:/images/calendar.png) 1; border-width: 1px; border-top-width: 0;} "
+        #dateedit_button_style += "QSpinBox::down-arrow {image: url(:/images/calendar.png); width: 16px; height: 16px;}"
         self.edit_protocol_date_dateEdit.setStyleSheet(dateedit_button_style)
 
-        self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
-        self.admin_protocols_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_protocols_remove_pushButton.setText("")
-        self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
-        self.admin_protocols_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon("images/add.png"))
         self.admin_protocols_add_pushButton.setText("")
 
-        self.admin_user_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
-        self.admin_user_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_db_create_pushButton.setIcon(QtGui.QIcon("images/database_add.png"))
+        self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
+        self.admin_db_export_subjects_pushButton.setIcon(QtGui.QIcon("images/database_user.png"))
+        self.admin_db_export_subjects_pushButton.setStyleSheet ("text-align: left");
+        self.admin_db_export_db_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
+        self.admin_db_export_db_pushButton.setStyleSheet ("text-align: left");
+        
+        self.admin_user_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_user_remove_pushButton.setText("")
-        self.admin_user_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
-        self.admin_user_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+
+        self.admin_user_add_pushButton.setIcon(QtGui.QIcon("images/add.png"))
         self.admin_user_add_pushButton.setText("")
 
-        self.admin_reports_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
-        self.admin_reports_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_reports_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_reports_remove_pushButton.setText("")
-        self.admin_reports_add_pushButton.setIcon(QtGui.QIcon("icons/add.png"))
-        self.admin_reports_add_pushButton.setIconSize(QtCore.QSize(13, 13))
+        
+        self.admin_reports_add_pushButton.setIcon(QtGui.QIcon("images/add.png"))
         self.admin_reports_add_pushButton.setText("")
 
-        self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("icons/delete.png"))
-        self.edit_protocol_date_remove_pushButton.setIconSize(QtCore.QSize(13, 13))
+        self.admin_reports_script_pushButton.setIcon(QtGui.QIcon("images/folder_add.png"))
+        self.admin_reports_script_pushButton.setText("")
+        
+        self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.edit_protocol_date_remove_pushButton.setText("")
 
-        self.edit_search_back_pushButton.setIcon(QtGui.QIcon("icons/back.png"))
-        self.edit_search_back_pushButton.setIconSize(QtCore.QSize(13, 13))
+        #self.edit_search_back_pushButton.setIcon(QtGui.QIcon("images/control_play_flipped.png"))
+        self.edit_search_back_pushButton.setIcon(QtGui.QIcon("images/back.png"))
         self.edit_search_back_pushButton.setText("")
 
-        self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("icons/fwd.png"))
-        self.edit_search_fwd_pushButton.setIconSize(QtCore.QSize(13, 13))
+        #self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/control_play.png"))
+        self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/fwd.png"))
         self.edit_search_fwd_pushButton.setText("")
 
+        self.admin_user_listWidget.setAlternatingRowColors(True)
+        
         palette = QtGui.QPalette(self.edit_data_changed_label.palette())
         h_back = palette.color(QtGui.QPalette.Highlight)
         h_text = palette.color(QtGui.QPalette.HighlightedText)
@@ -111,8 +119,8 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(False)
         
         self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
-        self.label_about.setText("<p><b>Subject Manager  %s</b></p>" % self.version + 
-                                 "<p>Copyright 2011-2012 Christopher Brown</p>" + 
+        self.label_about.setText("<h2><img src='images/report.png'>&nbsp;<b>Subject Manager  %s</b></h2>" % self.version + 
+                                 "<p>Copyright &copy; 2011-2012 Christopher Brown</p>" + 
                                  "<p>Python Version: " + platform.python_version() + "<br>" + 
                                  "Qt Version: " + QtCore.QT_VERSION_STR + "<br>" + 
                                  "PyQt Version: " + QtCore.PYQT_VERSION_STR + "<br>" +
@@ -156,7 +164,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_subject_list_comboBox.clear()
         ind = 0
         for row in c:
-            self.edit_subject_list_comboBox.insertItem(ind, "%3s, %s %s" % (row[0], row[1], row[2]))
+            self.edit_subject_list_comboBox.insertItem(ind, QtGui.QIcon("images/user.png"), "%s, %s %s" % (row[0], row[1], row[2]))
             ind += 1
         c.close()
         conn.close()
@@ -270,6 +278,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         rowcount = 0
         for row in c:
             item = QtGui.QTableWidgetItem(row[0])
+            item.setIcon(QtGui.QIcon("images/vcard.png"))
             item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.edit_user_tableWidget.setRowCount(rowcount+1)
             self.edit_user_tableWidget.setItem(rowcount, 0, item)
@@ -369,13 +378,18 @@ class SubjectManager (QtGui.QWidget, form_class):
         c = conn.cursor()
         c.execute("""SELECT Protocol FROM Protocols""")
         self.admin_protocols_listWidget.clear()
-
         for row in c:
-            self.admin_protocols_listWidget.insertItem(-1, row[0])
+            item = QtGui.QListWidgetItem(row[0])
+            item.setIcon(QtGui.QIcon("images/table.png"))
+            item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+            self.admin_protocols_listWidget.insertItem(-1, item)
         c.execute("""SELECT UserVar FROM UserVars""")
         self.admin_user_listWidget.clear()
         for row in c:
-            self.admin_user_listWidget.insertItem(-1, row[0])
+            item = QtGui.QListWidgetItem(row[0])
+            item.setIcon(QtGui.QIcon("images/vcard.png"))
+            item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+            self.admin_user_listWidget.insertItem(-1, item)
         c.close()
         conn.close()
 
@@ -481,7 +495,11 @@ class SubjectManager (QtGui.QWidget, form_class):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol name.\nSpaces will be replaced with _')
         if ret != '':
             ret = ret.replace(" ","_")
-            self.admin_protocols_listWidget.insertItem(-1, ret)
+            item_a = QtGui.QListWidgetItem(ret)
+            item_a.setIcon(QtGui.QIcon("images/chart_pie.png"))
+            item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+            self.admin_protocols_listWidget.insertItem(-1, item_a)
+            #self.admin_protocols_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
             c.execute("""INSERT INTO Protocols (Protocol) VALUES (\'%s\')""" % ret)
@@ -543,12 +561,9 @@ class SubjectManager (QtGui.QWidget, form_class):
         for row in c:
             #if  (os.path.isfile(row[1])):
             item_a = QtGui.QListWidgetItem(row[0])
-            #else:
-            #    item_a = QtGui.QListWidgetItem("!! "+row[0])
-            item_a.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable |
-                                    QtCore.Qt.ItemIsEnabled )
+            item_a.setIcon(QtGui.QIcon("images/page_chart.png"))
+            item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.admin_reports_listWidget.insertItem(-1, item_a)
-
             args = row[1].split(" ")
             data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
             datal = ["$%s" % i for i in data.split(",")]
@@ -559,8 +574,8 @@ class SubjectManager (QtGui.QWidget, form_class):
                     break
             if subj:
                 item_e = QtGui.QListWidgetItem(row[0])
-                item_e.setFlags( QtCore.Qt.ItemIsSelectable | # QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable |
-                                        QtCore.Qt.ItemIsEnabled )
+                item_e.setIcon(QtGui.QIcon("images/page_chart.png"))
+                item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
                 self.edit_reports_listWidget.insertItem(-1, item_e)
             self.edit_reports_listWidget.item(0).setSelected(True)
         c.close()
@@ -615,7 +630,11 @@ class SubjectManager (QtGui.QWidget, form_class):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name with letters and numbers only.\nSpaces will be replaced with _')
         if ret != '':
             ret = ret.replace(" ","_")
-            self.admin_user_listWidget.insertItem(-1, ret)
+            item = QtGui.QListWidgetItem(ret)
+            item.setIcon(QtGui.QIcon("images/vcard.png"))
+            item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+            self.admin_user_listWidget.insertItem(-1, item)
+            #self.admin_user_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
             c.execute("""INSERT INTO UserVars (UserVar) VALUES (\'%s\')""" % ret)
