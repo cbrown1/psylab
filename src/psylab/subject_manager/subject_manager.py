@@ -48,7 +48,6 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.admin_user_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_add)
         self.connect(self.admin_user_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_remove)
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
-        self.connect(self.admin_db_export_subjects_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_subjects)
         self.connect(self.admin_db_export_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_db)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run)
@@ -78,8 +77,6 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         self.admin_db_create_pushButton.setIcon(QtGui.QIcon("images/database_add.png"))
         self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
-        self.admin_db_export_subjects_pushButton.setIcon(QtGui.QIcon("images/database_user.png"))
-        self.admin_db_export_subjects_pushButton.setStyleSheet ("text-align: left");
         self.admin_db_export_db_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
         self.admin_db_export_db_pushButton.setStyleSheet ("text-align: left");
         
@@ -101,11 +98,9 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.edit_protocol_date_remove_pushButton.setText("")
 
-        #self.edit_search_back_pushButton.setIcon(QtGui.QIcon("images/control_play_flipped.png"))
         self.edit_search_back_pushButton.setIcon(QtGui.QIcon("images/back.png"))
         self.edit_search_back_pushButton.setText("")
 
-        #self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/control_play.png"))
         self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/fwd.png"))
         self.edit_search_fwd_pushButton.setText("")
 
@@ -121,10 +116,14 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
         self.label_about.setText("<h2><img src='images/report.png'>&nbsp;<b>Subject Manager  %s</b></h2>" % self.version + 
                                  "<p>Copyright &copy; 2011-2012 Christopher Brown</p>" + 
+                                 "<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed " + 
+                                 "under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; " +
+                                 "see http://www.gnu.org/licenses/ for more information.</p>" +
                                  "<p>Python Version: " + platform.python_version() + "<br>" + 
                                  "Qt Version: " + QtCore.QT_VERSION_STR + "<br>" + 
                                  "PyQt Version: " + QtCore.PYQT_VERSION_STR + "<br>" +
-                                 "SQLite Version: " + sqlite3.sqlite_version + "</p>")
+                                 "SQLite Version: " + sqlite3.sqlite_version + "</p>" + 
+                                 "<p>Most icons taken or derived from the Silk Icon Set, found at http://www.famfamfam.com/lab/icons/silk/</p>")
 
         self.admin_init()
         self.add_init()
@@ -394,90 +393,34 @@ class SubjectManager (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_create_db(self):
-        ret = self.get_newfile(title = 'Select existing DB file to open, or enter new filename to create:')
+        ret = self.get_newfile(title = 'Select existing DB file to open, or enter new filename to create:', file_types = "SQL Files (*.sql);;SQLite DB Files (*.db);;All files (*.*)")
         if ret != '':
-            self.filename = ret
-            self.filePath_label.setText(ret)
-            if not os.path.isfile(self.filename):
-                qry = open('New_DB_Schema_debug.sql', 'r').read()
+            fileName, fileExtension = os.path.splitext(ret)
+            if fileExtension == ".sql":
+                qry = open(ret, 'r').read()
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.executescript(qry)
+                conn.commit()
+                c.close()
+                conn.close()
+                self.filePath_label.setText(self.filename)
+            elif fileExtension == ".db":
+                self.filename = ret
+                self.filePath_label.setText(ret)
+            elif not os.path.isfile(ret):
+                qry = open('New_DB_Schema.sql', 'r').read()
                 conn = sqlite3.connect(ret)
                 c = conn.cursor()
                 c.executescript(qry)
                 conn.commit()
                 c.close()
                 conn.close()
-                self.select_tab('Admin')
             self.add_init()
             self.add_edit_protocol_populate()
             self.edit_user_populate()
             self.admin_init()
 
-            
-    def admin_export_subjects(self):
-
-        def _iterdump(connection, table_name):
-            """
-            Returns an iterator to the dump of the database in an SQL text format.
-
-            Used to produce an SQL dump of the database.  Useful to save an in-memory
-            database for later restoration.  This function should not be called
-            directly but instead called from the Connection method, iterdump().
-            """
-
-            cu = connection.cursor()
-            table_name = table_name
-
-            yield('BEGIN TRANSACTION;')
-
-            # sqlite_master table contains the SQL CREATE statements for the database.
-            q = """
-               SELECT name, type, sql
-                FROM sqlite_master
-                    WHERE sql NOT NULL AND
-                    type == 'table' AND
-                    name == :table_name
-                """
-            schema_res = cu.execute(q, {'table_name': table_name})
-            for table_name, type, sql in schema_res.fetchall():
-                if table_name == 'sqlite_sequence':
-                    yield('DELETE FROM sqlite_sequence;')
-                elif table_name == 'sqlite_stat1':
-                    yield('ANALYZE sqlite_master;')
-                elif table_name.startswith('sqlite_'):
-                    continue
-                else:
-                    yield('%s;' % sql)
-
-                # Build the insert statement for each row of the current table
-                res = cu.execute("PRAGMA table_info('%s')" % table_name)
-                column_names = [str(table_info[1]) for table_info in res.fetchall()]
-                q = "SELECT 'INSERT INTO \"%(tbl_name)s\" VALUES("
-                q += ",".join(["'||quote(" + col + ")||'" for col in column_names])
-                q += ")' FROM '%(tbl_name)s'"
-                query_res = cu.execute(q % {'tbl_name': table_name})
-                for row in query_res:
-                    yield("%s;" % row[0])
-
-            # Now when the type is 'index', 'trigger', or 'view'
-            #q = """
-            #    SELECT name, type, sql
-            #    FROM sqlite_master
-            #        WHERE sql NOT NULL AND
-            #        type IN ('index', 'trigger', 'view')
-            #    """
-            #schema_res = cu.execute(q)
-            #for name, type, sql in schema_res.fetchall():
-            #    yield('%s;' % sql)
-
-            yield('COMMIT;')
-
-        ret = self.get_newfile(title = 'Select new db filename to dump subject data to:')
-        if (ret != '') and (not os.path.isfile(ret)):
-            conn = sqlite3.connect(self.filename);
-            with open(ret, 'w') as f:
-                for line in _iterdump(conn, 'Subjects'):
-                    f.write('%s\n' % line)
-    
     def admin_export_db(self):
         ret = self.get_newfile(title = 'Enter a new filename to create achive:', file_types = "All files types (*.zip)")
         if ret != '':

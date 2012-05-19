@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1089,30 +1089,17 @@
        <string>Create/Open DB...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_db_export_subjects_pushButton">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>50</y>
-        <width>146</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Export Subjects...</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="admin_db_export_db_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>80</y>
+        <y>45</y>
         <width>146</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Export Entire db...</string>
+       <string>Export DB...</string>
       </property>
      </widget>
     </widget>
@@ -1301,14 +1288,17 @@ number as input, and generate a report on that particular subject.</string>
     <widget class="QLabel" name="label_about">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>35</y>
-       <width>396</width>
-       <height>186</height>
+       <x>35</x>
+       <y>30</y>
+       <width>406</width>
+       <height>206</height>
       </rect>
      </property>
      <property name="text">
       <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
@@ -1380,7 +1370,6 @@ number as input, and generate a report on that particular subject.</string>
   <tabstop>edit_protocol_date_remove_pushButton</tabstop>
   <tabstop>edit_reports_listWidget</tabstop>
   <tabstop>edit_reports_run_pushButton</tabstop>
-  <tabstop>admin_db_export_subjects_pushButton</tabstop>
   <tabstop>admin_db_export_db_pushButton</tabstop>
  </tabstops>
  <resources/>
