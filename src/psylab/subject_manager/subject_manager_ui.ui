@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1156,7 +1156,7 @@
      <widget class="QPushButton" name="admin_reports_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>55</x>
+        <x>65</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1179,7 +1179,7 @@
      <widget class="QPushButton" name="admin_reports_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>90</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1204,7 +1204,7 @@
        <rect>
         <x>0</x>
         <y>20</y>
-        <width>96</width>
+        <width>111</width>
         <height>81</height>
        </rect>
       </property>
@@ -1219,9 +1219,9 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLineEdit" name="admin_reports_name_lineEdit">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>20</y>
-        <width>156</width>
+        <width>146</width>
         <height>21</height>
        </rect>
       </property>
@@ -1232,7 +1232,7 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>22</y>
         <width>41</width>
         <height>16</height>
@@ -1245,7 +1245,7 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>52</y>
         <width>41</width>
         <height>16</height>
@@ -1258,9 +1258,9 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLineEdit" name="admin_reports_script_lineEdit">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>50</y>
-        <width>131</width>
+        <width>121</width>
         <height>21</height>
        </rect>
       </property>
@@ -1294,7 +1294,7 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLabel" name="label_13">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>82</y>
         <width>41</width>
         <height>16</height>
@@ -1307,9 +1307,9 @@ number as input, and generate a report on that particular subject.</string>
      <widget class="QLineEdit" name="admin_reports_args_lineEdit">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>80</y>
-        <width>156</width>
+        <width>146</width>
         <height>21</height>
        </rect>
       </property>
@@ -1323,20 +1323,23 @@ number as input, and generate a report on that particular subject.</string>
     <attribute name="title">
      <string>About</string>
     </attribute>
-    <widget class="QLabel" name="label_about">
+    <widget class="QTextEdit" name="label_about">
      <property name="geometry">
       <rect>
-       <x>35</x>
-       <y>30</y>
-       <width>406</width>
-       <height>206</height>
+       <x>15</x>
+       <y>20</y>
+       <width>446</width>
+       <height>221</height>
       </rect>
      </property>
-     <property name="text">
-      <string/>
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <property name="wordWrap">
+     <property name="readOnly">
       <bool>true</bool>
+     </property>
+     <property name="cursorWidth">
+      <number>1</number>
      </property>
     </widget>
    </widget>

@@ -133,6 +133,10 @@ class SubjectManager (QtGui.QWidget, form_class):
                                  "PyQt Version: " + QtCore.PYQT_VERSION_STR + "<br>" +
                                  "SQLite Version: " + sqlite3.sqlite_version + "</p>" + 
                                  "<p>Most icons taken or derived from the Silk Icon Set, found at http://www.famfamfam.com/lab/icons/silk/</p>")
+        #self.label_about.adjustSize()
+        self.label_about.viewport().setAutoFillBackground(False) # <- Transparent bg
+        #print self.label_about.styleSheet()
+        self.label_about.setStyleSheet('QTextEdit {padding-top: 10px; padding-left: 10px; padding-right: 10px}')
 
         self.admin_init()
         self.add_init()
