@@ -87,7 +87,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>85</y>
+        <y>87</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -116,7 +116,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>115</y>
+        <y>118</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -139,7 +139,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>145</y>
+        <y>148</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -152,7 +152,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>55</y>
+        <y>57</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -185,7 +185,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>20</y>
+        <y>25</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -257,7 +257,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>55</y>
+        <y>57</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -290,7 +290,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>85</y>
+        <y>87</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -313,7 +313,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>115</y>
+        <y>117</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -326,7 +326,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>25</y>
+        <y>27</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -393,7 +393,7 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>2</x>
        <y>35</y>
        <width>231</width>
        <height>91</height>
@@ -422,7 +422,7 @@
         <rect>
          <x>5</x>
          <y>5</y>
-         <width>141</width>
+         <width>136</width>
          <height>16</height>
         </rect>
        </property>
@@ -435,7 +435,7 @@
         <rect>
          <x>5</x>
          <y>45</y>
-         <width>126</width>
+         <width>136</width>
          <height>16</height>
         </rect>
        </property>
@@ -459,9 +459,9 @@
       <widget class="QCheckBox" name="edit_contact_checkBox">
        <property name="geometry">
         <rect>
-         <x>145</x>
+         <x>138</x>
          <y>45</y>
-         <width>76</width>
+         <width>86</width>
          <height>16</height>
         </rect>
        </property>
@@ -472,9 +472,9 @@
       <widget class="QLabel" name="edit_dob_label">
        <property name="geometry">
         <rect>
-         <x>150</x>
+         <x>140</x>
          <y>5</y>
-         <width>71</width>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
@@ -559,7 +559,7 @@
      <widget class="QPushButton" name="edit_pushButton">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>155</x>
         <y>200</y>
         <width>71</width>
         <height>21</height>
@@ -814,7 +814,7 @@
     <widget class="QGroupBox" name="groupBox_9">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>2</x>
        <y>130</y>
        <width>114</width>
        <height>131</height>
@@ -842,9 +842,9 @@
      <widget class="QListWidget" name="edit_protocol_listWidget">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>0</x>
         <y>19</y>
-        <width>106</width>
+        <width>111</width>
         <height>81</height>
        </rect>
       </property>
@@ -891,9 +891,9 @@
      <widget class="QListWidget" name="edit_reports_listWidget">
       <property name="geometry">
        <rect>
-        <x>5</x>
+        <x>2</x>
         <y>20</y>
-        <width>106</width>
+        <width>111</width>
         <height>81</height>
        </rect>
       </property>
@@ -929,13 +929,16 @@
        <height>131</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="title">
       <string>Manage Protocols</string>
      </property>
      <widget class="QPushButton" name="admin_protocols_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>105</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -958,7 +961,7 @@
      <widget class="QPushButton" name="admin_protocols_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>125</x>
+        <x>130</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1001,13 +1004,16 @@
        <height>261</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="title">
       <string>Manage Variables</string>
      </property>
      <widget class="QPushButton" name="admin_user_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>105</x>
         <y>235</y>
         <width>21</width>
         <height>21</height>
@@ -1030,7 +1036,7 @@
      <widget class="QPushButton" name="admin_user_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>125</x>
+        <x>130</x>
         <y>235</y>
         <width>21</width>
         <height>21</height>
@@ -1073,6 +1079,9 @@
        <height>131</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="title">
       <string>Manage Database</string>
      </property>
@@ -1086,20 +1095,46 @@
        </rect>
       </property>
       <property name="text">
-       <string>Create/Open DB...</string>
+       <string>Create DB...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="admin_db_export_db_pushButton">
+     <widget class="QPushButton" name="admin_db_export_schema_pushButton">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>45</y>
+        <y>74</y>
         <width>146</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Export DB...</string>
+       <string>Export Data...</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_db_load_schema_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>101</y>
+        <width>146</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load Data...</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_db_open_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>47</y>
+        <width>146</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open DB...</string>
       </property>
      </widget>
     </widget>
@@ -1112,13 +1147,16 @@
        <height>131</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="title">
       <string>Manage Reports</string>
      </property>
      <widget class="QPushButton" name="admin_reports_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>55</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1141,7 +1179,7 @@
      <widget class="QPushButton" name="admin_reports_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>75</x>
+        <x>80</x>
         <y>105</y>
         <width>21</width>
         <height>21</height>
@@ -1164,7 +1202,7 @@
      <widget class="QListWidget" name="admin_reports_listWidget">
       <property name="geometry">
        <rect>
-        <x>5</x>
+        <x>0</x>
         <y>20</y>
         <width>96</width>
         <height>81</height>
@@ -1195,7 +1233,7 @@ number as input, and generate a report on that particular subject.</string>
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>20</y>
+        <y>22</y>
         <width>41</width>
         <height>16</height>
        </rect>
@@ -1208,7 +1246,7 @@ number as input, and generate a report on that particular subject.</string>
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>50</y>
+        <y>52</y>
         <width>41</width>
         <height>16</height>
        </rect>
@@ -1257,7 +1295,7 @@ number as input, and generate a report on that particular subject.</string>
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>80</y>
+        <y>82</y>
         <width>41</width>
         <height>16</height>
        </rect>
@@ -1370,7 +1408,7 @@ number as input, and generate a report on that particular subject.</string>
   <tabstop>edit_protocol_date_remove_pushButton</tabstop>
   <tabstop>edit_reports_listWidget</tabstop>
   <tabstop>edit_reports_run_pushButton</tabstop>
-  <tabstop>admin_db_export_db_pushButton</tabstop>
+  <tabstop>admin_db_export_schema_pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

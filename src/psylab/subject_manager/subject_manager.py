@@ -48,7 +48,9 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.admin_user_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_add)
         self.connect(self.admin_user_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_remove)
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
-        self.connect(self.admin_db_export_db_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_db)
+        self.connect(self.admin_db_open_pushButton, QtCore.SIGNAL("clicked()"), self.admin_open_db)
+        self.connect(self.admin_db_export_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_schema)
+        self.connect(self.admin_db_load_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_load_schema)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run)
         self.connect(self.admin_reports_script_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_script_browse)
@@ -77,8 +79,15 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         self.admin_db_create_pushButton.setIcon(QtGui.QIcon("images/database_add.png"))
         self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
-        self.admin_db_export_db_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
-        self.admin_db_export_db_pushButton.setStyleSheet ("text-align: left");
+        
+        self.admin_db_open_pushButton.setIcon(QtGui.QIcon("images/folder_database.png"))
+        self.admin_db_open_pushButton.setStyleSheet ("text-align: left");
+        
+        self.admin_db_export_schema_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
+        self.admin_db_export_schema_pushButton.setStyleSheet ("text-align: left");
+        
+        self.admin_db_load_schema_pushButton.setIcon(QtGui.QIcon("images/database_plain.png"))
+        self.admin_db_load_schema_pushButton.setStyleSheet ("text-align: left");
         
         self.admin_user_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_user_remove_pushButton.setText("")
@@ -114,7 +123,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_data_changed_label.setVisible(False)
         
         self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
-        self.label_about.setText("<h2><img src='images/report.png'>&nbsp;<b>Subject Manager  %s</b></h2>" % self.version + 
+        self.label_about.setText("<h3><img src='images/report.png'>&nbsp;Subject Manager  %s</h3>" % self.version + 
                                  "<p>Copyright &copy; 2011-2012 Christopher Brown</p>" + 
                                  "<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed " + 
                                  "under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; " +
@@ -393,10 +402,60 @@ class SubjectManager (QtGui.QWidget, form_class):
         conn.close()
 
     def admin_create_db(self):
-        ret = self.get_newfile(title = 'Select existing DB file to open, or enter new filename to create:', file_types = "SQL Files (*.sql);;SQLite DB Files (*.db);;All files (*.*)")
+        ret = self.get_newfile(title = 'Enter new filename to create:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
         if ret != '':
-            fileName, fileExtension = os.path.splitext(ret)
-            if fileExtension == ".sql":
+            qry = open('New_DB_Schema.sql', 'r').read()
+            conn = sqlite3.connect(ret)
+            c = conn.cursor()
+            c.executescript(qry)
+            conn.commit()
+            c.close()
+            conn.close()
+            self.add_init()
+            self.add_edit_protocol_populate()
+            self.edit_user_populate()
+            self.admin_init()
+
+    def admin_open_db(self):
+        ret = self.get_newfile(title = 'Select existing DB file to open:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
+        if ret != '':
+            self.filename = ret
+            self.filePath_label.setText(ret)
+            self.add_init()
+            self.add_edit_protocol_populate()
+            self.edit_user_populate()
+            self.admin_init()
+
+    def admin_export_schema(self):
+        ret = self.get_newfile(title = 'Enter a new SQL filename to save data to:', file_types = "SQL Files (*.sql);;All files (*.*)")
+        if ret != '':
+            conn = sqlite3.connect(self.filename);
+            c = conn.cursor();
+            c.execute("""SELECT name FROM sqlite_master WHERE type = 'table'""")
+            tables = c.fetchall()
+            c.close()
+            skip = ['sqlite_sequence', 'Subjects_content', 'Subjects_segments', 'Subjects_segdir']
+            fh = open(ret,'w')
+            now = datetime.datetime.now()
+            fh.write("-- Subject Manager database dump; db version %s\n-- This file was created at %s on %s\n\nBEGIN TRANSACTION;\n\n" % (self.version, now.strftime("%H:%M"), now.strftime("%Y-%m-%d")))
+            fh.close()
+            for table in tables:
+                if table[0] not in skip:
+                    with open(ret, 'a') as f:
+                        for line in self.sqlite_iterdump(conn, table[0]):
+                            f.write('%s\n' % line)
+                        f.write('\n')
+            fh = open(ret,'a')
+            fh.write('COMMIT;\n')
+            fh.close()
+            conn.close()
+
+    def admin_load_schema(self):
+        ret = self.get_newfile(title = 'Select SQL file to load from:', file_types = "SQL Files (*.sql);;All files (*.*)")
+        if ret != '':
+            confirm = self.get_yesno(title = 'Subject Manager', prompt = 'WARNING!\nThis will destroy all data and cannot be undone!\nMake sure you have backed up your database!\nAre you sure you want to continue?:')
+            if confirm:
+                os.remove(self.filename)
                 qry = open(ret, 'r').read()
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
@@ -405,34 +464,11 @@ class SubjectManager (QtGui.QWidget, form_class):
                 c.close()
                 conn.close()
                 self.filePath_label.setText(self.filename)
-            elif fileExtension == ".db":
-                self.filename = ret
-                self.filePath_label.setText(ret)
-            elif not os.path.isfile(ret):
-                qry = open('New_DB_Schema.sql', 'r').read()
-                conn = sqlite3.connect(ret)
-                c = conn.cursor()
-                c.executescript(qry)
-                conn.commit()
-                c.close()
-                conn.close()
-            self.add_init()
-            self.add_edit_protocol_populate()
-            self.edit_user_populate()
-            self.admin_init()
-
-    def admin_export_db(self):
-        ret = self.get_newfile(title = 'Enter a new filename to create achive:', file_types = "All files types (*.zip)")
-        if ret != '':
-            import zipfile
-            con = sqlite3.connect(self.filename)
-            data = '\n'.join(con.iterdump())
-            con.close()
-            zf = zipfile.ZipFile(ret,
-                                 mode='w',
-                                 compression=zipfile.ZIP_DEFLATED)
-            zf.writestr('dump.sql', data)
-            zf.close()
+                self.add_init()
+                self.add_edit_protocol_populate()
+                self.edit_user_populate()
+                self.admin_init()
+            
     
     def admin_protocols_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a protocol name.\nSpaces will be replaced with _')
@@ -887,6 +923,65 @@ class SubjectManager (QtGui.QWidget, form_class):
             conn.commit()
         c.close()
         conn.close()
+
+
+    def sqlite_iterdump(self, connection, table_name):
+        """
+        Returns an iterator to the dump of the database in an SQL text format.
+
+        Used to produce an SQL dump of the database.  Useful to save an in-memory
+        database for later restoration.  This function should not be called
+        directly but instead called from the Connection method, iterdump().
+        
+        Author: Paul Kippes <kippesp@gmail.com>
+        """
+
+        cu = connection.cursor()
+        table_name = table_name
+
+        #yield('BEGIN TRANSACTION;')
+
+        # sqlite_master table contains the SQL CREATE statements for the database.
+        q = """
+           SELECT name, type, sql
+            FROM sqlite_master
+                WHERE sql NOT NULL AND
+                type == 'table' AND
+                name == :table_name
+            """
+        schema_res = cu.execute(q, {'table_name': table_name})
+        for table_name, type, sql in schema_res.fetchall():
+            if table_name == 'sqlite_sequence':
+                yield('DELETE FROM sqlite_sequence;')
+            elif table_name == 'sqlite_stat1':
+                yield('ANALYZE sqlite_master;')
+            elif table_name.startswith('sqlite_'):
+                continue
+            else:
+                yield('%s;' % sql)
+
+            # Build the insert statement for each row of the current table
+            res = cu.execute("PRAGMA table_info('%s')" % table_name)
+            column_names = [str(table_info[1]) for table_info in res.fetchall()]
+            q = "SELECT 'INSERT INTO \"%(tbl_name)s\" VALUES("
+            q += ",".join(["'||quote(" + col + ")||'" for col in column_names])
+            q += ")' FROM '%(tbl_name)s'"
+            query_res = cu.execute(q % {'tbl_name': table_name})
+            for row in query_res:
+                yield("%s;" % row[0])
+
+        # Now when the type is 'index', 'trigger', or 'view'
+        #q = """
+        #    SELECT name, type, sql
+        #    FROM sqlite_master
+        #        WHERE sql NOT NULL AND
+        #        type IN ('index', 'trigger', 'view')
+        #    """
+        #schema_res = cu.execute(q)
+        #for name, type, sql in schema_res.fetchall():
+        #    yield('%s;' % sql)
+
+        #yield('COMMIT;')
 
 
 if __name__ == '__main__':
