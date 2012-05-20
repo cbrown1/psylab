@@ -112,6 +112,12 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/fwd.png"))
         self.edit_search_fwd_pushButton.setText("")
+        
+        self.edit_find_label.setPixmap(QtGui.QPixmap("images/find.png"))
+        self.edit_find_label.setText("")
+
+        self.edit_subjects_label.setPixmap(QtGui.QPixmap("images/group.png"))
+        self.edit_subjects_label.setText("")
 
         self.admin_user_listWidget.setAlternatingRowColors(True)
         
@@ -124,7 +130,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         
         self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
         self.label_about.setText("<h3><img src='images/report.png'>&nbsp;Subject Manager  %s</h3>" % self.version + 
-                                 "<p>Copyright &copy; 2011-2012 Christopher Brown</p>" + 
+                                 "<p><i>Copyright &copy; 2011-2012 Christopher Brown</i></p>" + 
                                  "<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed " + 
                                  "under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; " +
                                  "see http://www.gnu.org/licenses/ for more information.</p>" +
@@ -441,12 +447,13 @@ class SubjectManager (QtGui.QWidget, form_class):
             skip = ['sqlite_sequence', 'Subjects_content', 'Subjects_segments', 'Subjects_segdir']
             fh = open(ret,'w')
             now = datetime.datetime.now()
-            fh.write("-- Subject Manager database dump; db version %s\n-- This file was created at %s on %s\n\nBEGIN TRANSACTION;\n\n" % (self.version, now.strftime("%H:%M"), now.strftime("%Y-%m-%d")))
+            fh.write("-- Subject Manager database dump; db version %s\n-- This file was created at %s on %s\n\nBEGIN TRANSACTION;\n\n" % 
+                                                                        (self.version, now.strftime("%H:%M"), now.strftime("%Y-%m-%d")))
             fh.close()
             for table in tables:
                 if table[0] not in skip:
                     with open(ret, 'a') as f:
-                        for line in self.sqlite_iterdump(conn, table[0]):
+                        for line in self.sqlite_table_dump(conn, table[0]):
                             f.write('%s\n' % line)
                         f.write('\n')
             fh = open(ret,'a')
@@ -457,7 +464,7 @@ class SubjectManager (QtGui.QWidget, form_class):
     def admin_load_schema(self):
         ret = self.get_newfile(title = 'Select SQL file to load from:', file_types = "SQL Files (*.sql);;All files (*.*)")
         if ret != '':
-            confirm = self.get_yesno(title = 'Subject Manager', prompt = 'WARNING!\nThis will destroy all data and cannot be undone!\nMake sure you have backed up your database!\nAre you sure you want to continue?:')
+            confirm = self.get_yesno(title = 'Subject Manager', prompt = 'WARNING!\n\nThis will overwrite all data and cannot be undone!\nMake sure you have backed up your database!\nAre you sure you want to continue?:')
             if confirm:
                 os.remove(self.filename)
                 qry = open(ret, 'r').read()
@@ -929,7 +936,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         conn.close()
 
 
-    def sqlite_iterdump(self, connection, table_name):
+    def sqlite_table_dump(self, connection, table_name):
         """
         Returns an iterator to the dump of the database in an SQL text format.
 

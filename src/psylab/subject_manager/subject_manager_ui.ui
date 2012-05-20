@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -344,9 +344,9 @@
     <widget class="QComboBox" name="edit_subject_list_comboBox">
      <property name="geometry">
       <rect>
-       <x>305</x>
+       <x>280</x>
        <y>10</y>
-       <width>116</width>
+       <width>141</width>
        <height>21</height>
       </rect>
      </property>
@@ -354,9 +354,9 @@
     <widget class="QLineEdit" name="edit_search_lineEdit">
      <property name="geometry">
       <rect>
-       <x>55</x>
+       <x>25</x>
        <y>10</y>
-       <width>126</width>
+       <width>166</width>
        <height>21</height>
       </rect>
      </property>
@@ -364,26 +364,26 @@
       <string>Queries can be in the form &quot;FName:John OR LName:Smith&quot;</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_20">
+    <widget class="QLabel" name="edit_find_label">
      <property name="geometry">
       <rect>
        <x>5</x>
        <y>10</y>
-       <width>51</width>
-       <height>16</height>
+       <width>21</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
       <string>Search:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_21">
+    <widget class="QLabel" name="edit_subjects_label">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>260</x>
        <y>10</y>
-       <width>61</width>
-       <height>16</height>
+       <width>21</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
@@ -573,8 +573,8 @@
     <widget class="QCheckBox" name="edit_search_exact_checkBox">
      <property name="geometry">
       <rect>
-       <x>185</x>
-       <y>10</y>
+       <x>190</x>
+       <y>13</y>
        <width>61</width>
        <height>16</height>
       </rect>
