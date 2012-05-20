@@ -30,7 +30,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
-        self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
+        #self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
         self.connect(self.edit_search_back_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_back)
         self.connect(self.edit_search_fwd_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_fwd)
         self.connect(self.edit_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.edit_reports_click_button)
@@ -80,7 +80,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.admin_db_create_pushButton.setIcon(QtGui.QIcon("images/database_add.png"))
         self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
         
-        self.admin_db_open_pushButton.setIcon(QtGui.QIcon("images/folder_database.png"))
+        self.admin_db_open_pushButton.setIcon(QtGui.QIcon("images/database_folder.png"))
         self.admin_db_open_pushButton.setStyleSheet ("text-align: left");
         
         self.admin_db_export_schema_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
@@ -112,7 +112,10 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/fwd.png"))
         self.edit_search_fwd_pushButton.setText("")
-        
+
+        #self.edit_search_exact_checkBox.setIcon(QtGui.QIcon("images/scope.png"))
+        #self.edit_search_exact_checkBox.setText("")
+
         self.edit_find_label.setPixmap(QtGui.QPixmap("images/find.png"))
         self.edit_find_label.setText("")
 
@@ -144,6 +147,20 @@ class SubjectManager (QtGui.QWidget, form_class):
         #print self.label_about.styleSheet()
         self.label_about.setStyleSheet('QTextEdit {padding-top: 10px; padding-left: 10px; padding-right: 10px}')
 
+        self.edit_data_changed_label.setToolTip("This subject's User Data have changed.\nClick save, or changes will be lost.")
+        #self.edit_search_exact_checkBox.setToolTip("Show exact matches only")
+        self.edit_search_back_pushButton.setToolTip("Previous subject")
+        self.edit_search_fwd_pushButton.setToolTip("Next subject")
+        self.edit_search_lineEdit.setToolTip("Enter search terms to filter subjects on\n\n" +
+                                            "You can use AND & OR: 'John OR Mary'\n\n" +
+                                            "You can specify partial matches: 'Mar*'\n\n" +
+                                            "You can specify terms to exclude: 'Mar* -Jones'\n\n" +
+                                            "You can specify columns to search:\n" +
+                                            "'FName:John AND LName:Smith'\n\n" +
+                                            "To search on User Data, add 'User_' to the\n" + 
+                                            "beginning of the variable name: 'User_R1k:5'\n"
+                                            )
+
         self.admin_init()
         self.add_init()
         self.add_edit_protocol_populate()
@@ -163,9 +180,9 @@ class SubjectManager (QtGui.QWidget, form_class):
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
         self.edit_data_changed_label.setVisible(False)
 
-    def edit_search_exact_clicked(self, state):
-        self.edit_load_subject_list()
-        self.edit_load_subject_data(self.edit_subject_list_comboBox.currentText())
+    #def edit_search_exact_clicked(self, state):
+    #    self.edit_load_subject_list()
+    #    self.edit_load_subject_data(self.edit_subject_list_comboBox.currentText())
 
     def edit_load_subject_list(self, search_field=None):
         search_field = unicode(self.edit_search_lineEdit.text())
@@ -174,10 +191,10 @@ class SubjectManager (QtGui.QWidget, form_class):
         if search_field in [None, '']:
             query = """SELECT SubjN,FName,LName FROM Subjects"""
         else:
-            if self.edit_search_exact_checkBox.checkState() == QtCore.Qt.Checked:
-                query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
-            else:
-                query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s*\'""" % search_field
+        #    if self.edit_search_exact_checkBox.checkState() == QtCore.Qt.Checked:
+             query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
+        #    else:
+        #        query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s*\'""" % search_field
         c.execute(query)
         self.edit_subject_list_comboBox.clear()
         ind = 0
