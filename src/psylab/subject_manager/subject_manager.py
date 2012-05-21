@@ -50,9 +50,10 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
         self.connect(self.admin_db_open_pushButton, QtCore.SIGNAL("clicked()"), self.admin_open_db)
         self.connect(self.admin_db_export_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_schema)
-        self.connect(self.admin_db_load_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_load_schema)
+        self.connect(self.admin_db_import_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_import_schema)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
-        self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run)
+        self.connect(self.admin_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_run_buttonclick)
+        self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run_listclick)
         self.connect(self.admin_reports_script_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_script_browse)
         
         self.connect(self.admin_reports_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_add)
@@ -74,6 +75,7 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_protocols_remove_pushButton.setText("")
+
         self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon("images/add.png"))
         self.admin_protocols_add_pushButton.setText("")
 
@@ -86,8 +88,8 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.admin_db_export_schema_pushButton.setIcon(QtGui.QIcon("images/database_save.png"))
         self.admin_db_export_schema_pushButton.setStyleSheet ("text-align: left");
         
-        self.admin_db_load_schema_pushButton.setIcon(QtGui.QIcon("images/database_plain.png"))
-        self.admin_db_load_schema_pushButton.setStyleSheet ("text-align: left");
+        self.admin_db_import_schema_pushButton.setIcon(QtGui.QIcon("images/database_plain.png"))
+        self.admin_db_import_schema_pushButton.setStyleSheet ("text-align: left");
         
         self.admin_user_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.admin_user_remove_pushButton.setText("")
@@ -101,11 +103,20 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.admin_reports_add_pushButton.setIcon(QtGui.QIcon("images/add.png"))
         self.admin_reports_add_pushButton.setText("")
 
+        self.admin_reports_run_pushButton.setIcon(QtGui.QIcon("images/page_chart_go.png"))
+        self.admin_reports_run_pushButton.setText("")
+
         self.admin_reports_script_pushButton.setIcon(QtGui.QIcon("images/folder_add.png"))
         self.admin_reports_script_pushButton.setText("")
         
+        self.edit_pushButton.setIcon(QtGui.QIcon("images/disk.png"))
+        self.edit_pushButton.setText("Save")
+
         self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
         self.edit_protocol_date_remove_pushButton.setText("")
+
+        self.edit_reports_run_pushButton.setIcon(QtGui.QIcon("images/page_chart_go.png"))
+        self.edit_reports_run_pushButton.setText("")
 
         self.edit_search_back_pushButton.setIcon(QtGui.QIcon("images/back.png"))
         self.edit_search_back_pushButton.setText("")
@@ -113,14 +124,14 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_search_fwd_pushButton.setIcon(QtGui.QIcon("images/fwd.png"))
         self.edit_search_fwd_pushButton.setText("")
 
-        #self.edit_search_exact_checkBox.setIcon(QtGui.QIcon("images/scope.png"))
-        #self.edit_search_exact_checkBox.setText("")
-
         self.edit_find_label.setPixmap(QtGui.QPixmap("images/find.png"))
         self.edit_find_label.setText("")
 
         self.edit_subjects_label.setPixmap(QtGui.QPixmap("images/group.png"))
         self.edit_subjects_label.setText("")
+
+        self.add_pushButton.setIcon(QtGui.QIcon("images/user_add.png"))
+        self.add_pushButton.setText("Add")
 
         self.admin_user_listWidget.setAlternatingRowColors(True)
         
@@ -131,35 +142,112 @@ class SubjectManager (QtGui.QWidget, form_class):
             (h_text.red(), h_text.green(), h_text.blue(), h_back.red(), h_back.green(), h_back.blue(), h_text.red(), h_text.green(), h_text.blue()))
         self.edit_data_changed_label.setVisible(False)
         
-        self.label_about.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
-        self.label_about.setText("<h3><img src='images/report.png'>&nbsp;Subject Manager  %s</h3>" % self.version + 
-                                 "<p><i>Copyright &copy; 2011-2012 Christopher Brown</i></p>" + 
-                                 "<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed " + 
-                                 "under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; " +
-                                 "see http://www.gnu.org/licenses/ for more information.</p>" +
-                                 "<p>Python Version: " + platform.python_version() + "<br>" + 
-                                 "Qt Version: " + QtCore.QT_VERSION_STR + "<br>" + 
-                                 "PyQt Version: " + QtCore.PYQT_VERSION_STR + "<br>" +
-                                 "SQLite Version: " + sqlite3.sqlite_version + "</p>" + 
-                                 "<p>Most icons taken or derived from the Silk Icon Set, found at http://www.famfamfam.com/lab/icons/silk/</p>")
-        #self.label_about.adjustSize()
-        self.label_about.viewport().setAutoFillBackground(False) # <- Transparent bg
-        #print self.label_about.styleSheet()
-        self.label_about.setStyleSheet('QTextEdit {padding-top: 10px; padding-left: 10px; padding-right: 10px}')
+        self.about_textedit.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
+        self.about_textedit.setText("""<h3><img src='images/report.png'>&nbsp;Subject Manager  %s</h3> 
+                                 <p><i>Copyright &copy; 2011-2012 Christopher Brown &lt;cbrown1@pitt.edu&gt;</i></p> 
+                                 <p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed 
+                                 under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; 
+                                 see http://www.gnu.org/licenses/ for more information.</p>
+                                 <p>Subject Manager is part of Psylab. Bug reports, bug fixes, suggestions, enhancements, or other
+                                 contributions are welcome. Go to http://code.google.com/p/psylab/ for more information and to contribute. 
+                                 <p>Python Version: %s<br> 
+                                 Qt Version: %s<br>
+                                 PyQt Version: %s<br>
+                                 SQLite Version: %s</p> 
+                                 <p>Most icons taken or derived from the Silk Icon Set, found at http://www.famfamfam.com/lab/icons/silk/</p>
+                                 """ % (self.version, platform.python_version(), QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR, sqlite3.sqlite_version)
+                                )
+        self.about_textedit.viewport().setAutoFillBackground(False) # <- Transparent bg
+        self.about_textedit.setStyleSheet('QTextEdit {padding-top: 10px; padding-left: 10px; padding-right: 10px}')
 
-        self.edit_data_changed_label.setToolTip("This subject's User Data have changed.\nClick save, or changes will be lost.")
-        #self.edit_search_exact_checkBox.setToolTip("Show exact matches only")
-        self.edit_search_back_pushButton.setToolTip("Previous subject")
-        self.edit_search_fwd_pushButton.setToolTip("Next subject")
-        self.edit_search_lineEdit.setToolTip("Enter search terms to filter subjects on\n\n" +
-                                            "You can use AND & OR: 'John OR Mary'\n\n" +
-                                            "You can specify partial matches: 'Mar*'\n\n" +
-                                            "You can specify terms to exclude: 'Mar* -Jones'\n\n" +
-                                            "You can specify columns to search:\n" +
-                                            "'FName:John AND LName:Smith'\n\n" +
-                                            "To search on User Data, add 'User_' to the\n" + 
-                                            "beginning of the variable name: 'User_R1k:5'\n"
-                                            )
+        self.edit_data_changed_label.setToolTip("This subject's data have changed.\nClick save, or changes will be lost.")
+        self.edit_search_back_pushButton.setToolTip("Select previous subject in list")
+        self.edit_search_fwd_pushButton.setToolTip("Select next subject in list")
+        self.edit_search_lineEdit.setToolTip("""<p>Enter search terms to filter the list of subjects</p>
+                                                <p>When multiple search terms are used, the default is AND (ie., 'John Smith' will return
+                                                only records containing both 'John' AND 'Smith'). You can use the OR operator (ie., 'John OR Mary'
+                                                will return any record that contains either 'John' OR 'Mary'.</p>
+                                                <p>The default is exact matches (ie., 'Mar' will not return records containing 'Mary'). 
+                                                You can use the * wildcard to specify partial matches (ie., 'Mar*' will match both 
+                                                'Mary' and 'Margaret').</p>
+                                                <p>You can search for records that do not contain a term using -. (ie., 'Mary -Jones').</p>
+                                                <p>You can limit the search for a term to a specific variable (ie., 'FName:John LName:Smith')</p>
+                                                <p>To search a User Data variable, add 'User_' to the beginning of 
+                                                the variable name ('User_R1k:5').</p>
+                                                """)
+        self.edit_protocol_listWidget.setToolTip("""<p>Protocols consented to by a subject</p>
+                                                <p>A check means that consent for a protocol was obtained from a subject</p> 
+                                                <p>Click on that protocol to see the date of consent, or enter a date and click save</p>
+                                                """)
+        self.edit_protocol_date_dateEdit.setToolTip("""<p>Displays or sets the date on which a subject consented to a protocol</p>
+                                                    <p>If you change this value, be sure to click save or the changes will be lost</p>
+                                                    """)
+        self.edit_reports_listWidget.setToolTip("""<p>This is a list of reports available for individual subjects.</p> 
+                                                <p>Double-click on a report (or select and click run) to run it.</p>
+                                                """)
+        self.edit_reports_run_pushButton.setToolTip("Run selected Report")
+        self.edit_user_tableWidget.setToolTip("""<p>This is a list of user variables and their values for each subject</p> 
+                                                <p>If you change any values, be sure to click save or the changes will be lost</p>
+                                                """)
+        self.admin_db_create_pushButton.setToolTip("Click to create a new, empty database")
+        self.admin_db_open_pushButton.setToolTip("Click to open an existing database")
+        self.admin_db_export_schema_pushButton.setToolTip("Click export all data in database to an sql file")
+        self.admin_db_import_schema_pushButton.setToolTip("""<p>Click to import data from an sql file</p>
+                                                    <p><b>WARNING! All current data will be lost!</b></p>
+                                                    <p>You should backup your DB regularly
+                                                    (either by exporting the data, or by simply
+                                                    copying the db file to a safe place)</p>
+                                                    """)
+        self.admin_protocols_add_pushButton.setToolTip("Add a new Protocol")
+        self.admin_protocols_remove_pushButton.setToolTip("Delete selected Protocol")
+        self.admin_reports_add_pushButton.setToolTip("Add a new Report")
+        self.admin_reports_remove_pushButton.setToolTip("Delete selected Report")
+        self.admin_reports_run_pushButton.setToolTip("Run selected Report")
+        self.admin_user_add_pushButton.setToolTip("Add a new User Variable")
+        self.admin_user_remove_pushButton.setToolTip("Delete selected User Variable")
+        self.admin_reports_script_pushButton.setToolTip("Browse to select a Report script")
+        self.admin_protocols_listWidget.setToolTip("""<p>The list of Protocols</p>
+                                                    <p>Add new protocols, or delete unneeded ones here</p>
+                                                    <p><b>WARNING! Deleting a protocol will
+                                                    delete all subject data for that protocol!</b></p>
+                                                    <p>You should backup your DB regularly
+                                                    (either by exporting the data, or by simply
+                                                    copying the db file to a safe place)</p>
+                                                    """)
+        self.admin_reports_listWidget.setToolTip("""<p>The list of reports</p>
+                                                    <p>Add new reports, or delete unneeded ones here</p>
+                                                    <p>Note that deleting a report here does not delete
+                                                    the report script, only the reference to it here</p>
+                                                    """)
+        self.admin_reports_name_lineEdit.setToolTip("""<p>The name of a report</p>
+                                                    <p>If you make any changes here, click the Plus button to
+                                                    save them. Reports with the same name will be overwritten.</p>
+                                                    """)
+        self.admin_reports_script_lineEdit.setToolTip("""<p>The path to the script of a Report</p>
+                                                    <p>If you make any changes here, click the Plus button to
+                                                    save them. Reports with the same name will be overwritten.</p>
+                                                    """)
+        self.admin_reports_args_lineEdit.setToolTip("""<p>The command line arguments to the Report script</p>
+                                                    <p>If you make any changes here, click the Plus button to
+                                                    save them. Reports with the same name will be overwritten.</p>
+                                                    <p>You can use $db, which will pass to the report script the full path of the database
+                                                     file. This is useful when you want to make sql queries from within the report script.
+                                                    You can also use any variable name from the Subjects table preceded by a '$'
+                                                    (eg., $SubjN will pass to the report script the subject number of the currently 
+                                                    selected subject, $FName is the subject's First Name, etc.). Using any of these
+                                                    variables will cause the Report to show up in the list on Browse page (and these
+                                                    reports can only be run from there when a subject is selected, since they require individual
+                                                    subject data).</p>
+                                                    """)
+        self.admin_user_listWidget.setToolTip("""<p>The list of User Variables</p>
+                                                <p>Add new user variables, or delete unneeded ones here</p>
+                                                <p><b>WARNING! Deleting a user variable will
+                                                delete all subject data for that variable!</b></p>
+                                                <p>You should backup your DB regularly
+                                                (either by exporting the data, or by simply
+                                                copying the db file to a safe place)</p>
+                                                """)
+        self.close_pushButton.setToolTip("Close Subject Manager")
 
         self.admin_init()
         self.add_init()
@@ -478,7 +566,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             fh.close()
             conn.close()
 
-    def admin_load_schema(self):
+    def admin_import_schema(self):
         ret = self.get_newfile(title = 'Select SQL file to load from:', file_types = "SQL Files (*.sql);;All files (*.*)")
         if ret != '':
             confirm = self.get_yesno(title = 'Subject Manager', prompt = 'WARNING!\n\nThis will overwrite all data and cannot be undone!\nMake sure you have backed up your database!\nAre you sure you want to continue?:')
@@ -532,7 +620,13 @@ class SubjectManager (QtGui.QWidget, form_class):
                 self.sqlite_column_delete(self.filename, 'Subjects', 'Protocol_%s' % val)
                 self.add_edit_protocol_populate()
 
-                
+    def admin_reports_run_buttonclick(self):
+        if self.admin_reports_listWidget.currentItem() is not None:
+            self.admin_reports_run(self.admin_reports_listWidget.currentItem())
+
+    def admin_reports_run_listclick(self, item):
+        self.admin_reports_run(item)
+
     def admin_reports_run(self, item):
         val = item.text()
         conn = sqlite3.connect(self.filename)
@@ -584,7 +678,7 @@ class SubjectManager (QtGui.QWidget, form_class):
                 item_e.setIcon(QtGui.QIcon("images/page_chart.png"))
                 item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
                 self.edit_reports_listWidget.insertItem(-1, item_e)
-            self.edit_reports_listWidget.item(0).setSelected(True)
+            #self.edit_reports_listWidget.item(0).setSelected(True)
         c.close()
         conn.close()
         
