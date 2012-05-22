@@ -583,6 +583,7 @@ class SubjectManager (QtGui.QWidget, form_class):
                 self.add_init()
                 self.add_edit_protocol_populate()
                 self.edit_user_populate()
+                self.edit_load_subject_list()
                 self.admin_init()
             
     

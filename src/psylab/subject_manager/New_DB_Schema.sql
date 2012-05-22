@@ -33,6 +33,7 @@ CREATE VIRTUAL TABLE "Subjects" USING FTS3(
     "Race" TEXT NOT NULL DEFAULT "",
     "EthnicID" TEXT NOT NULL DEFAULT "",
     "Contact" TEXT NOT NULL DEFAULT "",
+    "Notes" TEXT NOT NULL DEFAULT "",
     "Protocol_Default" TEXT NOT NULL DEFAULT ""
 );
 

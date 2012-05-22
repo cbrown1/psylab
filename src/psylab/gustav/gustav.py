@@ -102,7 +102,9 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
     if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        # Edit CB 2012-05-21
+        #settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         if settingsFile == '':
             print ""+exp.exp_name+" cancelled at user request"
             return;
