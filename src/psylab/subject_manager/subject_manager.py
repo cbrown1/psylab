@@ -39,6 +39,8 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.connect(self.edit_user_tableWidget, QtCore.SIGNAL("itemChanged ( QTableWidgetItem *)"), self.edit_data_changed)
         self.connect(self.edit_protocol_date_dateEdit, QtCore.SIGNAL("dateChanged ( QDate *)"), self.edit_data_changed)
         self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
+        self.connect(self.edit_notes_plainTextEdit, QtCore.SIGNAL("textChanged ()"), self.edit_note_changed)
+
         self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
         self.connect(self.edit_protocol_date_dateEdit.calendarWidget(), QtCore.SIGNAL("clicked(const QDate&)"), self.edit_protocol_dateChanged)
         self.connect(self.edit_protocol_date_remove_pushButton, QtCore.SIGNAL("clicked()"), self.edit_protocol_date_remove)
@@ -183,7 +185,7 @@ class SubjectManager (QtGui.QWidget, form_class):
                                                     <p>If you change this value, be sure to click save or the changes will be lost</p>
                                                     """)
         self.edit_reports_listWidget.setToolTip("""<p>This is a list of reports available for individual subjects.</p> 
-                                                <p>Double-click on a report (or select and click run) to run it.</p>
+                                                <p>Double-click on a report to run it.</p>
                                                 """)
         self.edit_reports_run_pushButton.setToolTip("Run selected Report")
         self.edit_user_tableWidget.setToolTip("""<p>This is a list of user variables and their values for each subject</p> 
@@ -308,7 +310,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         subn = unicode(info.split(", ")[0]).strip()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT FName,LName,Email,Phone,DOB,Contact FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+        c.execute("""SELECT FName,LName,Email,Phone,DOB,Contact,Notes FROM Subjects WHERE SubjN == \'%s\'""" % subn)
         subject = c.fetchone()
         if subject is not None:
             self.edit_name_label.setText("%s %s" % (subject[0],subject[1]))
@@ -316,6 +318,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             self.edit_phone_label.setText("%s" % subject[3])
             self.edit_dob_label.setText("%s" % subject[4])
             self.edit_contact_checkBox.setChecked(bool(subject[5]))
+            self.edit_notes_plainTextEdit.setPlainText("%s" % subject[6])
             c.execute("""SELECT Protocol FROM Protocols""")
             protocols = c.fetchall()
             self.edit_subject_protocol_dict = {}
@@ -351,6 +354,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             self.edit_name_label.setText("")
             self.edit_email_label.setText("")
             self.edit_phone_label.setText("")
+            self.edit_notes_plainTextEdit.setPlainText("")
             self.edit_contact_checkBox.setChecked(False)
             for i in range(self.edit_protocol_listWidget.count()):
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
@@ -376,9 +380,10 @@ class SubjectManager (QtGui.QWidget, form_class):
             else:
                 query += "User_%s = '%s', " % (unicode(self.edit_user_tableWidget.item(i,0).text()), "None")
         if self.edit_contact_checkBox.checkState() == QtCore.Qt.Checked:
-            query += "Contact = 'True' "
+            query += "Contact = 'True', "
         else:
-            query += "Contact = 'False' "
+            query += "Contact = 'False', "
+        query += "Notes = \"%s\"" % self.edit_notes_plainTextEdit.toPlainText()
 
         query += "WHERE SubjN = '%s';" % subn
 
@@ -459,6 +464,10 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.edit_protocol_date_dateEdit.setStyleSheet("QDateEdit {color: rgb(%i, %i, %i); padding: 0px;} QDateEdit::down-arrow {color: rgb(%i, %i, %i); padding: 0px;} " %
             (self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2],
              self.datewidget_background_color[0], self.datewidget_background_color[1], self.datewidget_background_color[2]))
+
+
+    def edit_note_changed(self):
+        self.edit_data_changed_label.setVisible(True)
 
     def edit_data_changed(self, obj):
         self.edit_data_changed_label.setVisible(True)
