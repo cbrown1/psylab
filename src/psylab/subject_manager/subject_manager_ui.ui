@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -398,8 +398,8 @@
       <rect>
        <x>0</x>
        <y>35</y>
-       <width>201</width>
-       <height>221</height>
+       <width>181</width>
+       <height>226</height>
       </rect>
      </property>
      <property name="title">
@@ -413,7 +413,7 @@
        <rect>
         <x>5</x>
         <y>40</y>
-        <width>191</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
@@ -426,7 +426,7 @@
        <rect>
         <x>5</x>
         <y>60</y>
-        <width>191</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
@@ -439,7 +439,7 @@
        <rect>
         <x>5</x>
         <y>20</y>
-        <width>191</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
@@ -450,9 +450,9 @@
      <widget class="QCheckBox" name="edit_contact_checkBox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>100</x>
         <y>80</y>
-        <width>86</width>
+        <width>76</width>
         <height>16</height>
        </rect>
       </property>
@@ -465,7 +465,7 @@
        <rect>
         <x>5</x>
         <y>80</y>
-        <width>106</width>
+        <width>96</width>
         <height>16</height>
        </rect>
       </property>
@@ -478,7 +478,7 @@
        <rect>
         <x>5</x>
         <y>115</y>
-        <width>191</width>
+        <width>171</width>
         <height>106</height>
        </rect>
       </property>
@@ -500,9 +500,9 @@
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
-       <x>325</x>
+       <x>315</x>
        <y>35</y>
-       <width>151</width>
+       <width>161</width>
        <height>226</height>
       </rect>
      </property>
@@ -514,7 +514,7 @@
        <rect>
         <x>2</x>
         <y>20</y>
-        <width>146</width>
+        <width>153</width>
         <height>176</height>
        </rect>
       </property>
@@ -823,8 +823,8 @@
     <widget class="QGroupBox" name="groupBox_9">
      <property name="geometry">
       <rect>
-       <x>198</x>
-       <y>130</y>
+       <x>185</x>
+       <y>35</y>
        <width>126</width>
        <height>131</height>
       </rect>
@@ -888,8 +888,8 @@
     <widget class="QGroupBox" name="groupBox_10">
      <property name="geometry">
       <rect>
-       <x>198</x>
-       <y>35</y>
+       <x>185</x>
+       <y>165</y>
        <width>126</width>
        <height>96</height>
       </rect>
@@ -1227,7 +1227,7 @@
      <widget class="QLineEdit" name="admin_reports_name_lineEdit">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>165</x>
         <y>20</y>
         <width>141</width>
         <height>21</height>
@@ -1240,7 +1240,7 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>22</y>
         <width>41</width>
         <height>16</height>
@@ -1253,7 +1253,7 @@
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>52</y>
         <width>41</width>
         <height>16</height>
@@ -1266,7 +1266,7 @@
      <widget class="QLineEdit" name="admin_reports_script_lineEdit">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>165</x>
         <y>50</y>
         <width>116</width>
         <height>21</height>
@@ -1279,7 +1279,7 @@
      <widget class="QPushButton" name="admin_reports_script_pushButton">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>285</x>
         <y>50</y>
         <width>21</width>
         <height>21</height>
@@ -1302,7 +1302,7 @@
      <widget class="QLabel" name="label_13">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>125</x>
         <y>82</y>
         <width>41</width>
         <height>16</height>
@@ -1315,7 +1315,7 @@
      <widget class="QLineEdit" name="admin_reports_args_lineEdit">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>165</x>
         <y>80</y>
         <width>141</width>
         <height>21</height>

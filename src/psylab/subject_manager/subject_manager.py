@@ -4,6 +4,7 @@ import sys, os
 import sqlite3
 import datetime
 import platform
+import ConfigParser
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import Qt
@@ -16,15 +17,15 @@ form_class, base_class = uic.loadUiType("subject_manager_ui.ui")
 
 class SubjectManager (QtGui.QWidget, form_class):
     version = '0.1'
-    filename = 'Subjects.db'
+    filename = ''
+    configFilePath = 'subject_manager.ini'
 
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
         self.setWindowTitle("Subject Manager")
         self.setWindowIcon(QtGui.QIcon('images/report.png'))
-        self.filePath_label.setText(self.filename)
-
+        
         self.connect(self.add_pushButton, QtCore.SIGNAL("clicked()"), self.add_Process)
         self.connect(self.add_birthdate_dateEdit, QtCore.SIGNAL("dateChanged(const QDate&)"), self.doAge)
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
@@ -406,6 +407,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         rowcount = 0
         for row in c:
             item = QtGui.QTableWidgetItem(row[0])
+            item.setToolTip(row[0])
             item.setIcon(QtGui.QIcon("images/vcard.png"))
             item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.edit_user_tableWidget.setRowCount(rowcount+1)
@@ -501,11 +503,26 @@ class SubjectManager (QtGui.QWidget, form_class):
             sys.argv = args
             execfile(ret[0])
 
-
     def admin_init(self):
+        Config = ConfigParser.ConfigParser()
+        if self.filename == "":
+            self.filename = 'Subjects.db'
+        if not os.path.isfile(self.configFilePath):
+            Config.add_section('database')
+            Config.set('database','path',self.filename)
+            fh = open(self.configFilePath, 'w')
+            Config.write(fh)
+            fh.close()
+        Config.read(self.configFilePath)
+        Config.set('database','path',self.filename)
+        fh = open(self.configFilePath, 'w')
+        Config.write(fh)
+        fh.close()
+        
         if not os.path.isfile(self.filename):
             self.admin_create_db()
-
+        self.filePath_label.setText(self.filename)
+        
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
         c.execute("""SELECT Protocol FROM Protocols""")
@@ -535,6 +552,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             conn.commit()
             c.close()
             conn.close()
+            self.filename = ret
             self.add_init()
             self.add_edit_protocol_populate()
             self.edit_user_populate()
@@ -544,7 +562,6 @@ class SubjectManager (QtGui.QWidget, form_class):
         ret = self.get_newfile(title = 'Select existing DB file to open:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
         if ret != '':
             self.filename = ret
-            self.filePath_label.setText(ret)
             self.add_init()
             self.add_edit_protocol_populate()
             self.edit_user_populate()
