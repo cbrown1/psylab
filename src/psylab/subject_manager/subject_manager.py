@@ -283,9 +283,9 @@ class SubjectManager (QtGui.QWidget, form_class):
             query = """SELECT SubjN,FName,LName FROM Subjects"""
         else:
         #    if self.edit_search_exact_checkBox.checkState() == QtCore.Qt.Checked:
-             query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s\'""" % search_field
+             query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH '%s'""" % search_field
         #    else:
-        #        query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH \'%s*\'""" % search_field
+        #        query = """SELECT SubjN,FName,LName FROM Subjects WHERE Subjects MATCH '%s*'""" % search_field
         c.execute(query)
         self.edit_subject_list_comboBox.clear()
         ind = 0
@@ -311,7 +311,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         subn = unicode(info.split(", ")[0]).strip()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT FName,LName,Email,Phone,DOB,Contact,Notes FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+        c.execute("""SELECT FName,LName,Email,Phone,DOB,Contact,Notes FROM Subjects WHERE SubjN == '%s'""" % subn)
         subject = c.fetchone()
         if subject is not None:
             self.edit_name_label.setText("%s %s" % (subject[0],subject[1]))
@@ -324,7 +324,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             protocols = c.fetchall()
             self.edit_subject_protocol_dict = {}
             for protocol in protocols:
-                c.execute("""SELECT Protocol_%s FROM Subjects WHERE SubjN == \'%s\'""" % (protocol[0],subn))
+                c.execute("""SELECT Protocol_%s FROM Subjects WHERE SubjN == '%s'""" % (protocol[0],subn))
                 protocol_date = c.fetchone()
                 for i in range(self.edit_protocol_listWidget.count()):
                     if protocol[0] == self.edit_protocol_listWidget.item(i).text():
@@ -339,7 +339,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             vars = c.fetchall()
             rowcount = 0
             for var in vars:
-                c.execute("""SELECT User_%s FROM Subjects WHERE SubjN == \'%s\'""" % (var[0],subn))
+                c.execute("""SELECT User_%s FROM Subjects WHERE SubjN == '%s'""" % (var[0],subn))
                 uservar_this = c.fetchone()
                 if uservar_this[0] is not None:
                     item = QtGui.QTableWidgetItem(uservar_this[0])
@@ -486,13 +486,13 @@ class SubjectManager (QtGui.QWidget, form_class):
     def edit_reports_run(self, report):
             conn = sqlite3.connect(self.filename)
             c = conn.cursor()
-            c.execute("""SELECT Path, Args FROM Reports WHERE Name == \'%s\'""" % report)
+            c.execute("""SELECT Path, Args FROM Reports WHERE Name == '%s'""" % report)
             ret = c.fetchone()
             args = ret[1].split(" ")
             subjn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
             data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
             datal = data.split(",")
-            c.execute("""SELECT %s FROM Subjects WHERE SubjN == \'%s\'""" % (data, subjn))
+            c.execute("""SELECT %s FROM Subjects WHERE SubjN == '%s'""" % (data, subjn))
             rets = c.fetchone()
             c.close()
             conn.close()
@@ -624,7 +624,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             #self.admin_protocols_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
-            c.execute("""INSERT INTO Protocols (Protocol) VALUES (\'%s\')""" % ret)
+            c.execute("""INSERT INTO Protocols (Protocol) VALUES ('%s')""" % ret)
             conn.commit()
             c.close()
             conn.close()
@@ -638,7 +638,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from Protocols where Protocol == \'%s\'""" % val)
+                c.execute("""Delete from Protocols where Protocol == '%s'""" % val)
                 c.close()
                 conn.commit()
                 conn.close()
@@ -658,7 +658,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         val = item.text()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT Path, Args FROM Reports where Name == \'%s\'""" % val)
+        c.execute("""SELECT Path, Args FROM Reports where Name == '%s'""" % val)
         ret = c.fetchone()
         c.close()
         conn.close()
@@ -714,7 +714,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             val = self.admin_reports_listWidget.currentItem().text()
             conn = sqlite3.connect(self.filename)
             c = conn.cursor()
-            c.execute("""SELECT Name, Path, Args FROM Reports where Name == \'%s\'""" % val)
+            c.execute("""SELECT Name, Path, Args FROM Reports where Name == '%s'""" % val)
             row = c.fetchone()
             self.admin_reports_name_lineEdit.setText(row[0])
             self.admin_reports_script_lineEdit.setText(row[1])
@@ -727,8 +727,8 @@ class SubjectManager (QtGui.QWidget, form_class):
             ret_args = unicode(self.admin_reports_args_lineEdit.text())
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
-            c.execute("""Delete from Reports where Name == \'%s\'""" % ret_name)
-            c.execute("""INSERT INTO Reports (Name, Path, Args) VALUES (\'%s\', \'%s\', \'%s\')""" % (ret_name,ret_path,ret_args))
+            c.execute("""Delete from Reports where Name == '%s'""" % ret_name)
+            c.execute("""INSERT INTO Reports (Name, Path, Args) VALUES ('%s', '%s', '%s')""" % (ret_name,ret_path,ret_args))
             conn.commit()
             c.close()
             conn.close()
@@ -741,7 +741,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from Reports where Name == \'%s\'""" % val)
+                c.execute("""Delete from Reports where Name == '%s'""" % val)
                 c.close()
                 conn.commit()
                 conn.close()
@@ -765,7 +765,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             #self.admin_user_listWidget.insertItem(-1, ret)
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
-            c.execute("""INSERT INTO UserVars (UserVar) VALUES (\'%s\')""" % ret)
+            c.execute("""INSERT INTO UserVars (UserVar) VALUES ('%s')""" % ret)
             conn.commit()
             c.close()
             conn.close()
@@ -779,7 +779,7 @@ class SubjectManager (QtGui.QWidget, form_class):
             if ret:
                 conn = sqlite3.connect(self.filename)
                 c = conn.cursor()
-                c.execute("""Delete from UserVars where UserVar == \'%s\'""" % val)
+                c.execute("""Delete from UserVars where UserVar == '%s'""" % val)
                 c.close()
                 conn.commit()
                 conn.close()
@@ -797,6 +797,8 @@ class SubjectManager (QtGui.QWidget, form_class):
             self.add_subject_lineEdit.setText('1')
         else:
             self.add_subject_lineEdit.setText(unicode(int(subn[0])+1));
+
+
 
         c.execute("""SELECT EthnicID FROM EthnicIDs""")
         self.add_ethnic_id_comboBox.clear()
@@ -906,11 +908,13 @@ class SubjectManager (QtGui.QWidget, form_class):
 
         #print "\'"+"\',\'".join(query_columns_list)+"\'"
         #print "\'"+"\',\'".join(query_vals_list)+"\'"
-        c.execute("""INSERT INTO Subjects (\'%s\') VALUES (\'%s\')""" % ("\',\'".join(query_columns_list), "\',\'".join(query_vals_list)))
+        c.execute("""INSERT INTO Subjects ('%s') VALUES ('%s')""" % ("','".join(query_columns_list), "','".join(query_vals_list)))
         conn.commit()
         c.close()
         conn.close()
         self.add_init()
+        self.edit_load_subject_list()
+
         #self.close()
 
     def doAge(self):
