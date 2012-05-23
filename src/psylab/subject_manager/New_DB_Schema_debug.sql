@@ -116,10 +116,10 @@ CREATE TABLE "Admin" (
     "Name" TEXT,
     "Value" TEXT
 );
-INSERT INTO "Subjects" VALUES(NULL,1,'John','Smith','1955-02-15','2011-03-04','Male','john.smith@hotmail.com','123-456-7890','White','Not Hispanic','True','','','2011-03-04','','5','5','5','10','10','20','15','20','25','25','30', '45','50','60','70','70','80','85','90','-110','-110','-70','2012-02-12','CAB');
-INSERT INTO "Subjects" VALUES(NULL,2,'Mary','Jones','1965-10-22','2011-03-04','Female','mary.jones@yahoo.com','111-222-3333','Black','Hispanic/Latino','True','','2011-04-15','','','0','5','5','10','5','5','10','10','20','5','10', '0','0','0','0','5','5','0','10','15','10','5','2012-03-27','KHT');
-INSERT INTO "Subjects" VALUES(NULL,3,'Thomas','Jefferson','1743-04-13','2011-03-04','Male','jefferson@whitehouse.gov','456-765-4321','White','Not Hispanic','True','','2012-07-22','','','20','25','25','20','35','45','50','50','45','55','50', '10','20','35','30','35','45','40','40','45','40','45','2011-03-04','KHT');
-INSERT INTO "Subjects" VALUES(NULL,4,'Margaret','Thatcher','1743-04-13','2011-03-04','Male','jefferson@whitehouse.gov','456-765-4321','White','Not Hispanic','True','','2012-07-22','','','20','25','25','20','35','45','50','50','45','55','50', '10','20','35','30','35','45','40','40','45','40','45','2011-03-04','KHT');
+INSERT INTO "Subjects" VALUES(NULL,'1','John','Smith','1955-02-15','2011-03-04','Male','john.smith@hotmail.com','123-456-7890','White','Not Hispanic','True','','','2011-03-04','','5','5','5','10','10','20','15','20','25','25','30', '45','50','60','70','70','80','85','90','-110','-110','-70','2012-02-12','CAB');
+INSERT INTO "Subjects" VALUES(NULL,'2','Mary','Jones','1965-10-22','2011-03-04','Female','mary.jones@yahoo.com','111-222-3333','Black','Hispanic/Latino','True','','2011-04-15','','','0','5','5','10','5','5','10','10','20','5','10', '0','0','0','0','5','5','0','10','15','10','5','2012-03-27','KHT');
+INSERT INTO "Subjects" VALUES(NULL,'3','Thomas','Jefferson','1743-04-13','2011-03-04','Male','jefferson@whitehouse.gov','456-765-4321','White','Not Hispanic','True','','2012-07-22','','','20','25','25','20','35','45','50','50','45','55','50', '10','20','35','30','35','45','40','40','45','40','45','2011-03-04','KHT');
+INSERT INTO "Subjects" VALUES(NULL,'4','Margaret','Thatcher','1743-04-13','2011-03-04','Male','jefferson@whitehouse.gov','456-765-4321','White','Not Hispanic','True','','2012-07-22','','','20','25','25','20','35','45','50','50','45','55','50', '10','20','35','30','35','45','40','40','45','40','45','2011-03-04','KHT');
 
 INSERT INTO "Admin" VALUES(1,'version','0.1');
 

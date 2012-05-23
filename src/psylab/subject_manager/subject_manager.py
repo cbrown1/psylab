@@ -791,7 +791,7 @@ class SubjectManager (QtGui.QWidget, form_class):
     def add_init(self):
         conn = sqlite3.connect(self.filename);
         c = conn.cursor();
-        c.execute("""SELECT MAX(SubjN) FROM Subjects""");
+        c.execute("""SELECT MAX(CAST(SubjN AS Int)) FROM Subjects""");
         subn = c.fetchone();
         if subn[0] is None:
             self.add_subject_lineEdit.setText('1')
