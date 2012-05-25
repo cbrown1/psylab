@@ -112,7 +112,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         self.admin_reports_script_pushButton.setIcon(QtGui.QIcon("images/folder_add.png"))
         self.admin_reports_script_pushButton.setText("")
         
-        self.edit_pushButton.setIcon(QtGui.QIcon("images/disk.png"))
+        self.edit_pushButton.setIcon(QtGui.QIcon("images/user_save.png"))
         self.edit_pushButton.setText("Save")
 
         self.edit_protocol_date_remove_pushButton.setIcon(QtGui.QIcon("images/delete.png"))
