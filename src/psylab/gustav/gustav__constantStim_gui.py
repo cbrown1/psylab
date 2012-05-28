@@ -24,8 +24,8 @@ def setup(exp,run,var,stim,user):
     exp.name = 'SNR_exp'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     # TODO: move logstring and datastring vars out of exp and into either method or settings, so they can be properly enumerated at startup
-    exp.logString_post_trial = " adf Trial $trial, Response: $response\n"
-    #exp.logString_post_trial = "  Trial $trials_exp, KW Possible: $stim_kw['CUNYf'], KW Correct: $response"; #Write this string to the console after every trial
+    exp.logString_post_trial = " Trial $trial, Response: $response\n"
+    #exp.logString_post_trial = "  Trial $trial, KW Possible: $stim_kw['CUNYf'], KW Correct: $response"; #Write this string to the console after every trial
     #exp.logString_Block = "Blocky $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')

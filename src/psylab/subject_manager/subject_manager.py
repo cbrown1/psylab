@@ -1,5 +1,25 @@
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2010-2012 Christopher Brown
+#
+# This file is part of Psylab.
+#
+# Psylab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Psylab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
+#
+
 import sys, os
 import sqlite3
 import datetime
@@ -147,7 +167,7 @@ class SubjectManager (QtGui.QWidget, form_class):
         
         self.about_textedit.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
         self.about_textedit.setText("""<h3><img src='images/report.png'>&nbsp;Subject Manager  %s</h3> 
-                                 <p><i>Copyright &copy; 2011-2012 Christopher Brown &lt;cbrown1@pitt.edu&gt;</i></p> 
+                                 <p><i>Copyright &copy; 2010-2012 Christopher Brown &lt;cbrown1@pitt.edu&gt;</i></p> 
                                  <p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed 
                                  under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; 
                                  see http://www.gnu.org/licenses/ for more information.</p>
