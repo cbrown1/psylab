@@ -23,15 +23,15 @@ requires=[
 
 setup(name='PsyLab',
       version=version,
-      description='PsychoAcoustics Lab',
+      description='PsyLab: PsychoAcoustics Lab',
       long_description='''\
- A loose collection of modules useful for various aspects of running psychoacoustics
- experiments, although several will be more generally useful.''',
+ Psylab is a loose collection of modules useful for various aspects of running
+ psychoacoustics experiments, although several might be more generally useful.''',
       author='Christopher Brown, Joseph Ranweiler',
       author_email='c-b@asu.edu',
       maintainer='Christopher Brown',
       maintainer_email='c-b@asu.edu',
-      url='http://www.psy-lab.us',
+      url='http://www.psylab.us',
       package_dir = {'psylab': 'src/psylab'},
       packages = packages,
       requires = requires,

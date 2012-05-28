@@ -12,6 +12,8 @@ class Interface():
         self.dialog = self.Dialog(exp, run, choices)
         self.dialog.show()
         self.dialog.setFixedSize(self.dialog.width(),self.dialog.height()) # <- Must be done after show
+        self.app.processEvents()
+        self.app.processEvents()
 
     class Dialog(QtGui.QDialog):
 
@@ -41,6 +43,7 @@ class Interface():
             self.isPlaying.setVisible(False)
 
             self.timeLabel = QtGui.QLabel()
+            self.timeLabel.setStyleSheet("QWidget { border: 1px solid black; margin-left: 10; margin-right: 10; margin-top: 8; margin-bottom: 8 }")
             f = self.timeLabel.font()
             f.setPointSize(14)
             self.timeLabel.setFont(f)
@@ -49,42 +52,47 @@ class Interface():
 
             self.expLabel = QtGui.QLabel()
             f = self.expLabel.font()
-            f.setPointSize(14)
+            f.setPointSize(10)
             self.expLabel.setFont(f)
             self.expLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
             vbox.addWidget(self.expLabel)
 
             self.blockLabel = QtGui.QLabel()
             f = self.blockLabel.font()
-            f.setPointSize(14);
+            f.setPointSize(10);
             self.blockLabel.setFont(f)
-            self.blockLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.blockLabel.setStyleSheet("QWidget { border: 1px solid darkGray; vertical-align: text-top; }")
+            self.blockLabel.setAlignment(QtCore.Qt.AlignTop)
             vbox.addWidget(self.blockLabel)
 
             self.trialLabel = QtGui.QLabel()
             f = self.trialLabel.font()
-            f.setPointSize(16);
+            f.setPointSize(10);
             self.trialLabel.setFont(f)
             self.trialLabel.setFixedHeight(60)
             self.trialLabel.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.trialLabel.setAlignment(QtCore.Qt.AlignTop)
+            self.trialLabel.setWordWrap(True)
             vbox.addWidget(self.trialLabel)
 
             scoreBox = QtGui.QHBoxLayout()
 
             self.trialScore = QtGui.QLabel()
             f = self.trialScore.font()
-            f.setPointSize(14);
+            f.setPointSize(10);
             self.trialScore.setFont(f)
             self.trialScore.setFixedHeight(60)
             self.trialScore.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.trialScore.setAlignment(QtCore.Qt.AlignTop)
             scoreBox.addWidget(self.trialScore)
 
             self.blockScore = QtGui.QLabel()
             f = self.blockScore.font()
-            f.setPointSize(14);
+            f.setPointSize(10);
             self.blockScore.setFont(f)
             self.blockScore.setFixedHeight(60)
             self.blockScore.setStyleSheet("QWidget { border: 1px solid darkGray; }")
+            self.blockScore.setAlignment(QtCore.Qt.AlignTop)
             scoreBox.addWidget(self.blockScore)
 
             vbox.addLayout(scoreBox)
@@ -93,7 +101,7 @@ class Interface():
 
             self.blockVariables = QtGui.QLabel()
             f = self.blockVariables.font()
-            f.setPointSize(11);
+            f.setPointSize(10);
             self.blockVariables.setFont(f)
             self.blockVariables.setFixedHeight(120)
             self.blockVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
@@ -102,7 +110,7 @@ class Interface():
 
             self.expVariables = QtGui.QLabel()
             f = self.expVariables.font()
-            f.setPointSize(11);
+            f.setPointSize(10);
             self.expVariables.setFont(f)
             self.expVariables.setFixedHeight(120)
             self.expVariables.setStyleSheet("QWidget { border: 1px solid darkGray; }")
@@ -183,6 +191,8 @@ class Interface():
 
     def showPlaying(self, playing):
         self.dialog.isPlaying.setVisible(playing)
+        self.app.processEvents()
+        self.app.processEvents()
 
     def updateInfo_Exp(self, s):
         self.dialog.expLabel.setText(s)

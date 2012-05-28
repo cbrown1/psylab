@@ -42,7 +42,7 @@ import numpy as np
 dynamic_vars_user = {            # These must be set by experimenter
             'name': '',          # Name of the dynamic variable
             'units': '',         # Units of the dynamic variable
-            'intervals': 2,      # Number of intervals
+            'alternatives': 2,   # Number of alternatives
             'steps': [0, 0],     # Stepsizes to use at each reversal (len = #revs)
             'downs': 2,          # Number of 'downs'
             'ups': 1,            # Number of 'ups'
@@ -223,19 +223,27 @@ def post_block(exp, run, var, stim, user):
 
 
 def pre_exp(exp, run, var, stim, user):
-    exp.logString_pre_exp = "Experiment $name started at $time\n"
-    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_pre_trial = "  Trial $trial_block, dynamic: $dynamic[value] $dynamic[units], Interval: $dynamic[correct], "
-    exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
-    exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_post_exp = "\nExperiment $name ended at $time\n"
+    # Only set these if empty, in case they were set in settings file setup, which has run already
+    if exp.logString_pre_exp == "":
+        exp.logString_pre_exp = "Experiment $name started at $time\n"
+    if exp.logString_pre_block == "":
+        exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    if exp.logString_pre_trial == "":
+        exp.logString_pre_trial = "  Trial $trial_block, dynamic: $dynamic[value] $dynamic[units], alternative: $dynamic[correct], "
+    print "Got Here"
+    if exp.logString_post_trial == "":
+        print "But also here"
+        exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
+    if exp.logString_post_block == "":
+        exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    if exp.logString_post_exp == "":
+        exp.logString_post_exp = "\nExperiment $name ended at $time\n"
 
 
 def save_data_block(exp,run,var,stim,user):
     if os.path.isfile(exp.dataFile):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
     else:
-        print "SAVING NEW!"
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
         f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav!\n\n")
         f.write(u"# Experiment: %s\n\n'''%s\n'''\n\n" % (exp.name, exp.comments))

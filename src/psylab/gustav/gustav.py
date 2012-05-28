@@ -90,7 +90,7 @@ def list_conditions(settingsFile = None, frontend = None):
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
 
-def run(settingsFile = None, subjectID = None, frontend = None, recordData = True):
+def run(settingsFile = None, subjectID = None, frontend = None, recordData = None):
 
     exp = utils.exp()
     var = utils.var()
@@ -136,20 +136,20 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Tru
     exp.method = getattr(methodi, exp.method_str)
 
     exp.utils.initialize_experiment(exp,run,var,stim,user)
+    if recordData is not None:
+        exp.recordData = recordData
 
-    exp.recordData = recordData
     if exp.recordData:
         if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
             if (exp.dataString_trial == None or exp.dataString_trial == ''):
                 if (exp.dataString_block == None or exp.dataString_block == ''):
                     if (exp.dataString_exp == None or exp.dataString_exp == ''):
                         raise Exception, "Can't record data, because no available method has been specified.\nYou must specify at least one of the following:\nStrings exp.dataString_trial, exp.dataString_block, exp.dataString_exp\nFunctions: save_data_trial, save_data_block, save_data_exp"
-
+    else:
+        print "WARNING: No data will be recorded!"
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
-    else:
-        if not exp.recordData:
-            print "WARNING: No data will be recorded!"
+
     if run.gustav_is_go == False:
         print "Gustav cancelled at user request"
         return;
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     settingsFile = None
     subjectID = None
     frontend = None
-    recordData = True
+    recordData = None
     action = 'run'
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hcldf:s:i:", ["help", "config", "list", "dontrecord", "frontend=", "settingsFile=", "subjectID="])

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown and Joseph Ranweiler;
-# All Rights Reserved.
+# Copyright (c) 2010-2012 Christopher Brown
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +34,7 @@
 PsyLab - Psychophysics Lab
 
 A loose collection of modules useful for various aspects of running
-psychophysical experiments, although several will be more generally
+psychophysical experiments, although several might be more generally
 useful.
 
 '''

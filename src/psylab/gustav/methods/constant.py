@@ -33,6 +33,7 @@
 '''Method of constant stimuli for Gustav
 
 '''
+import os, codecs
 
 #def initialize(exp,run,var,stim,user):
 #    pass
@@ -40,12 +41,17 @@
 # TODO: add trialsperblock, startblock, starttrial
 
 def pre_exp(exp, run, var, stim, user):
-    exp.logString_pre_exp = "Experiment $name started at $time\n"
-    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_pre_trial = ""
-    exp.logString_post_trial = " Trial $trial, Response: $response\n"
-    exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_post_exp = "\nExperiment $name ended at $time\n"
+    # Only set these if empty, in case they were set in settings file setup, which has run already
+    if exp.logString_pre_exp == "":
+        exp.logString_pre_exp = "Experiment $name started at $time\n"
+    if exp.logString_pre_block == "":
+        exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    if exp.logString_post_trial == "":
+        exp.logString_post_trial = " Trial $trial, Response: $response\n"
+    if exp.logString_post_block == "":
+        exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    if exp.logString_post_exp == "":
+        exp.logString_post_exp = "\nExperiment $name ended at $time\n"
     run.block = var.constant['startblock']-1
     if run.block == run.nblocks - 1:
         run.gustav_is_go = False
@@ -63,5 +69,4 @@ def post_trial(exp, run, var, stim, user):
         run.block_on = False
     run.trial_on = False
 
-def save_data_block(exp,run,var,stim,user):
-    pass
+

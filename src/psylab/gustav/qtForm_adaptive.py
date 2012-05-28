@@ -66,6 +66,7 @@ class adaptive_interface():
 
             self.setWindowTitle("Gustav!")
             self.setModal=False
+            self.setFocus()
 
         def closeEvent(self, event):
             # fake a quit:
@@ -125,10 +126,11 @@ class adaptive_interface():
         else:
             stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
         button = list(button)
-        #self.app.processEvents()
+
         for b in button:
             self.dialog.button_dict[str(b)].setStyleSheet(stylesheet)
         self.app.processEvents()
+        self.app.processEvents() # have to call twice to actually update widgets correctly
 
     def updateInfo_BlockCount(self, s):
         self.dialog.blocks.setText(s)

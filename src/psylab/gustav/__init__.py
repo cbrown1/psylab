@@ -33,11 +33,11 @@
 """Gustav - A Python module to run psychophysical experiments
 
     The goal of Gustav is to handle the routines that are common across
-    experiments (like the psychophysical procedure, keeping track of
-    responses, writing to data files, etc), to allow the experimenter to
-    worry about the things that are unique to each experiment (like the
-    design, stimulus generation, etc.).
-
+    experiments (like the psychophysical procedure, keeping track of stimulus
+    and condition orders, recording response data, etc), to allow the 
+    experimenter to worry about the things that are unique to each experiment
+    (like the experimental design, stimulus generation, etc.).
+ 
     See one of the settings.py files for more information.
 	
 	The main functions in Gustav are:

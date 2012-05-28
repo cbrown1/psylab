@@ -55,15 +55,15 @@ class exp:
     prompt = ''
     responseMethod = 'key' # 'key' or 'text'. If key, be sure to set'validresponses'
     validKeys = '1, 2'  # list of valid responses
-    logString_pre_trial = '' #Write this string to the console and/or logfile before every trial
-    logString_post_trial = ''#Write this string to the console and/or logfileafter every trial
+    logString_pre_trial = "" #Write this string to the console and/or logfile before every trial
+    logString_post_trial = ""#Write this string to the console and/or logfileafter every trial
     logString_pre_block = "" #Write this string to the console and/or logfilebefore every block
     logString_post_block = ""#Write this string to the console and/or logfileafter every block
     logString_pre_exp = ""   #Write this string to the console and/or logfileat start of exp
     logString_post_exp = ""  #Write this string to the console and/or logfileat end of exp
     logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new (variables expand to names, not values)
     logFile = 'gustav_logfile_$date.log'
-    logFile_unexpanded = ''
+    logFile_unexpanded = ""
     logConsole = True
     dataString_trial = '' #Write this string to datafile after every trial
     dataString_block = '' #Write this string to datafile after every block
@@ -209,41 +209,43 @@ def initialize_experiment( exp, run, var, stim, user):
     # pre_exp, pre_block, post_trial, post_block, post_exp
     if hasattr(exp.method, 'pre_exp'):
         exp.pre_exp_.append(exp.method.pre_exp)
-    if hasattr(exp.settings, 'pre_exp'):
-        exp.pre_exp_.append(exp.settings.pre_exp)
     if hasattr(exp.method, 'pre_block'):
         exp.pre_block_.append(exp.method.pre_block)
-    if hasattr(exp.settings, 'pre_block'):
-        exp.pre_block_.append(exp.settings.pre_block)
     if hasattr(exp.method, 'post_trial'):
         exp.post_trial_.append(exp.method.post_trial)
-    if hasattr(exp.settings, 'post_trial'):
-        exp.post_trial_.append(exp.settings.post_trial)
     if hasattr(exp.method, 'post_block'):
         exp.post_block_.append(exp.method.post_block)
-    if hasattr(exp.settings, 'post_block'):
-        exp.post_block_.append(exp.settings.post_block)
     if hasattr(exp.method, 'post_exp'):
         exp.post_exp_.append(exp.method.post_exp)
+
+    if hasattr(exp.settings, 'pre_exp'):
+        exp.pre_exp_.append(exp.settings.pre_exp)
+    if hasattr(exp.settings, 'pre_block'):
+        exp.pre_block_.append(exp.settings.pre_block)
+    if hasattr(exp.settings, 'post_trial'):
+        exp.post_trial_.append(exp.settings.post_trial)
+    if hasattr(exp.settings, 'post_block'):
+        exp.post_block_.append(exp.settings.post_block)
     if hasattr(exp.settings, 'post_exp'):
         exp.post_exp_.append(exp.settings.post_exp)
 
     # For save_data functions, look for any present in settings first, then look in method.
     # But only run one each.
-    if hasattr(exp.settings, 'save_data_trial'):
-        exp.save_data_trial = exp.settings.save_data_trial
     elif hasattr(exp.method, 'save_data_trial'):
         exp.save_data_trial = exp.method.save_data_trial
-    if hasattr(exp.settings, 'save_data_block'):
-        exp.save_data_block = exp.settings.save_data_block
     elif hasattr(exp.method, 'save_data_block'):
         exp.save_data_block = exp.method.save_data_block
-    if hasattr(exp.settings, 'save_data_exp'):
-        exp.save_data_exp = exp.settings.save_data_exp
     elif hasattr(exp.method, 'save_data_exp'):
         exp.save_data_exp = exp.method.save_data_exp
 
-    # A few unique situation:
+    if hasattr(exp.settings, 'save_data_trial'):
+        exp.save_data_trial = exp.settings.save_data_trial
+    if hasattr(exp.settings, 'save_data_block'):
+        exp.save_data_block = exp.settings.save_data_block
+    if hasattr(exp.settings, 'save_data_exp'):
+        exp.save_data_exp = exp.settings.save_data_exp
+
+    # A few that should be settings-specific:
     if hasattr(exp.settings, 'present_trial'):
         exp.present_trial = exp.settings.present_trial
     if hasattr(exp.settings, 'prompt_response'):
@@ -251,6 +253,7 @@ def initialize_experiment( exp, run, var, stim, user):
     if hasattr(exp.settings, 'prompt_condition'):
         exp.prompt_condition = exp.settings.prompt_condition
 
+    # And one that needs to be in settings
     if hasattr(exp.settings, 'pre_trial'):
         exp.pre_trial = exp.settings.pre_trial
     else:
@@ -674,7 +677,7 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         $var[varname]    : varname is the name of one of your variables
         $currentvars[';']: A delimited list of the current levels of all vars
                             The delimiter can be specified (use empty brackets
-                            to specify default: ','
+                            to specify default: ',')
         $currentvarsvals : Same as currentvars, but you will get 'var = val'
                             instead of just 'val'
         $user[varname]   : Any user variables
