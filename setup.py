@@ -1,12 +1,44 @@
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
-from setuptools import setup
-import sys
-sys.path.append("src")
+# Copyright (c) 2010-2012 Christopher Brown
+#
+# This file is part of Psylab.
+#
+# Psylab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Psylab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Bug reports, bug fixes, suggestions, enhancements, or other 
+# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# for more information and to contribute. Or send an e-mail to: 
+# cbrown1@pitt.edu.
+#
 
+from distutils.core import setup
+from distutils.sysconfig import get_python_lib
+#from setuptools import setup
+import sys, os
 import psylab
 version = psylab.__version__
+
+package_dir = {'psylab': 'psylab'}
+package_data = {'psylab': [ '*.py',
+                            'subject_manager/*.ui',
+                            'subject_manager/*.sql',
+                            'subject_manager/images/*.*',
+                            'misc/*.csl',
+                ]}
+
+requires = ['numpy (>=1.2)',]
 
 packages = ['psylab%s' % (p) for p in ['',
                                     '.array',
@@ -16,9 +48,13 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.gustav.frontends',
                                     '.misc',
                                     '.signal',
-                                    '.stats']]
+                                    '.stats',
+                                    '.subject_manager',
+                                    '.tdt2'
+                                    ]]
 requires=[
 'numpy (>=1.2)',
+'scipy',
 ]
 
 setup(name='PsyLab',
@@ -32,8 +68,9 @@ setup(name='PsyLab',
       maintainer='Christopher Brown',
       maintainer_email='c-b@asu.edu',
       url='http://www.psylab.us',
-      package_dir = {'psylab': 'src/psylab'},
       packages = packages,
+      package_dir = package_dir,
+      package_data = package_data,
       requires = requires,
       platforms = ['any'],
       classifiers = [
