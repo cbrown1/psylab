@@ -62,6 +62,7 @@ smooth - Smooths a signal using windowing
 specgram - Plots a nice spectrogram
 specplot - Plots magnitude spectra
 t60 - Estimates reverberation time
+tone - Generates pure tones
 vocoder - Implements an envelope vocoder
 zeropad - Zero pads the shorter of two or more arrays
 
@@ -95,6 +96,7 @@ from samp2ms import samp2ms
 from smooth import smooth
 from specgram import specgram
 from specplot import specplot
+from tone import tone
 from t60 import t60
 from vocoder import vocoder, vocoder_overlap
 from zeropad import zeropad

@@ -28,7 +28,6 @@
 # A Gustav settings file!
 
 import os
-import inspect
 import numpy as np
 import psylab
 import qtForm_speech as theForm
@@ -347,6 +346,5 @@ def post_exp(exp,run,var,stim,user):
 
 
 if __name__ == '__main__':
-    import inspect
-    fname = inspect.getfile( inspect.currentframe() )
+    fname = os.path.realpath(__file__)
     psylab.gustav.run(settingsFile=fname)

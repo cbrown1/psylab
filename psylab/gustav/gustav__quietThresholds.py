@@ -26,13 +26,13 @@
 # A Gustav settings file!
 
 import os
-import numpy as np
 import time
+import numpy as np
 import psylab
+import medussa as m
 import qtForm_adaptive as theForm
 #from brian import hears as bh
 #import brian as b
-import medussa as m
 
 def setup(exp,run,var,stim,user):
 
@@ -45,7 +45,6 @@ def setup(exp,run,var,stim,user):
     else:
         basedir = os.path.expanduser(os.path.join('~','Documents','Python')) # Win7
         basedir = os.path.expanduser(os.path.join('~','My Documents','Python'))
-
     # General Experimental Variables
     exp.name = 'quiet_thresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
@@ -54,7 +53,7 @@ def setup(exp,run,var,stim,user):
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.logConsole = True
     exp.debug = False
-    exp.recordData = True
+    exp.recordData = False
     exp.dataFile = os.path.join(basedir,'data','$name_$subj.py')
     exp.dataString_trial = ''
     exp.dataString_block = ''
@@ -64,18 +63,24 @@ def setup(exp,run,var,stim,user):
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = "Quiet Thresholds for pure tones"
     exp.comments = '''\
-    A simple 1-up 2-down procedure to estimate quiet thresholds for pure tones 
-    of various frequencies. 
+    A simple 2-down 1-up procedure to estimate psychophysical quiet thresholds 
+    for pure tones of various frequencies. 
     '''
 
     """STIMULUS SETS
         If you generate all your stimuli on the fly, you don't need any of these.
 
-        The only required property is 'type', which should be either 'manual'
-        or 'soundfiles'. If it is manual, the experimenter is responsible for
-        handling it.
+        The only required property is `type`, which should be either `manual`
+        or `files`. If it is 'files', the function stim.get_next will be called 
+        on each trial, and you can access the current token at 
+        stim.current[setname]. In this case, you must also set the `path` 
+        variable. If it is manual, the experimenter is responsible for
+        keeping track of file order, etc., but you can call stim.get_next yourself
+        as needed (you'll still need to set `path`), in which case 
+        stim.current[setname] will be accessible. In all cases, the experimenter 
+        is responsible for loading the stimuli. 
 
-        If 'type is set to 'soundfiles', each set needs two additional settings:
+        If `type` is set to `files`, an additional setting is required:
 
         'path' is the full path to the folder containing the files
 
@@ -314,6 +319,5 @@ def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks+1))
 
 if __name__ == '__main__':
-    import inspect
-    fname = inspect.getfile( inspect.currentframe() )
+    fname = os.path.realpath(__file__)
     psylab.gustav.run(settingsFile=fname)
