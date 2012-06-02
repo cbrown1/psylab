@@ -29,7 +29,7 @@ import os
 import inspect
 import numpy as np
 import psylab
-import qtForm_speech as theForm
+#import qtForm_speech as theForm
 
 def setup(exp,run,var,stim,user):
 
@@ -43,17 +43,19 @@ def setup(exp,run,var,stim,user):
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
 
     # General Experimental Variables
-    exp.name = 'Speech_exp'
+    exp.name = '_SomeExperiment'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    # TODO: move logstring and datastring vars out of exp and into either method or settings, so they can be properly enumerated at startup
-    exp.logString_post_trial = " adf Trial $trial, Response: $response\n"
-    #exp.logString_post_trial = "  Trial $trials_exp, KW Possible: $stim_kw['CUNYf'], KW Correct: $response"; #Write this string to the console after every trial
-    #exp.logString_Block = "Blocky $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
+    exp.consoleString_Trial = ''; #Write this string to the console after every trial
+    exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
     exp.frontend = 'term'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
+    exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
+    exp.dataString_exp = ''
+    exp.dataString_block = ''
+    exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.cacheTrials = False
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid responses
     exp.note = 'CI Pilot data'
@@ -111,9 +113,8 @@ def setup(exp,run,var,stim,user):
 
     stim.sets['CUNYf'] = {
                               'type':   'soundfiles',
-                              'path':   os.path.join(basedir,'stim','CUNYf'),
-                              'fs'  :   44100,
-                              'text':   os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
+                              'path':   os.path.join(basedir,'stim','CUNY_F1'),
+                              'text':   os.path.join(basedir,'stim','CUNY_F1.txt'),
                               'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
                               'load':   'auto',  # 'auto' = Load stimuli automatically (default)
@@ -123,8 +124,7 @@ def setup(exp,run,var,stim,user):
                             };
     stim.sets['Babble'] = {
                               'type':   'soundfiles',
-                              'path':   os.path.join(basedir,'stim','babble'),
-                              'fs'  :   44100,
+                              'path':   os.path.join(basedir,'stim','noise'),
                               'mask':   '*.wav; *.WAV',
                               'load':   'manual',  # 'manual' = Just get names, don't load
                               'order':  'random', #
@@ -308,9 +308,8 @@ def setup(exp,run,var,stim,user):
 def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        #p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        #ret = exp.term.get_input(None, "Gustav!",p)
-        ret = exp.interface.get_char()
+        p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
+        ret = exp.term.get_input(None, "Gustav!",p)
 
         #TODO: Switch to get_char
         #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
@@ -331,35 +330,9 @@ def prompt_response(exp,run,var,stim,user):
     using exp.utils.wavplay.
 """
 def pre_trial(exp,run,var,stim,user):
-    p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase']+" KW: "+str(stim.current['CUNYf']['kw']) +"\n"+stim.current['CUNYf']['txt']
-    exp.interface.updateInfo_Trial(p)
     stim.stimarray = np.zeros((1))
-
-def post_trial(exp,run,var,stim,user):
-    exp.interface.updateInfo_TrialScore('This is the trial score')
-
-def pre_exp(exp,run,var,stim,user):
-    exp.interface = theForm.Interface(exp, run, exp.validKeys_)
-    exp.interface.updateInfo_Exp(exp.name+", "+exp.note)
-    expvars = "Conditions: %r\nRecord Data: %r" % (var.orderarray, exp.recordData)
-    exp.interface.updateInfo_expVariables(expvars)
-
-def pre_block(exp,run,var,stim,user):
-    exp.interface.updateInfo_BlockCount("Block %g of %g" % (run.block+1, run.nblocks))
-    exp.interface.updateInfo_Block("Block %g of %g | Condition # %g" % (run.block+1, run.nblocks, run.condition+1))
-    exp.interface.updateInfo_blockVariables(exp.utils.get_expanded_vals_in_string("$currentvarsvals['\n']",exp,run,var,stim,user))
-
-def post_block(exp,run,var,stim,user):
-    exp.interface.updateInfo_BlockScore('Block score')
-
-def post_exp(exp,run,var,stim,user):
-    exp.interface.dialog.isPlaying.setText("Finished")
-    exp.interface.showPlaying(True)
-    #exp.interface.dialog.close()
-
 
 
 if __name__ == '__main__':
-    import inspect
-    fname = inspect.getfile( inspect.currentframe() )
+    fname = os.path.realpath(__file__)
     psylab.gustav.run(settingsFile=fname)

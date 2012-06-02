@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
-
 # Copyright (c) 2010-2012 Christopher Brown
 #
 # This file is part of Psylab.
@@ -30,7 +28,7 @@
 import os
 import numpy as np
 import psylab
-import qtForm_speech as theForm
+import gustav_form_speech_qt as theForm
 import medussa as m
 
 def setup(exp,run,var,stim,user):

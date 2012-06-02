@@ -1,38 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
-#
-# This file is part of Psylab.
-#
-# Psylab is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Psylab is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
-# cbrown1@pitt.edu.
-#
-
 # A Gustav settings file!
 
 import os
-import time
 import numpy as np
+import time
 import psylab
-import medussa as m
-import qtForm_adaptive as theForm
+import gustav_form_adaptive_qt as theForm
 #from brian import hears as bh
 #import brian as b
+import medussa as m
 
 def setup(exp,run,var,stim,user):
 
@@ -41,10 +18,11 @@ def setup(exp,run,var,stim,user):
     run.starttrial = 1
 
     if os.name == 'posix':
-        basedir = os.path.expanduser(os.path.join('~','Python'))
+        basedir = r'/home/code-breaker/Python'
     else:
-        basedir = os.path.expanduser(os.path.join('~','Documents','Python')) # Win7
-        basedir = os.path.expanduser(os.path.join('~','My Documents','Python'))
+        basedir = r'C:\Users\code-breaker\Documents\Python'
+        basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
+
     # General Experimental Variables
     exp.name = 'quiet_thresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
@@ -53,7 +31,7 @@ def setup(exp,run,var,stim,user):
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.logConsole = True
     exp.debug = False
-    exp.recordData = False
+    exp.recordData = False # Ask gustav not to save data: it is saved in the adaptive method script
     exp.dataFile = os.path.join(basedir,'data','$name_$subj.py')
     exp.dataString_trial = ''
     exp.dataString_block = ''
@@ -63,24 +41,18 @@ def setup(exp,run,var,stim,user):
     exp.validKeys = '1,2';  # comma-delimited list of valid responses
     exp.note = "Quiet Thresholds for pure tones"
     exp.comments = '''\
-    A simple 2-down 1-up procedure to estimate psychophysical quiet thresholds 
-    for pure tones of various frequencies. 
+    A 1-up 2-down procedure to estimate quiet thresholds for pure tones 
+    of various frequencies. 
     '''
 
     """STIMULUS SETS
         If you generate all your stimuli on the fly, you don't need any of these.
 
-        The only required property is `type`, which should be either `manual`
-        or `files`. If it is 'files', the function stim.get_next will be called 
-        on each trial, and you can access the current token at 
-        stim.current[setname]. In this case, you must also set the `path` 
-        variable. If it is manual, the experimenter is responsible for
-        keeping track of file order, etc., but you can call stim.get_next yourself
-        as needed (you'll still need to set `path`), in which case 
-        stim.current[setname] will be accessible. In all cases, the experimenter 
-        is responsible for loading the stimuli. 
+        The only required property is 'type', which should be either 'manual'
+        or 'soundfiles'. If it is manual, the experimenter is responsible for
+        handling it.
 
-        If `type` is set to `files`, an additional setting is required:
+        If 'type is set to 'soundfiles', each set needs two additional settings:
 
         'path' is the full path to the folder containing the files
 
@@ -117,15 +89,15 @@ def setup(exp,run,var,stim,user):
                 are enough stimulus files available. default is False
     """
 #    stim.sets['CNC'] = {
-#                              'type':   'files',
+#                              'type':   'soundfiles',
 #                              'path':   os.path.join(basedir,'stim','CNC','gammatone_32'),
+#                              'fs'  :   44100,
 #                              'text':   '', #os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
 #                              'txtfmt': 'file kw text',
 #                              'mask':   '*.wav; *.WAV',
 #                              'load':   'manual',  # 'auto' = Load stimuli automatically (default)
 #                              'order':  'r,1:500', #
 #                              'repeat': True,    # If we run out of files, should we start over?
-#                              'fs'  :   44100,  # A custom value
 #                              'equate': 3,  # A custom value
 #                            };
 
@@ -161,12 +133,11 @@ def setup(exp,run,var,stim,user):
                 files, but from different directories depending on the
                 treatment.
 
-        'levels' should be a list of strings that identify each level of interest
+        'levels' should be a list of strings that label each level of interest
+                  Then when you generate your stimulus for a given trial, you 
+                  can user var.current['name'] to get the current level. 
+                  Remeber that levels are always strings, so convert to numeric 
 
-        for file in stim['masker_files']:
-            masker,fs,enc = utils.wavread(file)
-            stim['masker'] += masker
-        stim['masker'] = stim['masker'][0:stim['masker_samples_needed']]
     """
     # TODO: for python 2.7, change these to ordered dicts, where name is the key
     # and the dict {type, levels} is the val
@@ -195,11 +166,13 @@ def setup(exp,run,var,stim,user):
 #                                      ]
 #                        });
 
+    """DYNAMIC VARIABLES
+        When the method is adaptive, these variables must be set in var.dynamic
+    """
     var.dynamic = { 'name': 'level',     # Name of the dynamic variable
                     'units': 'dB',       # Units of the dynamic variable
                     'alternatives': 2,   # Number of alternatives
                     'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (#revs = len)
-                    #'steps': [2, 2], # Stepsizes to use at each reversal (#revs = len)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
                     'val_start': 70,     # Starting value
@@ -236,14 +209,17 @@ def setup(exp,run,var,stim,user):
     user.isi = 250 # ms
     user.dur = 500 # ms
     user.max_level = 110 # dB; the max level achievable for pure tones with your system
+    user.interval_feedback = True   # Whether to provide interval feedback
+                                    # Although this is needed with quiet thresholds
+    user.performance_feedback = True # Whether to provide performance feedback
 
-"""CUSTOM PROMPT
-    If you want a custom response prompt, define a function for it
-    here. run.response should receive the response as a string, and
-    if you want to cancel the experiment, set both run.block_on and
-    run.pylab_is_go to False
-"""
 def prompt_response(exp,run,var,stim,user):
+    """CUSTOM PROMPT
+        If you want a custom response prompt, define a function for it
+        here. run.response should receive the response as a string, and
+        if you want to cancel the experiment, set both run.block_on and
+        run.pylab_is_go to False
+    """
     while True:
         #ret = exp.utils.getchar()
         exp.interface.app.processEvents()
@@ -257,13 +233,13 @@ def prompt_response(exp,run,var,stim,user):
             var.dynamic['msg'] = "Cancelled by user"
             break;
 
-"""PRE_TRIAL
-    This function gets called on every trial to generate the stimulus, and
-    do any other processing you need. All settings and variables are
-    available. For the current level of a variable, use
-    var.current['varname']. 
-"""
 def pre_trial(exp,run,var,stim,user):
+    """PRE_TRIAL
+        This function gets called on every trial to generate the stimulus, and
+        do any other processing you need. All settings and variables are
+        available. For the current level of a variable, use
+        var.current['varname']. 
+    """
     sig = psylab.signal.tone(float(var.current['Frequency']),user.fs,user.dur)
     sig = psylab.signal.ramps(sig,user.fs,duration=20)
     sig = psylab.signal.atten(sig,float(user.max_level)-float(var.dynamic['value']))
@@ -276,37 +252,49 @@ def pre_trial(exp,run,var,stim,user):
     else:
         #stim.out = [nosig, sig]
         stim.out = np.hstack((nosig, isi, sig))
-    time.sleep(.5)
     
 def present_trial(exp, run, var, stim, user):
+    # Wait a half-second, otherwise trial start is too quick
+    time.sleep(.5)
+    # Create a playback stream from the generated stimulus
     s = exp.audiodev.open_array(stim.out,user.fs)
+    # Play it
     s.play()
-    exp.interface.button_light([1], 'yellow')
-    time.sleep(float(user.dur)/1000.)
-    exp.interface.button_light([1], None)
-    time.sleep(float(user.isi)/1000.)
-    exp.interface.button_light([2], 'yellow')
-    time.sleep(float(user.dur)/1000.)
-    exp.interface.button_light([2], None)
+    if user.interval_feedback:
+        # Experimenter wants interval feedback
+        # Grab user values (user.dur, etc) to turn on 'lights' at the 
+        # correct time while stimulus is playing
+        exp.interface.button_light([1], 'yellow')
+        time.sleep(float(user.dur)/1000.)
+        exp.interface.button_light([1], None)
+        time.sleep(float(user.isi)/1000.)
+        exp.interface.button_light([2], 'yellow')
+        time.sleep(float(user.dur)/1000.)
+        exp.interface.button_light([2], None)
+    # Wait for stimulus to finish playing
+    while s.is_playing:
+        time.sleep(.1)
 
 def post_trial(exp, run, var, stim, user):
     exp.interface.button_light([1,2], None)
-    flash = .1
-
-    if run.gustav_is_go:
-        time.sleep(flash)
-        if str(var.dynamic['correct']).lower() == run.response.lower():
-            for i in range(3):
-                exp.interface.button_light([var.dynamic['correct']], 'green')
-                time.sleep(flash)
-                exp.interface.button_light([var.dynamic['correct']], None)
-                time.sleep(flash)
-        else:
-            for i in range(3):
-                exp.interface.button_light([var.dynamic['correct']], 'red')
-                time.sleep(flash)
-                exp.interface.button_light([var.dynamic['correct']], None)
-                time.sleep(flash)
+    if user.performance_feedback:
+        # Experimenter wants performance feedback
+        # Flash the correct interval; green if correct, red if wrong
+        flash = .1
+        if run.gustav_is_go:
+            time.sleep(flash)
+            if str(var.dynamic['correct']).lower() == run.response.lower():
+                for i in range(3):
+                    exp.interface.button_light([var.dynamic['correct']], 'green')
+                    time.sleep(flash)
+                    exp.interface.button_light([var.dynamic['correct']], None)
+                    time.sleep(flash)
+            else:
+                for i in range(3):
+                    exp.interface.button_light([var.dynamic['correct']], 'red')
+                    time.sleep(flash)
+                    exp.interface.button_light([var.dynamic['correct']], None)
+                    time.sleep(flash)
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = theForm.adaptive_interface(exp, run, exp.validKeys_)

@@ -32,10 +32,6 @@ class Interface():
     def __init__(self, exp, run, choices):
         self.app = QtGui.QApplication([])
         self.dialog = self.Dialog(exp, run, choices)
-        self.dialog.show()
-        self.dialog.setFixedSize(self.dialog.width(),self.dialog.height()) # <- Must be done after show
-        self.app.processEvents()
-        self.app.processEvents()
 
     class Dialog(QtGui.QDialog):
 
@@ -62,7 +58,7 @@ class Interface():
             headerBox.addWidget(self.isPlaying)
             headerBox.addStretch(1)
 
-            self.isPlaying.setVisible(False)
+            #self.isPlaying.setVisible(False)
 
             self.timeLabel = QtGui.QLabel()
             self.timeLabel.setStyleSheet("QWidget { border: 1px solid black; margin-left: 10; margin-right: 10; margin-top: 8; margin-bottom: 8 }")
@@ -160,6 +156,9 @@ class Interface():
 
             self.setWindowTitle("Gustav!")
             self.setModal=False
+            self.show()
+            self.setFixedSize(self.width(),self.height()) # <- Must be done after show
+
 
         def updateClock(self):
             now = datetime.now()
@@ -196,7 +195,6 @@ class Interface():
             elif key == QtCore.Qt.Key_Alt:
                 altDown = False
 
-
     # End Dialog
 
     def get_char(self):
@@ -213,51 +211,41 @@ class Interface():
 
     def showPlaying(self, playing):
         self.dialog.isPlaying.setVisible(playing)
-        self.app.processEvents()
-        self.app.processEvents()
+        self.update_form()
 
     def updateInfo_Exp(self, s):
         self.dialog.expLabel.setText(s)
+        self.update_form()
 
     def updateInfo_Block(self, s):
         self.dialog.blockLabel.setText(s)
+        self.update_form()
 
     def updateInfo_Trial(self, s):
         self.dialog.trialLabel.setText(s)
+        self.update_form()
 
     def updateInfo_BlockScore(self, s):
         self.dialog.blockScore.setText(s)
+        self.update_form()
 
     def updateInfo_TrialScore(self, s):
         self.dialog.trialScore.setText(s)
+        self.update_form()
 
     def updateInfo_blockVariables(self, s):
         self.dialog.blockVariables.setText(s)
+        self.update_form()
 
     def updateInfo_expVariables(self, s):
         self.dialog.expVariables.setText(s)
+        self.update_form()
 
     def updateInfo_BlockCount(self, s):
         self.dialog.blocks.setText(s)
-
-    def button_flash(self, button, color):
-        """Flashes the specified button on and off several times with the specified color
-        """
-        stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
-        for i in range(3):
-            self.dialog.button_dict[button].setStyleSheet(stylesheet)
-            self.app.processEvents()
-            time.sleep(.12)
-            self.dialog.button_dict[button].setStyleSheet(self.dialog.default_button_stylesheet)
-            self.app.processEvents()
-            time.sleep(.06)
-
-    def button_light(self, button, color, dur):
-        """Turns the specified button on then off with the specified color
-        """
-        stylesheet = "QPushButton {background-color: " + color + "; " + self.dialog.default_button_stylesheet_nobg
-        self.dialog.button_dict[button].setStyleSheet(stylesheet)
+        self.update_form()
+        
+    def update_form(self):
+        # have to call this twice or some widgets won't update
         self.app.processEvents()
-        time.sleep(dur)
-        self.dialog.button_dict[button].setStyleSheet(self.dialog.default_button_stylesheet)
         self.app.processEvents()

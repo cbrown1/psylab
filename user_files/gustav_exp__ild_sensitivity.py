@@ -1,35 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
-#
-# This file is part of Psylab.
-#
-# Psylab is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Psylab is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
-# cbrown1@pitt.edu.
-#
-
 # A Gustav settings file!
 
 import os
 import numpy as np
 import time
 import psylab
-import qtForm_adaptive as theForm
+import gustav_form_adaptive_qt as theForm
 #from brian import hears as bh
 #import brian as b
 import medussa as m
@@ -45,6 +22,7 @@ def setup(exp,run,var,stim,user):
     else:
         basedir = r'C:\Users\code-breaker\Documents\Python'
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
+        #basedir = r'P:\Python'
 
     # General Experimental Variables
     exp.name = '_ILD_x_freq'
@@ -130,6 +108,18 @@ def setup(exp,run,var,stim,user):
                               'equate': 3,  # A custom value
                             };
 
+#    stim.sets['Noise'] = {
+#                              'type':   'soundfiles',
+#                              'path':   os.path.join(basedir,'stim','noise','gammatone_32'),
+#                              'fs'  :   44100,
+#                              'text':   '', #os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
+#                              'txtfmt': 'file kw text',
+#                              'mask':   '*.wav; *.WAV',
+#                              'load':   'manual',  # 'auto' = Load stimuli automatically (default)
+#                              'order':  'r,1:50', #
+#                              'repeat': True,    # If we run out of files, should we start over?
+#                              'equate': 3,  # A custom value
+#                            };
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -184,20 +174,21 @@ def setup(exp,run,var,stim,user):
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CNC',
+                                        #'Noise',
                                       ]
                         });
 
     var.dynamic = { 'name': 'ild_coeff', # Name of the dynamic variable
                     'units': 'dB',       # Units of the dynamic variable
-                    'alternatives': 2,   # Number of alternatives
-                    'steps': [2, 2, 1, 1, 1, 1, 1, 1], # Stepsizes to use at each reversal (#revs = len)
+                    'intervals': 2,      # Number of intervals
+                    'steps': [.1, .1, .02, .02, .02, .02, .02, .02], # Stepsizes to use at each reversal (#revs = len)
                     #'steps': [2, 2], # Stepsizes to use at each reversal (#revs = len)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
-                    'val_start': -16,    # Starting value
+                    'val_start': .2,    # Starting value
                     #'val_start': 0,     # Starting value
-                    'val_floor': -40,    # Floor
-                    'val_ceil': 0,       # Ceiling
+                    'val_floor': 0,      # Floor
+                    'val_ceil': 1,       # Ceiling
                     'val_floor_n': 3,    # Number of consecutive floor values to quit at
                     'val_ceil_n': 3,     # Number of consecutive ceiling values to quit at
                     'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
@@ -248,6 +239,7 @@ def setup(exp,run,var,stim,user):
                             2007.97,  2248.1 ,  2514.01,  2808.46,  3134.53,  3495.61,
                             3895.44,  4338.2 ,  4828.5 ,  5371.42,  5972.64,  6638.4 ,
                             7375.63,  8192.  ])
+    user.rms = 0.03592662
 
 """CUSTOM PROMPT
     If you want a custom response prompt, define a function for it
@@ -277,11 +269,14 @@ def prompt_response(exp,run,var,stim,user):
     using exp.utils.wavplay.
 """
 def pre_trial(exp,run,var,stim,user):
-    fb_wf,fs = m.read_file(stim.current['CNC']['file'])
+
+    fb_wf,fs = psylab.signal.wavread(stim.current['CNC']['file'])
+#    fb_wf,fs = m.read_file(stim.current['CNC']['file'])
+    
     if var.current['ILD_type'] == 'Natural':
-        ild_fun = psylab.signal.atten(user.ild_nat_useable, np.abs(var.dynamic['value']))
+        ild_fun = user.ild_nat_useable * var.dynamic['value']
     elif var.current['ILD_type'] in [ 'Flat_rms', 'Flat_max' ]:
-        ild_fun = psylab.signal.atten(user.ild_flat_useable, np.abs(var.dynamic['value']))
+        ild_fun = user.ild_flat_useable * var.dynamic['value']
     fb_wf = fb_wf[:,user.useable_channels]
     #ild_fun = ild_fun[user.useable_channels]
     
@@ -302,7 +297,7 @@ def pre_trial(exp,run,var,stim,user):
         
     
     isi = np.zeros(psylab.signal.ms2samp(user.isi,user.fs))
-    var.dynamic['correct'] = np.random.randint(1, var.dynamic['alternatives']+1)
+    var.dynamic['correct'] = np.random.randint(1, var.dynamic['intervals']+1)
     if var.dynamic['correct'] == 1:
         channel_l = np.hstack((fb_wf_ild_l_2, isi, fb_wf_ild_l_1))
         channel_r = np.hstack((fb_wf_ild_r_2, isi, fb_wf_ild_r_1))
@@ -318,10 +313,12 @@ def pre_trial(exp,run,var,stim,user):
     #exp.interface.button_light('2', 'yellow', float(fb_wf.shape[0])/user.fs)
     
 def present_trial(exp, run, var, stim, user):
-#    s = exp.audiodev.open_array(stim.out,user.fs)
-#    s.play()
-    exp.interface.button_light([1,2], 'yellow')
+    #pass
+    #s = exp.audiodev.open_array(stim.out,user.fs)
+    #s.play()
     m.play_array(stim.out,user.fs)
+    #exp.interface.button_light([1,2], 'yellow')
+    #m.play_array(stim.out,user.fs)
     exp.interface.button_light([1,2], 'green')
 
 def post_trial(exp, run, var, stim, user):
@@ -334,7 +331,7 @@ def post_trial(exp, run, var, stim, user):
 
 def pre_exp(exp,run,var,stim,user):
     exp.interface = theForm.adaptive_interface(exp, run, exp.validKeys_)
-    exp.audiodev = m.open_device()
+    #exp.audiodev = m.open_device()
 
 def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
@@ -353,6 +350,5 @@ def pre_block(exp,run,var,stim,user):
         user.ild_flat_useable = np.ones(user.useable_channels.shape[0]) * (user.ild_nat_useable.max())
 
 if __name__ == '__main__':
-    import inspect
-    fname = inspect.getfile( inspect.currentframe() )
+    fname = os.path.realpath(__file__)
     psylab.gustav.run(settingsFile=fname)
