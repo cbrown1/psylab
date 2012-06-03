@@ -1,34 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
-#
-# This file is part of Psylab.
-#
-# Psylab is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Psylab is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
-# cbrown1@pitt.edu.
-#
-
 # A Gustav settings file!
 
 import os
 import numpy as np
+import time
 import psylab
-import gustav_form_speech_qt as theForm
+from gustav_forms import qt_newbug as theForm
+#from brian import hears as bh
+#import brian as b
 import medussa as m
 
 def setup(exp,run,var,stim,user):
@@ -45,11 +25,12 @@ def setup(exp,run,var,stim,user):
 
     # General Experimental Variables
     exp.name = 'SNR_exp'
+    exp.prompt = 'Select one word per column'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     # TODO: move logstring and datastring vars out of exp and into either method or settings, so they can be properly enumerated at startup
 
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_post_trial = " Trial $trial, target stimulus: $user[trial_stimbase], KWs correct: $response / possible: $user[trial_kwp] ($user[block_kwc] / $user[block_kwp]: $user[block_pc] %)\n"
+    exp.logString_post_trial = " Trial $trial, response: $response\n"
     exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.frontend = 'qt'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
@@ -235,37 +216,35 @@ def setup(exp,run,var,stim,user):
     user.prebuff = 150
     user.postbuff = 150
     user.fs = 44100
-    # Placeholders. Values will be set in pre or post trial, then used for logging / saving data.
-    user.trial_kwp = 0
-    user.trial_stimbase = ''
-    user.block_kwp = 0.
-    user.block_kwc = 0.
-    user.block_pc = 0.
+    user.choices = [['Bill', 'Joe',  'Ruth', 'Rick',  'Kate', 'Mike', 'Jack', 'Ned',  'Tom',  'Lynn'],
+                    ['took', 'gave', 'lost', 'found', 'had',  'bought', 'sold', 'saw', 'got', 'brought'],
+                    ['no',  'two',  'three', 'four', 'five', 'six',  'eight', 'nine', 'ten', 'twelve'],
+                    ['red', 'blue', 'green', 'brown', 'gray', 'black', 'white', 'beige', 'tan', 'dark'],
+                    ['clips', 'pens', 'cards', 'toys', 'wires', 'gloves', 'hats', 'socks', 'blocks', 'tops']
+                   ]
 
+def prompt_response(exp,run,var,stim,user):
+    """CUSTOM PROMPT
+        If you want a custom response prompt, define a function for it
+        here. run.response should receive the response as a string, and
+        if you want to cancel the experiment, set both run.block_on and
+        run.pylab_is_go to False
+    """
+    exp.interface.app.processEvents()
+    ret = exp.interface.get_response()
+    if ret:
+        run.response = ret
+    else:
+        run.block_on = False
+        run.gustav_is_go = False
 
-def pre_exp(exp,run,var,stim,user):
-    exp.interface = theForm.Interface(exp, run, exp.validKeys_)
-    exp.interface.updateInfo_Exp(exp.name+", "+exp.note)
-    expvars = "Conditions: %r\nRecord Data: %r" % (var.orderarray, exp.recordData)
-    exp.interface.updateInfo_expVariables(expvars)
-    exp.audiodev = m.open_device()
-
-def pre_block(exp,run,var,stim,user):
-    user.block_kwp = 0
-    user.block_kwc = 0
-    user.block_pc = 0.
-    exp.interface.updateInfo_BlockCount("Block %g of %g" % (run.block+1, run.nblocks))
-    exp.interface.updateInfo_Block("Block %g of %g | Condition # %g" % (run.block+1, run.nblocks, run.condition+1))
-    exp.interface.updateInfo_blockVariables(exp.utils.get_expanded_vals_in_string("$currentvarsvals['\n']",exp,run,var,stim,user))
-
-"""PRE_TRIAL
-    This function gets called on every trial to generate the stimulus, do
-    any other processing you need, and present the stimulus. All settings
-    and variables are available. For the current level of a variable, use
-    var.current['varname']. The stimulus waveform can be played back
-    using exp.utils.wavplay.
-"""
 def pre_trial(exp,run,var,stim,user):
+    """PRE_TRIAL
+        This function gets called on every trial to generate the stimulus, and
+        do any other processing you need. All settings and variables are
+        available. For the current level of a variable, use
+        var.current['varname']. 
+    """
     target_name = var.current['target']
     masker_name = var.current['masker']
     p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +"\n"+stim.current[target_name]['txt']
@@ -286,62 +265,33 @@ def pre_trial(exp,run,var,stim,user):
         target = psylab.signal.atten(target,-snr)
     stim.out = psylab.signal.mix(target,masker,offsets=[0,user.prebuff])
     
-    exp.interface.updateInfo_Trial(p)
-    user.trial_kwp = stim.current[target_name]['kw']
-    user.trial_stimbase = stim.current[target_name]['filebase']
-
 def present_trial(exp, run, var, stim, user):
-    exp.interface.showPlaying(True)
-    m.play_array(stim.out,user.fs)
-    exp.interface.showPlaying(False)
+    exp.interface.updateInfo_task('Listen...')
+    # Wait a half-second, otherwise trial start is too quick
+    time.sleep(.5)
+    # Create a playback stream from the generated stimulus
+    s = exp.audiodev.open_array(stim.out,user.fs)
+    # Play it
+    s.play()
+    while s.is_playing:
+        time.sleep(.1)
+    exp.interface.updateInfo_task(exp.prompt)
 
-"""CUSTOM PROMPT
-    If you want a custom response prompt, define a function for it
-    here. run.response should receive the response as a string, and
-    if you want to cancel the experiment, set both run.block_on and
-    run.pylab_is_go to False
-"""
-def prompt_response(exp,run,var,stim,user):
-    while True:
-        # The prompt is the trial feedback.
-        #p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
-        #ret = exp.term.get_input(None, "Gustav!",p)
-        ret = exp.interface.get_char()
-
-        #TODO: Switch to get_char
-        #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
-        if ret in exp.validKeys_:
-            run.response = ret
-            #exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
-            break
-        elif ret in exp.quitKeys:
-            run.block_on = False
-            run.gustav_is_go = False
-            break;
-
-def post_trial(exp,run,var,stim,user):
+def post_trial(exp, run, var, stim, user):
+    # In case the subject has clicked during playback
+    exp.interface.resetForm()
     if run.gustav_is_go:
-        user.block_kwp += int(user.trial_kwp)
-        user.block_kwc += int(run.response)
-        user.block_pc = round(float(user.block_kwc) / float(user.block_kwp) * 100, 1)
-        trial_pc = round(float(run.response) / float(user.trial_kwp) * 100, 1)
-        t = 'Trial: %s / %s (%s %%)\n' % (run.response, user.trial_kwp, trial_pc)
-    else:
-        t = 'Trial unfinished (Exp cancelled)\n'
-    blockPercent = round(user.block_kwc / user.block_kwp * 100, 1)
-    exp.interface.updateInfo_TrialScore(t + 'Total: %0.0f / %0.0f (%0.1f %%)' % 
-    (user.block_kwc, user.block_kwp, user.block_pc))
+        pass
 
-def post_block(exp,run,var,stim,user):
-    exp.interface.updateInfo_BlockScore("Prev Condition # %g\nScore: %s / %s (%s %%)" % 
-    (run.condition+1, user.block_kwc, user.block_kwp, user.block_pc))
+def pre_exp(exp,run,var,stim,user):
+    exp.interface = theForm.Interface(exp, run, user.choices)
+    exp.audiodev = m.open_device()
 
 def post_exp(exp,run,var,stim,user):
-    exp.interface.dialog.isPlaying.setText("Finished")
-    exp.interface.showPlaying(True)
-    #exp.interface.dialog.close()
+    exp.interface.dialog.close()
 
-
+def pre_block(exp,run,var,stim,user):
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks+1))
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)

@@ -30,13 +30,18 @@ import sys, os
 import psylab
 version = psylab.__version__
 
-package_dir = {'psylab': 'psylab'}
-package_data = {'psylab': [ '*.py',
-                            'subject_manager/*.ui',
+package_dir = { 'psylab': 'src', 
+#                'psylab_examples': 'user_scripts'
+              }
+package_data = {'psylab': [ 'subject_manager/*.ui',
                             'subject_manager/*.sql',
                             'subject_manager/images/*.*',
                             'misc/*.csl',
-                ]}
+                          ],
+#                'psylab_examples': [ '*.py',
+#                             'gustav_forms/*.py'
+#                           ],
+                }
 
 requires = ['numpy (>=1.2)',]
 
@@ -51,7 +56,10 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.stats',
                                     '.subject_manager',
                                     '.tdt2'
-                                    ]]
+                                    ]
+            ]
+#packages.append('psylab_examples')
+
 requires=[
 'numpy (>=1.2)',
 'scipy',
@@ -83,7 +91,6 @@ setup(name='PsyLab',
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Multimedia :: Sound/Audio :: Speech',

@@ -6,7 +6,7 @@ import os
 import numpy as np
 import time
 import psylab
-import gustav_form_adaptive_qt as theForm
+from gustav_forms import qt_adaptive as theForm
 #from brian import hears as bh
 #import brian as b
 import medussa as m

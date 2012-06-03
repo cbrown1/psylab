@@ -27,7 +27,7 @@ import sys
 from PyQt4 import QtGui, QtCore
 import time
 
-class adaptive_interface():
+class Interface():
     def __init__(self, exp, run, choices):
         self.app = QtGui.QApplication([])
         self.dialog = self.Dialog(exp, run, choices)
