@@ -21,9 +21,17 @@
 # contributions are welcome. Go to http://code.google.com/p/psylab/ 
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
-#
+# 
+# Psylab is a collection of Python modules for handling various aspects 
+# of psychophysical experimentation. Python is a powerful programming  
+# language that is free, open-source, easy-to-learn, and cross-platform, 
+# thus making it extremely well-suited to scientific applications. 
+# There are countless modules written by other scientists that are  
+# freely available, making Python a good choice regardless of your  
+# particular field. Consider using Python as your scientific platform.
+# 
 
-# A Gustav settings file!
+# A Gustav experiment file!
 
 import os
 import numpy as np
@@ -46,7 +54,7 @@ def setup(exp,run,var,stim,user):
     # General Experimental Variables
     exp.name = 'SNR_exp'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    # TODO: move logstring and datastring vars out of exp and into either method or settings, so they can be properly enumerated at startup
+    # TODO: move logstring and datastring vars out of exp and into either method or experiment, so they can be properly enumerated at startup
 
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_trial = " Trial $trial, target stimulus: $user[trial_stimbase], KWs correct: $response / possible: $user[trial_kwp] ($user[block_kwc] / $user[block_kwp]: $user[block_pc] %)\n"
@@ -339,4 +347,4 @@ def post_exp(exp,run,var,stim,user):
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)
-    psylab.gustav.run(settingsFile=fname)
+    psylab.gustav.run(experimentFile=fname)

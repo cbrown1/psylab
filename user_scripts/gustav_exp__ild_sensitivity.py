@@ -1,6 +1,37 @@
 # -*- coding: utf-8 -*-
 
-# A Gustav settings file!
+# Copyright (c) 2010-2012 Christopher Brown
+#
+# This file is part of Psylab.
+#
+# Psylab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Psylab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Bug reports, bug fixes, suggestions, enhancements, or other 
+# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# for more information and to contribute. Or send an e-mail to: 
+# cbrown1@pitt.edu.
+# 
+# Psylab is a collection of Python modules for handling various aspects 
+# of psychophysical experimentation. Python is a powerful programming  
+# language that is free, open-source, easy-to-learn, and cross-platform, 
+# thus making it extremely well-suited to scientific applications. 
+# There are countless modules written by other scientists that are  
+# freely available, making Python a good choice regardless of your  
+# particular field. Consider using Python as your scientific platform.
+# 
+
+# A Gustav experiment file!
 
 import os
 import numpy as np
@@ -337,7 +368,7 @@ def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
 
 def pre_block(exp,run,var,stim,user):
-    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks+1))
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.nblocks+1))
     # Only use bands available by CI users
     user.useable_channels = np.where((user.cfs>350) & (user.cfs<5500))[0]
     user.cfs_useable = user.cfs[user.useable_channels]
@@ -351,4 +382,4 @@ def pre_block(exp,run,var,stim,user):
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)
-    psylab.gustav.run(settingsFile=fname)
+    psylab.gustav.run(experimentFile=fname)

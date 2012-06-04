@@ -30,7 +30,7 @@ import sys, os
 import psylab
 version = psylab.__version__
 
-package_dir = { 'psylab': 'src', 
+package_dir = { 'psylab': 'psylab', 
 #                'psylab_examples': 'user_scripts'
               }
 package_data = {'psylab': [ 'subject_manager/*.ui',
@@ -67,14 +67,14 @@ requires=[
 
 setup(name='PsyLab',
       version=version,
-      description='PsyLab: PsychoAcoustics Lab',
+      description='PsyLab: Psychophysics Lab',
       long_description='''\
  Psylab is a loose collection of modules useful for various aspects of running
- psychoacoustics experiments, although several might be more generally useful.''',
-      author='Christopher Brown, Joseph Ranweiler',
-      author_email='c-b@asu.edu',
+ psychophysics experiments, although several might be more generally useful.''',
+      author='Christopher Brown',
+      author_email='cbrown1@pitt.edu',
       maintainer='Christopher Brown',
-      maintainer_email='c-b@asu.edu',
+      maintainer_email='cbrown1@pitt.edu',
       url='http://www.psylab.us',
       packages = packages,
       package_dir = package_dir,

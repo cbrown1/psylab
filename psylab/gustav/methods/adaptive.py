@@ -184,8 +184,8 @@ def pre_block(exp, run, var, stim, user):
     var.dynamic = dynamic_vars_block.copy()
     var.dynamic.update(dynamic_vars_track.copy())
     var.dynamic.update(d.copy())
-    if hasattr(exp.settings, 'step'):
-        exp.dynamic_step = exp.settings.step
+    if hasattr(exp.experiment, 'step'):
+        exp.dynamic_step = exp.experiment.step
     else:
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
@@ -213,7 +213,7 @@ def post_block(exp, run, var, stim, user):
 
 
 def pre_exp(exp, run, var, stim, user):
-    # Only set these if empty, in case they were set in settings file setup, which has run already
+    # Only set these if empty, in case they were set in experiment file setup, which has run already
     if exp.logString_pre_exp == "":
         exp.logString_pre_exp = "Experiment $name started at $time\n"
     if exp.logString_pre_block == "":

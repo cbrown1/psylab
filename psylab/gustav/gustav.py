@@ -30,7 +30,7 @@ import getopt
 import numpy as np
 import utils
 
-def configure(settingsFile = None, frontend = None):
+def configure(experimentFile = None, frontend = None):
 
     var = utils.var()
     stim = utils.stim()
@@ -40,24 +40,24 @@ def configure(settingsFile = None, frontend = None):
     exp.utils = utils
     exp.utils.get_frontend(exp, frontend)
 
-    # Settings File
-    if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        if settingsFile == '':
+    # Experiment File
+    if experimentFile == None:
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        if experimentFile == '':
             print "Gustav cancelled at user request"
             return;
-    exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
-    exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
-    exp.settingsFilePath = os.path.join(exp.settingsPath,exp.settingsFile)
-    sys.path.append(exp.settingsPath)
-    settings = __import__(exp.settingsBase)
+    exp.experimentPath,exp.experimentFile = os.path.split(experimentFile)
+    exp.experimentBase = os.path.splitext(exp.experimentFile)[0]
+    exp.experimentFilePath = os.path.join(exp.experimentPath,exp.experimentFile)
+    sys.path.append(exp.experimentPath)
+    experiment = __import__(exp.experimentBase)
 
-    settings.setup( exp, run, var, stim, user)
+    experiment.setup( exp, run, var, stim, user)
 
     exp.gui.show_config( exp, run, var, stim, user )
 
 
-def list_conditions(settingsFile = None, frontend = None):
+def list_conditions(experimentFile = None, frontend = None):
 
     var = utils.var()
     stim = utils.stim()
@@ -66,24 +66,24 @@ def list_conditions(settingsFile = None, frontend = None):
     user = utils.user()
     exp.utils = utils
 
-    # Settings File
-    if settingsFile == None:
-        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        if settingsFile == '':
+    # Experiment File
+    if experimentFile == None:
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        if experimentFile == '':
             print "Gustav cancelled at user request"
             return;
-    exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
-    exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
-    exp.settingsFilePath = os.path.join(exp.settingsPath,exp.settingsFile)
-    sys.path.append(exp.settingsPath)
-    settings = __import__(exp.settingsBase)
+    exp.experimentPath,exp.experimentFile = os.path.split(experimentFile)
+    exp.experimentBase = os.path.splitext(exp.experimentFile)[0]
+    exp.experimentFilePath = os.path.join(exp.experimentPath,exp.experimentFile)
+    sys.path.append(exp.experimentPath)
+    experiment = __import__(exp.experimentBase)
 
-    settings.setup( exp, run, var, stim, user)
+    experiment.setup( exp, run, var, stim, user)
 
     exp.utils.process_variables(var);
     print exp.utils.get_variable_strtable(var)
 
-def run(settingsFile = None, subjectID = None, frontend = None, recordData = None):
+def run(experimentFile = None, subjectID = None, frontend = None, recordData = None):
 
     exp = utils.exp()
     var = utils.var()
@@ -94,11 +94,11 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Non
 
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
-    if settingsFile == None:
+    if experimentFile == None:
         # Edit CB 2012-05-21
-        #settingsFile = exp.term.get_file(None, "Open "+exp.exp_name+" Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        settingsFile = exp.term.get_file(None, "Open Gustav Settings File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        if settingsFile == '':
+        #experimentFile = exp.term.get_file(None, "Open "+exp.exp_name+" Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        if experimentFile == '':
             print ""+exp.exp_name+" cancelled at user request"
             return;
 
@@ -110,16 +110,16 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Non
     else:
         exp.subjID = str(subjectID)
 
-    exp.settingsPath,exp.settingsFile = os.path.split(settingsFile)
-    exp.settingsBase = os.path.splitext(exp.settingsFile)[0]
-    exp.settingsFilePath = os.path.join(exp.settingsPath,exp.settingsFile)
-    sys.path.append(exp.settingsPath)
-    exp.settings = __import__(exp.settingsBase)
+    exp.experimentPath,exp.experimentFile = os.path.split(experimentFile)
+    exp.experimentBase = os.path.splitext(exp.experimentFile)[0]
+    exp.experimentFilePath = os.path.join(exp.experimentPath,exp.experimentFile)
+    sys.path.append(exp.experimentPath)
+    exp.experiment = __import__(exp.experimentBase)
 
     var.factvars[:] = []
     var.listvars[:] = []
 
-    exp.settings.setup( exp, run, var, stim, user )
+    exp.experiment.setup( exp, run, var, stim, user )
 
     exp.method_str = exp.method
     try:
@@ -214,13 +214,13 @@ def run(settingsFile = None, subjectID = None, frontend = None, recordData = Non
     exp.utils.save_data(exp,run,var,stim,user, 'exp')
 
 if __name__ == '__main__':
-    settingsFile = None
+    experimentFile = None
     subjectID = None
     frontend = None
     recordData = None
     action = 'run'
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcldf:s:i:", ["help", "config", "list", "dontrecord", "frontend=", "settingsFile=", "subjectID="])
+        opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:i:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
     except getopt.error, msg:
         print msg
         print "for help use --help"
@@ -229,8 +229,8 @@ if __name__ == '__main__':
         if var in ("-h", "--help"):
             print __doc__
             sys.exit(0)
-        elif var in ["--settingsFile", "-s"]:
-            settingsFile = val
+        elif var in ["--experimentFile", "-e"]:
+            experimentFile = val
         elif var in ["--subjectID", "-i"]:
             subjectID = val
         elif var in ["--frontend", "-f"]:
@@ -242,8 +242,8 @@ if __name__ == '__main__':
         elif var in ["--list", "-l"]:
             action = 'list'
     if action in ['config']:
-        configure(settingsFile = settingsFile, frontend = frontend)
+        configure(experimentFile = experimentFile, frontend = frontend)
     elif action in ['list']:
-        list_conditions(settingsFile = settingsFile, frontend = frontend)
+        list_conditions(experimentFile = experimentFile, frontend = frontend)
     else:
-        run(settingsFile = settingsFile, subjectID = subjectID, frontend = frontend, recordData = recordData)
+        run(experimentFile = experimentFile, subjectID = subjectID, frontend = frontend, recordData = recordData)

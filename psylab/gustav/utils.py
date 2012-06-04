@@ -38,9 +38,9 @@ class exp:
     name = ''
     host = socket.gethostname()
     subjID = ''
-    settingsPath = ''
-    settingsFile = ''
-    settingsFilePath = ''
+    experimentPath = ''
+    experimentFile = ''
+    experimentFilePath = ''
     frontend = None
     debug = False
     method = 'constant'
@@ -197,7 +197,7 @@ def initialize_experiment( exp, run, var, stim, user):
     '''Do stuff necessary for the start of an experiment
     '''
     exp.utils.get_frontend(exp, exp.frontend)
-    # For the following functions, run exp version first, then method (if present), then settings:
+    # For the following functions, run exp version first, then method (if present), then experiment:
     # pre_exp, pre_block, post_trial, post_block, post_exp
     if hasattr(exp.method, 'pre_exp'):
         exp.pre_exp_.append(exp.method.pre_exp)
@@ -210,18 +210,18 @@ def initialize_experiment( exp, run, var, stim, user):
     if hasattr(exp.method, 'post_exp'):
         exp.post_exp_.append(exp.method.post_exp)
 
-    if hasattr(exp.settings, 'pre_exp'):
-        exp.pre_exp_.append(exp.settings.pre_exp)
-    if hasattr(exp.settings, 'pre_block'):
-        exp.pre_block_.append(exp.settings.pre_block)
-    if hasattr(exp.settings, 'post_trial'):
-        exp.post_trial_.append(exp.settings.post_trial)
-    if hasattr(exp.settings, 'post_block'):
-        exp.post_block_.append(exp.settings.post_block)
-    if hasattr(exp.settings, 'post_exp'):
-        exp.post_exp_.append(exp.settings.post_exp)
+    if hasattr(exp.experiment, 'pre_exp'):
+        exp.pre_exp_.append(exp.experiment.pre_exp)
+    if hasattr(exp.experiment, 'pre_block'):
+        exp.pre_block_.append(exp.experiment.pre_block)
+    if hasattr(exp.experiment, 'post_trial'):
+        exp.post_trial_.append(exp.experiment.post_trial)
+    if hasattr(exp.experiment, 'post_block'):
+        exp.post_block_.append(exp.experiment.post_block)
+    if hasattr(exp.experiment, 'post_exp'):
+        exp.post_exp_.append(exp.experiment.post_exp)
 
-    # For save_data functions, look for any present in settings first, then look in method.
+    # For save_data functions, look for any present in experiment first, then look in method.
     # But only run one each.
     elif hasattr(exp.method, 'save_data_trial'):
         exp.save_data_trial = exp.method.save_data_trial
@@ -230,26 +230,26 @@ def initialize_experiment( exp, run, var, stim, user):
     elif hasattr(exp.method, 'save_data_exp'):
         exp.save_data_exp = exp.method.save_data_exp
 
-    if hasattr(exp.settings, 'save_data_trial'):
-        exp.save_data_trial = exp.settings.save_data_trial
-    if hasattr(exp.settings, 'save_data_block'):
-        exp.save_data_block = exp.settings.save_data_block
-    if hasattr(exp.settings, 'save_data_exp'):
-        exp.save_data_exp = exp.settings.save_data_exp
+    if hasattr(exp.experiment, 'save_data_trial'):
+        exp.save_data_trial = exp.experiment.save_data_trial
+    if hasattr(exp.experiment, 'save_data_block'):
+        exp.save_data_block = exp.experiment.save_data_block
+    if hasattr(exp.experiment, 'save_data_exp'):
+        exp.save_data_exp = exp.experiment.save_data_exp
 
-    # A few that should be settings-specific:
-    if hasattr(exp.settings, 'present_trial'):
-        exp.present_trial = exp.settings.present_trial
-    if hasattr(exp.settings, 'prompt_response'):
-        exp.prompt_response = exp.settings.prompt_response
-    if hasattr(exp.settings, 'prompt_condition'):
-        exp.prompt_condition = exp.settings.prompt_condition
+    # A few that should be experiment-specific:
+    if hasattr(exp.experiment, 'present_trial'):
+        exp.present_trial = exp.experiment.present_trial
+    if hasattr(exp.experiment, 'prompt_response'):
+        exp.prompt_response = exp.experiment.prompt_response
+    if hasattr(exp.experiment, 'prompt_condition'):
+        exp.prompt_condition = exp.experiment.prompt_condition
 
-    # And one that needs to be in settings
-    if hasattr(exp.settings, 'pre_trial'):
-        exp.pre_trial = exp.settings.pre_trial
+    # And one that needs to be in experiment
+    if hasattr(exp.experiment, 'pre_trial'):
+        exp.pre_trial = exp.experiment.pre_trial
     else:
-        raise Exception, "Function `pre_trial` must be specified in exp.settings file"
+        raise Exception, "Function `pre_trial` must be specified in exp.experiment file"
 
     stim.get_next = exp.utils.stim_get_next
     stim.reset_order = exp.utils.stim_reset_order
@@ -756,57 +756,57 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
     return outstr
 
 
-# Now that header is its own variable, this function is not needed
-def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
-    """Replaces all variable references with the name of the specified variable
-
-        Or, generates a header line in a datafile
-    """
-
-    outstr = instr.replace("$name", "ExpName")
-    outstr = instr.replace("$note", "Note")
-    outstr = instr.replace("$comment", "Comments")
-    outstr = outstr.replace("$host", "Host")
-    outstr = outstr.replace("$subj", "SubjID")
-    outstr = outstr.replace("$trials", "Trial")
-    outstr = outstr.replace("$block", "Block")
-    outstr = outstr.replace("$conditions", "Conditions")
-    outstr = outstr.replace("$condition", "Condition")
-    outstr = outstr.replace("$time", "Time")
-    outstr = outstr.replace("$date", "Date")
-    outstr = outstr.replace("$response", "Response")
-
-    for s in stim.stimvars:
-        outstr = outstr.replace("$stim_kw["+stim.sets[s]['name']+"]", "KW")
-        outstr = outstr.replace("$stim_file["+stim.sets[s]['name']+"]", 'File')
-        outstr = outstr.replace("$stim_text["+stim.sets[s]['name']+"]", 'Text')
-        outstr = outstr.replace("$stim_ind["+stim.sets[s]['name']+"]", 'Ind')
-
-    varlist = []
-    for key in var.varlist:
-        outstr = outstr.replace("$var["+key+"]", key)
-        varlist.append(key)
-
-    got_cv = True
-    while got_cv:
-        expr, delim = get_arg(outstr,"$currentvars")
-        if expr != "":
-            if delim == "":
-                delim = ","
-            outstr = outstr.replace(expr, delim.join(varlist))
-        else:
-            got_cv = False
-
-    items = getmembers(user)
-    for key, val in items:
-        if key[:2] != "__":
-            outstr = outstr.replace("$user["+str(key)+"]", str(key))
-
-    if hasattr(var,'dynamic'):
-        for key, val in var.dynamic.items():
-            outstr = outstr.replace("$dynamic["+str(key)+"]", str(key))
-
-    return outstr
+## Now that header is its own variable, this function is not needed
+#def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
+#    """Replaces all variable references with the name of the specified variable
+#
+#        Or, generates a header line in a datafile
+#    """
+#
+#    outstr = instr.replace("$name", "ExpName")
+#    outstr = instr.replace("$note", "Note")
+#    outstr = instr.replace("$comment", "Comments")
+#    outstr = outstr.replace("$host", "Host")
+#    outstr = outstr.replace("$subj", "SubjID")
+#    outstr = outstr.replace("$trials", "Trial")
+#    outstr = outstr.replace("$block", "Block")
+#    outstr = outstr.replace("$conditions", "Conditions")
+#    outstr = outstr.replace("$condition", "Condition")
+#    outstr = outstr.replace("$time", "Time")
+#    outstr = outstr.replace("$date", "Date")
+#    outstr = outstr.replace("$response", "Response")
+#
+#    for s in stim.stimvars:
+#        outstr = outstr.replace("$stim_kw["+stim.sets[s]['name']+"]", "KW")
+#        outstr = outstr.replace("$stim_file["+stim.sets[s]['name']+"]", 'File')
+#        outstr = outstr.replace("$stim_text["+stim.sets[s]['name']+"]", 'Text')
+#        outstr = outstr.replace("$stim_ind["+stim.sets[s]['name']+"]", 'Ind')
+#
+#    varlist = []
+#    for key in var.varlist:
+#        outstr = outstr.replace("$var["+key+"]", key)
+#        varlist.append(key)
+#
+#    got_cv = True
+#    while got_cv:
+#        expr, delim = get_arg(outstr,"$currentvars")
+#        if expr != "":
+#            if delim == "":
+#                delim = ","
+#            outstr = outstr.replace(expr, delim.join(varlist))
+#        else:
+#            got_cv = False
+#
+#    items = getmembers(user)
+#    for key, val in items:
+#        if key[:2] != "__":
+#            outstr = outstr.replace("$user["+str(key)+"]", str(key))
+#
+#    if hasattr(var,'dynamic'):
+#        for key, val in var.dynamic.items():
+#            outstr = outstr.replace("$dynamic["+str(key)+"]", str(key))
+#
+#    return outstr
 
 
 def get_arg(instr, var):

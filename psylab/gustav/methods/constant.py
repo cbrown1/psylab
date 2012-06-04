@@ -31,7 +31,7 @@ import os, codecs
 # TODO: add trialsperblock, startblock, starttrial
 
 def pre_exp(exp, run, var, stim, user):
-    # Only set these if empty, in case they were set in settings file setup, which has run already
+    # Only set these if empty, in case they were set in experiment file setup, which has run already
     if exp.logString_pre_exp == "":
         exp.logString_pre_exp = "Experiment $name started at $time\n"
     if exp.logString_pre_block == "":
@@ -46,7 +46,7 @@ def pre_exp(exp, run, var, stim, user):
     if run.block == run.nblocks - 1:
         run.gustav_is_go = False
     # Check if there are enough stimuli
-    # Move to settingsfile? Are stim issues really method related?
+    # Move to experimentfile? Are stim issues really method related?
     for stimset in stim.stimvars:
         if stim.sets[stimset]['type'] != 'manual':
             if not stim.sets[stimset]['repeat']:

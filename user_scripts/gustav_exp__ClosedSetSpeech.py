@@ -1,6 +1,38 @@
 # -*- coding: utf-8 -*-
 
-# A Gustav settings file!
+# Copyright (c) 2012 Christopher Brown
+#
+# This file is part of Psylab.
+#
+# Psylab is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Psylab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Bug reports, bug fixes, suggestions, enhancements, or other 
+# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# for more information and to contribute. Or send an e-mail to: 
+# cbrown1@pitt.edu.
+# 
+# Psylab is a collection of Python modules for handling various aspects 
+# of psychophysical experimentation. Python is a powerful programming  
+# language that is free, open-source, easy to learn, and cross-platform, 
+# thus making it extremely well-suited to scientific applications. 
+# There are countless other freely-available Python modules written by    
+# scientists in many different fields, making Python a good choice   
+# regardless of your particular field. Consider using Python as your 
+# scientific platform.
+# 
+
+# A Gustav experiment file!
 
 import os
 import numpy as np
@@ -24,10 +56,10 @@ def setup(exp,run,var,stim,user):
         basedir = os.path.expanduser(os.path.join('~','My Documents','Python'))
 
     # General Experimental Variables
-    exp.name = 'SNR_exp'
-    exp.prompt = 'Select one word per column'
+    exp.name = 'CSS_exp'
+    exp.prompt = 'Select one word from each column'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    # TODO: move logstring and datastring vars out of exp and into either method or settings, so they can be properly enumerated at startup
+    # TODO: move logstring and datastring vars out of exp and into either method or experiment, so they can be properly enumerated at startup
 
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_trial = " Trial $trial, response: $response\n"
@@ -43,13 +75,8 @@ def setup(exp,run,var,stim,user):
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.cacheTrials = False
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid single-char responses
-    exp.note = 'CI Pilot data'
-    exp.comments = '''ci_fmam: CI Pilot data
-    When processing involves speech in lf region, freq is the lowpass cutoff of
-    the acoustic speech, and atten is a /-delimited list of attenuation values
-    for broadband, 200 and 150Hz lp. For tones, freq is the downward shift of
-    mean f0, and atten is a /-delimited list of attenuation values for shifts
-    of 0, -25, -50, -75,-100 & -125.
+    exp.note = 'A closed-set speech experiment'
+    exp.comments = '''This is an example of a closed-set speech experiment. 
     '''
 
     """STIMULUS SETS
@@ -291,8 +318,8 @@ def post_exp(exp,run,var,stim,user):
     exp.interface.dialog.close()
 
 def pre_block(exp,run,var,stim,user):
-    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, var.nblocks+1))
+    exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.nblocks+1))
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)
-    psylab.gustav.run(settingsFile=fname)
+    psylab.gustav.run(experimentFile=fname)

@@ -22,8 +22,17 @@
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
+# Psylab is a collection of Python modules for handling various aspects 
+# of psychophysical experimentation. Python is a powerful programming  
+# language that is free, open-source, easy to learn, and cross-platform, 
+# thus making it extremely well-suited to scientific applications. 
+# There are countless other freely-available Python modules written by    
+# scientists in many different fields, making Python a good choice   
+# regardless of your particular field. Consider using Python as your 
+# scientific platform.
+# 
 
-# A Gustav settings file!
+# A Gustav experiment file!
 
 import os
 import inspect
@@ -335,4 +344,4 @@ def pre_trial(exp,run,var,stim,user):
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)
-    psylab.gustav.run(settingsFile=fname)
+    psylab.gustav.run(experimentFile=fname)
