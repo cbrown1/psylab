@@ -103,7 +103,7 @@ class Interface():
         def closeEvent(self, event):
             # fake a quit:
             self.waitingForResponse = True
-            self.keyDown(self.exp, self.run, ord(self.exp.quitKeys[0]))
+            self.keyDown(self.exp, self.run, ord(self.exp.quitKey))
 
         def keyPressEvent(self, event):
             self.keyDown(self.exp, self.run, event.key())
@@ -125,7 +125,7 @@ class Interface():
             if self.waitingForResponse:
                 if key < 256:
                     thiskey = chr(key).lower()
-                    if thiskey in self.exp.quitKeys:
+                    if thiskey == self.exp.quitKey:
                         # Close Gustav...
                         self.response = None
                         self.waitingForResponse = False

@@ -66,7 +66,10 @@ def setup(exp,run,var,stim,user):
     exp.dataString_block = ''
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.cacheTrials = False
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid responses
+    # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
+    # the experimenter do the scoring, and enter the score on each trial.
+    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',');
+    exp.quitKey = '/'
     exp.note = 'CI Pilot data'
     exp.comments = '''ci_fmam: CI Pilot data
     When processing involves speech in lf region, freq is the lowpass cutoff of
@@ -317,16 +320,14 @@ def setup(exp,run,var,stim,user):
 def prompt_response(exp,run,var,stim,user):
     while True:
         # The prompt is the trial feedback.
-        p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current['CUNYf']['filebase'] +" - "+stim.current['CUNYf']['txt']+" KW: "+str(stim.current['CUNYf']['kw'])+", Resp: "
+        p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +"\n"+stim.current[target_name]['txt']
         ret = exp.term.get_input(None, "Gustav!",p)
-
         #TODO: Switch to get_char
         #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
-        if ret in exp.validKeys_:
+        if ret in exp.validKeys:
             run.response = ret
-            #exp.utils.log(exp,run,var,stim,user, p+ret+'\n', exp.logFile, False) # Since there's no other feedback, log trial info manually
             break
-        elif ret in exp.quitKeys:
+        elif ret == exp.quitKey:
             run.block_on = False
             run.gustav_is_go = False
             break;

@@ -69,7 +69,8 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_header = ''
     exp.cacheTrials = False
-    exp.validKeys = '1,2';  # comma-delimited list of valid responses
+    exp.validKeys = '1,2'.split(',');  # comma-delimited list of valid responses
+    exp.quitKey = '/'
     exp.note = "Quiet Thresholds for pure tones"
     exp.comments = '''\
     A 1-up 2-down procedure to estimate quiet thresholds for pure tones 
@@ -255,10 +256,10 @@ def prompt_response(exp,run,var,stim,user):
         #ret = exp.utils.getchar()
         exp.interface.app.processEvents()
         ret = exp.interface.get_char()
-        if str(ret) in exp.validKeys_:
+        if str(ret) in exp.validKeys:
             run.response = ret
             break
-        elif str(ret) in exp.quitKeys:
+        elif str(ret) == exp.quitKey:
             run.block_on = False
             run.gustav_is_go = False
             var.dynamic['msg'] = "Cancelled by user"
@@ -328,7 +329,7 @@ def post_trial(exp, run, var, stim, user):
                     time.sleep(flash)
 
 def pre_exp(exp,run,var,stim,user):
-    exp.interface = theForm.Interface(exp, run, exp.validKeys_)
+    exp.interface = theForm.Interface(exp, run, exp.validKeys)
     exp.audiodev = m.open_device()
 
 def post_exp(exp,run,var,stim,user):

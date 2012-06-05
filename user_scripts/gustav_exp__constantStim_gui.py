@@ -68,8 +68,10 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_block = ''
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
-    exp.cacheTrials = False
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid single-char responses
+    # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
+    # the experimenter do the scoring, and enter the score on each trial.
+    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',');
+    exp.quitKey = '/'
     exp.note = 'CI Pilot data'
     exp.comments = '''ci_fmam: CI Pilot data
     When processing involves speech in lf region, freq is the lowpass cutoff of
@@ -252,7 +254,7 @@ def setup(exp,run,var,stim,user):
 
 
 def pre_exp(exp,run,var,stim,user):
-    exp.interface = theForm.Interface(exp, run, exp.validKeys_)
+    exp.interface = theForm.Interface(exp, run)
     exp.interface.updateInfo_Exp(exp.name+", "+exp.note)
     expvars = "Conditions: %r\nRecord Data: %r" % (var.orderarray, exp.recordData)
     exp.interface.updateInfo_expVariables(expvars)
@@ -309,16 +311,15 @@ def present_trial(exp, run, var, stim, user):
     if you want to cancel the experiment, set both run.block_on and
     run.pylab_is_go to False
 """
+
+
 def prompt_response(exp,run,var,stim,user):
     while True:
         ret = exp.interface.get_char()
-        # TODO: Get rid of validKeys_ in qt_speech & just pass back any key. 
-        # Then do the checking here. (This is the right place to check, not 
-        # the form. This will make the form more portable across designs)
-        if ret in exp.validKeys_:
+        if ret in exp.validKeys:
             run.response = ret
             break
-        elif ret in exp.quitKeys:
+        elif ret in ['/','q']:
             run.block_on = False
             run.gustav_is_go = False
             break;

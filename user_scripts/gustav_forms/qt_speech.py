@@ -29,13 +29,13 @@ import time
 from datetime import datetime
 
 class Interface():
-    def __init__(self, exp, run, choices):
+    def __init__(self, exp, run):
         self.app = QtGui.QApplication([])
-        self.dialog = self.Dialog(exp, run, choices)
+        self.dialog = self.Dialog(exp, run)
 
     class Dialog(QtGui.QDialog):
 
-        def __init__(self, exp, run, choices, parent=None):
+        def __init__(self, exp, run, parent=None):
             QtGui.QDialog.__init__(self, parent, QtCore.Qt.WindowTitleHint)
             self.setWindowIcon(QtGui.QIcon('shs_head16.png'))
             self.setFixedWidth(400)
@@ -167,7 +167,7 @@ class Interface():
         def closeEvent(self, event):
             # fake a quit:
             self.waitingForResponse = True
-            self.keyDown(self.exp, self.run, ord(self.exp.quitKeys[0]))
+            self.keyDown(self.exp, self.run, ord(self.exp.quitKey))
 
         def keyPressEvent(self, event):
             self.keyDown(self.exp, self.run, event.key())
@@ -179,11 +179,11 @@ class Interface():
             if self.waitingForResponse:
                 if key < 256:
                     thiskey = chr(key).lower()
-                    if thiskey in self.exp.quitKeys:
+                    if thiskey == self.exp.quitKey:
                         # Close Gustav...
                         self.char = thiskey
                         self.waitingForResponse = False
-                    elif thiskey in self.exp.validKeys_:
+                    else:
                         self.char = thiskey
                         self.waitingForResponse = False
 

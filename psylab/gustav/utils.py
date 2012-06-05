@@ -45,8 +45,6 @@ class exp:
     debug = False
     method = 'constant'
     prompt = ''
-    responseMethod = 'key' # 'key' or 'text'. If key, be sure to set'validresponses'
-    validKeys = '1, 2'  # list of valid responses
     logString_pre_trial = "" #Write this string to the console and/or logfile before every trial
     logString_post_trial = ""#Write this string to the console and/or logfileafter every trial
     logString_pre_block = "" #Write this string to the console and/or logfilebefore every block
@@ -66,9 +64,6 @@ class exp:
     recordData = True
     stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
-    cacheTrials = False             # Unimplemented
-    quitKeys = ['q', '/']
-    responseTypes = ['key', 'text'] # 'key' or 'text'. If key, be sure to set'validresponses'
     disable_functions = []          # Experimenter can add function names as strings to disable them
     methodTypes = ['constant', 'staircase'] # TODO: remove methodTypes
     stimLoadTypes = ['auto', 'manual']
@@ -80,22 +75,22 @@ class exp:
     def prompt_response(self,exp,run,var,stim,user):
         while True:
             ret = exp.gui.get_input(None, "Gustav!","Enter Response: ")
-            # Check for valid response
-            if ret in exp.validKeys_:
-                # Its good. Record response
-                run.response = ret
-                # Exit while-True loop
-                break
-            elif ret in exp.quitKeys:
+            # Check for quit
+            if ret in ['/', 'q']:
                 # User wants to exit. Break out of block, gustav loops
                 run.block_on = False
                 run.gustav_is_go = False
                 break
-
+            else:
+                # Its good. Record response
+                run.response = ret
+                # Exit while-True loop
+                break
+            
     def prompt_condition(self,exp,run,var,stim,user):
         while True:
             ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
-            if ret in exp.quitKeys:
+            if ret in ['/', 'q']:
                 run.block_on = False
                 run.gustav_is_go = False
                 break
@@ -254,6 +249,13 @@ def initialize_experiment( exp, run, var, stim, user):
     stim.get_next = exp.utils.stim_get_next
     stim.reset_order = exp.utils.stim_reset_order
     exp.utils.process_stimuli(stim)
+    # Make a list of the stimuli that are actually used
+    for v in range(len(var.factvars)):
+        if var.factvars[v]['type'] == 'stim':
+            for level in var.factvars[v]['levels']:
+                if level not in stim.stimvars:
+                    stim.stimvars.append(level)
+
     exp.utils.process_variables(var)
     run.nblocks = var.nblocks
     stim.debug = exp.debug
@@ -277,13 +279,6 @@ def initialize_experiment( exp, run, var, stim, user):
     if not os.path.isfile(exp.logFile):
         exp.logString_header = get_expanded_vals_in_string(exp.logString_header, exp, run, var, stim, user)
         write_data(exp.logString_header, exp.logFile)
-    exp.validKeys_ = exp.validKeys.split(',')
-    # Make a list of the stimuli that are actually used
-    for v in range(len(var.factvars)):
-        if var.factvars[v]['type'] == 'stim':
-            for level in var.factvars[v]['levels']:
-                if level not in stim.stimvars:
-                    stim.stimvars.append(level)
 
 
 def process_variables(var):
@@ -493,7 +488,7 @@ def menu_condition(exp,run,var,stim,user):
         disp += "%11s - run exp using selected conditions in random order\n" % 'r'
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
-        disp += "%11s - quit\n" % ", ".join(exp.quitKeys)
+        disp += "%11s - quit\n" % (exp.quitKey)
         clearscreen()
         ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
@@ -501,7 +496,7 @@ def menu_condition(exp,run,var,stim,user):
         elif ret in ['a']:
             for cond in conditions:
                 sel.append(cond)
-        elif ret in exp.quitKeys:
+        elif ret == exp.quitKey:
             run.gustav_is_go = False
             break;
         elif ret in ['c']:
@@ -530,14 +525,6 @@ def stim_get_next(stim, stimset):
     stim.current[stimset]['filebase'] = os.path.splitext(stim.sets[stimset]['tokens'][stim.current[stimset]['ind2']]['name'])[0]
     stim.current[stimset]['txt'] = stim.sets[stimset]['tokens'][stim.current[stimset]['ind2']]['text']
     stim.current[stimset]['kw'] = stim.sets[stimset]['tokens'][stim.current[stimset]['ind2']]['kw']
-#    if stim.sets[stimset]['load'] == 'auto':
-#        if stim.sets[stimset]['type'] == 'files':  # Check for manual done in gustav
-#            if stim.debug:
-#                stim.current[stimset]['data'] = [0]
-#            else:
-#                stim.current[stimset]['data'],fs = wavread(stim.current[stimset]['filelist'][0])
-#        else:
-#            raise Exception, "Unknown stimulus type: " + stim.sets[stimset]['type'] + " for stimulus set: " + stimset
 
     if stim.current[stimset]['ind'] == stim.sets[stimset]['n']-1:
         if stim.sets[stimset]['repeat']:
@@ -674,7 +661,9 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
                             to specify default: ',')
         $currentvarsvals : Same as currentvars, but you will get 'var = val'
                             instead of just 'val'
-        $user[varname]   : Any user variables
+        @currentvars     : Same as currentvars, but you will get var names 
+                            instead of values (eg., for datafile header). 
+        $user[varname]   : The value of a user variables
         $resp            : The current response
     """
 
@@ -754,59 +743,6 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
             outstr = outstr.replace("@dynamic["+str(key)+"]", str(key))
 
     return outstr
-
-
-## Now that header is its own variable, this function is not needed
-#def get_expanded_vars_in_string(instr, exp, run, var, stim, user):
-#    """Replaces all variable references with the name of the specified variable
-#
-#        Or, generates a header line in a datafile
-#    """
-#
-#    outstr = instr.replace("$name", "ExpName")
-#    outstr = instr.replace("$note", "Note")
-#    outstr = instr.replace("$comment", "Comments")
-#    outstr = outstr.replace("$host", "Host")
-#    outstr = outstr.replace("$subj", "SubjID")
-#    outstr = outstr.replace("$trials", "Trial")
-#    outstr = outstr.replace("$block", "Block")
-#    outstr = outstr.replace("$conditions", "Conditions")
-#    outstr = outstr.replace("$condition", "Condition")
-#    outstr = outstr.replace("$time", "Time")
-#    outstr = outstr.replace("$date", "Date")
-#    outstr = outstr.replace("$response", "Response")
-#
-#    for s in stim.stimvars:
-#        outstr = outstr.replace("$stim_kw["+stim.sets[s]['name']+"]", "KW")
-#        outstr = outstr.replace("$stim_file["+stim.sets[s]['name']+"]", 'File')
-#        outstr = outstr.replace("$stim_text["+stim.sets[s]['name']+"]", 'Text')
-#        outstr = outstr.replace("$stim_ind["+stim.sets[s]['name']+"]", 'Ind')
-#
-#    varlist = []
-#    for key in var.varlist:
-#        outstr = outstr.replace("$var["+key+"]", key)
-#        varlist.append(key)
-#
-#    got_cv = True
-#    while got_cv:
-#        expr, delim = get_arg(outstr,"$currentvars")
-#        if expr != "":
-#            if delim == "":
-#                delim = ","
-#            outstr = outstr.replace(expr, delim.join(varlist))
-#        else:
-#            got_cv = False
-#
-#    items = getmembers(user)
-#    for key, val in items:
-#        if key[:2] != "__":
-#            outstr = outstr.replace("$user["+str(key)+"]", str(key))
-#
-#    if hasattr(var,'dynamic'):
-#        for key, val in var.dynamic.items():
-#            outstr = outstr.replace("$dynamic["+str(key)+"]", str(key))
-#
-#    return outstr
 
 
 def get_arg(instr, var):

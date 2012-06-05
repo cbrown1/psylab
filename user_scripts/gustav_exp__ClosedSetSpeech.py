@@ -73,8 +73,7 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_block = ''
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
-    exp.cacheTrials = False
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9';  # comma-delimited list of valid single-char responses
+    exp.quitKey = '/'
     exp.note = 'A closed-set speech experiment'
     exp.comments = '''This is an example of a closed-set speech experiment. 
     '''
