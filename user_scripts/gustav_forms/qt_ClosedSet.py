@@ -139,14 +139,15 @@ class Interface():
                 altDown = False
 
         def radioCheck(self, group, choice):
-            for item in self.bbox_group[group]:
-                if item.text() == choice:
-                    item.setChecked(True)
-                    stylesheet = "QPushButton {background-color: yellow; " + self.default_button_stylesheet_nobg
-                else:
-                    item.setChecked(False)
-                    stylesheet = self.default_button_stylesheet
-                item.setStyleSheet(stylesheet)
+            if self.waitingForResponse:
+                for item in self.bbox_group[group]:
+                    if item.text() == choice:
+                        item.setChecked(True)
+                        stylesheet = "QPushButton {background-color: yellow; " + self.default_button_stylesheet_nobg
+                    else:
+                        item.setChecked(False)
+                        stylesheet = self.default_button_stylesheet
+                    item.setStyleSheet(stylesheet)
 
         def isGoodResponse(self):
             all = True

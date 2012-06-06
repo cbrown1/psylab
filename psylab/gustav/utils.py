@@ -69,7 +69,7 @@ class exp:
     stimLoadTypes = ['auto', 'manual']
     stimTypes = ['files', 'manual']
     varTypes = ['stim', 'manual', 'dynamic']
-    frontendTypes = ['qt', 'tk']
+    frontendTypes = ['qt', 'tk', 'term']
     from frontends import term
 
     def prompt_response(self,exp,run,var,stim,user):

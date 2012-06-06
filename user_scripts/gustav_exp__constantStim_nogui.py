@@ -42,10 +42,6 @@ import psylab
 
 def setup(exp,run,var,stim,user):
 
-    # Crash Recovery
-    run.startblock = 1;
-    run.starttrial = 1;
-
     if os.name == 'posix':
         basedir = r'/home/code-breaker/Python'
     else:
@@ -68,7 +64,7 @@ def setup(exp,run,var,stim,user):
     exp.cacheTrials = False
     # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
     # the experimenter do the scoring, and enter the score on each trial.
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',');
+    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
     exp.quitKey = '/'
     exp.note = 'CI Pilot data'
     exp.comments = '''ci_fmam: CI Pilot data
@@ -133,7 +129,7 @@ def setup(exp,run,var,stim,user):
                               'order':  '1:10', #
                               'repeat': True,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
-                            };
+                            }
     stim.sets['Babble'] = {
                               'type':   'soundfiles',
                               'path':   os.path.join(basedir,'stim','noise'),
@@ -141,10 +137,10 @@ def setup(exp,run,var,stim,user):
                               'load':   'manual',  # 'manual' = Just get names, don't load
                               'order':  'random', #
                               'repeat': True,    #
-                            };
+                            }
     stim.sets['SSNoise'] = {
                               'type': 'manual',
-                              };
+                              }
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -196,7 +192,7 @@ def setup(exp,run,var,stim,user):
                                         '-100',
                                         '-125',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'processing',
                             'type' : 'manual',
@@ -205,7 +201,7 @@ def setup(exp,run,var,stim,user):
                                         'E/A',
                                         'E/Tfmam',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'excursion',
                             'type' : 'manual',     # This variable will be processed manually in stimgen (default behavior)
@@ -213,42 +209,42 @@ def setup(exp,run,var,stim,user):
                                         '1',
                                         '.5',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CUNYf',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'snr',
                             'type' : 'manual',
                           'levels' : [
                                         '3',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'freq',
                             'type' : 'manual',
                           'levels' : [
                                         '300',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'processing',
                             'type' : 'manual',
                           'levels' : [
                                         'E',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'excursion',
                             'type' : 'manual',
@@ -258,28 +254,28 @@ def setup(exp,run,var,stim,user):
                                         '5',
                                         '7',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'target',
                             'type' : 'stim',
                           'levels' : [
                                         'CUNYf',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
-                        });
+                        })
 
     var.listvars.append( {  'name' : 'snr',
                             'type' : 'manual',
                           'levels' : [
                                         '3',
                                       ]
-                        });
+                        })
 
     var.constant = {
         'trialsperblock' : 10,
@@ -295,7 +291,7 @@ def setup(exp,run,var,stim,user):
         make the first item in the print range 'random' to randomize the specified
         range.
     """
-    var.order = 'menu';
+    var.order = 'menu'
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -307,8 +303,8 @@ def setup(exp,run,var,stim,user):
     """USER VARIABLES
         Add any additional variables you need here
     """
-    user.prebuff = 150;
-    user.postbuff = 150;
+    user.prebuff = 150
+    user.postbuff = 150
 
 
 """CUSTOM PROMPT
@@ -318,10 +314,16 @@ def setup(exp,run,var,stim,user):
     run.pylab_is_go to False
 """
 def prompt_response(exp,run,var,stim,user):
+    #while True:
+    target_name = var.current['target']
+    # The prompt is the trial feedback.
+    p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
+    print p
     while True:
-        # The prompt is the trial feedback.
-        p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +"\n"+stim.current[target_name]['txt']
-        ret = exp.term.get_input(None, "Gustav!",p)
+        ret = exp.gui.get_char()
+        #ret = exp.utils._Getch()
+        #print ret
+        #term.get_input(None, "Gustav!",p)
         #TODO: Switch to get_char
         #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
         if ret in exp.validKeys:
@@ -330,7 +332,7 @@ def prompt_response(exp,run,var,stim,user):
         elif ret == exp.quitKey:
             run.block_on = False
             run.gustav_is_go = False
-            break;
+            break
 
 """PRE_TRIAL
     This function gets called on every trial to generate the stimulus, do

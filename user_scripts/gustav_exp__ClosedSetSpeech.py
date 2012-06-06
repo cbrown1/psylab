@@ -38,16 +38,12 @@ import os
 import numpy as np
 import time
 import psylab
-from gustav_forms import qt_newbug as theForm
+from gustav_forms import qt_ClosedSet as theForm
 #from brian import hears as bh
 #import brian as b
 import medussa as m
 
 def setup(exp,run,var,stim,user):
-
-    # Crash Recovery
-    run.startblock = 1;
-    run.starttrial = 1;
 
     if os.name == 'posix':
         basedir = os.path.expanduser(os.path.join('~','Python'))
@@ -76,6 +72,7 @@ def setup(exp,run,var,stim,user):
     exp.quitKey = '/'
     exp.note = 'A closed-set speech experiment'
     exp.comments = '''This is an example of a closed-set speech experiment. 
+    The interface is designed for the subject to run herself. 
     '''
 
     """STIMULUS SETS
@@ -136,7 +133,7 @@ def setup(exp,run,var,stim,user):
                               'order':  '1:866', #
                               'repeat': False,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
-                            };
+                            }
     stim.sets['Babble'] = {
                               'type':   'files',
                               'path':   os.path.join(basedir,'stim','noise'),
@@ -144,10 +141,10 @@ def setup(exp,run,var,stim,user):
                               'load':   'manual',  # 'manual' = Just get names, don't load
                               'order':  'random', #
                               'repeat': True,    #
-                            };
+                            }
     stim.sets['SSNoise'] = {
                               'type': 'manual',
-                              };
+                              }
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -197,21 +194,21 @@ def setup(exp,run,var,stim,user):
                                         '-5',
                                         '-10',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CUNYf',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
-                        });
+                        })
 
     var.constant = {
         'trialsperblock' : 10,

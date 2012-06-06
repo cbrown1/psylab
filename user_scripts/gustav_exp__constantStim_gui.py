@@ -41,10 +41,6 @@ import medussa as m
 
 def setup(exp,run,var,stim,user):
 
-    # Crash Recovery
-    run.startblock = 1;
-    run.starttrial = 1;
-
     if os.name == 'posix':
         basedir = os.path.expanduser(os.path.join('~','Python'))
     else:
@@ -70,7 +66,7 @@ def setup(exp,run,var,stim,user):
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
     # the experimenter do the scoring, and enter the score on each trial.
-    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',');
+    exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
     exp.quitKey = '/'
     exp.note = 'CI Pilot data'
     exp.comments = '''ci_fmam: CI Pilot data
@@ -139,7 +135,7 @@ def setup(exp,run,var,stim,user):
                               'order':  '1:866', #
                               'repeat': False,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
-                            };
+                            }
     stim.sets['Babble'] = {
                               'type':   'files',
                               'path':   os.path.join(basedir,'stim','noise'),
@@ -147,10 +143,10 @@ def setup(exp,run,var,stim,user):
                               'load':   'manual',  # 'manual' = Just get names, don't load
                               'order':  'random', #
                               'repeat': True,    #
-                            };
+                            }
     stim.sets['SSNoise'] = {
                               'type': 'manual',
-                              };
+                              }
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -200,21 +196,21 @@ def setup(exp,run,var,stim,user):
                                         '-5',
                                         '-10',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CUNYf',
                                       ]
-                        });
+                        })
 
     var.factvars.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
-                        });
+                        })
 
     var.constant = {
         'trialsperblock' : 10,
@@ -322,7 +318,7 @@ def prompt_response(exp,run,var,stim,user):
         elif ret in ['/','q']:
             run.block_on = False
             run.gustav_is_go = False
-            break;
+            break
 
 def post_trial(exp,run,var,stim,user):
     if run.gustav_is_go:

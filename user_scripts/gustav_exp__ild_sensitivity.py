@@ -44,10 +44,6 @@ import medussa as m
 
 def setup(exp,run,var,stim,user):
 
-    # Crash Recovery
-    run.startblock = 1
-    run.starttrial = 1
-
     if os.name == 'posix':
         basedir = r'/home/code-breaker/Python'
     else:
@@ -70,7 +66,8 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_header = ''
     exp.cacheTrials = False
-    exp.validKeys = '1,2';  # comma-delimited list of valid responses
+    exp.validKeys = '1,2'  # comma-delimited list of valid responses
+    exp.quitKey = '/'
     exp.note = "ILD Sensitivity; overall vs 'natural' ILDs"
     exp.comments = '''\
     user.ild_nat and flat are the amounts of attenuation in each of 32 
@@ -137,7 +134,7 @@ def setup(exp,run,var,stim,user):
                               'order':  'r,1:500', #
                               'repeat': True,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
-                            };
+                            }
 
 #    stim.sets['Noise'] = {
 #                              'type':   'soundfiles',
@@ -150,7 +147,7 @@ def setup(exp,run,var,stim,user):
 #                              'order':  'r,1:50', #
 #                              'repeat': True,    # If we run out of files, should we start over?
 #                              'equate': 3,  # A custom value
-#                            };
+#                            }
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
@@ -199,7 +196,7 @@ def setup(exp,run,var,stim,user):
                                         'Flat_rms',
                                         'Flat_max',
                                       ]
-                        });
+                        })
     
     var.factvars.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
@@ -207,7 +204,7 @@ def setup(exp,run,var,stim,user):
                                         'CNC',
                                         #'Noise',
                                       ]
-                        });
+                        })
 
     var.dynamic = { 'name': 'ild_coeff', # Name of the dynamic variable
                     'units': 'dB',       # Units of the dynamic variable
@@ -286,11 +283,11 @@ def prompt_response(exp,run,var,stim,user):
         if str(ret) in exp.validKeys_:
             run.response = ret
             break
-        elif str(ret) in exp.quitKeys:
+        elif str(ret) == exp.quitKey:
             run.block_on = False
             run.gustav_is_go = False
             var.dynamic['msg'] = "Cancelled by user"
-            break;
+            break
 
 """PRE_TRIAL
     This function gets called on every trial to generate the stimulus, and

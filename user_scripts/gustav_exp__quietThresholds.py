@@ -44,10 +44,6 @@ import medussa as m
 
 def setup(exp,run,var,stim,user):
 
-    # Crash Recovery
-    run.startblock = 1
-    run.starttrial = 1
-
     if os.name == 'posix':
         basedir = r'/home/code-breaker/Python'
     else:
@@ -69,7 +65,7 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_header = ''
     exp.cacheTrials = False
-    exp.validKeys = '1,2'.split(',');  # comma-delimited list of valid responses
+    exp.validKeys = '1,2'.split(',')  # comma-delimited list of valid responses
     exp.quitKey = '/'
     exp.note = "Quiet Thresholds for pure tones"
     exp.comments = '''\
@@ -131,7 +127,7 @@ def setup(exp,run,var,stim,user):
 #                              'order':  'r,1:500', #
 #                              'repeat': True,    # If we run out of files, should we start over?
 #                              'equate': 3,  # A custom value
-#                            };
+#                            }
 
 
     """EXPERIMENT VARIABLES
@@ -189,14 +185,14 @@ def setup(exp,run,var,stim,user):
                                         '6000',
                                         '8000',
                                       ]
-                        });
+                        })
     
 #    var.factvars.append( {  'name' : 'target',
 #                            'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
 #                          'levels' : [
 #                                        'CNC',
 #                                      ]
-#                        });
+#                        })
 
     """DYNAMIC VARIABLES
         When the method is adaptive, these variables must be set in var.dynamic
@@ -263,7 +259,7 @@ def prompt_response(exp,run,var,stim,user):
             run.block_on = False
             run.gustav_is_go = False
             var.dynamic['msg'] = "Cancelled by user"
-            break;
+            break
 
 def pre_trial(exp,run,var,stim,user):
     """PRE_TRIAL
