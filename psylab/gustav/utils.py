@@ -31,6 +31,7 @@ import codecs
 import types
 from time import sleep
 from inspect import getmembers
+from frontends import term
 
 class exp:
     '''Experimental settings
@@ -45,12 +46,12 @@ class exp:
     debug = False
     method = 'constant'
     prompt = ''
-    logString_pre_trial = "" #Write this string to the console and/or logfile before every trial
-    logString_post_trial = ""#Write this string to the console and/or logfileafter every trial
-    logString_pre_block = "" #Write this string to the console and/or logfilebefore every block
-    logString_post_block = ""#Write this string to the console and/or logfileafter every block
-    logString_pre_exp = ""   #Write this string to the console and/or logfileat start of exp
-    logString_post_exp = ""  #Write this string to the console and/or logfileat end of exp
+    logString_pre_trial = None #Write this string to the console and/or logfile before every trial
+    logString_post_trial = None#Write this string to the console and/or logfileafter every trial
+    logString_pre_block = None #Write this string to the console and/or logfilebefore every block
+    logString_post_block = None#Write this string to the console and/or logfileafter every block
+    logString_pre_exp = None   #Write this string to the console and/or logfileat start of exp
+    logString_post_exp = None  #Write this string to the console and/or logfileat end of exp
     logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new (variables expand to names, not values)
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ""
@@ -74,7 +75,7 @@ class exp:
 
     def prompt_response(self,exp,run,var,stim,user):
         while True:
-            ret = exp.gui.get_input(None, "Gustav!","Enter Response: ")
+            ret = exp.frontend.get_input(None, "Gustav!","Enter Response: ")
             # Check for quit
             if ret in ['/', 'q']:
                 # User wants to exit. Break out of block, gustav loops
@@ -474,13 +475,14 @@ def menu_condition(exp,run,var,stim,user):
     strtable = exp.utils.get_variable_strtable(var) + "\nSelected Conditions: ["
     sel = []
     conditions = []
+    message = ''
     for i in range(1,var.nlevels_total+1):
         conditions.append(str(i))
     while True:
         disp = strtable
         for s in sel:
             disp += " " + s
-        disp += " ]\n\nMenu"
+        disp += " ]\n\n%sMenu" % message
         if not exp.recordData:
             disp += "  [NO DATA WILL BE RECORDED]"
         disp += ":\nCondition # - Add condition\n"
@@ -489,7 +491,8 @@ def menu_condition(exp,run,var,stim,user):
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
         disp += "%11s - quit\n" % (exp.quitKey)
-        clearscreen()
+        term.clearscreen()
+        message = ''
         ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
@@ -502,19 +505,24 @@ def menu_condition(exp,run,var,stim,user):
         elif ret in ['c']:
             sel = []
         elif ret in ['r']:
-            sel = np.random.permutation(sel).tolist()
-            for s in sel:
-                var.orderarray.append(int(s)-1)
-            run.nblocks = len(var.orderarray)
-            run.gustav_is_go = True
-            break;
+            if len(sel) > 0:
+                sel = np.random.permutation(sel).tolist()
+                for s in sel:
+                    var.orderarray.append(int(s)-1)
+                run.nblocks = len(var.orderarray)
+                run.gustav_is_go = True
+                break;
+            else:
+                message = "You must select at least 1 condition to run!\n\n"
         elif ret in ['s']:
-            for s in sel:
-                var.orderarray.append(int(s)-1)
-            run.nblocks = len(var.orderarray)
-            run.gustav_is_go = True
-            break;
-
+            if len(sel) > 0:
+                for s in sel:
+                    var.orderarray.append(int(s)-1)
+                run.nblocks = len(var.orderarray)
+                run.gustav_is_go = True
+                break;
+            else:
+                message = "You must select at least 1 condition to run!\n\n"
 
 def stim_get_next(stim, stimset):
     '''Load the next stimulus for a stimulus set
@@ -598,15 +606,16 @@ def save_data(exp,run,var,stim,user, which):
 def get_frontend(exp, frontend):
     '''Tries to load the specified frontend
     '''
-    if frontend not in exp.frontendTypes:
+    frontend_s = frontend
+    if frontend_s not in exp.frontendTypes:
         print 'Unknown frontend. Using tk'
         frontend = 'tk'
 
     try:
-        gui = __import__('frontends',globals(), locals(), frontend)
+        frontend = __import__('frontends',globals(), locals(), frontend)
     except ImportError:
         raise Exception, "Could not import frontend "+frontend
-    exp.gui = getattr(gui, frontend)
+    exp.frontend = getattr(frontend, frontend_s)
 
 def obj_to_str(obj, name, indent=''):
     """Returns formatted, python-callable string representations of objects
@@ -811,50 +820,4 @@ def str_to_range(s):
     else:
         return sorted(result)
 
-# System-specific functions
-if os.name in ["posix", "mac"]:
-    import termios
-    TERMIOS = termios
-    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
-        '''Returns a single character from standard input
-        '''
-        import tty, termios
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
-
-    def clearscreen():
-        """Clear the console.
-        """
-        os.system('tput clear')
-        #os.system('clear')
-
-elif os.name in ("nt", "dos", "ce"):
-    from msvcrt import getch
-    def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
-        '''Returns a single character from standard input
-        '''
-        ch = getch()
-        return ch
-
-    def clearscreen():
-        """Clear the console.
-        """
-        os.system('CLS')
-
-elif os.name == "mac":
-    def get_char(parent=None, title = 'User Input', prompt = 'Enter a value:'):
-        '''Returns a single character from standard input
-        '''
-        # Nope. Try the posix function, since osx seems to have termios
-
-    def clearscreen():
-        """Clear the console.
-        """
-        os.system('tput clear')
 

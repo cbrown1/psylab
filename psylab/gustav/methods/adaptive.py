@@ -214,19 +214,17 @@ def post_block(exp, run, var, stim, user):
 
 def pre_exp(exp, run, var, stim, user):
     # Only set these if empty, in case they were set in experiment file setup, which has run already
-    if exp.logString_pre_exp == "":
+    if exp.logString_pre_exp == None:
         exp.logString_pre_exp = "Experiment $name started at $time\n"
-    if exp.logString_pre_block == "":
+    if exp.logString_pre_block == None:
         exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    if exp.logString_pre_trial == "":
+    if exp.logString_pre_trial == None:
         exp.logString_pre_trial = "  Trial $trial_block, dynamic: $dynamic[value] $dynamic[units], alternative: $dynamic[correct], "
-    print "Got Here"
-    if exp.logString_post_trial == "":
-        print "But also here"
+    if exp.logString_post_trial == None:
         exp.logString_post_trial = "Response: $response $dynamic[cur_status]\n"
-    if exp.logString_post_block == "":
+    if exp.logString_post_block == None:
         exp.logString_post_block = " Mean: $dynamic[mean], SD: $dynamic[sd], Result: $dynamic[msg]\n Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    if exp.logString_post_exp == "":
+    if exp.logString_post_exp == None:
         exp.logString_post_exp = "\nExperiment $name ended at $time\n"
 
 

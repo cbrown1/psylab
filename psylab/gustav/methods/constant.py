@@ -32,15 +32,15 @@ import os, codecs
 
 def pre_exp(exp, run, var, stim, user):
     # Only set these if empty, in case they were set in experiment file setup, which has run already
-    if exp.logString_pre_exp == "":
+    if exp.logString_pre_exp == None:
         exp.logString_pre_exp = "Experiment $name started at $time\n"
-    if exp.logString_pre_block == "":
+    if exp.logString_pre_block == None:
         exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    if exp.logString_post_trial == "":
+    if exp.logString_post_trial == None:
         exp.logString_post_trial = " Trial $trial, Response: $response\n"
-    if exp.logString_post_block == "":
+    if exp.logString_post_block == None:
         exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    if exp.logString_post_exp == "":
+    if exp.logString_post_exp == None:
         exp.logString_post_exp = "\nExperiment $name ended at $time\n"
     run.block = var.constant['startblock']-1
     if run.block == run.nblocks - 1:

@@ -50,8 +50,10 @@ def setup(exp,run,var,stim,user):
     # General Experimental Variables
     exp.name = '_SomeExperiment'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    exp.consoleString_Trial = ''; #Write this string to the console after every trial
-    exp.consoleString_Block = "Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n"; #Write this string to the console before every block
+    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_trial = ''; # trial info is written in the pre_trial function
+    exp.logString_post_trial = ''; 
+    exp.logString_post_block = "Blocky $block ; Condition: $condition ; $currentvarsvals[' ; ']\n";
     exp.frontend = 'term'
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
@@ -61,7 +63,6 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_block = ''
     exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
-    exp.cacheTrials = False
     # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
     # the experimenter do the scoring, and enter the score on each trial.
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
@@ -318,14 +319,9 @@ def prompt_response(exp,run,var,stim,user):
     target_name = var.current['target']
     # The prompt is the trial feedback.
     p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
-    print p
+    print p,
     while True:
-        ret = exp.gui.get_char()
-        #ret = exp.utils._Getch()
-        #print ret
-        #term.get_input(None, "Gustav!",p)
-        #TODO: Switch to get_char
-        #ret = exp.gui.get_input(None, "Gustav!","How many keywords? ")
+        ret = exp.frontend.get_char()
         if ret in exp.validKeys:
             run.response = ret
             break
@@ -344,6 +340,8 @@ def prompt_response(exp,run,var,stim,user):
 def pre_trial(exp,run,var,stim,user):
     stim.stimarray = np.zeros((1))
 
+def post_trial(exp,run,var,stim,user):
+    print " | Correct: %s" % run.response
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)

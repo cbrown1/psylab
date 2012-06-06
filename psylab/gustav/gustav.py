@@ -54,7 +54,7 @@ def configure(experimentFile = None, frontend = None):
 
     experiment.setup( exp, run, var, stim, user)
 
-    exp.gui.show_config( exp, run, var, stim, user )
+    exp.frontend.show_config( exp, run, var, stim, user )
 
 
 def list_conditions(experimentFile = None, frontend = None):
@@ -146,7 +146,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if run.gustav_is_go == False:
         print "Gustav cancelled at user request"
         return;
-    ret = exp.gui.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
+    ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
     if not ret:
         print "Gustav cancelled at user request"
         return;

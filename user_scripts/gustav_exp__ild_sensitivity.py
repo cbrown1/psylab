@@ -66,7 +66,7 @@ def setup(exp,run,var,stim,user):
     exp.dataString_exp = ''
     exp.dataString_header = ''
     exp.cacheTrials = False
-    exp.validKeys = '1,2'  # comma-delimited list of valid responses
+    exp.validKeys = '1,2'.split(",")
     exp.quitKey = '/'
     exp.note = "ILD Sensitivity; overall vs 'natural' ILDs"
     exp.comments = '''\
