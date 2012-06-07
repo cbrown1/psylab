@@ -46,20 +46,23 @@ class exp:
     debug = False
     method = 'constant'
     prompt = ''
+    logString_pre_exp = None   #Write this string to the console and/or logfileat start of exp
+    logString_pre_block = None #Write this string to the console and/or logfilebefore every block
     logString_pre_trial = None #Write this string to the console and/or logfile before every trial
     logString_post_trial = None#Write this string to the console and/or logfileafter every trial
-    logString_pre_block = None #Write this string to the console and/or logfilebefore every block
     logString_post_block = None#Write this string to the console and/or logfileafter every block
-    logString_pre_exp = None   #Write this string to the console and/or logfileat start of exp
     logString_post_exp = None  #Write this string to the console and/or logfileat end of exp
-    logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new (variables expand to names, not values)
+    logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ""
     logConsole = True
-    dataString_trial = '' #Write this string to datafile after every trial
-    dataString_block = '' #Write this string to datafile after every block
-    dataString_exp = ''   #Write this string to datafile at exp end
-    dataString_header = '#A data file for Gustav\n\n'#Write this string to datafile if the file is new  (variables expand to names, not values)
+    dataString_pre_exp = ''   #Write this string to datafile at exp begin
+    dataString_pre_block = '' #Write this string to datafile before every block
+    dataString_pre_trial = '' #Write this string to datafile before every trial
+    dataString_post_trial = '' #Write this string to datafile after every trial
+    dataString_post_block = '' #Write this string to datafile after every block
+    dataString_post_exp = ''   #Write this string to datafile at exp end
+    dataString_header = '#A data file for Gustav\n\n'#Write this string to datafile if the file is new
     dataFile ='$name.csv'
     dataFile_unexpanded =''
     recordData = True
@@ -70,6 +73,7 @@ class exp:
     stimLoadTypes = ['auto', 'manual']
     stimTypes = ['files', 'manual']
     varTypes = ['stim', 'manual', 'dynamic']
+    dataStringTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
     from frontends import term
 
@@ -118,18 +122,6 @@ class exp:
 
     def post_exp(exp,run,var,stim,user):
         pass
-
-    def save_data_trial_(self,exp,run,var,stim,user):
-        if exp.dataString_trial is not None and exp.dataString_trial != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_trial, exp, run, var, stim, user), exp.dataFile)
-
-    def save_data_block_(self,exp,run,var,stim,user):
-        if exp.dataString_block is not None and exp.dataString_block != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_block, exp, run, var, stim, user), exp.dataFile)
-
-    def save_data_exp_(self,exp,run,var,stim,user):
-        if exp.dataString_exp is not None and exp.dataString_exp != '':
-            exp.utils.write_data(exp.utils.get_expanded_vals_in_string(exp.dataString_exp, exp, run, var, stim, user), exp.dataFile)
 
     pre_exp_ = [pre_exp]
     pre_block_ = [pre_block]
@@ -217,21 +209,15 @@ def initialize_experiment( exp, run, var, stim, user):
     if hasattr(exp.experiment, 'post_exp'):
         exp.post_exp_.append(exp.experiment.post_exp)
 
-    # For save_data functions, look for any present in experiment first, then look in method.
+    # For dataString functions, look for any present in experiment first, then look in method.
     # But only run one each.
-    elif hasattr(exp.method, 'save_data_trial'):
-        exp.save_data_trial = exp.method.save_data_trial
-    elif hasattr(exp.method, 'save_data_block'):
-        exp.save_data_block = exp.method.save_data_block
-    elif hasattr(exp.method, 'save_data_exp'):
-        exp.save_data_exp = exp.method.save_data_exp
-
-    if hasattr(exp.experiment, 'save_data_trial'):
-        exp.save_data_trial = exp.experiment.save_data_trial
-    if hasattr(exp.experiment, 'save_data_block'):
-        exp.save_data_block = exp.experiment.save_data_block
-    if hasattr(exp.experiment, 'save_data_exp'):
-        exp.save_data_exp = exp.experiment.save_data_exp
+    if exp.recordData:
+        for datatype in exp.dataStringTypes:
+            thisstr = 'dataString_%s' % datatype
+            if hasattr(exp.experiment, thisstr):
+                setattr(exp, thisstr, getattr(exp.experiment, thisstr))
+            elif hasattr(exp.method, thisstr):
+                setattr(exp, thisstr, getattr(exp.method, thisstr))
 
     # A few that should be experiment-specific:
     if hasattr(exp.experiment, 'present_trial'):
@@ -560,17 +546,6 @@ def update_time(run):
     run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
-def log(exp,run,var,stim,user, event):
-    '''Writes info to the console, to a log file, or both
-    '''
-    if hasattr(exp, 'logString_'+event) and getattr(exp, 'logString_'+event) is not None:
-        message = exp.utils.get_expanded_vals_in_string(getattr(exp, 'logString_'+event), exp, run, var, stim, user)
-        if exp.logConsole:
-            print(message),
-        if exp.logFile is not None and exp.logFile is not '':
-            write_data(message, exp.logFile)
-
-
 def write_data(data, filename):
     '''Data IO.
     '''
@@ -584,23 +559,29 @@ def write_data(data, filename):
     f.close()
 
 
-def save_data(exp,run,var,stim,user, which):
+def save_data(exp,run,var,stim,user, event):
     if exp.recordData:
-        if which == 'trial' and 'save_data_trial' not in exp.disable_functions:
-            if hasattr(exp, 'save_data_trial'):
-                exp.save_data_trial(exp,run,var,stim,user)
-            else:
-                exp.save_data_trial_(exp,run,var,stim,user)
-        elif which == 'block' and 'save_data_block' not in exp.disable_functions:
-            if hasattr(exp, 'save_data_block'):
-                exp.save_data_block(exp,run,var,stim,user)
-            else:
-                exp.save_data_block_(exp,run,var,stim,user)
-        elif which == 'exp' and 'save_data_exp' not in exp.disable_functions:
-            if hasattr(exp, 'save_data_exp'):
-                exp.save_data_exp(exp,run,var,stim,user)
-            else:
-                exp.save_data_exp_(exp,run,var,stim,user)
+        thisstr_s = 'dataString_%s' % event
+        if hasattr(exp, thisstr_s):
+            thisstr = getattr(exp, thisstr_s)
+            if thisstr is not None and thisstr != '':
+                exp.utils.write_data(
+                        exp.utils.get_expanded_vals_in_string(thisstr, exp, run, var, stim, user),
+                        exp.dataFile)
+
+
+def log(exp,run,var,stim,user, event):
+    '''Writes info to the console, to a log file, or both
+    '''
+    thisstr_s = 'logString_%s' % event
+    if hasattr(exp, thisstr_s):
+        thisstr = getattr(exp, thisstr_s)
+        if thisstr is not None and thisstr != '':
+            message = exp.utils.get_expanded_vals_in_string(thisstr, exp, run, var, stim, user)
+            if exp.logConsole:
+                print(message),
+            if exp.logFile is not None and exp.logFile is not '':
+                write_data(message, exp.logFile)
 
 
 def get_frontend(exp, frontend):
@@ -653,6 +634,7 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         $name            : The name of the experiment
         $host            : The name of the machine that the exp is being run on
         $subj            : The subject id
+        $resp            : The current response
         $trial           : The current trial number
         $trial_block     : The current trial number within the current block
         $block           : The current block number
@@ -673,7 +655,6 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         @currentvars     : Same as currentvars, but you will get var names 
                             instead of values (eg., for datafile header). 
         $user[varname]   : The value of a user variables
-        $resp            : The current response
     """
 
     outstr = instr.replace("$name", exp.name)

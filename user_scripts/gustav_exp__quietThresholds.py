@@ -51,6 +51,10 @@ def setup(exp,run,var,stim,user):
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
 
     # General Experimental Variables
+    exp.recordData = False # Ask gustav not to save data: it is saved in the adaptive method script
+    exp.dataFile = os.path.join(basedir,'data','$name_$subj.py')
+    exp.dataString_post_block = None
+    exp.dataString_header = None
     exp.name = 'quiet_thresholds'
     exp.method = 'adaptive' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.prompt = 'Which interval?' # Prompt for subject
@@ -58,12 +62,6 @@ def setup(exp,run,var,stim,user):
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.logConsole = True
     exp.debug = False
-    exp.recordData = False # Ask gustav not to save data: it is saved in the adaptive method script
-    exp.dataFile = os.path.join(basedir,'data','$name_$subj.py')
-    exp.dataString_trial = ''
-    exp.dataString_block = ''
-    exp.dataString_exp = ''
-    exp.dataString_header = ''
     exp.cacheTrials = False
     exp.validKeys = '1,2'.split(',')  # comma-delimited list of valid responses
     exp.quitKey = '/'

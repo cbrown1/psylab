@@ -56,19 +56,69 @@ def setup(exp,run,var,stim,user):
     exp.prompt = 'Select one word from each column'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     # TODO: move logstring and datastring vars out of exp and into either method or experiment, so they can be properly enumerated at startup
-
+    exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
+    exp.dataFile = os.path.join(basedir,'data','$name.csv')
+    exp.recordData = True
+    """DATA & LOG STRINGS
+        Data strings are written to the file specified in exp.dataFile. Log  
+        strings are written to the console and to the log file specified in 
+        'gustav_logfile_$date.log'. You don't need to specify any particular
+        one, only the ones that make sense for the particular experiment. 
+        Note also that the method classes have reasonable default strings 
+        specified, but the ones in the experiment file have priority. If you 
+        don't want a method string used, set that string to "". 
+        
+        Each type of string can be written at various points in the experiment
+        by specifying any of the following:
+        
+        dataString_pre_exp           logString_pre_exp
+        dataString_pre_block         logString_pre_block
+        dataString_pre_trial         logString_pre_trial
+        dataString_post_trial        logString_post_trial
+        dataString_post_block        logString_post_block
+        dataString_post_exp          logString_post_exp
+        dataString_header (only written if dataFile does not exist)
+        
+        For each string, there are a number of variables that you can use, 
+        that will be expanded just prior to being written. They are:
+        
+        Var ref:         : Will be replaced with:
+        $name            : The name of the experiment
+        $host            : The name of the machine that the exp is being run on
+        $subj            : The subject id
+        $resp            : The current response
+        $trial           : The current trial number
+        $trial_block     : The current trial number within the current block
+        $block           : The current block number
+        $condition       : The current condition number
+        $conditions      : The total number of conditions
+        $time            : The time the session started
+        $date            : The date the session started
+        $stim_kw[name]   : The current kw value for the specified stimulus set
+        $stim_file[name] : The current filename for the specified stimulus set
+        $stim_text[name] : The current text for the specified stimulus set
+        $stim_ind[name]  : The current file ind for the specified stimulus set
+        $var[varname]    : varname is the name of one of your variables
+        $currentvars[';']: A delimited list of the current levels of all vars
+                            The delimiter can be specified (use empty brackets
+                            to specify default: ',')
+        $currentvarsvals : Same as currentvars, but you will get 'var = val'
+                            instead of just 'val'
+        @currentvars     : Same as currentvars, but you will get var names 
+                            instead of values (eg., for datafile header). 
+        $user[varname]   : The value of a user variables
+        
+    """
+    exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
+    exp.dataString_pre_exp = ''
+    exp.dataString_pre_block = ''
+    exp.dataString_post_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_trial = " Trial $trial, response: $response\n"
     exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+
     exp.frontend = 'qt'
-    exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.debug = True
-    exp.recordData = True
-    exp.dataFile = os.path.join(basedir,'data','$name.csv')
-    exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
-    exp.dataString_exp = ''
-    exp.dataString_block = ''
-    exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.quitKey = '/'
     exp.note = 'A closed-set speech experiment'
     exp.comments = '''This is an example of a closed-set speech experiment. 

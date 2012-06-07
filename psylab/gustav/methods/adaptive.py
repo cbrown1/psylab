@@ -15,7 +15,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
@@ -213,7 +213,7 @@ def post_block(exp, run, var, stim, user):
 
 
 def pre_exp(exp, run, var, stim, user):
-    # Only set these if empty, in case they were set in experiment file setup, which has run already
+    # Only set these if None, in case they were set in experiment file setup, which has run already
     if exp.logString_pre_exp == None:
         exp.logString_pre_exp = "Experiment $name started at $time\n"
     if exp.logString_pre_block == None:

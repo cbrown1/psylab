@@ -48,21 +48,19 @@ def setup(exp,run,var,stim,user):
         basedir = r'C:\Documents and Settings\cabrown4\My Documents\Python'
 
     # General Experimental Variables
-    exp.name = '_SomeExperiment'
+    exp.name = '_Constant_nogui'
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
-    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
-    exp.logString_pre_trial = ''; # trial info is written in the pre_trial function
-    exp.logString_post_trial = ''; 
-    exp.logString_post_block = "Blocky $block ; Condition: $condition ; $currentvarsvals[' ; ']\n";
-    exp.frontend = 'term'
-    exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
-    exp.debug = True
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
     exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
-    exp.dataString_exp = ''
-    exp.dataString_block = ''
-    exp.dataString_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
+    exp.dataString_post_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
+    exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
+    exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
+    exp.logString_pre_trial = ''; # trial info is written in the pre_trial function
+    exp.logString_post_trial = ''; 
+    exp.logString_post_block = " Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n";
+    exp.frontend = 'term'
+    exp.debug = True
     # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
     # the experimenter do the scoring, and enter the score on each trial.
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
@@ -126,7 +124,6 @@ def setup(exp,run,var,stim,user):
                               'text':   os.path.join(basedir,'stim','CUNY_F1.txt'),
                               'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
-                              'load':   'auto',  # 'auto' = Load stimuli automatically (default)
                               'order':  '1:10', #
                               'repeat': True,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
@@ -135,7 +132,6 @@ def setup(exp,run,var,stim,user):
                               'type':   'soundfiles',
                               'path':   os.path.join(basedir,'stim','noise'),
                               'mask':   '*.wav; *.WAV',
-                              'load':   'manual',  # 'manual' = Just get names, don't load
                               'order':  'random', #
                               'repeat': True,    #
                             }
@@ -306,6 +302,7 @@ def setup(exp,run,var,stim,user):
     """
     user.prebuff = 150
     user.postbuff = 150
+    user.kwp = '0'
 
 
 """CUSTOM PROMPT
@@ -318,6 +315,7 @@ def prompt_response(exp,run,var,stim,user):
     #while True:
     target_name = var.current['target']
     # The prompt is the trial feedback.
+    # TODO: This 'logs' text to the console. Add ability to log custom strings like this one to the log file:
     p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
     print p,
     while True:
@@ -339,6 +337,7 @@ def prompt_response(exp,run,var,stim,user):
 """
 def pre_trial(exp,run,var,stim,user):
     stim.stimarray = np.zeros((1))
+    user.kwp = str(stim.current[var.current['target']]['kw'])
 
 def post_trial(exp,run,var,stim,user):
     print " | Correct: %s" % run.response

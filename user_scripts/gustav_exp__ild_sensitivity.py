@@ -61,10 +61,8 @@ def setup(exp,run,var,stim,user):
     exp.debug = False
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name_$subj.py')
-    exp.dataString_trial = ''
-    exp.dataString_block = ''
-    exp.dataString_exp = ''
-    exp.dataString_header = ''
+    # The method class writes to the datafile, so don't overwrite the string here 
+    exp.dataString_post_block = None
     exp.cacheTrials = False
     exp.validKeys = '1,2'.split(",")
     exp.quitKey = '/'

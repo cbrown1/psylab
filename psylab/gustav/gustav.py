@@ -133,11 +133,13 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         exp.recordData = recordData
 
     if exp.recordData:
-        if not hasattr(exp, 'save_data_trial') and not hasattr(exp, 'save_data_block') and not hasattr(exp, 'save_data_exp'):
-            if (exp.dataString_trial == None or exp.dataString_trial == ''):
-                if (exp.dataString_block == None or exp.dataString_block == ''):
-                    if (exp.dataString_exp == None or exp.dataString_exp == ''):
-                        raise Exception, "Can't record data, because no available method has been specified.\nYou must specify at least one of the following:\nStrings exp.dataString_trial, exp.dataString_block, exp.dataString_exp\nFunctions: save_data_trial, save_data_block, save_data_exp"
+        got_dataString = False
+        for datatype in exp.dataStringTypes:
+            if hasattr(exp, 'dataString_%s' % datatype):
+                got_dataString = True
+                break
+        if not got_dataString:
+            raise Exception, "Can't record data, because no dataString variables have been specified!"
     else:
         print "WARNING: No data will be recorded!"
     if var.order == 'menu':
@@ -155,10 +157,12 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         if f.func_name not in exp.disable_functions:
             f(exp,run,var,stim,user)
     exp.utils.update_time(run)
+    if not os.path.isfile(exp.dataFile):
+        exp.utils.save_data(exp,run,var,stim,user, 'header')
     exp.utils.log(exp,run,var,stim,user, 'pre_exp')
+    exp.utils.save_data(exp,run,var,stim,user, 'pre_exp')
     run.gustav_is_go = True
     run.trials_exp = 0
-    # TODO: handle datafile headers
 
     while run.gustav_is_go:
         if var.order == 'prompt':
@@ -174,6 +178,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                 if f.func_name not in exp.disable_functions:
                     f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, 'pre_block')
+            exp.utils.save_data(exp,run,var,stim,user, 'pre_block')
 
             while run.block_on:
                 for s in stim.stimvars:
@@ -183,6 +188,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                 while run.trial_on:
                     exp.pre_trial(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, 'pre_trial')
+                    exp.utils.save_data(exp,run,var,stim,user, 'pre_trial')
                     exp.present_trial(exp,run,var,stim,user)
                     exp.prompt_response(exp,run,var,stim,user)
 
@@ -190,7 +196,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                         if f.func_name not in exp.disable_functions:
                             f(exp,run,var,stim,user)
                     exp.utils.log(exp,run,var,stim,user, 'post_trial')
-                    exp.utils.save_data(exp,run,var,stim,user, 'trial')
+                    exp.utils.save_data(exp,run,var,stim,user, 'post_trial')
 
                     run.trials_block += 1
                     run.trials_exp += 1
@@ -200,7 +206,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                 if f.func_name not in exp.disable_functions:
                     f(exp,run,var,stim,user)
             exp.utils.log(exp,run,var,stim,user, 'post_block')
-            exp.utils.save_data(exp,run,var,stim,user, 'block')
+            exp.utils.save_data(exp,run,var,stim,user, 'post_block')
             run.block += 1
             if var.order != 'prompt' and run.block == run.nblocks:
                 run.gustav_is_go = False
@@ -211,7 +217,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         if f.func_name not in exp.disable_functions:
             f(exp,run,var,stim,user)
     exp.utils.log(exp,run,var,stim,user, 'post_exp')
-    exp.utils.save_data(exp,run,var,stim,user, 'exp')
+    exp.utils.save_data(exp,run,var,stim,user, 'post_exp')
 
 if __name__ == '__main__':
     experimentFile = None
