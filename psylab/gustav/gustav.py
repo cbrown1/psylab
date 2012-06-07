@@ -153,14 +153,10 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         print "Gustav cancelled at user request"
         return;
 
-    for f in exp.pre_exp_:
-        if f.func_name not in exp.disable_functions:
-            f(exp,run,var,stim,user)
     exp.utils.update_time(run)
     if not os.path.isfile(exp.dataFile):
         exp.utils.save_data(exp,run,var,stim,user, 'header')
-    exp.utils.log(exp,run,var,stim,user, 'pre_exp')
-    exp.utils.save_data(exp,run,var,stim,user, 'pre_exp')
+    exp.utils.do_event(exp,run,var,stim,user, 'pre_exp')
     run.gustav_is_go = True
     run.trials_exp = 0
 
@@ -173,12 +169,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
             run.trials_block = 0;
             run.block_on = True
             exp.utils.get_current_variables(var, run.condition)
-            exp.utils.update_time(run)
-            for f in exp.pre_block_:
-                if f.func_name not in exp.disable_functions:
-                    f(exp,run,var,stim,user)
-            exp.utils.log(exp,run,var,stim,user, 'pre_block')
-            exp.utils.save_data(exp,run,var,stim,user, 'pre_block')
+            exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
 
             while run.block_on:
                 for s in stim.stimvars:
@@ -186,38 +177,21 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                         exp.utils.stim_get_next(stim, s)
                 run.trial_on = True
                 while run.trial_on:
-                    exp.pre_trial(exp,run,var,stim,user)
-                    exp.utils.log(exp,run,var,stim,user, 'pre_trial')
-                    exp.utils.save_data(exp,run,var,stim,user, 'pre_trial')
+                    exp.utils.do_event(exp,run,var,stim,user, 'pre_trial')
                     exp.present_trial(exp,run,var,stim,user)
                     exp.prompt_response(exp,run,var,stim,user)
 
-                    for f in exp.post_trial_:
-                        if f.func_name not in exp.disable_functions:
-                            f(exp,run,var,stim,user)
-                    exp.utils.log(exp,run,var,stim,user, 'post_trial')
-                    exp.utils.save_data(exp,run,var,stim,user, 'post_trial')
-
+                    exp.utils.do_event(exp,run,var,stim,user, 'post_trial')
                     run.trials_block += 1
                     run.trials_exp += 1
 
-            exp.utils.update_time(run)
-            for f in exp.post_block_:
-                if f.func_name not in exp.disable_functions:
-                    f(exp,run,var,stim,user)
-            exp.utils.log(exp,run,var,stim,user, 'post_block')
-            exp.utils.save_data(exp,run,var,stim,user, 'post_block')
+            exp.utils.do_event(exp,run,var,stim,user, 'post_block')
             run.block += 1
             if var.order != 'prompt' and run.block == run.nblocks:
                 run.gustav_is_go = False
 
     # End gustav_is_go loop
-    exp.utils.update_time(run)
-    for f in exp.post_exp_:
-        if f.func_name not in exp.disable_functions:
-            f(exp,run,var,stim,user)
-    exp.utils.log(exp,run,var,stim,user, 'post_exp')
-    exp.utils.save_data(exp,run,var,stim,user, 'post_exp')
+    exp.utils.do_event(exp,run,var,stim,user, 'post_exp')
 
 if __name__ == '__main__':
     experimentFile = None

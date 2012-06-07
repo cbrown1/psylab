@@ -559,31 +559,37 @@ def write_data(data, filename):
     f.close()
 
 
-def save_data(exp,run,var,stim,user, event):
+def save_data(exp,run,var,stim,user, message):
     if exp.recordData:
-        thisstr_s = 'dataString_%s' % event
-        if hasattr(exp, thisstr_s):
-            thisstr = getattr(exp, thisstr_s)
-            if thisstr is not None and thisstr != '':
-                exp.utils.write_data(
-                        exp.utils.get_expanded_vals_in_string(thisstr, exp, run, var, stim, user),
-                        exp.dataFile)
+        if message is not None and message != '':
+            message_exp = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
+            exp.utils.write_data(message_exp, exp.dataFile)
 
 
-def log(exp,run,var,stim,user, event):
+def log(exp,run,var,stim,user, message):
     '''Writes info to the console, to a log file, or both
     '''
-    thisstr_s = 'logString_%s' % event
-    if hasattr(exp, thisstr_s):
-        thisstr = getattr(exp, thisstr_s)
-        if thisstr is not None and thisstr != '':
-            message = exp.utils.get_expanded_vals_in_string(thisstr, exp, run, var, stim, user)
-            if exp.logConsole:
-                print(message),
-            if exp.logFile is not None and exp.logFile is not '':
-                write_data(message, exp.logFile)
+    if message is not None and message != '':
+        message_exp = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
+        if exp.logConsole:
+            print(message_exp),
+        if exp.logFile is not None and exp.logFile is not '':
+            write_data(message_exp, exp.logFile)
 
-
+        
+def do_event(exp,run,var,stim,user, event):
+    exp.utils.update_time(run)
+    if hasattr(exp, "%s_" % event):
+        funcs = getattr(exp, "%s_" % event)
+        for f in funcs:
+            if f.func_name not in exp.disable_functions:
+                f(exp,run,var,stim,user)
+    if hasattr(exp, 'logString_%s' % event):
+        exp.utils.log(exp,run,var,stim,user, getattr(exp, 'logString_%s' % event))
+    if hasattr(exp, 'dataString_%s' % event):
+        exp.utils.save_data(exp,run,var,stim,user, getattr(exp, 'dataString_%s' % event))
+            
+        
 def get_frontend(exp, frontend):
     '''Tries to load the specified frontend
     '''

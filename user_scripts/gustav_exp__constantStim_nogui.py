@@ -315,9 +315,9 @@ def prompt_response(exp,run,var,stim,user):
     #while True:
     target_name = var.current['target']
     # The prompt is the trial feedback.
-    # TODO: This 'logs' text to the console. Add ability to log custom strings like this one to the log file:
-    p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
-    print p,
+    user.kwp = str(stim.current[var.current['target']]['kw']) # TODO: stim isn't getting set before pre-trial? 
+    p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
+    exp.utils.log(exp,run,var,stim,user,p)
     while True:
         ret = exp.frontend.get_char()
         if ret in exp.validKeys:
@@ -337,10 +337,9 @@ def prompt_response(exp,run,var,stim,user):
 """
 def pre_trial(exp,run,var,stim,user):
     stim.stimarray = np.zeros((1))
-    user.kwp = str(stim.current[var.current['target']]['kw'])
 
 def post_trial(exp,run,var,stim,user):
-    print " | Correct: %s" % run.response
+    exp.utils.log(exp,run,var,stim,user, " | Correct: %s\n" % run.response)
 
 if __name__ == '__main__':
     fname = os.path.realpath(__file__)
