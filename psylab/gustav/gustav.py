@@ -134,7 +134,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
 
     if exp.recordData:
         got_dataString = False
-        for datatype in exp.dataStringTypes:
+        for datatype in exp.eventTypes:
             if hasattr(exp, 'dataString_%s' % datatype):
                 got_dataString = True
                 break
@@ -180,7 +180,6 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                     exp.utils.do_event(exp,run,var,stim,user, 'pre_trial')
                     exp.present_trial(exp,run,var,stim,user)
                     exp.prompt_response(exp,run,var,stim,user)
-
                     exp.utils.do_event(exp,run,var,stim,user, 'post_trial')
                     run.trials_block += 1
                     run.trials_exp += 1

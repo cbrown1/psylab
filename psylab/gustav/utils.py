@@ -73,7 +73,7 @@ class exp:
     stimLoadTypes = ['auto', 'manual']
     stimTypes = ['files', 'manual']
     varTypes = ['stim', 'manual', 'dynamic']
-    dataStringTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
+    eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
     from frontends import term
 
@@ -114,6 +114,9 @@ class exp:
     def pre_block(exp,run,var,stim,user):
         pass
 
+    def pre_trial(exp,run,var,stim,user):
+        pass
+
     def post_trial(exp,run,var,stim,user):
         pass
 
@@ -125,6 +128,7 @@ class exp:
 
     pre_exp_ = [pre_exp]
     pre_block_ = [pre_block]
+    pre_trial_ = [pre_trial]
     post_trial_ = [post_trial]
     post_block_ = [post_block]
     post_exp_ = [post_exp]
@@ -185,53 +189,26 @@ def initialize_experiment( exp, run, var, stim, user):
     '''Do stuff necessary for the start of an experiment
     '''
     exp.utils.get_frontend(exp, exp.frontend)
-    # For the following functions, run exp version first, then method (if present), then experiment:
-    # pre_exp, pre_block, post_trial, post_block, post_exp
-    if hasattr(exp.method, 'pre_exp'):
-        exp.pre_exp_.append(exp.method.pre_exp)
-    if hasattr(exp.method, 'pre_block'):
-        exp.pre_block_.append(exp.method.pre_block)
-    if hasattr(exp.method, 'post_trial'):
-        exp.post_trial_.append(exp.method.post_trial)
-    if hasattr(exp.method, 'post_block'):
-        exp.post_block_.append(exp.method.post_block)
-    if hasattr(exp.method, 'post_exp'):
-        exp.post_exp_.append(exp.method.post_exp)
 
-    if hasattr(exp.experiment, 'pre_exp'):
-        exp.pre_exp_.append(exp.experiment.pre_exp)
-    if hasattr(exp.experiment, 'pre_block'):
-        exp.pre_block_.append(exp.experiment.pre_block)
-    if hasattr(exp.experiment, 'post_trial'):
-        exp.post_trial_.append(exp.experiment.post_trial)
-    if hasattr(exp.experiment, 'post_block'):
-        exp.post_block_.append(exp.experiment.post_block)
-    if hasattr(exp.experiment, 'post_exp'):
-        exp.post_exp_.append(exp.experiment.post_exp)
+    # For each event type, look for a function in method, and in experiment.
+    # If a function is found, add to list to be run during that event. 
+    for event in exp.eventTypes:
+        if hasattr(exp.method, event):
+            thisstr = '%s_' % event
+            thisfunclist = getattr(exp, thisstr)
+            thisfunclist.append(getattr(exp.method, event))
+        if hasattr(exp.experiment, event):
+            thisstr = '%s_' % event
+            thisfunclist = getattr(exp, thisstr)
+            thisfunclist.append(getattr(exp.experiment, event))
 
-    # For dataString functions, look for any present in experiment first, then look in method.
-    # But only run one each.
-    if exp.recordData:
-        for datatype in exp.dataStringTypes:
-            thisstr = 'dataString_%s' % datatype
-            if hasattr(exp.experiment, thisstr):
-                setattr(exp, thisstr, getattr(exp.experiment, thisstr))
-            elif hasattr(exp.method, thisstr):
-                setattr(exp, thisstr, getattr(exp.method, thisstr))
-
-    # A few that should be experiment-specific:
+    # A few 'special' events that should only occur (if at all) in the experiment file:
     if hasattr(exp.experiment, 'present_trial'):
         exp.present_trial = exp.experiment.present_trial
     if hasattr(exp.experiment, 'prompt_response'):
         exp.prompt_response = exp.experiment.prompt_response
     if hasattr(exp.experiment, 'prompt_condition'):
         exp.prompt_condition = exp.experiment.prompt_condition
-
-    # And one that needs to be in experiment
-    if hasattr(exp.experiment, 'pre_trial'):
-        exp.pre_trial = exp.experiment.pre_trial
-    else:
-        raise Exception, "Function `pre_trial` must be specified in exp.experiment file"
 
     stim.get_next = exp.utils.stim_get_next
     stim.reset_order = exp.utils.stim_reset_order
