@@ -42,10 +42,10 @@ def configure(experimentFile = None, frontend = None):
 
     # Experiment File
     if experimentFile == None:
-        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
-            print "Gustav cancelled at user request"
-            return;
+            print("Gustav cancelled at user request")
+            return
     exp.experimentPath,exp.experimentFile = os.path.split(experimentFile)
     exp.experimentBase = os.path.splitext(exp.experimentFile)[0]
     exp.experimentFilePath = os.path.join(exp.experimentPath,exp.experimentFile)
@@ -68,10 +68,10 @@ def list_conditions(experimentFile = None, frontend = None):
 
     # Experiment File
     if experimentFile == None:
-        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
-            print "Gustav cancelled at user request"
-            return;
+            print("Gustav cancelled at user request")
+            return
     exp.experimentPath,exp.experimentFile = os.path.split(experimentFile)
     exp.experimentBase = os.path.splitext(exp.experimentFile)[0]
     exp.experimentFilePath = os.path.join(exp.experimentPath,exp.experimentFile)
@@ -80,8 +80,8 @@ def list_conditions(experimentFile = None, frontend = None):
 
     experiment.setup( exp, run, var, stim, user)
 
-    exp.utils.process_variables(var);
-    print exp.utils.get_variable_strtable(var)
+    exp.utils.process_variables(var)
+    print(exp.utils.get_variable_strtable(var))
 
 def run(experimentFile = None, subjectID = None, frontend = None, recordData = None):
 
@@ -97,16 +97,16 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if experimentFile == None:
         # Edit CB 2012-05-21
         #experimentFile = exp.term.get_file(None, "Open "+exp.exp_name+" Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
-        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
+        experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
-            print ""+exp.exp_name+" cancelled at user request"
-            return;
+            print("\""+exp.exp_name+"\" cancelled at user request")
+            return
 
     if subjectID == None:
         exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
         if exp.subjID == '':
-            print "No Subject ID entered, Gustav cancelled at user request"
-            return;
+            print("No Subject ID entered, Gustav cancelled at user request")
+            return
     else:
         exp.subjID = str(subjectID)
 
@@ -139,19 +139,23 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                 got_dataString = True
                 break
         if not got_dataString:
-            raise Exception, "Can't record data, because no dataString variables have been specified!"
+            ret = exp.frontend.get_yesno(None, title = "Gustav!", 
+                    prompt = "exp.recordData == True, but no dataStrings were found so no data will be record data.\nAre you sure you want to continue?")
+            if not ret:
+                print("Gustav cancelled at user request")
+                return
     else:
-        print "WARNING: No data will be recorded!"
+        print("WARNING: No data will be recorded!")
     if var.order == 'menu':
         exp.utils.menu_condition(exp,run,var,stim,user)
 
     if run.gustav_is_go == False:
-        print "Gustav cancelled at user request"
-        return;
+        print("Gustav cancelled at user request")
+        return
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
     if not ret:
-        print "Gustav cancelled at user request"
-        return;
+        print("Gustav cancelled at user request")
+        return
 
     exp.utils.update_time(run)
     if not os.path.isfile(exp.dataFile):
@@ -166,7 +170,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         else:
             run.condition = var.orderarray[run.block]
         if var.order == 'prompt' or run.condition+1 not in var.ignore:
-            run.trials_block = 0;
+            run.trials_block = 0
             run.block_on = True
             exp.utils.get_current_variables(var, run.condition)
             exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
@@ -201,12 +205,12 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:i:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
     except getopt.error, msg:
-        print msg
-        print "for help use --help"
+        print(msg)
+        print("for help use --help")
         sys.exit(2)
     for var, val in opts:
         if var in ("-h", "--help"):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
         elif var in ["--experimentFile", "-e"]:
             experimentFile = val

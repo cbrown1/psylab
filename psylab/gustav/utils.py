@@ -227,7 +227,7 @@ def initialize_experiment( exp, run, var, stim, user):
     if exp.recordData:
         datapath = os.path.split(exp.dataFile)
         if not os.path.isdir(datapath[0]):
-            print "Creating datafile path: " + datapath[0]
+            print("Creating datafile path: " + datapath[0])
             os.makedirs(datapath[0])
         exp.dataFile_unexpanded = exp.dataFile
         exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
@@ -236,7 +236,7 @@ def initialize_experiment( exp, run, var, stim, user):
             write_data(exp.dataString_header, exp.dataFile)
     logpath = os.path.split(exp.logFile)
     if not os.path.isdir(logpath[0]):
-        print "Creating logfile path: " + logpath[0]
+        print("Creating logfile path: " + logpath[0])
         os.makedirs(logpath[0])
     exp.logFile_unexpanded = exp.logFile
     exp.logFile = get_expanded_vals_in_string(exp.logFile, exp, run, var, stim, user)
@@ -572,7 +572,7 @@ def get_frontend(exp, frontend):
     '''
     frontend_s = frontend
     if frontend_s not in exp.frontendTypes:
-        print 'Unknown frontend. Using tk'
+        print("Unknown frontend. Using tk")
         frontend = 'tk'
 
     try:
