@@ -15,9 +15,10 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-import qt, tk, term
+from . import qt, tk, term
+

@@ -125,7 +125,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     try:
         methodi = __import__('methods',globals(), locals(), exp.method_str)
     except ImportError:
-        raise Exception, "Unknown experimental method: " + exp.method_str
+        raise Exception("Unknown experimental method: " + exp.method_str)
     exp.method = getattr(methodi, exp.method_str)
 
     exp.utils.initialize_experiment(exp,run,var,stim,user)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     action = 'run'
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:i:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
-    except getopt.error, msg:
+    except (getopt.error, msg):
         print(msg)
         print("for help use --help")
         sys.exit(2)

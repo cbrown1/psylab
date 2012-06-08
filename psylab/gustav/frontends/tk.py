@@ -26,7 +26,7 @@ import tkFileDialog, tkSimpleDialog, tkMessageBox
 name = 'tk'
 
 def show_config(exp,run,var,stim,user):
-    print "Sorry, there is no tk version of the Experiment Configuration Dialog."
+    print("Sorry, there is no tk version of the Experiment Configuration Dialog.")
 
 def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("All files (*.*)")):
     """Opens a file dialog, returns file path as a string

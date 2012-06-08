@@ -26,7 +26,7 @@
 import os
 import numpy as np
 
-from waveio import wavread, wavwrite
+from scipy.io.wavfile import read as wavread, write as wavwrite
 from .rms import rms
 
 def equate(indir, reloutdir="norm", ext='wav'):

@@ -66,7 +66,7 @@ def lts(sig, wsize, overlap=0, window=None):
     if window == None:
         window = 'hanning'
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError, "Window is one of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+        raise ValueError("Window is one of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
     
     if window == 'flat': #no window
         w=np.ones(wsize,'d')

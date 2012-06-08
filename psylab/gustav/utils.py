@@ -31,7 +31,7 @@ import codecs
 import types
 from time import sleep
 from inspect import getmembers
-from frontends import term
+from .frontends import term
 
 class exp:
     '''Experimental settings
@@ -272,7 +272,7 @@ def process_variables(var):
             nlist = var.listvars[v]['n']
         else:
             if nlist != var.listvars[v]['n'] and var.listvars[v]['n'] != 1:
-                raise Exception, "All 'listvars' variables must either have the same number of levels, or one level"
+                raise Exception("All 'listvars' variables must either have the same number of levels, or one level")
     if len(factvars) == 0:
         for v in range(len(var.listvars)):
             var.varlist.append(var.listvars[v]['name'])
@@ -321,7 +321,7 @@ def process_variables(var):
                     var.levelsbycond[v].append(var.listvars[i]['levels'][condition])
                 gotvar = True
             if not gotvar:
-                raise Exception, "Unable to process the following variable: " + v
+                raise Exception("Unable to process the following variable: " + v)
 
     # Process order
     if var.order == 'random':
@@ -359,7 +359,7 @@ def process_stimuli(stim):
 
             stim.current[stimset] = {'file': '', 'filebase': '', 'txt': '', 'kw': '', 'ind': -1, 'data': None}
             if 'path' not in stim.sets[stimset] or (stim.sets[stimset]['path'] == None and stim.sets[stimset]['path'] == "") :
-                raise Exception, "No path set for Stimulus Set: " + str(stimset) + "\nIf you want to process manually, set 'type' to 'manual'"
+                raise Exception("No path set for Stimulus Set: " + str(stimset) + "\nIf you want to process manually, set 'type' to 'manual'")
             elif stim.sets[stimset]['path']=='None':
                 pass
             else:
@@ -501,7 +501,7 @@ def stim_get_next(stim, stimset):
         if stim.sets[stimset]['repeat']:
             stim.reset_order(stim,stimset)
         else:
-            raise Exception, "Ran out of stimulus files for stimset: " + stimset
+            raise Exception("Ran out of stimulus files for stimset: " + stimset)
 
 
 def stim_reset_order(stim, stimset):
@@ -530,7 +530,7 @@ def write_data(data, filename):
         f = codecs.open(filename, encoding='utf-8', mode='a')
     else:
         f = codecs.open(filename, encoding='utf-8', mode='w')
-        f.write(u"# -*- coding: utf-8 -*-\n\n")
+        f.write("# -*- coding: utf-8 -*-\n\n")
 
     f.write(data)
     f.close()
@@ -578,7 +578,7 @@ def get_frontend(exp, frontend):
     try:
         frontend = __import__('frontends',globals(), locals(), frontend)
     except ImportError:
-        raise Exception, "Could not import frontend "+frontend
+        raise Exception("Could not import frontend "+frontend)
     exp.frontend = getattr(frontend, frontend_s)
 
 def obj_to_str(obj, name, indent=''):

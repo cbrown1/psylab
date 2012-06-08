@@ -179,7 +179,7 @@ def pre_block(exp, run, var, stim, user):
         if not var.dynamic.has_key(key):
             missing_vars += "var.dynamic['" + key + "']\n"
     if missing_vars != '':
-            raise Exception, "The following dynamic variables must be set: \n\n%s" % missing_vars
+            raise Exception("The following dynamic variables must be set: \n\n%s" % missing_vars)
     d = var.dynamic.copy()
     var.dynamic = dynamic_vars_block.copy()
     var.dynamic.update(dynamic_vars_track.copy())

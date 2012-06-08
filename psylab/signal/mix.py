@@ -24,7 +24,7 @@
 #
 
 import numpy as np
-from zeropad import zeropad
+from .zeropad import zeropad
 
 def mix( *args, **kwargs ):
     '''Mixes [adds] signals at specified offsets, zero padding as needed

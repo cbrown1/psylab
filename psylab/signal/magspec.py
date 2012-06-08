@@ -24,7 +24,7 @@
 #
 
 import numpy as np
-from lts import lts
+from .lts import lts
 
 def magspec(wave,fs,fftsize=8192):
     '''Computes the magnitude spectrum of a signal

@@ -26,7 +26,7 @@
 import os
 import numpy as np
 
-from waveio import wavread, wavwrite
+from scipy.io.wavfile import read as wavread, write as wavwrite
 
 def normalize(indir, reloutdir="norm", ext='wav'):
     '''Normalizes wavefiles, so that the overall peak is 1
@@ -58,14 +58,14 @@ def normalize(indir, reloutdir="norm", ext='wav'):
     '''
 
     if isinstance( indir, str ):
-        indir = [ indir ];
+        indir = [ indir ]
     elif not isinstance( indir, list ):
-        print "Indir must be either a string or a list of strings";
+        print("Indir must be either a string or a list of strings")
         return
     else:
         for item in indir:
             if not isinstance( item, str ):
-                print "Indir must be either a string or a list of strings";
+                print("Indir must be either a string or a list of strings")
                 return
 
     if ext is not None:
@@ -74,26 +74,26 @@ def normalize(indir, reloutdir="norm", ext='wav'):
             exts[n] = exts[n].lower()
             if exts[n][0] != ".":
                 exts[n] = "." + exts[n]
-    peak = 0.;
-    peakfile = '';
-    goodpaths = []; # When writing, use only 'good' paths 
+    peak = 0.
+    peakfile = ''
+    goodpaths = [] # When writing, use only 'good' paths 
     
     # Analysis
     for filepath in indir:
         if not os.path.exists( filepath ):
-            print "Invalid path, skipping: " + filepath;
-            break;
+            print("Invalid path, skipping: " + filepath)
+            break
         else:
-            goodpaths.append(filepath);
+            goodpaths.append(filepath)
         files = os.listdir(filepath)
         for fname in files:
             filename, fileext = os.path.splitext( fname )
             if ext is None or fileext.lower() in exts:
-                filefull = os.path.join(filepath,fname);
-                data,fs = wavread(filefull);
-                thispeak = np.max(np.abs(data));
+                filefull = os.path.join(filepath,fname)
+                data,fs = wavread(filefull)
+                thispeak = np.max(np.abs(data))
                 if thispeak > peak:
-                    peak = thispeak;
+                    peak = thispeak
                     peakfile = filefull
 
     # Processing
@@ -104,11 +104,11 @@ def normalize(indir, reloutdir="norm", ext='wav'):
         for fname in files:
             filename, fileext = os.path.splitext( fname )
             if ext is None or fileext.lower() in exts:
-                filefull = os.path.join( filepath, fname );
-                outfull = os.path.join( filepath, reloutdir, fname );
-                data,fs = wavread(filefull);
-                data = data / peak;
-                wavwrite( data, fs, outfull );
+                filefull = os.path.join( filepath, fname )
+                outfull = os.path.join( filepath, reloutdir, fname )
+                data,fs = wavread(filefull)
+                data = data / peak
+                wavwrite( data, fs, outfull )
 
-    return peak,peakfile;
+    return peak,peakfile
     

@@ -97,7 +97,7 @@ def tone(f, fs, dur, **kwargs):
 
     if amp.size == 2:
         if not amp[0] > 0 or not amp[1] > 0:
-            raise Exception, 'When generating amplitude sweeps, linear scaling must be used (ie., .01 < amp < 1.0';
+            raise Exception('When generating amplitude sweeps, linear scaling must be used (ie., .01 < amp < 1.0')
         amp1 = np.linspace(amp[0], amp[1], dur);
     elif amp.size == 1:
         if amp <= 0:

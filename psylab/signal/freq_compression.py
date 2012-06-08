@@ -25,7 +25,7 @@
 
 import numpy as np
 from numpy.fft import fft, ifft
-import interp
+from . import interp
 
 def tdhs(x, window, overlap):
     """Time-scale modification algorithm using overlap-add and windowing for
@@ -182,4 +182,5 @@ def freq_compress(x, semitones, window,
         y = interp_func(y, int(x.size))
         return y
     else:
-        raise ValueError, "`tdsalg` must be 'tdhs' or 'solafs'."
+        raise ValueError("`tdsalg` must be 'tdhs' or 'solafs'.")
+

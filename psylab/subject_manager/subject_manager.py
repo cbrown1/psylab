@@ -710,7 +710,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             sys.argv = args
             execfile(ret[0])
         else:
-            print "This report appears to require individual subject information, and thus should be run from the 'Browse' tab with the desired subject selected"
+            print("This report appears to require individual subject information, and thus should be run from the 'Browse' tab with the desired subject selected")
             
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)
@@ -939,8 +939,8 @@ class Subject_Manager (QtGui.QWidget, form_class):
             query_columns_list.append("User_%s" % row[0])
             query_vals_list.append('')
 
-        #print "\'"+"\',\'".join(query_columns_list)+"\'"
-        #print "\'"+"\',\'".join(query_vals_list)+"\'"
+        #print("\'"+"\',\'".join(query_columns_list)+"\'")
+        #print("\'"+"\',\'".join(query_vals_list)+"\'")
         c.execute("""INSERT INTO Subjects ('%s') VALUES ('%s')""" % ("','".join(query_columns_list), "','".join(query_vals_list)))
         conn.commit()
         c.close()

@@ -121,10 +121,10 @@ class ConfigDialog(QtGui.QWidget):
             if self.stimsets[selected_name].has_key('mask'):
                 self.stim.sets[selected_name]['mask'] = self.stimsets[selected_name]['mask']
             if self.exp.debug:
-                print "SET: " + selected_name
+                print("SET: " + selected_name)
                 for key in self.stim.sets[selected_name]:
-                    print "    " + key + " : ",
-                    print self.stim.sets[selected_name][key]
+                    print("    " + key + " : "),
+                    print(self.stim.sets[selected_name][key])
 
     def stim_selectPath(self, t):
         #print "Path changed: " + str(t)

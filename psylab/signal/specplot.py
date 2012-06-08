@@ -25,7 +25,7 @@
 
 from matplotlib import pyplot as pp
 
-from magspec import magspec
+from .magspec import magspec
 
 def specplot(signal, fs, plotspec='b-',log=False, fighandle=None):
     '''Plots magnitude spectra
@@ -57,11 +57,11 @@ def specplot(signal, fs, plotspec='b-',log=False, fighandle=None):
 
     h = pp.figure(num=fighandle)
     h.canvas.set_window_title('Spectrum Plot')
-    x,y = magspec(signal,fs);
+    x,y = magspec(signal,fs)
     if log:
-      pp.semilogx(x,y,plotspec,figure=fighandle);
+      pp.semilogx(x,y,plotspec,figure=fighandle)
     else:
-      pp.plot(x,y,plotspec,figure=fighandle);
+      pp.plot(x,y,plotspec,figure=fighandle)
     pp.xlabel('Frequency (Hz)')
     pp.ylabel('Magnitude (dB)')
     pp.show()

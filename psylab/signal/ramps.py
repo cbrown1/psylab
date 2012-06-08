@@ -72,7 +72,7 @@ def ramps(data, fs, duration=10, shape='raisedcosine', set='onoff'):
         r = np.linspace(0, 1, dur)
         rf = np.concatenate((r, r[::-1]),1)
     else:
-        raise Exception, "shape not recognized";
+        raise Exception("shape not recognized")
 
     y = data
 # This used to work for multi-dimension data:
