@@ -66,7 +66,7 @@ def mix( *args, **kwargs ):
     '''
     out = np.zeros((1,1))
 
-    if kwargs.has_key('offsets') and kwargs['offsets'] is not None:
+    if 'offsets' in kwargs and kwargs['offsets'] is not None:
         offsets_a = np.array(kwargs['offsets'])
         if len(offsets_a) < len(args):
             offsets_a = np.hstack((offsets_a,np.zeros(len(args)-len(offsets_a))))

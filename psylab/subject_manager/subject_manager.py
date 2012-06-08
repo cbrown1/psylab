@@ -27,7 +27,6 @@ import sys, os
 import sqlite3
 import datetime
 import platform
-import ConfigParser
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import Qt
@@ -36,7 +35,12 @@ from PyQt4 import uic
 #from PySide import QtCore
 #from PyQt4 import uic
 STDOUT = sys.stdout
-
+try:
+    # Python2
+    import ConfigParser
+except ImportError:
+    # Python3
+    import configparser as ConfigParser
 
 thispath, thisfile = os.path.split(os.path.realpath(__file__))
 form_class, base_class = uic.loadUiType(os.path.join(thispath,"subject_manager_ui.ui"))
@@ -953,9 +957,9 @@ class Subject_Manager (QtGui.QWidget, form_class):
     def doAge(self):
         thisage = self.age(self.add_birthdate_dateEdit.text());
         if int(thisage) < 18:
-            self.add_age_label.setText(u"<font color='red'>Age: " + unicode(thisage) + "</font>");
+            self.add_age_label.setText("<font color='red'>Age: " + unicode(thisage) + "</font>");
         else:
-            self.add_age_label.setText(u"<font color='green'>Age: " + unicode(thisage) + "</font>");
+            self.add_age_label.setText("<font color='green'>Age: " + unicode(thisage) + "</font>");
 
     def days_previous_month(self, y, m):
         from calendar import monthrange as _monthrange;

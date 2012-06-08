@@ -52,8 +52,8 @@ def setup(exp,run,var,stim,user):
     exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     exp.recordData = True
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
-    exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
-    exp.dataString_post_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
+    exp.dataString_header = "# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
+    exp.dataString_post_trial = "$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_pre_trial = ''; # trial info is written in the pre_trial function

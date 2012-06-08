@@ -34,5 +34,5 @@
 __version__ = '0.1'
 __author__ = 'Christopher Brown <c-b@asu.edu>'
 
-from subject_manager import Subject_Manager, run
+from .subject_manager import Subject_Manager, run
 

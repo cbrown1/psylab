@@ -21,7 +21,7 @@
 #
 
 from PyQt4 import QtGui, QtCore
-from pylabconfig import Ui_Dialog
+from .pylabconfig import Ui_Dialog
 import sys
 from copy import deepcopy
 STDOUT = sys.stdout

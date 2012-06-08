@@ -31,6 +31,7 @@ import codecs
 import types
 from time import sleep
 from inspect import getmembers
+from functools import reduce
 from .frontends import term
 
 class exp:
@@ -75,7 +76,7 @@ class exp:
     varTypes = ['stim', 'manual', 'dynamic']
     eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
-    from frontends import term
+    from .frontends import term
 
     def prompt_response(self,exp,run,var,stim,user):
         while True:
@@ -583,7 +584,7 @@ def do_event(exp,run,var,stim,user, event):
     if hasattr(exp, "%s_" % event):
         funcs = getattr(exp, "%s_" % event)
         for f in funcs:
-            if f.func_name not in exp.disable_functions:
+            if f.__name__ not in exp.disable_functions:
                 f(exp,run,var,stim,user)
     if hasattr(exp, 'logString_%s' % event):
         exp.utils.log(exp,run,var,stim,user, getattr(exp, 'logString_%s' % event))

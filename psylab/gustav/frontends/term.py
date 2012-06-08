@@ -20,9 +20,18 @@
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-import Tkinter
-import tkFileDialog, tkSimpleDialog, tkMessageBox
 import os, sys
+try:
+    # Python2
+    import Tkinter as tk
+    import tkFileDialog as filedialog
+except ImportError:
+    # Python3
+    import tkinter as tk
+    from tkinter import filedialog
+
+try: input = raw_input
+except: pass
 
 name = 'term'
 
@@ -42,7 +51,7 @@ def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("
         fts.append(tuple([d," ".join(t.strip(" )").split())]))
     toplevel=Tkinter.Tk()
     toplevel.withdraw()
-    fname = tkFileDialog.askopenfilename( title = title, initialdir = default_dir, filetypes = fts, multiple = False)
+    fname = filedialog.askopenfilename( title = title, initialdir = default_dir, filetypes = fts, multiple = False)
     toplevel.deiconify()
     toplevel.destroy()
     if isinstance(fname, tuple):
@@ -56,7 +65,7 @@ def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
     """
     toplevel=Tkinter.Tk()
     toplevel.withdraw()
-    fname = tkFileDialog.askdirectory( title = title, initialdir = default_dir )
+    fname = filedialog.askdirectory( title = title, initialdir = default_dir )
     toplevel.deiconify()
     toplevel.destroy()
     if isinstance(fname, tuple):
@@ -68,8 +77,8 @@ def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = 
     """Opens a simple prompt to choose an item from a list, returns a string
     """
     for ind, item in enumerate(items):
-        print " ",ind+1,". ", item
-    ret = raw_input(prompt)
+        print(" ",ind+1,". ", item)
+    ret = input(prompt)
     if ret != '':
         ind = int(ret)-1
         if ind < len(items):
@@ -83,7 +92,7 @@ def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = 
 def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
     """Opens a simple yes/no message box, returns a bool
     """
-    ret = raw_input(prompt+" (Y/N) ")
+    ret = input(prompt+" (Y/N) ")
 
     return ret
 
@@ -93,16 +102,16 @@ def show_message(parent=None, title = 'Title', message = 'Message', msgtype = 'I
       msgtype = 'Information', 'Warning', or 'Critical'
     """
     if msgtype == 'Information':
-        print message
+        print(message)
     else:
-        print msgtype + ": "+ message
+        print(msgtype + ": "+ message)
 
 
 def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
     """Opens a simple prompt for user input, returns a string
     """
     try:
-        ret = raw_input(prompt)
+        ret = input(prompt)
     except EOFError:
         ret = ''
     return ret

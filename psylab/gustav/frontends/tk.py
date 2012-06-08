@@ -20,8 +20,14 @@
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-import Tkinter
-import tkFileDialog, tkSimpleDialog, tkMessageBox
+try:
+    # Python2
+    import Tkinter as tk
+    import tkFileDialog as filedialog, tkSimpleDialog as simpledialog, tkMessageBox as messagebox
+except ImportError:
+    # Python3
+    import tkinter as tk
+    from tkinter import filedialog, simpledialog, messagebox
 
 name = 'tk'
 
@@ -39,9 +45,9 @@ def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("
     for ft in ftl:
         d,t = ft.split("(")
         fts.append(tuple([d," ".join(t.strip(" )").split())]))
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
-    fname = tkFileDialog.askopenfilename( title = title, initialdir = default_dir, filetypes = fts, multiple = False)
+    fname = filedialog.askopenfilename( title = title, initialdir = default_dir, filetypes = fts, multiple = False)
     toplevel.deiconify()
     toplevel.destroy()
     if isinstance(fname, tuple):
@@ -53,9 +59,9 @@ def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("
 def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
     """Opens a folder dialog, returns the path as a string
     """
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
-    fname = tkFileDialog.askdirectory( title = title, initialdir = default_dir )
+    fname = filedialog.askdirectory( title = title, initialdir = default_dir )
     toplevel.deiconify()
     toplevel.destroy()
     if isinstance(fname, tuple):
@@ -66,9 +72,9 @@ def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
 def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
     """Opens a simple prompt for user input, returns a string
     """
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
-    fname = tkSimpleDialog.askstring( title = title, prompt = prompt)
+    fname = simpledialog.askstring( title = title, prompt = prompt)
     if fname is None:
         fname = ''
     toplevel.deiconify()
@@ -78,15 +84,15 @@ def get_input(parent=None, title = 'User Input', prompt = 'Enter a value:'):
 def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = [], current = 0, editable = False):
     """Opens a simple prompt to choose an item from a list, returns a string
     """
-    class Radiobar(Tkinter.Frame):
-        def __init__(self, parent=None, items=[], side=Tkinter.LEFT, anchor=Tkinter.W):
-            Tkinter.Frame.__init__(self, parent)
-            self.var = Tkinter.StringVar()
+    class Radiobar(tk.Frame):
+        def __init__(self, parent=None, items=[], side=tk.LEFT, anchor=tk.W):
+            tk.Frame.__init__(self, parent)
+            self.var = tk.StringVar()
             for ind, item in enumerate(items):
-                rad = Tkinter.Radiobutton(self, text=item, value=item, variable=self.var, indicatoron=0)
+                rad = tk.Radiobutton(self, text=item, value=item, variable=self.var, indicatoron=0)
                 if current == ind:
                     rad.select()
-                rad.pack(side=side, anchor=anchor, expand=Tkinter.YES)
+                rad.pack(side=side, anchor=anchor, expand=tk.YES)
         def state(self):
             return self.var.get()
 
@@ -102,23 +108,23 @@ def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = 
         r.root.destroy()
 
     r = r();
-    r.root = Tkinter.Tk()
+    r.root = tk.Tk()
     r.root.title(title)
-    Tkinter.Label(r.root, text=prompt).pack(side=Tkinter.TOP, fill=Tkinter.Y)
-    gui = Radiobar(r.root, items, side=Tkinter.LEFT, anchor=Tkinter.NW)
-    gui.pack(side=Tkinter.TOP, fill=Tkinter.Y)
-    gui.config(relief=Tkinter.RIDGE,  bd=2)
-    Tkinter.Button(r.root, text='OK', command=getstate).pack(side=Tkinter.RIGHT)
-    Tkinter.Button(r.root, text='Cancel', command=quit).pack(side=Tkinter.RIGHT)
+    tk.Label(r.root, text=prompt).pack(side=tk.TOP, fill=tk.Y)
+    gui = Radiobar(r.root, items, side=tk.LEFT, anchor=tk.NW)
+    gui.pack(side=tk.TOP, fill=tk.Y)
+    gui.config(relief=tk.RIDGE,  bd=2)
+    tk.Button(r.root, text='OK', command=getstate).pack(side=tk.RIGHT)
+    tk.Button(r.root, text='Cancel', command=quit).pack(side=tk.RIGHT)
     r.root.mainloop()
     return r.ret
 
 def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
     """Opens a simple yes/no message box, returns a bool
     """
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
-    ret = tkMessageBox.askyesno(title, prompt)
+    ret = messagebox.askyesno(title, prompt)
     toplevel.deiconify()
     toplevel.destroy()
     return ret
@@ -128,14 +134,14 @@ def show_message(parent=None, title = 'Title', message = 'Message', msgtype = 'I
 
       msgtype = 'Information', 'Warning', or 'Critical'
     """
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
     if msgtype == 'Information':
-        tkMessageBox.showinfo(title, message)
+        messagebox.showinfo(title, message)
     elif msgtype == 'Warning':
-        tkMessageBox.showwarning(title, message)
+        messagebox.showwarning(title, message)
     elif msgtype == 'Critical':
-        tkMessageBox.showerror(title, message)
+        messagebox.showerror(title, message)
     toplevel.deiconify()
     toplevel.destroy()
 

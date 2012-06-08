@@ -20,4 +20,4 @@
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-import constant, adaptive
+from . import constant, adaptive

@@ -233,10 +233,10 @@ def save_data_block(exp,run,var,stim,user):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
     else:
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
-        f.write(u"# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav!\n\n")
-        f.write(u"# Experiment: %s\n\n'''%s\n'''\n\n" % (exp.name, exp.comments))
+        f.write("# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav!\n\n")
+        f.write("# Experiment: %s\n\n'''%s\n'''\n\n" % (exp.name, exp.comments))
         
-    f.write(u"class block_%s_%s ():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
+    f.write("class block_%s_%s ():\n" % (run.date.replace("-","_"), run.time.replace(":","_")))
     indent='    '
     f.write(exp.utils.obj_to_str(exp.name,'name',indent))
     f.write(exp.utils.obj_to_str(exp.note,'note',indent))
@@ -247,5 +247,5 @@ def save_data_block(exp,run,var,stim,user):
     f.write(exp.utils.obj_to_str(var.current,'variables',indent))
     f.write(exp.utils.obj_to_str(user,'user',indent))
     f.write(exp.utils.obj_to_str(var.dynamic,'dynamic',indent))
-    f.write(u"\n")
+    f.write("\n")
     f.close()

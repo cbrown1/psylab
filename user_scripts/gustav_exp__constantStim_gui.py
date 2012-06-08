@@ -55,8 +55,8 @@ def setup(exp,run,var,stim,user):
     exp.logFile = os.path.join(basedir,'logs','$name_$date.log')
     exp.dataFile = os.path.join(basedir,'data','$name.csv')
     exp.recordData = True
-    exp.dataString_header = u"# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
-    exp.dataString_post_trial = u"$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
+    exp.dataString_header = "# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],KWP,KWC\n"
+    exp.dataString_post_trial = "$subj,$trial,$date,$block,$condition,$currentvars[],$user[kwp],$response\n"
     exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.logString_post_trial = " Trial $trial, target stimulus: $user[trial_stimbase], KWs correct: $response / possible: $user[trial_kwp] ($user[block_kwc] / $user[block_kwp]: $user[block_pc] %)\n"
     exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
