@@ -48,5 +48,5 @@
 __version__ = '0.1'
 __author__ = 'Christopher Brown <c-b@asu.edu>'
 
-from gustav import run, configure, list_conditions
-import frontends, methods
+from .gustav import run, configure, list_conditions
+from . import frontends, methods

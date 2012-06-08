@@ -27,7 +27,7 @@ import os
 import numpy as np
 
 from waveio import wavread, wavwrite
-from rms import rms
+from .rms import rms
 
 def equate(indir, reloutdir="norm", ext='wav'):
     '''Equates wavefiles in rms
@@ -55,14 +55,14 @@ def equate(indir, reloutdir="norm", ext='wav'):
     '''
 
     if isinstance( indir, str ):
-        indir = [ indir ];
+        indir = [ indir ]
     elif not isinstance( indir, list ):
-        print "Indir must be either a string or a list of strings";
+        print("Indir must be either a string or a list of strings")
         return
     else:
         for item in indir:
             if not isinstance( item, str ):
-                print "Indir must be either a string or a list of strings";
+                print("Indir must be either a string or a list of strings")
                 return
 
     if ext is not None:
@@ -71,26 +71,26 @@ def equate(indir, reloutdir="norm", ext='wav'):
             exts[n] = exts[n].lower()
             if exts[n][0] != ".":
                 exts[n] = "." + exts[n]
-    target = 1.;
-    targetfile = '';
+    target = 1.
+    targetfile = ''
     goodpaths = []; # When writing, use only 'good' paths 
     
     # Analysis
     for filepath in indir:
         if not os.path.exists( filepath ):
-            print "Invalid path, skipping: " + filepath;
-            break;
+            print("Invalid path, skipping: " + filepath)
+            break
         else:
-            goodpaths.append(filepath);
+            goodpaths.append(filepath)
         files = os.listdir(filepath)
         for fname in files:
             filename, fileext = os.path.splitext( fname )
             if ext is None or fileext.lower() in exts:
-                filefull = os.path.join(filepath,fname);
-                data,fs = wavread(filefull);
-                thisrms = rms(data);
+                filefull = os.path.join(filepath,fname)
+                data,fs = wavread(filefull)
+                thisrms = rms(data)
                 if thisrms < target:
-                    target = thisrms;
+                    target = thisrms
                     targetfile = fname
 
     # Processing
@@ -101,11 +101,11 @@ def equate(indir, reloutdir="norm", ext='wav'):
         for fname in files:
             filename, fileext = os.path.splitext( fname )
             if ext is None or fileext.lower() in exts:
-                filefull = os.path.join( filepath, fname );
-                outfull = os.path.join( filepath, reloutdir, fname );
-                data,fs = wavread(filefull);
-                data = data * (target / rms(data));
-                wavwrite( data, fs, outfull );
+                filefull = os.path.join( filepath, fname )
+                outfull = os.path.join( filepath, reloutdir, fname )
+                data,fs = wavread(filefull)
+                data = data * (target / rms(data))
+                wavwrite( data, fs, outfull )
 
-    return target,targetfile;
+    return target,targetfile
     

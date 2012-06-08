@@ -39,10 +39,12 @@ tdt2: interface tucker davis system II hardware via the serial port
 
 __version__ = '0.3'
 
-from array import array, nanproduct, nanmean
-from dataview import dataview
-from misc import csv_inspect, plot_tools, path_tools
-import signal
-import stats
-import gustav
+#from array import array, nanproduct, nanmean
+#from dataview import dataview
+#from misc import csv_inspect, plot_tools, path_tools
+from . import signal
+from . import stats
+from . import gustav
+#import stats
+#import gustav
 

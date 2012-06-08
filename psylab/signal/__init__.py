@@ -76,27 +76,27 @@ from numpy.random import randn, rand
 from numpy.fft import fft, ifft
 from time import sleep
 from scipy.signal import filter_design as filters, lfilter, filtfilt
-from atten import atten
-from compensate import compensate
-from envelope import envelope
-from equate import equate
-from frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
-from f0 import f0
-from freq_compression import freq_compress
-from interp import interp_bad, interp_lin, interp_spline
-from lts import lts
-from magspec import magspec
-from mix import mix
-from ms2samp import ms2samp
-from normalize import normalize
-from ramps import ramps
-from rir import rir, fconv
-from rms import rms
-from samp2ms import samp2ms
-from smooth import smooth
-from specgram import specgram
-from specplot import specplot
-from tone import tone
-from t60 import t60
-from vocoder import vocoder, vocoder_overlap
-from zeropad import zeropad
+from .atten import atten
+from .compensate import compensate
+from .envelope import envelope
+from .equate import equate
+from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
+from .f0 import f0
+from .freq_compression import freq_compress
+from .interp import interp_bad, interp_lin, interp_spline
+from .lts import lts
+from .magspec import magspec
+from .mix import mix
+from .ms2samp import ms2samp
+from .normalize import normalize
+from .ramps import ramps
+from .rir import rir, fconv
+from .rms import rms
+from .samp2ms import samp2ms
+from .smooth import smooth
+from .specgram import specgram
+from .specplot import specplot
+from .tone import tone
+from .t60 import t60
+from .vocoder import vocoder, vocoder_overlap
+from .zeropad import zeropad

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010 Christopher Brown
+# Copyright (c) 2010, 2012 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -36,7 +36,7 @@ pairwise_comparisons - Computes a table of pairwise comparisons
 rau - Normalizes percent correct data, converting to rationalized arcsine units
 '''
 
-from cumr2 import cumr2
-from rau import rau
-from anova import anova_between, anova_within, anova_table
-from pairwise import pairwise_comparisons
+from .cumr2 import cumr2
+from .rau import rau
+from .anova import anova_between, anova_within, anova_table
+from .pairwise import pairwise_comparisons

@@ -26,7 +26,9 @@
 import numpy as np
 from scipy import stats
 from itertools import combinations, product
-from psylab import nanproduct
+
+def nanproduct(arr):
+    return np.product(tuple(x for x in arr if not np.isnan(x)))
 
 def anova_table(anova_data):
     """Generates a nicely formatted anova summary table
