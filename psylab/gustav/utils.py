@@ -52,7 +52,7 @@ class exp:
     logString_post_trial = None#Write this string to the console and/or logfileafter every trial
     logString_post_block = None#Write this string to the console and/or logfileafter every block
     logString_post_exp = None  #Write this string to the console and/or logfileat end of exp
-    logString_header = "#A log file for Gustav\n\n" #Write this string to the logfile if it is new
+    logString_header = "# A log file for Gustav\n\n" #Write this string to the logfile if it is new
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ""
     logConsole = True
@@ -188,8 +188,19 @@ class user:
 def initialize_experiment( exp, run, var, stim, user):
     '''Do stuff necessary for the start of an experiment
     '''
-    exp.utils.get_frontend(exp, exp.frontend)
+    logpath = os.path.split(exp.logFile)
+    if not os.path.isdir(logpath[0]):
+        print("Creating logfile path: " + logpath[0])
+        os.makedirs(logpath[0])
+    # We expand date only and not full variable expansion because many variables haven't been set.
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    exp.logFile = exp.logFile.replace("$date", date)
+    if not os.path.isfile(exp.logFile):
+        exp.logString_header = exp.logString_header.replace("$date", date)
+        write_data(exp.logString_header, exp.logFile)
 
+    exp.utils.get_frontend(exp, exp.frontend)
+    debug(exp, 'Got frontend: %s' % exp.frontend.name)
     # For each event type, look for a function in method, and in experiment.
     # If a function is found, add to list to be run during that event. 
     for event in exp.eventTypes:
@@ -197,22 +208,27 @@ def initialize_experiment( exp, run, var, stim, user):
             thisstr = '%s_' % event
             thisfunclist = getattr(exp, thisstr)
             thisfunclist.append(getattr(exp.method, event))
+            debug(exp, 'Found event in method: %s' % event)
         if hasattr(exp.experiment, event):
             thisstr = '%s_' % event
             thisfunclist = getattr(exp, thisstr)
             thisfunclist.append(getattr(exp.experiment, event))
+            debug(exp, 'Found event in experiment: %s' % event)
 
     # A few 'special' events that should only occur (if at all) in the experiment file:
     if hasattr(exp.experiment, 'present_trial'):
         exp.present_trial = exp.experiment.present_trial
+        debug(exp, 'Found event in experiment: present_trial')
     if hasattr(exp.experiment, 'prompt_response'):
         exp.prompt_response = exp.experiment.prompt_response
+        debug(exp, 'Found event in experiment: prompt_response')
     if hasattr(exp.experiment, 'prompt_condition'):
         exp.prompt_condition = exp.experiment.prompt_condition
+        debug(exp, 'Found event in experiment: prompt_condition')
 
     stim.get_next = exp.utils.stim_get_next
     stim.reset_order = exp.utils.stim_reset_order
-    exp.utils.process_stimuli(stim)
+    exp.utils.process_stimuli(exp, stim)
     # Make a list of the stimuli that are actually used
     for v in range(len(var.factvars)):
         if var.factvars[v]['type'] == 'stim':
@@ -220,32 +236,22 @@ def initialize_experiment( exp, run, var, stim, user):
                 if level not in stim.stimvars:
                     stim.stimvars.append(level)
 
-    exp.utils.process_variables(var)
+    exp.utils.process_variables(exp, var)
     run.nblocks = var.nblocks
-    stim.debug = exp.debug
-    var.debug = exp.debug
     if exp.recordData:
         datapath = os.path.split(exp.dataFile)
         if not os.path.isdir(datapath[0]):
-            print("Creating datafile path: " + datapath[0])
             os.makedirs(datapath[0])
+            debug(exp, "Created datafile path: " + datapath[0])
         exp.dataFile_unexpanded = exp.dataFile
         exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
         if not os.path.isfile(exp.dataFile):
             exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp, run, var, stim, user)
             write_data(exp.dataString_header, exp.dataFile)
-    logpath = os.path.split(exp.logFile)
-    if not os.path.isdir(logpath[0]):
-        print("Creating logfile path: " + logpath[0])
-        os.makedirs(logpath[0])
-    exp.logFile_unexpanded = exp.logFile
-    exp.logFile = get_expanded_vals_in_string(exp.logFile, exp, run, var, stim, user)
-    if not os.path.isfile(exp.logFile):
-        exp.logString_header = get_expanded_vals_in_string(exp.logString_header, exp, run, var, stim, user)
-        write_data(exp.logString_header, exp.logFile)
+            debug(exp, "Created datafile: " + exp.dataFile)
 
 
-def process_variables(var):
+def process_variables(exp, var):
     '''Processes conditions
         Factorialize all 'factvars' conditions, and add all 'listvars' conditions
         For each variable, make a list of levels for each condition
@@ -261,6 +267,8 @@ def process_variables(var):
             var.varlist.append(var.factvars[v]['name'])
             var.factvars[v]['n'] = len(var.factvars[v]['levels'])
             var.nlevels_fact *= var.factvars[v]['n']
+            debug(exp, "Found factorial variable: %s [%i levels]" % (var.factvars[v]['name'], len(var.factvars[v]['levels'])))
+
         factvars = var.varlist
     nlist = 0
     for v in range(len(var.listvars)):
@@ -273,11 +281,13 @@ def process_variables(var):
         else:
             if nlist != var.listvars[v]['n'] and var.listvars[v]['n'] != 1:
                 raise Exception("All 'listvars' variables must either have the same number of levels, or one level")
+        debug(exp, "Found list variable: %s [%i levels]" % (var.listvars[v]['name'], len(var.listvars[v]['levels'])))
     if len(factvars) == 0:
         for v in range(len(var.listvars)):
             var.varlist.append(var.listvars[v]['name'])
     var.nlevels_list = nlist
     var.nlevels_total = var.nlevels_fact + var.nlevels_list
+    debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (var.nlevels_total, var.nlevels_fact, var.nlevels_list))
     # End get number of levels
 
     # Begin process conditions
@@ -339,10 +349,11 @@ def process_variables(var):
     else:
         var.orderarray = str_to_range(var.order)
         var.nblocks = var.nlevels_total
+    debug(exp, "Presentation order: " + var.order)
 # End process_variables
 
 
-def process_stimuli(stim):
+def process_stimuli(exp, stim):
     '''Account for all stimuli present, and attach any associated text
     '''
     for stimset in stim.sets:
@@ -552,6 +563,19 @@ def log(exp,run,var,stim,user, message):
             print(message_exp),
         if exp.logFile is not None and exp.logFile is not '':
             write_data(message_exp, exp.logFile)
+
+        
+def debug(exp, message):
+    '''Writes debug info to the console, to a log file, or both
+    '''
+    if exp.debug:
+        time = datetime.datetime.now().strftime('%H:%M:%S')
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        dmessage = "DEBUG %s,%s: %s" % (date, time, message)
+        if exp.logConsole:
+            print(dmessage)
+        if exp.logFile is not None and exp.logFile is not '':
+            write_data(dmessage, exp.logFile)
 
         
 def do_event(exp,run,var,stim,user, event):

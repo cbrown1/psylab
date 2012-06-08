@@ -152,8 +152,9 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if run.gustav_is_go == False:
         print("Gustav cancelled at user request")
         return
+    # TODO: Fix term frontend -> get_yesno to return None if no
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
-    if not ret:
+    if not ret or ret == 'n':
         print("Gustav cancelled at user request")
         return
 
