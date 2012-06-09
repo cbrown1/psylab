@@ -150,7 +150,7 @@ class var:
     nlevels_total = 0
     order = 'natural'
     order_ = 0
-    debug = False
+    prompt = []
     dynamic = {}
 
 
@@ -414,17 +414,28 @@ def process_stimuli(exp, stim):
                             thisn['kw'] = ''
                             thisn['text'] = ''
                         stim.sets[stimset]['tokens'].append(thisn)
-                stim.reset_order(stim, stimset)
+                stim.reset_order(exp, stim, stimset)
                 stim.sets[stimset]['n'] = len(stim.sets[stimset]['order_'])
+        debug(exp, "Found stimulus set: %s; Type: %s" % (stimset, 
+                                                        stim.sets[stimset]['type'],
+                                                        ))
 # End process_stimuli
 
 
-def get_current_variables(var, condition):
+def get_current_variables(exp, var, condition):
     '''Get current levels of each variable for a given condition
     '''
     var.current = {}
     for v in var.varlist:
-        var.current[v] = var.levelsbycond[v][condition]
+        if v in var.prompt:
+            ret = exp.frontend.get_input(prompt = "Enter a value for variable: %s\nor hit enter for current level (%s): " % (v, var.levelsbycond[v][condition]))
+            if ret == "":
+                var.current[v] = var.levelsbycond[v][condition]
+            else:
+                var.current[v] = ret
+        else:
+            var.current[v] = var.levelsbycond[v][condition]
+        debug(exp, "Getting level: %s; for variable: %s" % (var.current[v],v))
 
 def get_variable_strtable(var):
     '''Creates a table specifying the levels of each variable for each condition
@@ -499,7 +510,7 @@ def menu_condition(exp,run,var,stim,user):
             else:
                 message = "You must select at least 1 condition to run!\n\n"
 
-def stim_get_next(stim, stimset):
+def stim_get_next(exp, stim, stimset):
     '''Load the next stimulus for a stimulus set
     '''
     stim.current[stimset]['ind'] += 1  # Index of index
@@ -511,12 +522,12 @@ def stim_get_next(stim, stimset):
 
     if stim.current[stimset]['ind'] == stim.sets[stimset]['n']-1:
         if stim.sets[stimset]['repeat']:
-            stim.reset_order(stim,stimset)
+            stim.reset_order(exp,stim,stimset)
         else:
             raise Exception("Ran out of stimulus files for stimset: " + stimset)
+    debug(exp, "Getting stimulus %s for set: %s" % (stim.current[stimset]['file'],stimset))
 
-
-def stim_reset_order(stim, stimset):
+def stim_reset_order(exp, stim, stimset):
     '''Resets the order of a stimulus set
     '''
     stim.current[stimset]['ind'] = -1
@@ -526,7 +537,7 @@ def stim_reset_order(stim, stimset):
         stim.sets[stimset]['order_'] = np.arange(len(stim.sets[stimset]['tokens']))
     else:
         stim.sets[stimset]['order_'] = str_to_range(stim.sets[stimset]['order'])
-
+    debug(exp, "Resetting order of stimulus set: %s" % (stimset))
 
 def update_time(run):
     '''Updates the date and time
@@ -590,7 +601,7 @@ def do_event(exp,run,var,stim,user, event):
         exp.utils.log(exp,run,var,stim,user, getattr(exp, 'logString_%s' % event))
     if hasattr(exp, 'dataString_%s' % event):
         exp.utils.save_data(exp,run,var,stim,user, getattr(exp, 'dataString_%s' % event))
-            
+    debug(exp, "Doing event: %s" % (event))
         
 def get_frontend(exp, frontend):
     '''Tries to load the specified frontend
@@ -605,6 +616,7 @@ def get_frontend(exp, frontend):
     except ImportError:
         raise Exception("Could not import frontend "+frontend)
     exp.frontend = getattr(frontend, frontend_s)
+    debug(exp, "Getting frontend: %s" % (exp.frontend.name))
 
 def obj_to_str(obj, name, indent=''):
     """Returns formatted, python-callable string representations of objects

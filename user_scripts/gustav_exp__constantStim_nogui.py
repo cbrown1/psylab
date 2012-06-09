@@ -297,6 +297,13 @@ def setup(exp,run,var,stim,user):
     """
     var.ignore = []
 
+    """PROMPT FOR VARIABLE
+        Add the name of a variable to this and you will be prompted for the 
+        level to run prior to each block during testing. The default value 
+        is the value of that variable in that condition at runtime.
+    """
+    var.prompt = ['snr']
+
     """USER VARIABLES
         Add any additional variables you need here
     """

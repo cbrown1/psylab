@@ -92,9 +92,11 @@ def get_item(parent=None, title = 'User Input', prompt = 'Choose One:', items = 
 def get_yesno(parent=None, title = 'User Input', prompt = 'Yes or No:'):
     """Opens a simple yes/no message box, returns a bool
     """
-    ret = input(prompt+" (Y/N) ")
-
-    return ret
+    ret = input(prompt+" (Y/N): ")
+    if ret.lower() == 'n':
+        return False
+    else:
+        return True
 
 def show_message(parent=None, title = 'Title', message = 'Message', msgtype = 'Information'):
     """Opens a simple message box

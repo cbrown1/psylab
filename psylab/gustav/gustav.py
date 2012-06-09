@@ -95,8 +95,6 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
 
     if experimentFile == None:
-        # Edit CB 2012-05-21
-        #experimentFile = exp.term.get_file(None, "Open "+exp.exp_name+" Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)");
         experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
             print("\""+exp.exp_name+"\" cancelled at user request")
@@ -154,7 +152,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         return
     # TODO: Fix term frontend -> get_yesno to return None if no
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
-    if not ret or ret == 'n':
+    if not ret:
         print("Gustav cancelled at user request")
         return
 
@@ -173,13 +171,13 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         if var.order == 'prompt' or run.condition+1 not in var.ignore:
             run.trials_block = 0
             run.block_on = True
-            exp.utils.get_current_variables(var, run.condition)
+            exp.utils.get_current_variables(exp, var, run.condition)
             exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
 
             while run.block_on:
                 for s in stim.stimvars:
                     if stim.sets[s]['type'] != 'manual':
-                        exp.utils.stim_get_next(stim, s)
+                        exp.utils.stim_get_next(exp, stim, s)
                 run.trial_on = True
                 while run.trial_on:
                     exp.utils.do_event(exp,run,var,stim,user, 'pre_trial')
@@ -204,7 +202,7 @@ if __name__ == '__main__':
     recordData = None
     action = 'run'
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:i:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
+        opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:s:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
     except (getopt.error, msg):
         print(msg)
         print("for help use --help")
