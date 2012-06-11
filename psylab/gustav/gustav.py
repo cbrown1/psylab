@@ -57,12 +57,12 @@ def configure(experimentFile = None, frontend = None):
     exp.frontend.show_config( exp, run, var, stim, user )
 
 
-def list_conditions(experimentFile = None, frontend = None):
+def info(experimentFile = None, frontend = None):
 
-    var = utils.var()
-    stim = utils.stim()
     exp = utils.exp()
     run = utils.run()
+    var = utils.var()
+    stim = utils.stim()
     user = utils.user()
     exp.utils = utils
 
@@ -86,9 +86,9 @@ def list_conditions(experimentFile = None, frontend = None):
 def run(experimentFile = None, subjectID = None, frontend = None, recordData = None):
 
     exp = utils.exp()
+    run = utils.run()
     var = utils.var()
     stim = utils.stim()
-    run = utils.run()
     user = utils.user()
     exp.utils = utils
 
@@ -97,7 +97,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if experimentFile == None:
         experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
-            print("\""+exp.exp_name+"\" cancelled at user request")
+            print("Gustav cancelled at user request")
             return
 
     if subjectID == None:
@@ -114,8 +114,8 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     sys.path.append(exp.experimentPath)
     exp.experiment = __import__(exp.experimentBase)
 
-    var.factvars[:] = []
-    var.listvars[:] = []
+    #var.factvars[:] = []
+    #var.listvars[:] = []
 
     exp.experiment.setup( exp, run, var, stim, user )
 
@@ -150,7 +150,6 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if run.gustav_is_go == False:
         print("Gustav cancelled at user request")
         return
-    # TODO: Fix term frontend -> get_yesno to return None if no
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
     if not ret:
         print("Gustav cancelled at user request")
@@ -160,9 +159,8 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if not os.path.isfile(exp.dataFile):
         exp.utils.save_data(exp,run,var,stim,user, 'header')
     exp.utils.do_event(exp,run,var,stim,user, 'pre_exp')
-    run.gustav_is_go = True
     run.trials_exp = 0
-
+    run.gustav_is_go = True
     while run.gustav_is_go:
         if var.order == 'prompt':
             exp.prompt_condition(exp,run,var,stim,user)
@@ -170,14 +168,11 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
             run.condition = var.orderarray[run.block]
         if var.order == 'prompt' or run.condition+1 not in var.ignore:
             run.trials_block = 0
-            run.block_on = True
             exp.utils.get_current_variables(exp, var, run.condition)
             exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
-
+            run.block_on = True
             while run.block_on:
-                for s in stim.stimvars:
-                    if stim.sets[s]['type'] != 'manual':
-                        exp.utils.stim_get_next(exp, stim, s)
+                exp.utils.get_current_stimuli(exp, stim)
                 run.trial_on = True
                 while run.trial_on:
                     exp.utils.do_event(exp,run,var,stim,user, 'pre_trial')
@@ -195,37 +190,41 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     # End gustav_is_go loop
     exp.utils.do_event(exp,run,var,stim,user, 'post_exp')
 
-if __name__ == '__main__':
+def main(argv):
     experimentFile = None
     subjectID = None
     frontend = None
     recordData = None
     action = 'run'
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hcldf:e:s:", ["help", "config", "list", "dontrecord", "frontend=", "experimentFile=", "subjectID="])
+        opts, args = getopt.getopt(argv, "hcdif:e:s:", ["help", "config", "dontrecord", "info", "frontend=", "experimentFile=", "subjectID="])
     except (getopt.error, msg):
         print(msg)
         print("for help use --help")
         sys.exit(2)
     for var, val in opts:
-        if var in ("-h", "--help"):
+        if var in ("--help", "-h"):
             print(__doc__)
             sys.exit(0)
-        elif var in ["--experimentFile", "-e"]:
+        elif var in ("--experimentFile", "-e"):
             experimentFile = val
-        elif var in ["--subjectID", "-i"]:
+        elif var in ("--subjectID", "-s"):
             subjectID = val
-        elif var in ["--frontend", "-f"]:
+        elif var in ("--frontend", "-f"):
             frontend = val
-        elif var in ["--config", "-c"]:
+        elif var in ("--config", "-c"):
             action = 'config'
-        elif var in ["--dontrecord", "-d"]:
+        elif var in ("--dontrecord", "-d"):
             recordData = False
-        elif var in ["--list", "-l"]:
-            action = 'list'
-    if action in ['config']:
+        elif var in ("--info", "-i"):
+            action = 'info'
+    if action in ('config'):
         configure(experimentFile = experimentFile, frontend = frontend)
-    elif action in ['list']:
-        list_conditions(experimentFile = experimentFile, frontend = frontend)
+    elif action in ('list'):
+        info(experimentFile = experimentFile, frontend = frontend)
     else:
         run(experimentFile = experimentFile, subjectID = subjectID, frontend = frontend, recordData = recordData)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+

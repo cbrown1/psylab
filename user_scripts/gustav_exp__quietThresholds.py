@@ -33,7 +33,7 @@
 
 # A Gustav experiment file!
 
-import os
+import os, sys
 import numpy as np
 import time
 import psylab
@@ -121,7 +121,7 @@ def setup(exp,run,var,stim,user):
 #                              'text':   '', #os.path.join(basedir,'stim','CUNYf','CUNY.txt'),
 #                              'txtfmt': 'file kw text',
 #                              'mask':   '*.wav; *.WAV',
-#                              'load':   'manual',  # 'auto' = Load stimuli automatically (default)
+#                              'process':'manual',  # 'auto' = Load stimulus info automatically (default)
 #                              'order':  'r,1:500', #
 #                              'repeat': True,    # If we run out of files, should we start over?
 #                              'equate': 3,  # A custom value
@@ -131,24 +131,24 @@ def setup(exp,run,var,stim,user):
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
 
-        Levels added as 'factvars' variables will be factorialized with each
+        Levels added as 'factorial' variables will be factorialized with each
         other. So, if you have 2 fact variables A & B, each with 3 levels, you
         will end up with 9 conditions: A1B1, A1B2, A1B3, A2B1 etc..
 
-        Levels added as 'listvars' variables will simply be listed (in parallel
+        Levels added as 'covariable' variables will simply be listed (in parallel
         with the corresponding levels from the other variables) in the order
-        specified. So, if you have 2 'listvars' variables A & B, each with 3
+        specified. So, if you have 2 'covariable' variables A & B, each with 3
         levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. All
-        'listvars' variables must have either the same number of levels, or
+        'covariable' variables must have either the same number of levels, or
         exactly one level. When only one level is specified, that level will
-        be used in all 'listvars' conditions. Eg., A1B1, A2B1, A3B1, etc.
+        be used in all 'covariable' conditions. Eg., A1B1, A2B1, A3B1, etc.
 
         You can use both types of variables in the same experiment, but both
-        factvars and listvars must contain exactly the same set of variable
-        names. Factvars levels are processed first, listvars levels are added at
-        the end.
+        factorial and covariable must contain exactly the same set of variable
+        names. factorial levels are processed first, covariable levels are added
+        at the end.
 
-        Each variable (whether factvars or listvars) should have 3 properties:
+        Each variable (whether factorial or covariable) should have 3 properties:
 
         'name' is the name of the variable, as a string
 
@@ -167,7 +167,7 @@ def setup(exp,run,var,stim,user):
     """
     # TODO: for python 2.7, change these to ordered dicts, where name is the key
     # and the dict {type, levels} is the val
-    var.factvars.append( {  'name' : 'Frequency',
+    var.factorial.append( {  'name' : 'Frequency',
                             'type' : 'manual',   
                           'levels' : [
                                         '62.5',
@@ -185,7 +185,7 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
     
-#    var.factvars.append( {  'name' : 'target',
+#    var.factorial.append( {  'name' : 'target',
 #                            'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
 #                          'levels' : [
 #                                        'CNC',
@@ -333,5 +333,7 @@ def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.nblocks+1))
 
 if __name__ == '__main__':
-    fname = os.path.realpath(__file__)
-    psylab.gustav.run(experimentFile=fname)
+    argv = sys.argv[1:]
+    argv.append("--experimentFile=%s" % os.path.realpath(__file__))
+    psylab.gustav.main(argv)
+

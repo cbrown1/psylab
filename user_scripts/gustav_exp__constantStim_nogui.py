@@ -34,7 +34,7 @@
 
 # A Gustav experiment file!
 
-import os
+import os, sys
 import inspect
 import numpy as np
 import psylab
@@ -60,7 +60,7 @@ def setup(exp,run,var,stim,user):
     exp.logString_post_trial = ''; 
     exp.logString_post_block = " Block $block ; Condition: $condition ; $currentvarsvals[' ; ']\n";
     exp.frontend = 'term'
-    exp.debug = True
+    exp.debug = False
     # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
     # the experimenter do the scoring, and enter the score on each trial.
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
@@ -78,33 +78,47 @@ def setup(exp,run,var,stim,user):
         If you generate all your stimuli on the fly, you don't need any of these.
 
         The only required property is `type`, which should be either `manual`
-        or `soundfiles`. If it is manual, the experimenter is responsible for
-        handling it.
-
-        If `type` is set to `soundfiles`, each set needs two additional settings:
+        or `files`. If it is 'files', the function stim.get_next will be called 
+        prior to each trial, and you can access the current token at 
+        stim.current[setname]. In this case, you must also set the `path` 
+        variable. If type is manual, nothing will occur automatically. `manual`
+        stim sets are useful if you have a level of an experimental variable 
+        that is stimulus-based, and another level of that variable that is 
+        not. For example, you might want a masker variable to be both a talker
+        (files on disk, type='files') and speech-shaped noise which you generate
+        digitally as needed (type='manual').  
+        
+        If `type` is set to `files`, an additional setting is required:
 
         `path` is the full path to the folder containing the files
 
-        `fs` is the playback sampling frequency
+        There are several optional settings when `type` is `files`:
 
-        There are several optional settings for soundfiles:
-
-        `text` is the full path to a text file that specifies text for each token.
+        `text` is the full path to a text file containing info on each token.
                 There should be one line per token, and the format can be
                 specified (see below).
 
-        `txtfmt` If you're using a text file, you can specify the format here.
-                  You can specify 3 values, `file`, `kw`, and `text`. The default
-                  format is `file,kw,text` which in your file would look like:
-                  `CUNY001,4,They LOOKED UP at the BLUE SKY.` where CUNY001 is
-                  the filename [no extension], 4 is the number of keywords, and
-                  the rest of the line is the text. The text should always be
-                  last on the line, and the delimiter can be a comma or a space.
+        `txtfmt` If you're using a text file, specify the format here.
+                The comma-delimited values you list here will be used as keys
+                to the info dictionary in stim.current to allow you to retrieve
+                the info. For example, if you set txtfmt to be `file,kw,text`,
+                and your file looks like `CUNY001,4,They LOOKED UP at the BLUE SKY.`, 
+                then you can use stim.current[stimname].info['kw'] to get the value 
+                4, and stim.current[stimname].info['text'] will be `They LOOKED...`.
+                One txtfmt value needs to be 'file', and the corresponding text in
+                the textfile should be the filename (without the extension), as that
+                is how the info is connected to a token.
 
         `mask` is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
 
-        `load` is `manual` to simply keep track of filenames, or `auto` to load
-                stimuli automatically as well. default is `auto`
+        `process` is either `manual` or `auto`. default = `auto`. When its `auto`,
+                the function stim.get_next will be called once before the start of 
+                every trial, which simply loads information for the next stimulus
+                token in the list into stim.current[stimname] (useful if you need 
+                exactly 1 stim token per trial). If `manual`, stim.get_next will 
+                not be called, and you will have to call it yourself as needed
+                (useful if you need something other than exactly 1 stim token per
+                trial). 
 
         `order` is the presentation order: `random`, `natural`, or a print
                 range style string, which should be a comma-separated list of
@@ -119,19 +133,21 @@ def setup(exp,run,var,stim,user):
     """
 
     stim.sets['CUNYf'] = {
-                              'type':   'soundfiles',
+                              'type':   'files',
                               'path':   os.path.join(basedir,'stim','CUNY_F1'),
                               'text':   os.path.join(basedir,'stim','CUNY_F1.txt'),
                               'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
+                              'process': 'auto',
                               'order':  '1:10', #
                               'repeat': True,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
                             }
     stim.sets['Babble'] = {
-                              'type':   'soundfiles',
+                              'type':   'files',
                               'path':   os.path.join(basedir,'stim','noise'),
                               'mask':   '*.wav; *.WAV',
+                              'process': 'auto',
                               'order':  'random', #
                               'repeat': True,    #
                             }
@@ -140,26 +156,26 @@ def setup(exp,run,var,stim,user):
                               }
 
     """EXPERIMENT VARIABLES
-        There are 2 kinds of variables: factorial and ordered
+        There are 2 kinds of variables: factorial and covariable
 
-        Levels added as 'factvars' variables will be factorialized with each
+        Levels added as 'factorial' variables will be factorialized with each
         other. So, if you have 2 fact variables A & B, each with 3 levels, you
         will end up with 9 conditions: A1B1, A1B2, A1B3, A2B1 etc..
 
-        Levels added as 'listvars' variables will simply be listed (in parallel
+        Levels added as 'covariable' variables will simply be listed (in parallel
         with the corresponding levels from the other variables) in the order
-        specified. So, if you have 2 'listvars' variables A & B, each with 3
+        specified. So, if you have 2 'covariable' variables A & B, each with 3
         levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. All
-        'listvars' variables must have either the same number of levels, or
+        'covariable' variables must have either the same number of levels, or
         exactly one level. When only one level is specified, that level will
-        be used in all 'listvars' conditions. Eg., A1B1, A2B1, A3B1, etc.
+        be used in all 'covariable' conditions. Eg., A1B1, A2B1, A3B1, etc.
 
         You can use both types of variables in the same experiment, but both
-        factvars and listvars must contain exactly the same set of variable
-        names. Factvars levels are processed first, listvars levels are added at
-        the end.
+        factorial and covariable must contain exactly the same set of variable
+        names. factorial levels are processed first, covariable levels are added
+        at the end (and then the entire list gets randomized, etc).
 
-        Each variable (whether factvars or listvars) should have 3 properties:
+        Each variable (whether factorial or covariable) should have 3 properties:
 
         'name' is the name of the variable, as a string
 
@@ -172,14 +188,10 @@ def setup(exp,run,var,stim,user):
 
         'levels' should be a list of strings that identify each level of interest
 
-        for file in stim['masker_files']:
-            masker,fs,enc = utils.wavread(file)
-            stim['masker'] += masker
-        stim['masker'] = stim['masker'][0:stim['masker_samples_needed']]
     """
     # TODO: for python 2.7, change these to ordered dicts, where name is the key
     # and the dict {type, levels} is the val
-    var.factvars.append( {  'name' : 'freq',
+    var.factorial.append( {  'name' : 'freq',
                             'type' : 'manual',
                           'levels' : [
                                         '0',
@@ -191,7 +203,7 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'processing',
+    var.factorial.append( {  'name' : 'processing',
                             'type' : 'manual',
                           'levels' : [
                                         'E',
@@ -200,7 +212,7 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'excursion',
+    var.factorial.append( {  'name' : 'excursion',
                             'type' : 'manual',     # This variable will be processed manually in stimgen (default behavior)
                           'levels' : [
                                         '1',
@@ -208,42 +220,42 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'target',
+    var.factorial.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CUNYf',
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'masker',
+    var.factorial.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'snr',
+    var.factorial.append( {  'name' : 'snr',
                             'type' : 'manual',
                           'levels' : [
                                         '3',
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'freq',
+    var.covariable.append( {  'name' : 'freq',
                             'type' : 'manual',
                           'levels' : [
                                         '300',
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'processing',
+    var.covariable.append( {  'name' : 'processing',
                             'type' : 'manual',
                           'levels' : [
                                         'E',
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'excursion',
+    var.covariable.append( {  'name' : 'excursion',
                             'type' : 'manual',
                           'levels' : [
                                         '1',
@@ -253,21 +265,21 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'target',
+    var.covariable.append( {  'name' : 'target',
                             'type' : 'stim',
                           'levels' : [
                                         'CUNYf',
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'masker',
+    var.covariable.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
                                       ]
                         })
 
-    var.listvars.append( {  'name' : 'snr',
+    var.covariable.append( {  'name' : 'snr',
                             'type' : 'manual',
                           'levels' : [
                                         '3',
@@ -322,8 +334,8 @@ def prompt_response(exp,run,var,stim,user):
     #while True:
     target_name = var.current['target']
     # The prompt is the trial feedback.
-    user.kwp = str(stim.current[var.current['target']]['kw']) # TODO: stim isn't getting set before pre-trial? 
-    p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +" "+stim.current[target_name]['txt']
+    user.kwp = str(stim.current[var.current['target']].info['kw']) # TODO: stim isn't getting set before pre-trial? 
+    p = "  Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name].filebase+" KW: "+str(stim.current[target_name].info['kw']) +" "+stim.current[target_name].info['text']
     exp.utils.log(exp,run,var,stim,user,p)
     while True:
         ret = exp.frontend.get_char()
@@ -349,5 +361,7 @@ def post_trial(exp,run,var,stim,user):
     exp.utils.log(exp,run,var,stim,user, " | Correct: %s\n" % run.response)
 
 if __name__ == '__main__':
-    fname = os.path.realpath(__file__)
-    psylab.gustav.run(experimentFile=fname)
+    argv = sys.argv[1:]
+    argv.append("--experimentFile=%s" % os.path.realpath(__file__))
+    psylab.gustav.main(argv)
+

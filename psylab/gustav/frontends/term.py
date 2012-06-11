@@ -49,7 +49,7 @@ def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("
     for ft in ftl:
         d,t = ft.split("(")
         fts.append(tuple([d," ".join(t.strip(" )").split())]))
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
     fname = filedialog.askopenfilename( title = title, initialdir = default_dir, filetypes = fts, multiple = False)
     toplevel.deiconify()
@@ -63,7 +63,7 @@ def get_file(parent=None, title = 'Open File', default_dir = "", file_types = ("
 def get_folder(parent=None, title = 'Open Folder', default_dir = ""):
     """Opens a folder dialog, returns the path as a string
     """
-    toplevel=Tkinter.Tk()
+    toplevel=tk.Tk()
     toplevel.withdraw()
     fname = filedialog.askdirectory( title = title, initialdir = default_dir )
     toplevel.deiconify()

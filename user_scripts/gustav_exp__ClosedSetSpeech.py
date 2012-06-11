@@ -34,7 +34,7 @@
 
 # A Gustav experiment file!
 
-import os
+import os, sys
 import numpy as np
 import time
 import psylab
@@ -118,7 +118,7 @@ def setup(exp,run,var,stim,user):
     exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
 
     exp.frontend = 'qt'
-    exp.debug = True
+    exp.debug = False
     exp.quitKey = '/'
     exp.note = 'A closed-set speech experiment'
     exp.comments = '''This is an example of a closed-set speech experiment. 
@@ -158,9 +158,6 @@ def setup(exp,run,var,stim,user):
 
         `mask` is a list of filemasks (e.g., '*.wav; *.WAV'). default = '*.*'
 
-        `load` is `manual` to simply keep track of filenames, or `auto` to load
-                stimuli automatically as well. default is `auto` * DEPRECATED! *
-
         `order` is the presentation order: `random`, `natural`, or a print
                 range style string, which should be a comma-separated list of
                 values, which can be either a single number, or a colon-delimited
@@ -179,7 +176,7 @@ def setup(exp,run,var,stim,user):
                               'text':   os.path.join(basedir,'stim','CUNY_F1.txt'),
                               'txtfmt': 'file kw text',
                               'mask':   '*.wav; *.WAV',
-                              'load':   'auto',  # 'auto' = Load stimuli automatically (default)
+                              'process': 'auto', 
                               'order':  '1:866', #
                               'repeat': False,    # If we run out of files, should we start over?
                               'equate': 3,  # A custom value
@@ -188,7 +185,7 @@ def setup(exp,run,var,stim,user):
                               'type':   'files',
                               'path':   os.path.join(basedir,'stim','noise'),
                               'mask':   '*.wav; *.WAV',
-                              'load':   'manual',  # 'manual' = Just get names, don't load
+                              'process': 'manual', # we may need more than 1
                               'order':  'random', #
                               'repeat': True,    #
                             }
@@ -199,24 +196,24 @@ def setup(exp,run,var,stim,user):
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
 
-        Levels added as 'factvars' variables will be factorialized with each
+        Levels added as 'factorial' variables will be factorialized with each
         other. So, if you have 2 fact variables A & B, each with 3 levels, you
         will end up with 9 conditions: A1B1, A1B2, A1B3, A2B1 etc..
 
-        Levels added as 'listvars' variables will simply be listed (in parallel
+        Levels added as 'covariable' variables will simply be listed (in parallel
         with the corresponding levels from the other variables) in the order
-        specified. So, if you have 2 'listvars' variables A & B, each with 3
+        specified. So, if you have 2 'covariable' variables A & B, each with 3
         levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. All
-        'listvars' variables must have either the same number of levels, or
+        'covariable' variables must have either the same number of levels, or
         exactly one level. When only one level is specified, that level will
-        be used in all 'listvars' conditions. Eg., A1B1, A2B1, A3B1, etc.
+        be used in all 'covariable' conditions. Eg., A1B1, A2B1, A3B1, etc.
 
         You can use both types of variables in the same experiment, but both
-        factvars and listvars must contain exactly the same set of variable
-        names. Factvars levels are processed first, listvars levels are added at
-        the end.
+        factorial and covariable must contain exactly the same set of variable
+        names. factorial levels are processed first, covariable levels are added
+        at the end.
 
-        Each variable (whether factvars or listvars) should have 3 properties:
+        Each variable (whether factorial or covariable) should have 3 properties:
 
         'name' is the name of the variable, as a string
 
@@ -229,14 +226,10 @@ def setup(exp,run,var,stim,user):
 
         'levels' should be a list of strings that identify each level of interest
 
-        for file in stim['masker_files']:
-            masker,fs,enc = utils.wavread(file)
-            stim['masker'] += masker
-        stim['masker'] = stim['masker'][0:stim['masker_samples_needed']]
     """
     # TODO: for python 2.7, change these to ordered dicts, where name is the key
     # and the dict {type, levels} is the val
-    var.factvars.append( {  'name' : 'SNR',
+    var.factorial.append( {  'name' : 'SNR',
                             'type' : 'manual',
                           'levels' : [
                                         '5',
@@ -246,14 +239,14 @@ def setup(exp,run,var,stim,user):
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'target',
+    var.factorial.append( {  'name' : 'target',
                             'type' : 'stim',    # This variable will be drawn from stim. 'levels' must be stim set names
                           'levels' : [
                                         'CUNYf',
                                       ]
                         })
 
-    var.factvars.append( {  'name' : 'masker',
+    var.factorial.append( {  'name' : 'masker',
                             'type' : 'stim',
                           'levels' : [
                                         'Babble',
@@ -320,13 +313,13 @@ def pre_trial(exp,run,var,stim,user):
     """
     target_name = var.current['target']
     masker_name = var.current['masker']
-    p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name]['filebase']+" KW: "+str(stim.current[target_name]['kw']) +"\n"+stim.current[target_name]['txt']
-    target, fs = m.read_file(stim.current[target_name]['file'])
+    p = "Trial "+ str(run.trials_exp+1) + ", " + stim.current[target_name].filebase + " KW: "+str(stim.current[target_name].info['kw']) +"\n"+stim.current[target_name].info['text']
+    target, fs = m.read_file(stim.current[target_name].filename)
     masker = np.zeros((1,1))
     masker_dur = psylab.signal.ms2samp((user.prebuff + user.postbuff), fs) + len(target)
     while len(masker) < masker_dur:
-        stim.get_next(stim,masker_name)
-        thistoken,fs = m.read_file(stim.current[masker_name]['file'])
+        stim.get_next(exp,stim,masker_name)
+        thistoken,fs = m.read_file(stim.current[masker_name].filename)
         masker = np.concatenate((masker,thistoken))
     masker = masker[0:masker_dur]
     masker_rms = psylab.signal.rms(masker)
@@ -367,5 +360,7 @@ def pre_block(exp,run,var,stim,user):
     exp.interface.dialog.blocks.setText("Block %g of %g" % (run.block+1, run.nblocks+1))
 
 if __name__ == '__main__':
-    fname = os.path.realpath(__file__)
-    psylab.gustav.run(experimentFile=fname)
+    argv = sys.argv[1:]
+    argv.append("--experimentFile=%s" % os.path.realpath(__file__))
+    psylab.gustav.main(argv)
+
