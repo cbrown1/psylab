@@ -62,7 +62,6 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.connect(self.edit_pushButton, QtCore.SIGNAL("clicked()"), self.edit_Process)
         self.connect(self.edit_subject_list_comboBox, QtCore.SIGNAL("currentIndexChanged (const QString&)"), self.edit_load_subject_data)
         self.connect(self.edit_search_lineEdit, QtCore.SIGNAL("textEdited ( const QString& )"), self.edit_load_subject_list)
-        #self.connect(self.edit_search_exact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_search_exact_clicked)
         self.connect(self.edit_search_back_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_back)
         self.connect(self.edit_search_fwd_pushButton, QtCore.SIGNAL("clicked()"), self.edit_search_fwd)
         self.connect(self.edit_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.edit_reports_click_button)
@@ -98,13 +97,13 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.edit_user_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
         # Hack! Use bg color to `hide` the date in the protocol datewidget when none has been selected
+        # Looks like crap on linux
         palette = QtGui.QPalette(self.edit_protocol_date_dateEdit.palette())
         self.datewidget_background_color = palette.color(QtGui.QPalette.Base).getRgb()
         self.datewidget_foreground_color = palette.color(QtGui.QPalette.WindowText).getRgb()
         self.datewidget_changed_programmatically = False
         dateedit_button_style = "QSpinBox::down-button {subcontrol-origin: border; subcontrol-position: bottom left; width: 16px; "
         dateedit_button_style += "image: url(:/images/calendar.png) 1; border-width: 1px; border-top-width: 0;} "
-        #dateedit_button_style += "QSpinBox::down-arrow {image: url(:/images/calendar.png); width: 16px; height: 16px;}"
         self.edit_protocol_date_dateEdit.setStyleSheet(dateedit_button_style)
 
         self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"delete.png")))
@@ -301,10 +300,6 @@ class Subject_Manager (QtGui.QWidget, form_class):
             if self.edit_subject_protocol_dict[item.text()] != "":
                 self.edit_protocol_listWidget.item(i).setCheckState(QtCore.Qt.Checked)
         self.edit_data_changed_label.setVisible(False)
-
-    #def edit_search_exact_clicked(self, state):
-    #    self.edit_load_subject_list()
-    #    self.edit_load_subject_data(self.edit_subject_list_comboBox.currentText())
 
     def edit_load_subject_list(self, search_field=None):
         search_field = unicode(self.edit_search_lineEdit.text())
@@ -536,14 +531,22 @@ class Subject_Manager (QtGui.QWidget, form_class):
 
     def admin_init(self):
         if os.path.isfile(self.configFilePath):
+            print 'config file found'
             Config = ConfigParser.ConfigParser()
             Config.read(self.configFilePath)
             self.filename = Config.get('database', 'path')
+            print "db name found; running load_db with name %s" % self.filename
             self.admin_load_db()
         else:
+            print 'config file not found'
             if self.filename == "":
                 self.filename = 'Subjects.db'
-                self.admin_create_db(dbname=self.filename)
+                if os.path.isfile(self.filename):
+                    self.admin_load_db()
+                else:
+                    print 'db not found; running create_db with name %s' % self.filename
+                    self.admin_create_db(dbname=self.filename)
+                print "running write_config"
             self.admin_write_config()
 
     def admin_write_config(self):

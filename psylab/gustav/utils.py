@@ -159,7 +159,6 @@ class stim:
     sets = {}
     current = {}
     stimvars = []
-    debug = False
     stimarray = 0
 
 

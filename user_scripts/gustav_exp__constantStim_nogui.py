@@ -38,7 +38,6 @@ import os, sys
 import inspect
 import numpy as np
 import psylab
-#import qtForm_speech as theForm
 
 def setup(exp,run,var,stim,user):
 
