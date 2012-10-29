@@ -212,14 +212,23 @@ def setup(exp,run,var,stim,user):
                    }
 
     """CONDITION PRESENTATION ORDER
-        Use 'prompt' to prompt for condition on each block, 'random' to randomize
-        condition order, 'menu' to be able to choose from a list of conditions at
-        the start of a run, 'natural' to use natural order (1:end), or a
-        print-range style string to specify the order ('1-10, 12, 15'). You can
-        make the first item in the print range 'random' to randomize the specified
-        range.
+        Use 'prompt' to prompt for a condition on each block, 'random' to 
+        randomize condition order, 'menu' to be able to choose from a list of 
+        conditions at the start of a run, 'natural' to use natural order 
+        (1:end), or a print-range style string to specify the order 
+        ('1-10, 12, 15'). You can make the first item in the print range 
+        'random' to randomize the specified range.
     """
     var.order = 'menu'
+
+    """PROMPT CONDITIONS
+        If you add a condition name to this list, you will be prompted for 
+        a level value for it at the start of a block. In this case, the level 
+        entered will be used during the block, and the default level will be
+        ignored. This is useful if the level of a variable needs to be set 
+        at runtime (eg., the level depends on previous performance). 
+    """
+    var.prompt = []
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -239,12 +248,37 @@ def setup(exp,run,var,stim,user):
                                     # Although this is needed with quiet thresholds
     user.performance_feedback = True # Whether to provide performance feedback
 
+""" EVENT FUNCTIONS
+    If you need to do something at a particular point during an experiment, 
+    here is where you do it. Just create a function with the correct name, and 
+    it will be run at the correct time. Be sure to define the following input 
+    arguments in exactly the following order: (exp,run,var,stim,user). 
+    Available function names include:
+        
+        pre_exp :         Run at the start of the experiment
+        pre_block :       Run at the start of a block of trials
+        pre_trial :       Run at the start of a trial (eg, stimulus generation)
+        present_trial :   Run during a trial, intended to present a stimulus
+        prompt_response : Run during a trial, intended to elicite a response
+        post_trial :      Run at the end of a trial
+        post_block :      Run at the end of a block of trials
+        post_exp :        Run at the end of the experiment
+        
+    If you don't need a particular function, either comment it out or just 
+    use Python's pass statement and no code will be run:
+        
+        def pre_exp (exp,run,var,stim,user):
+            pass
+    
+"""
+
+
 def prompt_response(exp,run,var,stim,user):
     """CUSTOM PROMPT
         If you want a custom response prompt, define a function for it
         here. run.response should receive the response as a string, and
         if you want to cancel the experiment, set both run.block_on and
-        run.pylab_is_go to False
+        run.gustav_is_go to False
     """
     while True:
         #ret = exp.utils.getchar()

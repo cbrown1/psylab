@@ -161,22 +161,24 @@ def setup(exp,run,var,stim,user):
         other. So, if you have 2 fact variables A & B, each with 3 levels, you
         will end up with 9 conditions: A1B1, A1B2, A1B3, A2B1 etc..
 
-        Levels added as 'covariable' variables will simply be listed (in parallel
-        with the corresponding levels from the other variables) in the order
-        specified. So, if you have 2 'covariable' variables A & B, each with 3
-        levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. All
-        'covariable' variables must have either the same number of levels, or
-        exactly one level. When only one level is specified, that level will
+        Levels added as 'covariable' variables will simply be listed, in 
+        parallel with the corresponding levels from the other variables, in the 
+        order specified. So, if you have 2 'covariable' variables A & B, each 
+        with 3 levels, you will end up with 3 conditions: A1B1, A2B2, and A3B3. 
+        All 'covariable' variables must have either the same number of levels, 
+        or exactly one level. When only one level is specified, that level will
         be used in all 'covariable' conditions. Eg., A1B1, A2B1, A3B1, etc.
 
         You can use both types of variables in the same experiment, but both
         factorial and covariable must contain exactly the same set of variable
-        names. factorial levels are processed first, covariable levels are added
-        at the end (and then the entire list gets randomized, etc).
+        names. factorial levels are processed first, covariable levels are 
+        added at the end (and then the entire list gets randomized, etc).
 
-        Each variable (whether factorial or covariable) should have 3 properties:
-
-        'name' is the name of the variable, as a string
+        Each variable (whether factorial or covariable) should have 3 
+        properties:
+        
+        'name' is the name of the variable, as a string. Should be unique for 
+                the experiment.
 
         'type' is either 'manual' or 'stim'. 'manual' variables are ones that
                 the experimenter will handle in the stimgen. 'stim' variables
@@ -185,7 +187,8 @@ def setup(exp,run,var,stim,user):
                 files, but from different directories depending on the
                 treatment.
 
-        'levels' should be a list of strings that identify each level of interest
+        'levels' should be a list of strings that identify each level of 
+                interest
 
     """
     # TODO: for python 2.7, change these to ordered dicts, where name is the key
