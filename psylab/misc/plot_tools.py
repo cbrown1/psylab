@@ -214,3 +214,15 @@ def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
         hax.add_line(pp.Line2D([.4, .8],[.3, .4],linewidth=lw,color=c))
         hax.add_line(pp.Line2D([.4, .7],[.2, .25],linewidth=lw,color=c))
 
+
+def plot_discrete_signal(x,y):
+    
+    pos = np.where(y>0)[0]
+    neg = np.where(y<0)[0]
+    zp = np.zeros(pos.shape[0])
+    zn = np.zeros(neg.shape[0])
+    
+    pp.axhline(color='k')
+    pp.plot(x,y,'ko')
+    pp.vlines(pos,zp,y[pos])
+    pp.vlines(neg,zn,y[neg])
