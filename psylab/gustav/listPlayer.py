@@ -29,15 +29,24 @@ Useful if you preprocess all your stimuli, and have a folder for each
 condition in your experiment. Run this script from the root (where all the 
 condition folders are) with no options and you can choose a condition 
 (folder) at a time, and 10 tokens will be run, followed by another menu. 
-If you choose another condition, the next set of 10 tokens will be run, 
-and so on. 
+If you choose another condition, the next 10 tokens will be run in that 
+condition, and so on. 
+
+The type of experimental design that this is useful for is when you want to
+randomize the presentation order of your conditions, but present the 
+particular stimuli (eg., speech) in the same order across subjects. You would 
+preprocess the same set of stimuli in all conditions, and save the output to 
+separate folders. In this case, listPlay can be used to easily present the 
+conditions in a particular order (ie., you could select each condition at 
+random), and it will automatically step through the stimuli in the correct
+order across all conditions.
 
 Parameters
 ----------
   folder [-f] : Rel or abs path to condition subfolders. default = '.'
     skip [-s] : The number of tokens to skip. default = 0
        n [-n] : The number of tokens to run per condition. default = 10
-filemask [-m] : Semicolon-delimited sase-insensitive filemask list.
+filemask [-m] : Semicolon-delimited case-insensitive filemask list.
                  default = .wav
 
 Examples:
@@ -56,8 +65,8 @@ import getopt
 import medussa
 
 
-def dirlist(directory, fileExtList=[]):
-    """Returns a list of file info objects for files of particular extensions in a folder
+def getFileList(directory, fileExtList=[]):
+    """Returns a list of files of particular extensions in a folder
     """
     fileList = [os.path.normcase(f) for f in os.listdir(directory)]
     if len(fileExtList)>0:
@@ -98,7 +107,7 @@ def playSoundFiles(folder, skip, n, filemask, done):
         soundfile, hits 'r' to repeat the current soundfile, or 'q' to quit.
     """
     d=medussa.open_default_device()
-    files = dirlist(folder,filemask)
+    files = getFileList(folder,filemask)
     base = os.path.basename(folder)
     print("%s: %i files remaining" % (base, len(files)-skip))
     keepGoing = True
