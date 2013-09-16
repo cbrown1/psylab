@@ -44,6 +44,7 @@ colors_pitt['blue'] = list(np.array((0,31,91))/255.)
 colors_pitt['gold'] = list(np.array((182,162,105))/255.)
 colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
+font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
 def ax_on_page(page_width=8.5, page_height=11.):
     """Returns a matplotlib axes that resides on a full page,

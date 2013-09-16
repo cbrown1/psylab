@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Christopher Brown
+# Copyright (c) 2013 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -23,7 +23,22 @@
 # cbrown1@pitt.edu.
 #
 
-import csv_inspect
-import plot_tools
-import stats_tools
-import path_tools
+"""
+stats_tools - A set of helper functions for working with statsmodels and pandas
+"""
+
+def print_pairwise_table ( tuk, sigpairsonly=False ):
+    """Prints a reasonably formatted summary table, given the output of sm.stats.multicomp.pairwise_tukeyhsd
+    """
+    tuksumm = tuk.summary()
+    print tuksumm.title
+    print "%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0])
+    for rec in tuksumm.data[1:]:
+        if sigpairsonly and rec[5]:
+            group1 = str(tuk.groupsunique.item(rec[0]))
+            group2 = str(tuk.groupsunique.item(rec[1]))
+            vals = (group1, group2) + tuple(rec[2:])
+            print "%10s %10s %8.2g %8.2g %8.2g %8s" % vals
+    print "%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0])
+
+
