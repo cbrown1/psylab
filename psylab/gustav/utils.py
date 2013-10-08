@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2013 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -47,12 +47,12 @@ class exp:
     debug = False
     method = 'constant'
     prompt = ''
-    logString_pre_exp = None   #Write this string to the console and/or logfileat start of exp
-    logString_pre_block = None #Write this string to the console and/or logfilebefore every block
+    logString_pre_exp = None   #Write this string to the console and/or logfile at start of exp
+    logString_pre_block = None #Write this string to the console and/or logfile before every block
     logString_pre_trial = None #Write this string to the console and/or logfile before every trial
-    logString_post_trial = None#Write this string to the console and/or logfileafter every trial
-    logString_post_block = None#Write this string to the console and/or logfileafter every block
-    logString_post_exp = None  #Write this string to the console and/or logfileat end of exp
+    logString_post_trial = None#Write this string to the console and/or logfile after every trial
+    logString_post_block = None#Write this string to the console and/or logfile after every block
+    logString_post_exp = None  #Write this string to the console and/or logfile at end of exp
     logString_header = "# A log file for Gustav\n\n" #Write this string to the logfile if it is new
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ""
@@ -71,6 +71,7 @@ class exp:
     comments = ''
     disable_functions = []          # Experimenter can add function names as strings to disable them
     methodTypes = ['constant', 'staircase'] # TODO: remove methodTypes
+    quitKeys = ['/', 'q']
     stimTypes = ['files', 'manual']
     varTypes = ['stim', 'manual', 'dynamic']
     eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
@@ -81,7 +82,7 @@ class exp:
         while True:
             ret = exp.frontend.get_input(None, "Gustav!","Enter Response: ")
             # Check for quit
-            if ret in ['/', 'q']:
+            if ret in exp.quitKeys:
                 # User wants to exit. Break out of block, gustav loops
                 run.block_on = False
                 run.gustav_is_go = False
@@ -95,7 +96,7 @@ class exp:
     def prompt_condition(self,exp,run,var,stim,user):
         while True:
             ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
-            if ret in ['/', 'q']:
+            if ret in exp.quitKeys:
                 run.block_on = False
                 run.gustav_is_go = False
                 break
