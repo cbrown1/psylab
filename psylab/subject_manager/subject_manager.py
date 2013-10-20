@@ -177,12 +177,12 @@ class Subject_Manager (QtGui.QWidget, form_class):
         
         self.about_textedit.setAlignment(Qt.Qt.AlignLeft | Qt.Qt.AlignTop)
         self.about_textedit.setText("""<h3><img src='%s'>&nbsp;Subject Manager  %s</h3> 
-                                 <p><i>Copyright &copy; 2010-2012 Christopher Brown &lt;cbrown1@pitt.edu&gt;</i></p> 
+                                 <p><i>Copyright &copy; 2010-2013 Christopher Brown &lt;cbrown1@pitt.edu&gt;</i></p> 
                                  <p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and is distributed 
                                  under the terms of the GNU GPL. You are welcome to redistribute it under certain conditions; 
                                  see http://www.gnu.org/licenses/ for more information.</p>
                                  <p>Subject Manager is part of Psylab. Bug reports, bug fixes, suggestions, enhancements, or other
-                                 contributions are welcome. Go to http://code.google.com/p/psylab/ for more information and to contribute. 
+                                 contributions are welcome. Go to http://psylab.googlecode.com/ for more information and to contribute. 
                                  <p>Python Version: %s<br> 
                                  Qt Version: %s<br>
                                  PyQt Version: %s<br>
@@ -344,7 +344,10 @@ class Subject_Manager (QtGui.QWidget, form_class):
             self.edit_email_label.setText("%s" % subject[2])
             self.edit_phone_label.setText("%s" % subject[3])
             self.edit_dob_label.setText("%s" % subject[4])
-            self.edit_contact_checkBox.setChecked(bool(subject[5]))
+            if subject[5] == "True":
+                self.edit_contact_checkBox.setChecked(True)
+            else:
+                self.edit_contact_checkBox.setChecked(False)
             self.edit_notes_plainTextEdit.setPlainText("%s" % subject[6])
             c.execute("""SELECT Protocol FROM Protocols""")
             protocols = c.fetchall()
@@ -531,23 +534,22 @@ class Subject_Manager (QtGui.QWidget, form_class):
 
     def admin_init(self):
         if os.path.isfile(self.configFilePath):
-            print 'config file found'
+            print("config file found")
             Config = ConfigParser.ConfigParser()
             Config.read(self.configFilePath)
             self.filename = Config.get('database', 'path')
-            print "db name found; running load_db with name %s" % self.filename
-            self.admin_load_db()
         else:
-            print 'config file not found'
+            print("config file not found")
             if self.filename == "":
                 self.filename = 'Subjects.db'
-                if os.path.isfile(self.filename):
-                    self.admin_load_db()
-                else:
-                    print 'db not found; running create_db with name %s' % self.filename
-                    self.admin_create_db(dbname=self.filename)
-                print "running write_config"
+            print("running write_config")
             self.admin_write_config()
+        if os.path.isfile(self.filename):
+            print("db file found: %s" % self.filename)
+            self.admin_load_db()
+        else:
+            print("db file not found; running create_db with name %s" % self.filename)
+            self.admin_create_db(dbname=self.filename)
 
     def admin_write_config(self):
         Config = ConfigParser.ConfigParser()
@@ -912,9 +914,13 @@ class Subject_Manager (QtGui.QWidget, form_class):
             if reply == QtGui.QMessageBox.Cancel:
                 return;
         # Check for unique subject number
-        c.execute("""SELECT MAX(SubjN) FROM Subjects""")
         subj_new = unicode(self.add_subject_lineEdit.text()).strip()
-        subj_db = unicode(int(c.fetchone()[0]) + 1)
+        c.execute("""SELECT MAX(SubjN) FROM Subjects""")
+        ret = c.fetchone()[0]
+        if ret:
+            subj_db = unicode(int(ret) + 1)
+        else:
+            subj_db = unicode(1)
         if (subj_new == subj_db):
             reply = QtGui.QMessageBox.question(self, 'Subject Manager',
              "Subject Number Confirmed:\n\n" + subj_new, QtGui.QMessageBox.Ok)
