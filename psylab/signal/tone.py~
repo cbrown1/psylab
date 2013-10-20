@@ -79,11 +79,11 @@ def tone(f, fs, dur, **kwargs):
     amp = kwargs.get('amp', 1);
     phase = kwargs.get('phase', 0);
 
-    f = np.array(np.float64(f));
-    fs = np.float64(fs);
-    dur = np.float64(dur);
-    amp = np.array(np.float64(amp));
-    phase = np.float64(phase)*np.pi/180.;
+    f = np.array(np.float32(f));
+    fs = np.float32(fs);
+    dur = np.float32(dur);
+    amp = np.array(np.float32(amp));
+    phase = np.float32(phase)*np.pi/180.;
 
     if f.size == 2:
         dur = np.round((dur / 1000.) * fs);

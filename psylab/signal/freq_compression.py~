@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Christopher Brown
+# Copyright (c) 2010-2012 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -69,7 +69,7 @@ def solafs_offline(x, w_ov, s_s, s_a, k_max):
     """Time-domain scaling using the SOLAFS algorithm.
     
     The compression ratio is determined by alpha = s_s / s_a.
-    
+
     alpha > 1 implies time-domain expansion,
     alpha < 1 implies time-domain compression.
     
@@ -132,50 +132,54 @@ def solafs_offline(x, w_ov, s_s, s_a, k_max):
 
     return y
 
-def freq_compress(x, semitones, 
-                  window=400,
+def freq_compress(x, semitones, window,
+                  interp_func=interp.interp_lin,
                   tdsalg="tdhs",
                   k_max = 100):
     """Performs frequency compression on a signal in the time domain.
-    
+
+
     Parameters
     ----------
     x : numpy.ndarray
         Array of samples
-    
+
     semitones : int
         Number of semitones by which to compress the pitch.
-    
-    window : scalar
-        The size of the sampling window, impacts quality for t.
-    
+
+    window : array
+        The sampling window, impacts quality for t.
+
+    interp_func : function
+        An interpolation function to use.
+
     tdsalg : str
         What algorithm to use in performing time-domain scaling.
         Permissible values are "tdhs" and "solafs".
-    
+
     k_max : int
         Search distance for the next overlapping window for SOLAFS.
         Not used if tdsalg == "tdhs".
-    
+
     Returns
     -------
     y : ndarray
-        The frequency-compressed signal.
-    
+        The pitch-compressed source signal.
+
     Examples
     --------
     >>>
     """
-    w = np.hanning(window)
     alpha = (2.0)**(float(semitones)/12)
-    w_ov = (1 - 1./alpha) * window
+    ws = window.size
+    w_ov = (1 - 1./alpha) * ws
     if tdsalg == "tdhs":
-        y = tdhs(x, w, w_ov)
-        y = interp.interp(y, int(x.size * alpha))[:x.size]
+        y = tdhs(x, window, w_ov)
+        #y = interp_func(y, int(x.size * alpha))[:x.size]
         return y
     elif tdsalg == "solafs":
-        y = solafs_offline(x, int(w_ov), window, int(window*alpha), k_max)
-        y = interp.interp(y, int(x.size))
+        y = solafs_offline(x, int(w_ov), ws, int(ws*alpha), k_max)
+        #y = interp_func(y, int(x.size))
         return y
     else:
         raise ValueError("`tdsalg` must be 'tdhs' or 'solafs'.")

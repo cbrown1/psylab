@@ -42,8 +42,7 @@ fconv - Convolves two signals using FFT-based fast convolution
 filterbank - Filters the input array with a bank of filters [UNTESTED]
 freq_compress - Performs frequency compression on a signal
 hcomplex - Generates harmonic complexes
-interp_lin - Interpolates a signal using linear interpolation
-interp_spline - Interpolates a signal using cubic spline interpolation
+interp - Interpolates a signal to a specified number of points
 lts - Computes a long-term spectrum of a signal
 magspec - Computes the magnitude spectrum of a signal
 mix - Mixes [adds] signals at specified offsets, zero padding as needed
@@ -83,7 +82,7 @@ from .equate import equate
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .f0 import f0
 from .freq_compression import freq_compress
-from .interp import interp_bad, interp_lin, interp_spline
+from .interp import interp
 from .lts import lts
 from .magspec import magspec
 from .mix import mix

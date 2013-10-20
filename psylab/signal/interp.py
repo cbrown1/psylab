@@ -26,11 +26,10 @@
 import numpy as np
 from scipy import interpolate
 
-def interp_bad(y, n):
-    '''Returns y interpolated to n points using bad interpolation
-        (completely aliased)
+def interp(sig, n, kind='linear'):
+    '''Returns y interpolated to n points using specified interpolation
      
-        BROKEN!
+        This is just a convenience function that wraps scipy's interp1d.
 
         Parameters
         ----------
@@ -38,61 +37,21 @@ def interp_bad(y, n):
             The input signal.
         n : scalar
             The number of points to interpolate to.
+        kind: str or int
+            The type of interpolation to use. This gets passed as is to the 
+            'kind' parameter of scipy.interpolate.interp1d. Can be 'zero' 
+            (completely aliased), 'lin', and so on. Consult the scipy 
+            function's docstring for more info.
         
         Returns
         -------
         y : array
             The interpolated signal.
 '''
-    x = np.arange(0,len(y))
-    new_x = np.linspace(0,len(y)-1,n)
-    f = interpolate.interp1d(x, y)
-    new_y = f(new_x) 
-    return np.floor(new_y)
 
-def interp_lin(y, n):
-    '''Interpolates a signal using linear interpolation
-        
-        Returns y interpolated to n points using linear interpolation
-        
-        Parameters
-        ----------
-        sig : array
-            The input signal.
-        n : scalar
-            The number of points to interpolate to.
-        
-        Returns
-        -------
-        y : array
-            The interpolated signal.
-    '''
-    x = np.arange(0,len(y))
-    new_x = np.linspace(0,len(y)-1,n)
-    f = interpolate.interp1d(x, y)
-    new_y = f(new_x) 
-    return new_y
+    x = np.linspace(0,sig.size,sig.size)
+    xx = np.linspace(0,sig.size,n)
+    f = interpolate.interp1d(x,sig)
+    yy = f(xx)
 
-def interp_spline(y, n):
-    '''Interpolates a signal using cubic spline interpolation
-        
-        Returns y interpolated to n points using cubic spline interpolation
-        
-        Parameters
-        ----------
-        sig : array
-            The input signal.
-        n : scalar
-            The number of points to interpolate to.
-        
-        Returns
-        -------
-        y : array
-            The interpolated signal.
-    '''
-    from scipy import interpolate
-    x = np.arange(0,len(y))
-    new_x = np.linspace(0,len(y)-1,n)
-    tck = interpolate.splrep(x,y)
-    new_y = interpolate.splev(new_x, tck)
-    return new_y
+    return(yy)

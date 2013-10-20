@@ -102,8 +102,10 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
 
     if subjectID == None:
         exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
-        if exp.subjID == '':
-            print("No Subject ID entered, Gustav cancelled at user request")
+        q = exp.quitKeys
+        q.append('')
+        if exp.subjID in q:
+            print("Gustav cancelled at user request")
             return
     else:
         exp.subjID = str(subjectID)

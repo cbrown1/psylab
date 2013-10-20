@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Christopher Brown
+# Copyright (c) 2010-2012 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -23,9 +23,29 @@
 # cbrown1@pitt.edu.
 #
 
-import csv_inspect
-import plot_tools
-import stats_tools
-import path_tools
-import textgrid
+'''
+PsyLab - Psychophysics Lab
+
+A loose collection of modules useful for various aspects of running
+psychophysical experiments, although several might be more generally
+useful.
+
+In addition to the modules that are imported automatically, others include:
+
+subject_manager: User interface with many features for a subject info database
+tdt2: interface tucker davis system II hardware via the serial port
+
+'''
+
+__version__ = '0.3'
+
+#from array import array, nanproduct, nanmean
+#from dataview import dataview
+#from misc import csv_inspect, plot_tools, path_tools
+from . import misc
+from . import signal
+from . import stats
+from . import gustav
+#import stats
+#import gustav
 
