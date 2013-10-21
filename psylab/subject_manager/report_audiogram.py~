@@ -178,7 +178,10 @@ def proc_subject(filename, subn):
         fh.show()
 
 if __name__ == "__main__":
-    filename = sys.argv[1].strip("\"").strip("\'")
-    subn = sys.argv[2]
-    proc_subject(filename, subn)
+    if sys.argv[1].lower() == 'report_type':
+        print( "subject" )
+    else:
+        filename = sys.argv[1].strip("\"").strip("\'")
+        subn = sys.argv[2]
+        proc_subject(filename, subn)
 
