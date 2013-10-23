@@ -30,7 +30,8 @@ import matplotlib.patches as mpp
 from matplotlib.lines import Line2D
 import numpy as np
 
-subject = True
+# The report must have the property 'name'
+name = "Audiogram"
 
 def draw_page():
 
@@ -130,7 +131,12 @@ def is_number(s):
         return False
 
 def proc_subject(filename, subn):
-
+    """
+    the report must have a function named 'proc_subject' for the report 
+    to show up on the edit subject page ie, to run it on individual subjects.
+    In this case, the full path to the db and the subject number will be 
+    passed to the function.
+    """
     fh,ap = draw_page()
 
     af = fh.add_axes([.2, .3, .5*11/8.5, .5*8.5/11])

@@ -24,6 +24,7 @@
 #
 
 import sys, os
+import imp
 import sqlite3
 import datetime
 import platform
@@ -81,7 +82,9 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.connect(self.admin_protocols_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_protocols_remove)
         self.connect(self.admin_user_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_add)
         self.connect(self.admin_user_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_remove)
-        self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
+        self.connect(self.admin_user_import_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_import)
+        self.connect(self.admin_user_export_pushButton, QtCore.SIGNAL("clicked()"), self.admin_user_export)
+        #self.connect(self.admin_db_create_pushButton, QtCore.SIGNAL("clicked()"), self.admin_create_db)
         self.connect(self.admin_db_open_pushButton, QtCore.SIGNAL("clicked()"), self.admin_open_db)
         self.connect(self.admin_db_export_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_schema)
         self.connect(self.admin_db_import_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_import_schema)
@@ -107,14 +110,14 @@ class Subject_Manager (QtGui.QWidget, form_class):
         dateedit_button_style += "image: url(:/images/calendar.png) 1; border-width: 1px; border-top-width: 0;} "
         self.edit_protocol_date_dateEdit.setStyleSheet(dateedit_button_style)
 
-        self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"delete.png")))
+        self.admin_protocols_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"table_delete.png")))
         self.admin_protocols_remove_pushButton.setText("")
 
-        self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"add.png")))
+        self.admin_protocols_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"table_add.png")))
         self.admin_protocols_add_pushButton.setText("")
 
-        self.admin_db_create_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"database_add.png")))
-        self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
+        #self.admin_db_create_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"database_add.png")))
+        #self.admin_db_create_pushButton.setStyleSheet ("text-align: left");
         
         self.admin_db_open_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"database_folder.png")))
         self.admin_db_open_pushButton.setStyleSheet ("text-align: left");
@@ -125,16 +128,22 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.admin_db_import_schema_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"database_plain.png")))
         self.admin_db_import_schema_pushButton.setStyleSheet ("text-align: left");
         
-        self.admin_user_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"delete.png")))
+        self.admin_user_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard_delete.png")))
         self.admin_user_remove_pushButton.setText("")
 
-        self.admin_user_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"add.png")))
+        self.admin_user_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard_add.png")))
         self.admin_user_add_pushButton.setText("")
 
-        self.admin_reports_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"delete.png")))
+        self.admin_user_import_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard_plain.png")))
+        self.admin_user_import_pushButton.setText("")
+
+        self.admin_user_export_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard_save.png")))
+        self.admin_user_export_pushButton.setText("")
+
+        self.admin_reports_remove_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart_delete.png")))
         self.admin_reports_remove_pushButton.setText("")
         
-        self.admin_reports_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"add.png")))
+        self.admin_reports_add_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart_add.png")))
         self.admin_reports_add_pushButton.setText("")
 
         self.admin_reports_run_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart_go.png")))
@@ -223,9 +232,9 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.edit_user_tableWidget.setToolTip("""<p>This is a list of user variables and their values for each subject</p> 
                                                 <p>If you change any values, be sure to click save or the changes will be lost</p>
                                                 """)
-        self.admin_db_create_pushButton.setToolTip("Click to create a new, empty database")
+        #self.admin_db_create_pushButton.setToolTip("Click to create a new, empty database")
         self.admin_db_open_pushButton.setToolTip("Click to open an existing database")
-        self.admin_db_export_schema_pushButton.setToolTip("Click export all data in database to an sql file")
+        self.admin_db_export_schema_pushButton.setToolTip("Click to export all data in database to an sql file")
         self.admin_db_import_schema_pushButton.setToolTip("""<p>Click to import data from an sql file</p>
                                                     <p><b>WARNING! All current data will be lost!</b></p>
                                                     <p>You should backup your DB regularly
@@ -239,6 +248,8 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.admin_reports_run_pushButton.setToolTip("Run selected Report")
         self.admin_user_add_pushButton.setToolTip("Add a new User Variable")
         self.admin_user_remove_pushButton.setToolTip("Delete selected User Variable")
+        self.admin_user_import_pushButton.setToolTip("Import User Variable data from a text file")
+        self.admin_user_export_pushButton.setToolTip("Export User Variable data to a text file")
         self.admin_reports_script_pushButton.setToolTip("Browse to select a Report script")
         self.admin_protocols_listWidget.setToolTip("""<p>The list of Protocols</p>
                                                     <p>Add new protocols, or delete unneeded ones here</p>
@@ -591,18 +602,19 @@ class Subject_Manager (QtGui.QWidget, form_class):
 
     def admin_create_db(self, dbname=None):
         if dbname is None:
-            ret = self.get_file_new(title = 'Enter new database name to create:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
+            ret = self.get_file_new(title = 'Enter new database name to create, or select an existing db file:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
             if ret != '':
                 dbname = ret
         if dbname is not None:
             self.filename = dbname
-            qry = open(os.path.join(self.script_path,'New_DB_Schema.sql'), 'r').read()
-            conn = sqlite3.connect(dbname)
-            c = conn.cursor()
-            c.executescript(qry)
-            conn.commit()
-            c.close()
-            conn.close()
+            if not os.path.exists(self.filename):
+                qry = open(os.path.join(self.script_path,'New_DB_Schema.sql'), 'r').read()
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.executescript(qry)
+                conn.commit()
+                c.close()
+                conn.close()
             self.admin_write_config()
             self.add_init()
             self.add_edit_protocol_populate()
@@ -610,13 +622,17 @@ class Subject_Manager (QtGui.QWidget, form_class):
             self.admin_load_db()
 
     def admin_open_db(self):
-        ret = self.get_file_existing(title = 'Select existing DB file to open:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
+        ret = self.get_file_new(title = 'Enter new database name to create, or select an existing db file:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
+        #ret = self.get_file_existing(title = 'Select existing DB file to open:', file_types = "SQLite DB Files (*.db);;All files (*.*)")
         if ret != '':
             self.filename = ret
-            self.add_init()
-            self.add_edit_protocol_populate()
-            self.edit_user_populate()
-            self.admin_load_db()
+            if os.path.exists(self.filename):
+                self.add_init()
+                self.add_edit_protocol_populate()
+                self.edit_user_populate()
+                self.admin_load_db()
+            else:
+                self.admin_create_db(self.filename)
 
     def admin_export_schema(self):
         ret = self.get_file_new(title = 'Enter a new SQL filename to save data to:', file_types = "SQL Files (*.sql);;All files (*.*)")
@@ -644,43 +660,23 @@ class Subject_Manager (QtGui.QWidget, form_class):
             conn.close()
 
     def admin_import_schema(self):
-        ret = self.get_file_existing(title = 'Select SQL file to load from:', file_types = "SQL Files (*.sql);;All files (*.*)")
-        if ret != '':
-            file_content = open(ret)
-            items = file_content.readlines()
-            for useritem in items:
-                useritem = useritem.strip()
-                if useritem is not "":
-                    item = QtGui.QListWidgetItem(useritem)
-                    item.setIcon(QtGui.QIcon(os.path.join(self.image_path,"card.png")))
-                    item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
-                    self.admin_user_listWidget.insertItem(-1, item)
-                    conn = sqlite3.connect(self.filename);
-                    c = conn.cursor();
-                    c.execute("""INSERT INTO UserVars (UserVar) VALUES ('%s')""" % useritem)
-                    print("""INSERT INTO UserVars (UserVar) VALUES ('%s')""" % useritem)
-                    conn.commit()
-                    c.close()
-                    conn.close()
-                    self.sqlite_column_add(self.filename, 'Subjects', 'User_%s' % useritem)
-            self.edit_user_populate()
             
-#            overwrite = self.get_yesnoquit(title = 'Subject Manager', prompt = 'This is important!\n\nClick yes if you want to delete the current subject db and create a new one with the selected schema. Click no if you want to load the selected schema to the current subject db. Click cancel to do nothing.\n\nDo you want to overwrite the existing subject db file using the selected schema (*all data will be lost!*)?')
-#            if overwrite == True:
-#                os.remove(self.filename)
-#                qry = open(ret, 'r').read()
-#                conn = sqlite3.connect(self.filename)
-#                c = conn.cursor()
-#                c.executescript(qry)
-#                conn.commit()
-#                c.close()
-#                conn.close()
-#                self.filePath_label.setText(self.filename)
-#                self.add_init()
-#                self.add_edit_protocol_populate()
-#                self.edit_user_populate()
-#                self.edit_load_subject_list()
-#                self.admin_load_db()
+            overwrite = self.get_yesno(title = 'Subject Manager', prompt = 'This is a very big deal!\n\nClick yes if you want to delete the current subject db and create a new one with the selected schema. Click no to do nothing.\n\nDo you want to overwrite the existing subject db file using the selected schema (*all data will be lost!*)?')
+            if overwrite == True:
+                os.remove(self.filename)
+                qry = open(ret, 'r').read()
+                conn = sqlite3.connect(self.filename)
+                c = conn.cursor()
+                c.executescript(qry)
+                conn.commit()
+                c.close()
+                conn.close()
+                self.filePath_label.setText(self.filename)
+                self.add_init()
+                self.add_edit_protocol_populate()
+                self.edit_user_populate()
+                self.edit_load_subject_list()
+                self.admin_load_db()
             
     
     def admin_protocols_add(self):
@@ -752,7 +748,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT Name, Args FROM Reports""")
+        c.execute("""SELECT Name, Path FROM Reports""")
         self.admin_reports_listWidget.clear()
         self.edit_reports_listWidget.clear()
         #self.add_protocol_comboBox.clear()
@@ -762,15 +758,8 @@ class Subject_Manager (QtGui.QWidget, form_class):
             item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
             item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.admin_reports_listWidget.insertItem(-1, item_a)
-            args = row[1].split(" ")
-            data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
-            datal = ["$%s" % i for i in data.split(",")]
-            subj = False
-            for arg in args:
-                if arg in datal:
-                    subj = True
-                    break
-            if subj:
+            s = imp.load_source("report",row[1])
+            if hasattr(s, 'proc_subject'):
                 item_e = QtGui.QListWidgetItem(row[0])
                 item_e.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
                 item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
@@ -824,12 +813,47 @@ class Subject_Manager (QtGui.QWidget, form_class):
         if ret != '':
             self.admin_reports_script_lineEdit.setText(ret)
 
+    def admin_user_import(self):
+        ret = self.get_file_existing(title = 'Select a file to load uservar data from:', file_types = "Text Files (*.txt);;All files (*.*)")
+        if ret != '':
+            file_content = open(ret)
+            items = file_content.readlines()
+            for useritem in items:
+                useritem = useritem.strip()
+                if useritem is not "":
+                    item = QtGui.QListWidgetItem(useritem)
+                    item.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard.png")))
+                    item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+                    self.admin_user_listWidget.insertItem(-1, item)
+                    conn = sqlite3.connect(self.filename);
+                    c = conn.cursor();
+                    c.execute("""INSERT INTO UserVars (UserVar) VALUES ('%s')""" % useritem)
+                    print("""INSERT INTO UserVars (UserVar) VALUES ('%s')""" % useritem)
+                    conn.commit()
+                    c.close()
+                    conn.close()
+                    self.sqlite_column_add(self.filename, 'Subjects', 'User_%s' % useritem)
+            self.edit_user_populate()
+
+    def admin_user_export(self):
+        ret = self.get_file_new(title = 'Enter a new filename to save data to:', file_types = "Text Files (*.txt);;All files (*.*)")
+        if ret != '':
+            conn = sqlite3.connect(self.filename)
+            c = conn.cursor()
+            c.execute("""SELECT UserVar FROM UserVars""")
+            f = open('myfile','w')
+            for row in c:
+                f.write('%s\n' % row[0]) # python will convert \n to os.linesep
+            f.close()
+            c.close()
+            conn.close()
+
     def admin_user_add(self):
         ret = self.get_input(title = 'Subject Manager', prompt = 'Enter a user variable name with letters and numbers only.\nSpaces will be replaced with _')
         if ret != '':
             ret = ret.replace(" ","_")
             item = QtGui.QListWidgetItem(ret)
-            item.setIcon(QtGui.QIcon(os.path.join(self.image_path,"card.png")))
+            item.setIcon(QtGui.QIcon(os.path.join(self.image_path,"vcard.png")))
             item.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.admin_user_listWidget.insertItem(-1, item)
             #self.admin_user_listWidget.insertItem(-1, ret)
@@ -1077,10 +1101,20 @@ class Subject_Manager (QtGui.QWidget, form_class):
         sys.stdout = None # Avoid the "Redirecting output to win32trace
                             # remote collector" message from showing in stdout
         #ret = QtGui.QFileDialog.getSaveFileName(parent, title, default_dir, file_types)
-        ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
+        dlg = QtGui.QFileDialog(parent)
+        dlg.setFileMode(QtGui.QFileDialog.AnyFile)
+        dlg.setAcceptMode(QtGui.QFileDialog.AcceptOpen)
+        dlg.setWindowTitle(title)
+        dlg.setDirectory(default_dir)
+        dlg.setFilter(file_types)
+        if dlg.exec_() != QtGui.QDialog.Accepted:
+            sys.stdout = STDOUT
+            return ''
+        else:
+            sys.stdout = STDOUT
+            return unicode(dlg.selectedFiles()[0])
 
-        sys.stdout = STDOUT
-        return str(ret)
+        #ret = QtGui.QFileDialog.getSaveFileName(parent, title, default_dir, file_types)
 
     def get_file_save(parent=None, title = 'Open File', default_dir = "", file_types = "All files types (*.*)"):
         """Opens a file dialog, returns file path as a string
@@ -1092,7 +1126,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             app = QtGui.QApplication([])
         sys.stdout = None # Avoid the "Redirecting output to win32trace
                             # remote collector" message from showing in stdout
-        ret = QtGui.QFileDialog.getSaveFileName(parent, title, default_dir, file_types)
+        ret = QtGui.QFileDialog.getSaveFileName(parent, title, default_dir, file_types, options=0)
         #ret = QtGui.QFileDialog.getOpenFileName(parent, title, default_dir, file_types)
 
         sys.stdout = STDOUT
