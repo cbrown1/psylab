@@ -25,6 +25,7 @@
 
 import sys, os
 import imp
+import inspect
 import sqlite3
 import datetime
 import platform
@@ -89,9 +90,10 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.connect(self.admin_db_export_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_export_schema)
         self.connect(self.admin_db_import_schema_pushButton, QtCore.SIGNAL("clicked()"), self.admin_import_schema)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
-        self.connect(self.admin_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_run_buttonclick)
         self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemDoubleClicked ( QListWidgetItem * )"), self.admin_reports_run_listclick)
-        self.connect(self.admin_reports_script_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_script_browse)
+#        self.connect(self.admin_reports_listWidget, QtCore.SIGNAL("itemClicked ( QListWidgetItem *, QListWidgetItem *)"), self.admin_reports_selected)
+        self.connect(self.admin_reports_run_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_run_buttonclick)
+#        self.connect(self.admin_reports_script_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_script_browse)
         
         self.connect(self.admin_reports_add_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_add)
         self.connect(self.admin_reports_remove_pushButton, QtCore.SIGNAL("clicked()"), self.admin_reports_remove)
@@ -149,8 +151,8 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.admin_reports_run_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart_go.png")))
         self.admin_reports_run_pushButton.setText("")
 
-        self.admin_reports_script_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"folder_add.png")))
-        self.admin_reports_script_pushButton.setText("")
+#        self.admin_reports_script_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"folder_add.png")))
+#        self.admin_reports_script_pushButton.setText("")
         
         self.edit_pushButton.setIcon(QtGui.QIcon(os.path.join(self.image_path,"user_save.png")))
         self.edit_pushButton.setText("Save")
@@ -250,7 +252,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.admin_user_remove_pushButton.setToolTip("Delete selected User Variable")
         self.admin_user_import_pushButton.setToolTip("Import User Variable data from a text file")
         self.admin_user_export_pushButton.setToolTip("Export User Variable data to a text file")
-        self.admin_reports_script_pushButton.setToolTip("Browse to select a Report script")
+#        self.admin_reports_script_pushButton.setToolTip("Browse to select a Report script")
         self.admin_protocols_listWidget.setToolTip("""<p>The list of Protocols</p>
                                                     <p>Add new protocols, or delete unneeded ones here</p>
                                                     <p><b>WARNING! Deleting a protocol will
@@ -527,28 +529,34 @@ class Subject_Manager (QtGui.QWidget, form_class):
     def edit_reports_run(self, report):
             conn = sqlite3.connect(self.filename)
             c = conn.cursor()
-            c.execute("""SELECT Path, Args FROM Reports WHERE Name == '%s'""" % report)
+            c.execute("""SELECT Path FROM Reports WHERE Name == '%s'""" % report)
             ret = c.fetchone()
-            args = ret[1].split(" ")
-            subjn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
-            data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
-            datal = data.split(",")
-            c.execute("""SELECT %s FROM Subjects WHERE SubjN == '%s'""" % (data, subjn))
-            rets = c.fetchone()
-            c.close()
-            conn.close()
-            for i in range(len(args)):
-                args[i] = args[i].replace("$db", "\""+os.path.abspath(self.filename)+"\"")
-                for dat,var in zip(datal,rets):
-                    args[i] = args[i].replace("$%s" % dat, var)
-            saved_argv = sys.argv
-            sys.argv[1:] = args
-            i = 0
-            for arg in sys.argv:
-                print i, arg
-                i += 1
-            runpy.run_path(ret[0], run_name="__main__")
-            sys.argv = saved_argv # restore sys.argv
+
+            s = imp.load_source("report",ret[0])
+            if hasattr(s, 'proc_subject'):
+                i = inspect.getargspec(s.proc_subject)
+                args = i[0]
+
+                subjn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
+                data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
+                datal = data.split(",")
+                c.execute("""SELECT %s FROM Subjects WHERE SubjN == '%s'""" % (data, subjn))
+                rets = c.fetchone()
+                c.close()
+                conn.close()
+                for i in range(len(args)):
+                    args[i] = args[i].replace("db", os.path.abspath(self.filename))
+                    for dat,var in zip(datal,rets):
+                        args[i] = args[i].replace("%s" % dat, var)
+                s.proc_subject(*args)
+                #saved_argv = sys.argv
+                #sys.argv[1:] = args
+                #i = 0
+                #for arg in sys.argv:
+                #    print i, arg
+                #    i += 1
+                #runpy.run_path(ret[0], run_name="__main__")
+                #sys.argv = saved_argv # restore sys.argv
 
             #execfile(ret[0])
 
@@ -684,7 +692,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
         if ret != '':
             ret = ret.replace(" ","_")
             item_a = QtGui.QListWidgetItem(ret)
-            item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"chart_pie.png")))
+            item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"table.png")))
             item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
             self.admin_protocols_listWidget.insertItem(-1, item_a)
             #self.admin_protocols_listWidget.insertItem(-1, ret)
@@ -744,7 +752,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             execfile(ret[0])
         else:
             print("This report appears to require individual subject information, and thus should be run from the 'Browse' tab with the desired subject selected")
-            
+        
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
@@ -753,18 +761,24 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.edit_reports_listWidget.clear()
         #self.add_protocol_comboBox.clear()
         for row in c:
-            #if  (os.path.isfile(row[1])):
-            item_a = QtGui.QListWidgetItem(row[0])
-            item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
-            item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
-            self.admin_reports_listWidget.insertItem(-1, item_a)
-            s = imp.load_source("report",row[1])
-            if hasattr(s, 'proc_subject'):
-                item_e = QtGui.QListWidgetItem(row[0])
-                item_e.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
-                item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
-                self.edit_reports_listWidget.insertItem(-1, item_e)
-            #self.edit_reports_listWidget.item(0).setSelected(True)
+            if  not (os.path.isfile(row[1])):
+                print ( 'Report file not found: %s' % row[1])
+            else:
+                s = imp.load_source("report",row[1])
+                if not hasattr(s, 'name'):
+                    print ( 'Report file must have a `name` property: %s' % row[0])
+                else:
+                    report_name = s.name
+                    item_a = QtGui.QListWidgetItem(report_name)
+                    item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
+                    item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+                    self.admin_reports_listWidget.insertItem(-1, item_a)
+                    if hasattr(s, 'proc_subject'):
+                        item_e = QtGui.QListWidgetItem(report_name)
+                        item_e.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
+                        item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
+                        self.edit_reports_listWidget.insertItem(-1, item_e)
+                    #self.edit_reports_listWidget.item(0).setSelected(True)
         c.close()
         conn.close()
         
@@ -773,21 +787,27 @@ class Subject_Manager (QtGui.QWidget, form_class):
             val = self.admin_reports_listWidget.currentItem().text()
             conn = sqlite3.connect(self.filename)
             c = conn.cursor()
-            c.execute("""SELECT Name, Path, Args FROM Reports where Name == '%s'""" % val)
+            c.execute("""SELECT Name, Path FROM Reports where Name == '%s'""" % val)
             row = c.fetchone()
-            self.admin_reports_name_lineEdit.setText(row[0])
+            #self.admin_reports_name_lineEdit.setText(row[0])
             self.admin_reports_script_lineEdit.setText(row[1])
-            self.admin_reports_args_lineEdit.setText(row[2])
+            #self.admin_reports_args_lineEdit.setText(row[2])
     
     def admin_reports_add(self):
-        if (self.admin_reports_name_lineEdit.text() != '') and (self.admin_reports_script_lineEdit.text() != '') and (os.path.isfile(self.admin_reports_script_lineEdit.text())):
-            ret_name = unicode(self.admin_reports_name_lineEdit.text()).replace(" ","_")
+        ret = self.get_file_existing(title = 'Subject Manager', default_dir = "", file_types = "Python Scripts (*.py)")
+        if os.path.exists(ret):
+            s = imp.load_source("report",ret)
+            if not hasattr(s, 'name'):
+                print ('The selected script must have a `name` property: %s' % ret)
+                return None
+#        if (self.admin_reports_name_lineEdit.text() != '') and (self.admin_reports_script_lineEdit.text() != '') and (os.path.isfile(self.admin_reports_script_lineEdit.text())):
+            self.admin_reports_script_lineEdit.setText(ret)
+            ret_name = s.name
             ret_path = unicode(self.admin_reports_script_lineEdit.text())
-            ret_args = unicode(self.admin_reports_args_lineEdit.text())
             conn = sqlite3.connect(self.filename);
             c = conn.cursor();
             c.execute("""Delete from Reports where Name == '%s'""" % ret_name)
-            c.execute("""INSERT INTO Reports (Name, Path, Args) VALUES ('%s', '%s', '%s')""" % (ret_name,ret_path,ret_args))
+            c.execute("""INSERT INTO Reports (Name, Path) VALUES ('%s', '%s')""" % (ret_name,ret))
             conn.commit()
             c.close()
             conn.close()
@@ -841,7 +861,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             conn = sqlite3.connect(self.filename)
             c = conn.cursor()
             c.execute("""SELECT UserVar FROM UserVars""")
-            f = open('myfile','w')
+            f = open(ret,'w')
             for row in c:
                 f.write('%s\n' % row[0]) # python will convert \n to os.linesep
             f.close()

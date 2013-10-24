@@ -478,7 +478,7 @@
        <rect>
         <x>5</x>
         <y>130</y>
-        <width>151</width>
+        <width>161</width>
         <height>91</height>
        </rect>
       </property>
@@ -500,9 +500,9 @@
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
-       <x>292</x>
+       <x>302</x>
        <y>35</y>
-       <width>181</width>
+       <width>171</width>
        <height>226</height>
       </rect>
      </property>
@@ -514,15 +514,9 @@
        <rect>
         <x>2</x>
         <y>20</y>
-        <width>179</width>
+        <width>168</width>
         <height>176</height>
        </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>179</width>
-        <height>0</height>
-       </size>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -562,7 +556,7 @@
      <widget class="QLabel" name="edit_data_changed_label">
       <property name="geometry">
        <rect>
-        <x>15</x>
+        <x>10</x>
         <y>200</y>
         <width>71</width>
         <height>21</height>
@@ -581,7 +575,7 @@
      <widget class="QPushButton" name="edit_pushButton">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>90</x>
         <y>200</y>
         <width>81</width>
         <height>21</height>
@@ -829,7 +823,7 @@
     <widget class="QGroupBox" name="groupBox_9">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>170</x>
        <y>35</y>
        <width>131</width>
        <height>131</height>
@@ -894,7 +888,7 @@
     <widget class="QGroupBox" name="groupBox_10">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>170</x>
        <y>165</y>
        <width>131</width>
        <height>96</height>
@@ -999,9 +993,9 @@
      <widget class="QListWidget" name="admin_protocols_listWidget">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>5</x>
         <y>20</y>
-        <width>151</width>
+        <width>146</width>
         <height>71</height>
        </rect>
       </property>
@@ -1189,10 +1183,10 @@
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>159</x>
-       <y>118</y>
-       <width>151</width>
-       <height>141</height>
+       <x>0</x>
+       <y>110</y>
+       <width>311</width>
+       <height>151</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1205,7 +1199,7 @@
       <property name="geometry">
        <rect>
         <x>75</x>
-        <y>117</y>
+        <y>120</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1228,7 +1222,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>117</y>
+        <y>120</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1252,7 +1246,7 @@
        <rect>
         <x>0</x>
         <y>20</y>
-        <width>151</width>
+        <width>121</width>
         <height>71</height>
        </rect>
       </property>
@@ -1263,12 +1257,100 @@
        <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
      </widget>
+     <widget class="QLineEdit" name="admin_reports_name_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>20</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>22</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>52</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Script</string>
+      </property>
+     </widget>
      <widget class="QLineEdit" name="admin_reports_script_lineEdit">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>93</y>
-        <width>151</width>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="admin_reports_script_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>285</x>
+        <y>50</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {color: green; padding: 0px;}</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>82</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Args</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="admin_reports_args_lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>165</x>
+        <y>80</y>
+        <width>141</width>
         <height>21</height>
        </rect>
       </property>
@@ -1280,7 +1362,7 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>117</y>
+        <y>120</y>
         <width>21</width>
         <height>21</height>
        </rect>

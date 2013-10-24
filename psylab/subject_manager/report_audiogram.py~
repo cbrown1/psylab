@@ -130,10 +130,12 @@ def is_number(s):
     except ValueError:
         return False
 
-def proc_subject(filename, subn):
+def proc_subject(db, SubjN):
     """
     the report must have a function named 'proc_subject' for the report 
     to show up on the edit subject page ie, to run it on individual subjects.
+    In this case, the full path to the db and the subject number will be 
+    passed to the function.
     """
     fh,ap = draw_page()
 
@@ -142,8 +144,8 @@ def proc_subject(filename, subn):
 
     #af.text(8,50,'V',horizontalalignment='center',verticalalignment='center', rotation=45,color='r',fontweight='bold', fontsize=14)
     #af.plot(8,50,marker='v',color='r')
-    print (filename)
-    conn = sqlite3.connect(filename)
+    print (db)
+    conn = sqlite3.connect(db)
     c = conn.cursor()
     c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date,User_Audio_Tester FROM Subjects WHERE SubjN == \'%s\'""" % subn)
     subject = c.fetchone()
@@ -182,7 +184,7 @@ def proc_subject(filename, subn):
         fh.show()
 
 if __name__ == "__main__":
-    filename = sys.argv[1].strip("\"").strip("\'")
+    db = sys.argv[1].strip("\"").strip("\'")
     subn = sys.argv[2]
-    proc_subject(filename, subn)
+    proc_subject(db, subn)
 

@@ -130,7 +130,7 @@ def is_number(s):
     except ValueError:
         return False
 
-def proc_subject(filename, subn):
+def proc_subject(db, SubjN):
     """
     the report must have a function named 'proc_subject' for the report 
     to show up on the edit subject page ie, to run it on individual subjects.
@@ -144,10 +144,10 @@ def proc_subject(filename, subn):
 
     #af.text(8,50,'V',horizontalalignment='center',verticalalignment='center', rotation=45,color='r',fontweight='bold', fontsize=14)
     #af.plot(8,50,marker='v',color='r')
-    print (filename)
-    conn = sqlite3.connect(filename)
+    print (db)
+    conn = sqlite3.connect(db)
     c = conn.cursor()
-    c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date,User_Audio_Tester FROM Subjects WHERE SubjN == \'%s\'""" % subn)
+    c.execute("""SELECT FName,LName,DOB,Gender,User_Audio_Date,User_Audio_Tester FROM Subjects WHERE SubjN == \'%s\'""" % SubjN)
     subject = c.fetchone()
     if subject is not None:
 
@@ -160,7 +160,7 @@ def proc_subject(filename, subn):
         ap.text(1, 1.9, "Gender: %s" % subject[3])
 
         c.execute("""SELECT User_L125,User_L250,User_L500,User_L750,User_L1k,
-                     User_L15,User_L2k,User_L3k,User_L4k,User_L6k,User_L8k FROM Subjects WHERE SubjN == \'%s\'""" % (subn))
+                     User_L15,User_L2k,User_L3k,User_L4k,User_L6k,User_L8k FROM Subjects WHERE SubjN == \'%s\'""" % (SubjN))
         uservar_this = c.fetchone()
         left = []
         for var in uservar_this:
@@ -171,7 +171,7 @@ def proc_subject(filename, subn):
         plot_data(af,left,'left')
 
         c.execute("""SELECT User_R125,User_R250,User_R500,User_R750,User_R1k,
-                     User_R15,User_R2k,User_R3k,User_R4k,User_R6k,User_R8k FROM Subjects WHERE SubjN == \'%s\'""" % (subn))
+                     User_R15,User_R2k,User_R3k,User_R4k,User_R6k,User_R8k FROM Subjects WHERE SubjN == \'%s\'""" % (SubjN))
         uservar_this = c.fetchone()
         right = []
         for var in uservar_this:
@@ -184,7 +184,7 @@ def proc_subject(filename, subn):
         fh.show()
 
 if __name__ == "__main__":
-    filename = sys.argv[1].strip("\"").strip("\'")
-    subn = sys.argv[2]
-    proc_subject(filename, subn)
+    db = sys.argv[1].strip("\"").strip("\'")
+    SubjN = sys.argv[2]
+    proc_subject(db, SubjN)
 
