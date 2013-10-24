@@ -732,26 +732,15 @@ class Subject_Manager (QtGui.QWidget, form_class):
         val = item.text()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT Path, Args FROM Reports where Name == '%s'""" % val)
+        c.execute("""SELECT Path FROM Reports where Name == '%s'""" % val)
         ret = c.fetchone()
         c.close()
         conn.close()
-        args = ret[1].split(" ")
-        data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
-        datal = ["$%s" % i for i in data.split(",")]
-        subj = False
-        for arg in args:
-            if arg in datal:
-                subj = True
-                break
-        if not subj:
-            for i in range(len(args)):
-                args[i] = args[i].replace("$db", os.path.abspath(self.filename))
-            import sys
-            sys.argv = args
-            execfile(ret[0])
+        s = imp.load_source("report",ret[0])
+        if hasattr(s, 'proc_main'):
+            s.proc_subject(self.filename)
         else:
-            print("This report appears to require individual subject information, and thus should be run from the 'Browse' tab with the desired subject selected")
+            print("This report will not be run because it does not appear to have a `proc_main(db)`: %s" % ret[0])
         
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)

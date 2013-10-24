@@ -266,26 +266,26 @@ class Subject_Manager (QtGui.QWidget, form_class):
                                                     <p>Note that deleting a report here does not delete
                                                     the report script, only the reference to it here</p>
                                                     """)
-        self.admin_reports_name_lineEdit.setToolTip("""<p>The name of a report</p>
-                                                    <p>If you make any changes here, click the Plus button to
-                                                    save them. Reports with the same name will be overwritten.</p>
-                                                    """)
+#        self.admin_reports_name_lineEdit.setToolTip("""<p>The name of a report</p>
+#                                                    <p>If you make any changes here, click the Plus button to
+#                                                    save them. Reports with the same name will be overwritten.</p>
+#                                                    """)
         self.admin_reports_script_lineEdit.setToolTip("""<p>The path to the script of a Report</p>
                                                     <p>If you make any changes here, click the Plus button to
                                                     save them. Reports with the same name will be overwritten.</p>
                                                     """)
-        self.admin_reports_args_lineEdit.setToolTip("""<p>The command line arguments to the Report script</p>
-                                                    <p>If you make any changes here, click the Plus button to
-                                                    save them. Reports with the same name will be overwritten.</p>
-                                                    <p>You can use $db, which will pass to the report script the full path of the database
-                                                     file. This is useful when you want to make sql queries from within the report script.
-                                                    You can also use any variable name from the Subjects table preceded by a '$'
-                                                    (eg., $SubjN will pass to the report script the subject number of the currently 
-                                                    selected subject, $FName is the subject's First Name, etc.). Using any of these
-                                                    variables will cause the Report to show up in the list on Browse page (and these
-                                                    reports can only be run from there when a subject is selected, since they require individual
-                                                    subject data).</p>
-                                                    """)
+#        self.admin_reports_args_lineEdit.setToolTip("""<p>The command line arguments to the Report script</p>
+#                                                    <p>If you make any changes here, click the Plus button to
+#                                                    save them. Reports with the same name will be overwritten.</p>
+#                                                    <p>You can use $db, which will pass to the report script the full path of the database
+#                                                     file. This is useful when you want to make sql queries from within the report script.
+#                                                    You can also use any variable name from the Subjects table preceded by a '$'
+#                                                    (eg., $SubjN will pass to the report script the subject number of the currently 
+#                                                    selected subject, $FName is the subject's First Name, etc.). Using any of these
+#                                                    variables will cause the Report to show up in the list on Browse page (and these
+#                                                    reports can only be run from there when a subject is selected, since they require individual
+#                                                    subject data).</p>
+#                                                    """)
         self.admin_user_listWidget.setToolTip("""<p>The list of User Variables</p>
                                                 <p>Add new user variables, or delete unneeded ones here</p>
                                                 <p><b>WARNING! Deleting a user variable will
@@ -732,26 +732,15 @@ class Subject_Manager (QtGui.QWidget, form_class):
         val = item.text()
         conn = sqlite3.connect(self.filename)
         c = conn.cursor()
-        c.execute("""SELECT Path, Args FROM Reports where Name == '%s'""" % val)
+        c.execute("""SELECT Path FROM Reports where Name == '%s'""" % val)
         ret = c.fetchone()
         c.close()
         conn.close()
-        args = ret[1].split(" ")
-        data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
-        datal = ["$%s" % i for i in data.split(",")]
-        subj = False
-        for arg in args:
-            if arg in datal:
-                subj = True
-                break
-        if not subj:
-            for i in range(len(args)):
-                args[i] = args[i].replace("$db", os.path.abspath(self.filename))
-            import sys
-            sys.argv = args
-            execfile(ret[0])
+        s = imp.load_source("report",ret[0])
+        if hasattr(s, 'proc_main'):
+            s.proc_subject(self.filename)
         else:
-            print("This report appears to require individual subject information, and thus should be run from the 'Browse' tab with the desired subject selected")
+            print("This report will not be run because it does not appear to have a `proc_main(db)`: %s" % ret[0])
         
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)
