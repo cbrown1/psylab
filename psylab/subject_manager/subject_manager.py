@@ -531,12 +531,15 @@ class Subject_Manager (QtGui.QWidget, form_class):
             c = conn.cursor()
             c.execute("""SELECT Path FROM Reports WHERE Name == '%s'""" % report)
             ret = c.fetchone()
-
-            s = imp.load_source("report",ret[0])
-            if hasattr(s, 'proc_subject'):
-                i = inspect.getargspec(s.proc_subject)
+            report_fullpath = ret[0]
+            report_path = os.path.dirname(report_fullpath)
+            report_basename = os.path.splitext(os.path.basename(report_fullpath))[0]
+            sys.path.insert(0,os.path.abspath(report_path))
+            report = __import__(report_basename)
+            del sys.path[0]
+            if hasattr(report, 'proc_subject'):
+                i = inspect.getargspec(report.proc_subject)
                 args = i[0]
-
                 subjn = unicode(self.edit_subject_list_comboBox.currentText().split(", ")[0]).strip()
                 data = "SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,EthnicID,Contact"
                 datal = data.split(",")
@@ -548,7 +551,10 @@ class Subject_Manager (QtGui.QWidget, form_class):
                     args[i] = args[i].replace("db", os.path.abspath(self.filename))
                     for dat,var in zip(datal,rets):
                         args[i] = args[i].replace("%s" % dat, var)
-                s.proc_subject(*args)
+                report.proc_subject(*args)
+            else:
+                print("This report will not be run because it does not appear to have a `proc_main(db)`: %s" % report_fullpath)
+
                 #saved_argv = sys.argv
                 #sys.argv[1:] = args
                 #i = 0
@@ -736,11 +742,16 @@ class Subject_Manager (QtGui.QWidget, form_class):
         ret = c.fetchone()
         c.close()
         conn.close()
-        s = imp.load_source("report",ret[0])
-        if hasattr(s, 'proc_main'):
-            s.proc_subject(self.filename)
+        report_fullpath = ret[0]
+        report_path = os.path.dirname(report_fullpath)
+        report_basename = os.path.splitext(os.path.basename(report_fullpath))[0]
+        sys.path.insert(0,os.path.abspath(report_path))
+        report = __import__(report_basename)
+        del sys.path[0]
+        if hasattr(report, 'proc_main'):
+            report.proc_main(self.filename)
         else:
-            print("This report will not be run because it does not appear to have a `proc_main(db)`: %s" % ret[0])
+            print("This report will not be run because it does not appear to have a `proc_main(db)`: %s" % report_fullpath)
         
     def admin_reports_populate(self):
         conn = sqlite3.connect(self.filename)
@@ -753,16 +764,21 @@ class Subject_Manager (QtGui.QWidget, form_class):
             if  not (os.path.isfile(row[1])):
                 print ( 'Report file not found: %s' % row[1])
             else:
-                s = imp.load_source("report",row[1])
-                if not hasattr(s, 'name'):
-                    print ( 'Report file must have a `name` property: %s' % row[0])
+                report_fullpath = row[1]
+                report_path = os.path.dirname(report_fullpath)
+                report_basename = os.path.splitext(os.path.basename(report_fullpath))[0]
+                sys.path.insert(0,os.path.abspath(report_path))
+                report = __import__(report_basename)
+                del sys.path[0]
+                if not hasattr(report, 'name'):
+                    print ( 'Report file must have a `name` property: %s' % report_fullpath)
                 else:
-                    report_name = s.name
+                    report_name = report.name
                     item_a = QtGui.QListWidgetItem(report_name)
                     item_a.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
                     item_a.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
                     self.admin_reports_listWidget.insertItem(-1, item_a)
-                    if hasattr(s, 'proc_subject'):
+                    if hasattr(report, 'proc_subject'):
                         item_e = QtGui.QListWidgetItem(report_name)
                         item_e.setIcon(QtGui.QIcon(os.path.join(self.image_path,"page_chart.png")))
                         item_e.setFlags( QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled )
@@ -783,7 +799,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             #self.admin_reports_args_lineEdit.setText(row[2])
     
     def admin_reports_add(self):
-        ret = self.get_file_existing(title = 'Subject Manager', default_dir = "", file_types = "Python Scripts (*.py)")
+        ret = self.get_file_existing(title = 'Select a Python script', default_dir = "", file_types = "Python Scripts (*.py)")
         if os.path.exists(ret):
             s = imp.load_source("report",ret)
             if not hasattr(s, 'name'):

@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -953,7 +953,7 @@
      <widget class="QPushButton" name="admin_protocols_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>105</x>
+        <x>106</x>
         <y>95</y>
         <width>21</width>
         <height>21</height>
@@ -976,7 +976,7 @@
      <widget class="QPushButton" name="admin_protocols_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>131</x>
         <y>95</y>
         <width>21</width>
         <height>21</height>
@@ -1204,7 +1204,7 @@
      <widget class="QPushButton" name="admin_reports_remove_pushButton">
       <property name="geometry">
        <rect>
-        <x>75</x>
+        <x>105</x>
         <y>117</y>
         <width>21</width>
         <height>21</height>
@@ -1227,7 +1227,7 @@
      <widget class="QPushButton" name="admin_reports_add_pushButton">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>130</x>
         <y>117</y>
         <width>21</width>
         <height>21</height>
@@ -1279,7 +1279,7 @@
      <widget class="QPushButton" name="admin_reports_run_pushButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>70</x>
         <y>117</y>
         <width>21</width>
         <height>21</height>

@@ -114,8 +114,6 @@ CREATE TABLE "Reports" (
     "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
     "Name" TEXT,
     "Path" TEXT,
-    "Args" TEXT,
-    "Subject" TEXT
 );
 
 INSERT INTO Admin (Name,Value) VALUES ('version','0.1');
