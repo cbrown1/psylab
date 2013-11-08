@@ -70,16 +70,17 @@ def draw_page():
     ap.invert_yaxis()
 
     ap.text(4.25, 1, "Psychoacoustics Lab",horizontalalignment='center', fontsize="x-large")
-    ap.text(4.25, 1.3, "The University of Pittsburgh",horizontalalignment='center', fontsize="large")
-    ap.text(4.25, 1.75, "Hearing Screening",horizontalalignment='center', fontsize="large")
+    ap.text(4.25, 1.25, "5057 Forbes Tower, Pittsburgh PA 15260",horizontalalignment='center', fontsize="medium")
+    ap.text(4.25, 1.5, "The University of Pittsburgh",horizontalalignment='center', fontsize="medium")
+    ap.text(4.25, 1.85, "Hearing Screening",horizontalalignment='center', fontsize="large")
 
-    ap.text(6.4, 2.2, "Tester:",horizontalalignment='right')
-    ap.text(6.4, 2.5, "Date of Audiogram:",horizontalalignment='right')
-    ap.text(2, 2.2, "Patient Name:", horizontalalignment='right')
-    ap.text(2, 2.5, "Date of Birth:", horizontalalignment='right')
-    ap.text(2, 2.8, "Gender:", horizontalalignment='right')
-    ap.hlines([2.2, 2.5, 2.8], 2.1, 4.5)
-    ap.hlines([2.2, 2.5], 6.5, 7.5)
+    ap.text(6.4, 2.25, "Tester:",horizontalalignment='right')
+    ap.text(6.4, 2.55, "Date of Audiogram:",horizontalalignment='right')
+    ap.text(2, 2.25, "Patient Name:", horizontalalignment='right')
+    ap.text(2, 2.55, "Date of Birth:", horizontalalignment='right')
+    ap.text(2, 2.85, "Gender:", horizontalalignment='right')
+    ap.hlines([2.25, 2.55, 2.85], 2.1, 4.5)
+    ap.hlines([2.25, 2.55], 6.5, 7.5)
 
     ap.add_line(Line2D([1, 7.5],[3, 3],color='k',lw=2))
 
@@ -103,8 +104,8 @@ def draw_page():
     ap.plot(lx+2.37,ly+.73, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
     ap.plot(lx+2.97,ly+.73, marker='x', ms=10, ls='None', mfc='None', mec='b', mew=3)
 
-    ap.add_patch(mpp.FancyArrowPatch((lx+2.37,ly+1.13), (lx+2.27,ly+1.23), arrowstyle='->', lw=3, ec='r', mutation_scale=20))
-    ap.add_patch(mpp.FancyArrowPatch((lx+2.97,ly+1.13), (lx+3.07,ly+1.23), arrowstyle='->', lw=3, ec='b', mutation_scale=20))
+    ap.add_patch(mpp.FancyArrowPatch((lx+2.37,ly+1.13), (lx+2.47,ly+1.23), arrowstyle='->', lw=3, ec='r', mutation_scale=20))
+    ap.add_patch(mpp.FancyArrowPatch((lx+2.97,ly+1.13), (lx+2.87,ly+1.23), arrowstyle='->', lw=3, ec='b', mutation_scale=20))
 
     return fh,ap,af
 
@@ -127,12 +128,12 @@ def plot_data(ax, data, side):
 
     if side == 'left':
         c = 'b'
-        mp_nr_x = [0., .2]
+        mp_nr_x = [0., -.2]
         mp_nr_y = [0, 2.]
         m='x'
     else:
         c = 'r'
-        mp_nr_x = [0., -.2]
+        mp_nr_x = [0., .2]
         mp_nr_y = [0., 2.]
         m='o'
     
@@ -175,11 +176,11 @@ def proc_subject(db, SubjN):
                 subject[i] = ''
         if subject is not None:
 
-            ap.text(6.5, 2.2, "%s" % subject[5],horizontalalignment='left')
-            ap.text(6.5, 2.5, "%s" % subject[4],horizontalalignment='left')
-            ap.text(2.1, 2.2, "%s %s" % (subject[0],subject[1]), horizontalalignment='left')
-            ap.text(2.1, 2.5, "%s" % subject[2], horizontalalignment='left')
-            ap.text(2.1, 2.8, "%s" % subject[3], horizontalalignment='left')
+            ap.text(6.5, 2.25, "%s" % subject[5],horizontalalignment='left')
+            ap.text(6.5, 2.55, "%s" % subject[4],horizontalalignment='left')
+            ap.text(2.1, 2.25, "%s %s" % (subject[0],subject[1]), horizontalalignment='left')
+            ap.text(2.1, 2.55, "%s" % subject[2], horizontalalignment='left')
+            ap.text(2.1, 2.85, "%s" % subject[3], horizontalalignment='left')
 
             c.execute("""SELECT User_L125,User_L250,User_L500,User_L750,User_L1k,
                          User_L15,User_L2k,User_L3k,User_L4k,User_L6k,User_L8k FROM Subjects WHERE SubjN == \'%s\'""" % (SubjN))
