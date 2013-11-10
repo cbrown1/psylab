@@ -104,8 +104,8 @@ def draw_page():
     ap.plot(lx+2.37,ly+.73, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
     ap.plot(lx+2.97,ly+.73, marker='x', ms=10, ls='None', mfc='None', mec='b', mew=3)
 
-    ap.plot(lx+2.42,ly+1.23, marker=mpm.CARETRIGHT, ms=10, ls='None', mfc='None', mec='r', mew=3)
-    ap.plot(lx+2.92,ly+1.23, marker=mpm.CARETLEFT, ms=10, ls='None', mfc='None', mec='b', mew=3)
+    ap.plot(lx+2.42,ly+1.13, marker=mpm.CARETRIGHT, ms=10, ls='None', mfc='None', mec='r', mew=3)
+    ap.plot(lx+2.92,ly+1.13, marker=mpm.CARETLEFT, ms=10, ls='None', mfc='None', mec='b', mew=3)
 
     return fh,ap,af
 

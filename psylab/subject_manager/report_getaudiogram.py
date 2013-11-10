@@ -131,7 +131,7 @@ def proc_subject(db, SubjN):
         if subject[i] is None:
             subject[i] = ''
     data['fh'].text(.5,.97,'%s %s' % (subject[0], subject[1]),horizontalalignment='center',fontsize='large')
-    data['fh'].text(.5,.94,'Left- or right-click for each ear',horizontalalignment='center',fontsize='medium')
+    data['fh'].text(.5,.94,'Left- or right-click for each ear, hold shift for no response',horizontalalignment='center',fontsize='medium')
 
     data['fh'].show()
 
