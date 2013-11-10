@@ -28,6 +28,7 @@ import sys
 import sqlite3
 from matplotlib import pyplot as pp
 import matplotlib.patches as mpp
+import matplotlib.markers as mpm
 from matplotlib.lines import Line2D
 import numpy as np
 
@@ -103,8 +104,8 @@ def draw_page():
     ap.plot(lx+2.37,ly+.73, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
     ap.plot(lx+2.97,ly+.73, marker='x', ms=10, ls='None', mfc='None', mec='b', mew=3)
 
-    ap.add_patch(mpp.FancyArrowPatch((lx+2.37,ly+1.13), (lx+2.47,ly+1.23), arrowstyle='->', lw=3, ec='r', mutation_scale=20))
-    ap.add_patch(mpp.FancyArrowPatch((lx+2.97,ly+1.13), (lx+2.87,ly+1.23), arrowstyle='->', lw=3, ec='b', mutation_scale=20))
+    ap.plot(lx+2.42,ly+1.23, marker=mpm.CARETRIGHT, ms=10, ls='None', mfc='None', mec='r', mew=3)
+    ap.plot(lx+2.92,ly+1.23, marker=mpm.CARETLEFT, ms=10, ls='None', mfc='None', mec='b', mew=3)
 
     return fh,ap,af
 
@@ -127,13 +128,15 @@ def plot_data(ax, data, side):
 
     if side == 'left':
         c = 'b'
-        mp_nr_x = [0., -.2]
+        nr_x = -.1
         mp_nr_y = [0, 2.]
         m='x'
+        mnr = mpm.CARETLEFT
     else:
         c = 'r'
-        mp_nr_x = [0., .2]
+        nr_x = .1
         mp_nr_y = [0., 2.]
+        mnr = mpm.CARETRIGHT
         m='o'
     
     ax.plot(xm_r, dm_r, marker=m, ms=10, ls='None', mfc='None', mec=c, mew=3)
@@ -141,8 +144,7 @@ def plot_data(ax, data, side):
         if not dm_n.mask[i]:
             this_data = np.abs(dm_n.data[i])
             this_ind = xpos[i]
-            ar = mpp.FancyArrowPatch((this_ind+mp_nr_x[0],this_data+mp_nr_y[0]), (this_ind+mp_nr_x[1],this_data+mp_nr_y[1]), arrowstyle='->', lw=3, ec=c, mutation_scale=20)
-            ax.add_patch(ar)
+            ax.plot(this_ind+nr_x,this_data, marker=mnr, ms=10, ls='None', mfc='None', mec=c, mew=3)
 
 def is_number(s):
     try:

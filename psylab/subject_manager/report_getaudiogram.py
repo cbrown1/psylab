@@ -11,6 +11,7 @@ import time
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.markers as mpm
 from matplotlib.widgets import Button
 
 name = "Get_Audio"
@@ -42,7 +43,7 @@ def mouse_click(event):
         x = find_nearest(xpos, event.xdata)
         y = find_nearest(ypos, event.ydata)
         # TODO: implement shift for no-response (plot as nr if y < -10)
-        if shift > 0:
+        if (y > 10) and (shift > 0):
             y1 = -y
         else:
             y1 = y
@@ -50,19 +51,21 @@ def mouse_click(event):
             if left_handle[x]:
                 left_handle[x][0].remove()
                 left_handle[x] = None
-            left_handle[x] = data['af'].plot(x,y, marker='s', ms=10, ls='None', mfc='None', mec='b', mew=3)
+            if y1 < -10:
+                left_handle[x] = data['af'].plot(x-.1,y, marker=mpm.CARETLEFT, ms=10, ls='None', mfc='None', mec='b', mew=3)
+            else:
+                left_handle[x] = data['af'].plot(x,y, marker='s', ms=10, ls='None', mfc='None', mec='b', mew=3)
             left_data[x] = y1
         elif event.button == 3:
             if right_handle[x]:
                 right_handle[x][0].remove()
                 right_handle[x] = None
-            right_handle[x] = data['af'].plot(x,y, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
+            if y1 < -10:
+                right_handle[x] = data['af'].plot(x+.1,y, marker=mpm.CARETRIGHT, ms=10, ls='None', mfc='None', mec='r', mew=3)
+            else:
+                right_handle[x] = data['af'].plot(x,y, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
             right_data[x] = y1
         event.canvas.draw()
-    #sys.stdout.flush()
-        #else:
-        #    return None
-        #if shift > 0:
 
 def key_press(event):
     global shift
