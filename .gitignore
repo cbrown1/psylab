@@ -1,4 +1,4 @@
-*.py[cod]
+*.py[cod~]
 
 # C extensions
 *.so
@@ -6,7 +6,6 @@
 # Packages
 *.egg
 *.egg-info
-dist
 build
 eggs
 parts

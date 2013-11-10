@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
-name = "Get_Audiogram"
+name = "Get_Audio"
 
 data = {}
 
@@ -41,22 +41,23 @@ def mouse_click(event):
     if event.inaxes and event.inaxes.get_xlabel() == "Frequency (Hz)":
         x = find_nearest(xpos, event.xdata)
         y = find_nearest(ypos, event.ydata)
-    #    if shift > 0:
-    #        y1 = -y
-    #    else:
-    #        y1 = y
+        # TODO: implement shift for no-response (plot as nr if y < -10)
+        if shift > 0:
+            y1 = -y
+        else:
+            y1 = y
         if event.button == 1:
             if left_handle[x]:
                 left_handle[x][0].remove()
                 left_handle[x] = None
             left_handle[x] = data['af'].plot(x,y, marker='s', ms=10, ls='None', mfc='None', mec='b', mew=3)
-            left_data[x] = y
+            left_data[x] = y1
         elif event.button == 3:
             if right_handle[x]:
                 right_handle[x][0].remove()
                 right_handle[x] = None
             right_handle[x] = data['af'].plot(x,y, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
-            right_data[x] = y
+            right_data[x] = y1
         event.canvas.draw()
     #sys.stdout.flush()
         #else:
@@ -154,12 +155,12 @@ def proc_subject(db, SubjN):
 #        plot_data(af,right,'right')
     
     
-    # TODO: query db, get S name, previous audio data and add to fig
+    # TODO: get previous audio data from db and add to fig
 
 def save_data():
     #global dbg, SubjNg
     query = "UPDATE Subjects SET "
-    items = []
+    items = ["User_Audio_Date = '%s'" % time.strftime("%Y-%m-%d")]
     vars = ['125', '250', '500', '750', '1k', '15', '2k', '3k', '4k', '6k', '8k']
     for i in range(len(vars)):
         if left_data[i] is not None:

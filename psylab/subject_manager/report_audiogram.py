@@ -32,7 +32,7 @@ from matplotlib.lines import Line2D
 import numpy as np
 
 # The report must have the property 'name'
-name = "Audiogram"
+name = "Show_Audio"
 
 def draw_page():
 
@@ -53,7 +53,6 @@ def draw_page():
     af.yaxis.set_ticks(range(0, 120, 10))
     af.yaxis.set_ticklabels(range(0, 120, 10))
     af.invert_yaxis()
-    af.set_xlim([0, 110])
     af.xaxis.set_ticks(xpos)
     af.xaxis.set_ticklabels(x)
     af.set_xlim([.5, len(xpos)+.5])
@@ -120,11 +119,11 @@ def plot_data(ax, data, side):
     xpos = np.arange(1,len(x)+1)
     
     # Mask no responses
-    dm_r = np.ma.masked_where(da<0,da)
-    xm_r = np.ma.masked_where(da<0,xpos)
+    dm_r = np.ma.masked_where(da<-10,da)
+    xm_r = np.ma.masked_where(da<-10,xpos)
     
     # Mask responses
-    dm_n = np.ma.masked_where(da>=0,da)
+    dm_n = np.ma.masked_where(da>=-10,da)
 
     if side == 'left':
         c = 'b'

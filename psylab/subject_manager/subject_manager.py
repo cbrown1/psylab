@@ -75,7 +75,8 @@ class Subject_Manager (QtGui.QWidget, form_class):
         self.connect(self.edit_contact_checkBox, QtCore.SIGNAL("clicked ( bool )"), self.edit_data_changed)
         self.connect(self.edit_notes_plainTextEdit, QtCore.SIGNAL("textChanged ()"), self.edit_note_changed)
 
-        self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
+#        self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("currentItemChanged ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
+        self.connect(self.edit_protocol_listWidget, QtCore.SIGNAL("itemClicked ( QListWidgetItem *, QListWidgetItem *)"), self.edit_protocol_selected)
         self.connect(self.edit_protocol_date_dateEdit.calendarWidget(), QtCore.SIGNAL("clicked(const QDate&)"), self.edit_protocol_dateChanged)
         self.connect(self.edit_protocol_date_remove_pushButton, QtCore.SIGNAL("clicked()"), self.edit_protocol_date_remove)
         
@@ -440,6 +441,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
         conn.commit()
         c.close()
         conn.close()
+        self.edit_protocol_selected(None, None)
 
     def edit_user_populate(self):
         conn = sqlite3.connect(self.filename)
@@ -458,6 +460,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             rowcount += 1
         c.close()
         conn.close()
+        
 
     def add_edit_protocol_populate(self):
         conn = sqlite3.connect(self.filename)
