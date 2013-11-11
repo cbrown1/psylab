@@ -87,6 +87,13 @@ def callback_cancel(event):
     plt.close(data['fh'])
     #sys.stdout.flush()
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError, TypeError:
+        return False
+
 def proc_subject(db, SubjN):
     #global dbg, SubjNg, af, fh
     data['db'] = db
@@ -132,6 +139,46 @@ def proc_subject(db, SubjN):
             subject[i] = ''
     data['fh'].text(.5,.97,'%s %s' % (subject[0], subject[1]),horizontalalignment='center',fontsize='large')
     data['fh'].text(.5,.94,'Left- or right-click for each ear, hold shift for no response',horizontalalignment='center',fontsize='medium')
+
+    c.execute("""SELECT User_L125,User_L250,User_L500,User_L750,User_L1k,
+                 User_L15,User_L2k,User_L3k,User_L4k,User_L6k,User_L8k FROM Subjects WHERE SubjN == \'%s\'""" % (SubjN))
+    uservar_this = list(c.fetchone())
+    for i in range(len(uservar_this)):
+        y = uservar_this[i]
+        if y and is_number(y):
+            y = float(y)
+            if y < -10:
+                y1 = -y
+            else:
+                y1 = y
+            if left_handle[i]:
+                left_handle[i][0].remove()
+                left_handle[i] = None
+            if y < -10:
+                left_handle[i] = data['af'].plot(i-.1,y1, marker=mpm.CARETLEFT, ms=10, ls='None', mfc='None', mec='b', mew=3)
+            else:
+                left_handle[i] = data['af'].plot(i,y1, marker='s', ms=10, ls='None', mfc='None', mec='b', mew=3)
+            left_data[i] = y
+
+    c.execute("""SELECT User_R125,User_R250,User_R500,User_R750,User_R1k,
+                 User_R15,User_R2k,User_R3k,User_R4k,User_R6k,User_R8k FROM Subjects WHERE SubjN == \'%s\'""" % (SubjN))
+    uservar_this = list(c.fetchone())
+    for i in range(len(uservar_this)):
+        y = uservar_this[i]
+        if y and is_number(y):
+            y = float(y)
+            if y < -10:
+                y1 = -y
+            else:
+                y1 = y
+            if right_handle[i]:
+                right_handle[i][0].remove()
+                right_handle[i] = None
+            if y < -10:
+                right_handle[i] = data['af'].plot(i+.1,y1, marker=mpm.CARETRIGHT, ms=10, ls='None', mfc='None', mec='r', mew=3)
+            else:
+                right_handle[i] = data['af'].plot(i,y1, marker='o', ms=10, ls='None', mfc='None', mec='r', mew=3)
+            right_data[i] = y
 
     data['fh'].show()
 
