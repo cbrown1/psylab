@@ -41,6 +41,7 @@ f2oct - Calculates the distance in octaves between two frequencies
 fconv - Convolves two signals using FFT-based fast convolution
 filterbank - Filters the input array with a bank of filters [UNTESTED]
 freq_compress - Performs frequency compression on a signal
+gso - Varies the inter-aural correlation of a stereo signal
 hcomplex - Generates harmonic complexes
 interp - Interpolates a signal to a specified number of points
 lts - Computes a long-term spectrum of a signal
@@ -82,6 +83,7 @@ from .equate import equate
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .f0 import f0
 from .freq_compression import freq_compress
+from .gso import gso
 from .interp import interp
 from .lts import lts
 from .magspec import magspec
