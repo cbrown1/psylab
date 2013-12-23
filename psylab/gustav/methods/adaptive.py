@@ -73,12 +73,8 @@ dynamic_vars_track = {           # Tracking (prob not useful, so not accessible)
                                  #  'cn' for ceiling trials
            }
 
-def step(cur_step,exp,run,var,stim,user):
-    if len(var.dynamic['values_at_rev']) == 0:
-        # If there are no reversals yet, use first step
-        var.dynamic['value'] += cur_step * var.dynamic['steps'][0]
-    else:
-        var.dynamic['value'] += cur_step * var.dynamic['steps'][len(var.dynamic['values_at_rev'])-1]
+def step(exp,run,var,stim,user):
+    var.dynamic['value'] += var.dynamic['cur_step'] * var.dynamic['steps'][var.dynamic['n_reversals']-1]
     var.dynamic['value'] = max(var.dynamic['value'], var.dynamic['val_floor'])
     var.dynamic['value'] = min(var.dynamic['value'], var.dynamic['val_ceil'])
 
@@ -102,6 +98,7 @@ def track(exp,run,var,stim,user):
             else:                                          #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 var.dynamic['track'].append(-1)            #   Record reversal
+                var.dynamic['n_reversals'] += 1            #   Count it
                 var.dynamic['values_at_rev'].append(var.dynamic['value'])
                 var.dynamic['cur_status'] = "-%g" % len(var.dynamic['values_at_rev'])
         else:
@@ -125,6 +122,7 @@ def track(exp,run,var,stim,user):
             else:                                          #  Otherwise, its a reversal
                 var.dynamic['prev_dir'] = 1                #   Set prev_dir
                 var.dynamic['track'].append(1)             #   Record reversal
+                var.dynamic['n_reversals'] += 1            #   Count it
                 var.dynamic['values_at_rev'].append(var.dynamic['value'])
                 var.dynamic['cur_status'] = "+%g" % len(var.dynamic['values_at_rev'])
         else:
@@ -168,7 +166,7 @@ def finish_trial(exp, run, var, stim, user):
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = 'A maximum of %g trials reached' % var.dynamic['max_trials']
-        elif len(var.dynamic['values_at_rev']) == len(var.dynamic['steps']):
+        elif var.dynamic['n_reversals'] == len(var.dynamic['steps']):
             run.block_on = False
             var.dynamic['good_run'] = True
             var.dynamic['msg'] = '%g reversals reached' % len(var.dynamic['steps'])
@@ -184,8 +182,8 @@ def pre_block(exp, run, var, stim, user):
     var.dynamic = dynamic_vars_block.copy()
     var.dynamic.update(dynamic_vars_track.copy())
     var.dynamic.update(d.copy())
-    if hasattr(exp.experiment, 'step'):
-        exp.dynamic_step = exp.experiment.step
+    if hasattr(var.dynamic, 'step'):
+        exp.dynamic_step = var.dynamic.step
     else:
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
@@ -194,12 +192,13 @@ def pre_block(exp, run, var, stim, user):
     var.dynamic['values_at_rev'] = []
     var.dynamic['prev_dir'] = 0
     var.dynamic['init_dir'] = 0
+    var.dynamic['n_reversals'] = 0
 
 def post_trial(exp, run, var, stim, user):
     var.dynamic['cur_correct'] = str(run.response)==str(var.dynamic['correct'])
     track(exp, run, var, stim, user)
     finish_trial(exp, run, var, stim, user)
-    exp.dynamic_step(var.dynamic['cur_step'], exp, run, var, stim, user)
+    exp.dynamic_step(exp, run, var, stim, user)
 
     run.trial_on = False
 
