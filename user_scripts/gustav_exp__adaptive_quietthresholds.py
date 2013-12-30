@@ -5,6 +5,7 @@
 import os, sys
 import numpy as np
 import time
+import socket
 import psylab
 from gustav_forms import qt_adaptive as theForm
 #from brian import hears as bh
@@ -173,20 +174,19 @@ def setup(exp,run,var,stim,user):
 #                        });
 
     def step(exp,run,var,stim,user):
-        var.dynamic['value'] -= var.dynamic['cur_step'] * var.dynamic['steps'][var.dynamic['n_reversals']-1]
+        var.dynamic['value'] += var.dynamic['cur_step'] * var.dynamic['steps'][var.dynamic['n_reversals']]
         var.dynamic['value'] = max(var.dynamic['value'], var.dynamic['val_floor'])
         var.dynamic['value'] = min(var.dynamic['value'], var.dynamic['val_ceil'])
 
 
-    var.dynamic = { 'name': 'Level', # Name of the dynamic variable
-                    'units': 'dBSPL',       # Units of the dynamic variable
-                    #'intervals': 2,      # Number of intervals
-                    'alternatives': 2,
+    var.dynamic = { 'name': 'Level',     # Name of the dynamic variable
+                    'units': 'dBSPL',    # Units of the dynamic variable
+                    'alternatives': 2,   # Number of alternatives
                     'steps': [5, 5, 2, 2, 2, 2, 2, 2], # Stepsizes to use at each reversal (#revs = len)
-                    #'steps': [2, 2], # Stepsizes to use at each reversal (#revs = len)
+                    #'steps': [2, 2],    # Stepsizes to use at each reversal (#revs = len)
                     'downs': 2,          # Number of 'downs'
                     'ups': 1,            # Number of 'ups'
-                    'val_start': 50,    # Starting value
+                    'val_start': 50,     # Starting value
                     #'val_start': 0,     # Starting value
                     'val_floor': 0,      # Floor
                     'val_ceil': 70,      # Ceiling
@@ -195,7 +195,7 @@ def setup(exp,run,var,stim,user):
                     'run_n_trials': 0,   # Set to non-zero to run exactly that number of trials
                     'max_trials': 60,    # Maximum number of trials to run
                     'vals_to_avg': 6,    # The number of values to average
-                    'step': step,     # A custom step function. Signature: def step(exp,run,var,stim,user)
+                    'step': step,        # A custom step function. Signature: def step(exp,run,var,stim,user)
                     'max_level': 80, 
                    }
 

@@ -74,7 +74,7 @@ dynamic_vars_track = {           # Tracking (prob not useful, so not accessible)
            }
 
 def step(exp,run,var,stim,user):
-    var.dynamic['value'] += var.dynamic['cur_step'] * var.dynamic['steps'][var.dynamic['n_reversals']-1]
+    var.dynamic['value'] += var.dynamic['cur_step'] * var.dynamic['steps'][var.dynamic['n_reversals']]
     var.dynamic['value'] = max(var.dynamic['value'], var.dynamic['val_floor'])
     var.dynamic['value'] = min(var.dynamic['value'], var.dynamic['val_ceil'])
 
@@ -182,8 +182,8 @@ def pre_block(exp, run, var, stim, user):
     var.dynamic = dynamic_vars_block.copy()
     var.dynamic.update(dynamic_vars_track.copy())
     var.dynamic.update(d.copy())
-    if hasattr(var.dynamic, 'step'):
-        exp.dynamic_step = var.dynamic.step
+    if var.dynamic.has_key('step'):
+        exp.dynamic_step = var.dynamic['step']
     else:
         exp.dynamic_step = step
     var.dynamic['value'] = var.dynamic['val_start']
