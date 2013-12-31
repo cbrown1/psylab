@@ -28,4 +28,5 @@ import plot_tools
 import stats_tools
 import path_tools
 import textgrid
+from .local_settings import local_settings
 
