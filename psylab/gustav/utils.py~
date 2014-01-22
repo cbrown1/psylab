@@ -199,8 +199,8 @@ def initialize_experiment( exp, run, var, stim, user):
     if not os.path.isdir(logpath[0]):
         print("Creating logfile path: " + logpath[0])
         os.makedirs(logpath[0])
-    # For logfile name, we expand date only and dont do full variable 
-    # expansion because many variables haven't been set yet.
+    # For logfile name, we expand date and exp name only and dont do full  
+    # variable expansion because many variables haven't been set yet.
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     exp.logFile = exp.logFile.replace("$date", date)
     exp.logFile = exp.logFile.replace("$name", exp.name)
@@ -358,7 +358,8 @@ def process_variables(exp, var):
     else:
         var.orderarray = str_to_range(var.order)
         var.nblocks = var.nlevels_total
-    debug(exp, "Presentation order: " + var.order)
+    debug(exp, "Presentation order input string: " + var.order)
+    debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in var.orderarray))
 # End process_variables
 
 

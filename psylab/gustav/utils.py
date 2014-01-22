@@ -358,7 +358,8 @@ def process_variables(exp, var):
     else:
         var.orderarray = str_to_range(var.order)
         var.nblocks = var.nlevels_total
-    debug(exp, "Presentation order: " + var.order)
+    debug(exp, "Presentation order input string: " + var.order)
+    debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in var.orderarray))
 # End process_variables
 
 
@@ -842,6 +843,7 @@ def str_to_range(s):
         shuffle(result)
         return result
     else:
-        return sorted(result)
+        #return sorted(result)
+        return result
 
 
