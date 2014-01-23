@@ -32,12 +32,12 @@ useful.
 
 In addition to the modules that are imported automatically, others include:
 
-subject_manager: User interface with many features for a subject info database
-tdt2: interface tucker davis system II hardware via the serial port
-
+subject_manager: Manage subjects with a useful user interface (dep: pyqt)
+tdt2: Access Tucker Davis System II hardware via serial port (dep: pyserial)
+audio: Perform tasks related to soundfile i/o (dep: medussa)
 '''
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 #from array import array, nanproduct, nanmean
 #from dataview import dataview

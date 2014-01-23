@@ -37,7 +37,7 @@ tdt2: interface tucker davis system II hardware via the serial port
 
 '''
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 #from array import array, nanproduct, nanmean
 #from dataview import dataview
