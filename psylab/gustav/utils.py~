@@ -839,10 +839,8 @@ def str_to_range(s):
     result = reduce(list.__add__, [parse(x) for x in tokens])
 
     if randomize:
-        from random import shuffle
-        shuffle(result)
-        return result
-    else:
-        return sorted(result)
+        np.random.shuffle(result)
+
+    return result
 
 
