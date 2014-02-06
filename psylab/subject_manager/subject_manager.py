@@ -571,7 +571,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
 
     def admin_init(self):
         if os.path.isfile(self.configFilePath):
-            print("config file found: %s" % self.configFilePath)
+            print("config file found: %s" % os.path.realpath(self.configFilePath))
             Config = ConfigParser.ConfigParser()
             Config.read(self.configFilePath)
             self.filename = Config.get('database', 'path')
