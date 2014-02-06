@@ -571,12 +571,12 @@ class Subject_Manager (QtGui.QWidget, form_class):
 
     def admin_init(self):
         if os.path.isfile(self.configFilePath):
-            print("config file found")
+            print("config file found: %s" % self.configFilePath)
             Config = ConfigParser.ConfigParser()
             Config.read(self.configFilePath)
             self.filename = Config.get('database', 'path')
         else:
-            print("config file not found")
+            print("config file not found. Creating: Subjects.db")
             if self.filename == "":
                 self.filename = 'Subjects.db'
             print("running write_config")
