@@ -357,7 +357,7 @@ def process_variables(exp, var):
         var.nblocks = 0
     else:
         var.orderarray = str_to_range(var.order)
-        var.nblocks = var.nlevels_total
+        var.nblocks = len(var.orderarray)
     debug(exp, "Presentation order input string: " + var.order)
     debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in var.orderarray))
 # End process_variables
