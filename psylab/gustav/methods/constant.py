@@ -50,8 +50,10 @@ def pre_exp(exp, run, var, stim, user):
     for stimset in stim.stimvars:
         if stim.sets[stimset]['type'] != 'manual':
             if not stim.sets[stimset]['repeat']:
-                if var.constant['trialsperblock']*var.nlevels_total > stim.sets[stimset]['n']:
-                    raise Exception("Not enough stimulus files for stimset: " + stimset + "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nlevels_total) + "\nAvailable: " + str(stim.sets[stimset]['n']))
+                if var.constant['trialsperblock']*var.nblocks > stim.sets[stimset]['n']:
+                    raise Exception("Not enough stimulus files for stimset: " + stimset + 
+                                    "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nblocks) + 
+                                    "\nAvailable: " + str(stim.sets[stimset]['n']))
 
 def post_trial(exp, run, var, stim, user):
     run.stim_index = run.trials_exp # Not used atm
