@@ -191,9 +191,11 @@ class Interface():
     #        self.show()
     # End Dialog
 
-    def get_resp(self):
+    def get_resp(self,prompt=None):
         """Waits modally for a response click
         """
+        if prompt:
+            self.prompt = prompt
         self.dialog.solicit_resp(self.prompt)
         while self.dialog.waitingForResponse:
             self.app.processEvents()
@@ -211,6 +213,11 @@ class Interface():
 
     def set_text_trial(self, text):
         self.dialog.label_trial.setText(text)
+    
+    def update(self):
+        self.dialog.update()
+        self.dialog.repaint()
+        self.app.processEvents()
         
 #def main():
 #    pass # D
