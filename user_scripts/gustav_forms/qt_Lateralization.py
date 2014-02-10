@@ -15,6 +15,7 @@ import psylab.audio
 class Interface():
 
     feedback_dur = 1.5
+    prompt = ""
     
     def __init__(self, bg_image=None, feedback=None, parent=None):
         pass
@@ -81,6 +82,7 @@ class Interface():
             y = (self.respArea_h/2) - round(self.respIcon_h/2)+self.respArea_y
             y = np.maximum(y,0)
             y = np.minimum(y,self.form_h)
+            self.respArea.setText("")
             if self.icon_folder:
                 self.iconImage.setVisible(False)
                 respIconraw = QtGui.QPixmap(os.path.join(self.icon_folder,self.icon_set.get_next()))
@@ -98,10 +100,6 @@ class Interface():
         def feedback_hide(self):
             self.iconImage.setVisible(False)
             
-        def response_show(self):
-            self.iconImage.setVisible(False)
-            self.respArea.setVisible(True)
-    
         def response_hide(self):
             if self.feedback:
                 self.iconImage.setVisible(False)
@@ -117,8 +115,9 @@ class Interface():
             self.response = round(response * 21)-10
             self.waitingForResponse = False
         
-        def solicit_resp(self):
+        def solicit_resp(self, prompt=""):
             self.iconImage.setVisible(False)
+            self.respArea.setText(prompt)
             self.respArea.setVisible(True)
             self.waitingForResponse = True
             
@@ -157,10 +156,10 @@ class Interface():
             self.respArea = QtGui.QLabel(self)
             self.respArea.setGeometry(QtCore.QRect(self.respArea_x, self.respArea_y, self.respArea_w, self.respArea_h))
             self.respArea.setAutoFillBackground(True)
-            self.respArea.setStyleSheet("border-style: outset; border-width: 3px; border-color: rgba(20,20,20,120); background-color: rgba(60,60,60,120); color: rgba(255,255,255,255);")
+            self.respArea.setStyleSheet("border-style: outset; border-width: 3px; border-color: rgba(20,20,20,120); background-color: rgba(60,60,60,120); color: rgba(255,255,255,255); font-size: 20px")
             self.respArea.mousePressEvent = self.response_click
             self.respArea.setAlignment(QtCore.Qt.AlignCenter)
-            self.respArea.setAlignment(QtCore.Qt.AlignHCenter)
+            #self.respArea.setAlignment(QtCore.Qt.AlignHCenter)
             self.respArea.setVisible(False)
     
             if self.feedback:
@@ -195,13 +194,10 @@ class Interface():
     def get_resp(self):
         """Waits modally for a response click
         """
-        self.dialog.solicit_resp()
-        #sys.stdout.flush() # In case the output of a prior print statement has been buffered
+        self.dialog.solicit_resp(self.prompt)
         while self.dialog.waitingForResponse:
-            #print('waiting')
             self.app.processEvents()
             time.sleep(.1)
-        #print('done')
         resp = self.dialog.response
         self.dialog.feedback_show()
         self.app.processEvents()
