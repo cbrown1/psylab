@@ -37,6 +37,12 @@ To access TDT modules via the serial port, set both jumpers on
 the back of the OI1 to the RIGHT (can be accessed from the front
 of the XBUS rack). Jumpers to the left for AP2 control.
 
+You must specify the serial port address like: 
+
+tdt2.port = '/dev/ttyS0'
+
+You can use tdt2.scan_ports() to return a list of available ports
+
 Tested on windows and linux.
 
 Depends on pyserial (http://sourceforge.net/projects/pyserial/)
@@ -58,7 +64,8 @@ def scan_ports():
             pass
     return available
 
-port = scan_ports()[0]
+# Must set this to something like '/dev/ttyS0'
+port = None
 
 from xb1 import xb1
 from pa4 import pa4
