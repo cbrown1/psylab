@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -24,8 +24,8 @@
 #
 
 '''
-signal - A collection of functions generally useful for psychoacoustics-based
-signal processing.
+signal - A collection of functions for psychoacoustics-based signal processing. 
+Some are pedagogical in nature, others might actually be useful. 
 
 Functions include:
 
@@ -46,7 +46,7 @@ hcomplex - Generates harmonic complexes
 interp - Interpolates a signal to a specified number of points
 lts - Computes a long-term spectrum of a signal
 magspec - Computes the magnitude spectrum of a signal
-mix - Mixes [adds] signals at specified offsets, zero padding as needed
+mix - Mixes [adds] signals, zero padding as needed and at specified offsets
 mls - Generates maximum-length sequences
 ms2samp - Converts milliseconds to samples
 normalize - Normalizes wavefiles, so that the overall peak is 1
@@ -90,6 +90,7 @@ from .magspec import magspec
 from .mix import mix
 from .ms2samp import ms2samp
 from .normalize import normalize
+from .pink import pink
 from .ramps import ramps
 from .rir import rir, fconv
 from .rms import rms
@@ -97,6 +98,7 @@ from .samp2ms import samp2ms
 from .smooth import smooth
 from .specgram import specgram
 from .specplot import specplot
+from .spl import spl2sp, spl2si, sp2spl, si2spl
 from .tone import tone
 from .t60 import t60
 from .vocoder import vocoder, vocoder_overlap

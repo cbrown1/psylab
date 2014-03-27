@@ -43,7 +43,7 @@ def pre_exp(exp, run, var, stim, user):
     if exp.logString_post_exp == None:
         exp.logString_post_exp = "\nExperiment $name ended at $time\n"
     run.block = var.constant['startblock']-1
-    if run.block == run.nblocks - 1:
+    if run.block >= run.nblocks - 1:
         run.gustav_is_go = False
     # Check if there are enough stimuli
     # Move to experimentfile? Are stim issues really method related?
@@ -54,6 +54,14 @@ def pre_exp(exp, run, var, stim, user):
                     raise Exception("Not enough stimulus files for stimset: " + stimset + 
                                     "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nblocks) + 
                                     "\nAvailable: " + str(stim.sets[stimset]['n']))
+
+def pre_block(exp, run, var, stim, user):
+    if run.block == var.constant['startblock'] - 1:
+        run.trials_block = var.constant['starttrial']
+        run.trials_exp = (var.constant['trialsperblock'] * (var.constant['startblock']-1)) + run.trials_block - 1
+        # Move to experimentfile? Are stim issues really method related?
+        for stimset in stim.stimvars:
+            stim.current[stimset].ind = run.trials_exp
 
 def post_trial(exp, run, var, stim, user):
     run.stim_index = run.trials_exp # Not used atm

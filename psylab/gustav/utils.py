@@ -167,7 +167,7 @@ class current_stim:
     filename = ''
     filebase = ''
     info = {}
-    ind = -1
+    ind = 0
     data = None
 
 class run:
@@ -532,7 +532,6 @@ def get_current_stimuli(exp, stim):
 def stim_get_next(exp, stim, stimset):
     '''Load the next stimulus for a stimulus set
     '''
-    stim.current[stimset].ind += 1  # Index of index
     stim.current[stimset].ind2 = stim.sets[stimset]['order_'][stim.current[stimset].ind]
     stim.current[stimset].filename = os.path.join(stim.sets[stimset]['path'],stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['name'])
     stim.current[stimset].filebase = os.path.splitext(stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['name'])[0]
@@ -543,17 +542,18 @@ def stim_get_next(exp, stim, stimset):
 #    stim.current[stimset]['txt'] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['text']
 #    stim.current[stimset]['kw'] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['kw']
 
-    if stim.current[stimset].ind == stim.sets[stimset]['n']-1:
+    if stim.current[stimset].ind == stim.sets[stimset]['n']:
         if stim.sets[stimset]['repeat']:
             stim.reset_order(exp,stim,stimset)
         else:
             raise Exception("Ran out of stimulus files for stimset: " + stimset)
     debug(exp, "Getting next stimulus: %s, for set: %s" % (stim.current[stimset].filebase,stimset))
+    stim.current[stimset].ind += 1  # Index of index
 
 def stim_reset_order(exp, stim, stimset):
     '''Resets the order of a stimulus set
     '''
-    stim.current[stimset].ind = -1
+    stim.current[stimset].ind = 0  # run.trials_exp - 1 #-1
     if stim.sets[stimset]['order'] == 'random':
         stim.sets[stimset]['order_'] = np.random.permutation(len(stim.sets[stimset]['tokens']))
     elif stim.sets[stimset]['order'] == 'natural':
