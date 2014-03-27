@@ -24,7 +24,6 @@
 
 '''
 import os, codecs
-from inspect import getmembers
 import numpy as np
 
 # TODO: change vals to types, so we can specify the type on initialize error

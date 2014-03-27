@@ -72,24 +72,35 @@ def read_audio_file(file_path):
 class get_consecutive_files:
     """A simple class for retrieving filesnames in a folder, one at a time
 
+        When the class is created, the input arguments are:
+
+        path : The full path with the files are
+        file_ext : A string of semicolon-separated extensions [default = '.wav;.WAV']
+        random : A boolean specifying whether to randomize the file list [default = False]
+        index : The starting index, if you want to skip some of the files. Not very 
+                useful if you are randomizing the list. [default = 0]
+
         Usage:
         >>> f = get_consecutive_files(path_to_files)
         >>> f.get_next()
         'AW001.WAV'
         >>> f.get_next()
         'AW002.WAV'
+
+        TODO: Add token strings
     """
     def reset(self):
-        self.index = 0
+        self.ind = self.index
         if self.random:
             np.random.shuffle(self.file_list)
 
-    def __init__(self, path, file_ext='.wav;.WAV',random=False):
+    def __init__(self, path, file_ext='.wav;.WAV', random=False, index=0):
         self.path = path
         self.file_ext = file_ext.split(';')
         self.random = random
         self.file_list = []
-        self.index = 0
+        self.index = index
+        self.ind = index
         files = os.listdir( self.path )
 
         for f in files:
@@ -103,9 +114,9 @@ class get_consecutive_files:
         self.n = len(self.file_list)
 
     def get_next(self):
-        item = self.file_list[self.index]
-        self.index += 1
-        if self.index == self.n:
+        item = self.file_list[self.ind]
+        self.ind += 1
+        if self.ind == self.n:
             self.reset()
         return item
 
