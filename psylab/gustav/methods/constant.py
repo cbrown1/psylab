@@ -23,7 +23,7 @@
 '''Method of constant stimuli for Gustav
 
 '''
-import os, codecs
+import os
 
 #def initialize(exp,run,var,stim,user):
 #    pass

@@ -93,9 +93,10 @@ class local_settings:
         """
         return self.Conf.sections()
 
-    def get_filename(self):
+    def get_conf_filename(self):
         """Returns the name of the configuration file
         """
+        #return os.path.realpath(self.conf_file)
         return self.conf_file
 
     def get_keys(self):
@@ -123,7 +124,7 @@ class local_settings:
         return self.Conf.getboolean(self.machine, var)
     
     def get_path(self, var):
-        """Returns the value of the specified key, as an expandable path
+        """Returns the value of the specified key, as an expanded path
         """
         return os.path.expanduser(self.Conf.get(self.machine, var))
     
