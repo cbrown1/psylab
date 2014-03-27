@@ -52,6 +52,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
     version = '0.1'
     filename = ''
     configFilePath = '.subject_manager.conf'
+    #configFilePath = '.subject_manager-debug.conf'
     script_path = os.path.dirname(os.path.realpath(__file__))
     image_path = os.path.join(script_path,'images')
     def __init__(self,parent=None):
@@ -585,7 +586,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
             print("db file found: %s" % self.filename)
             self.admin_load_db()
         else:
-            print("db file not found; running create_db with name %s" % self.filename)
+            print("db file not found: running create_db with name %s" % self.filename)
             self.admin_create_db(dbname=self.filename)
 
     def admin_write_config(self):
@@ -995,11 +996,14 @@ class Subject_Manager (QtGui.QWidget, form_class):
                 return;
         # Check for unique subject number
         subj_new = unicode(self.add_subject_lineEdit.text()).strip()
+        print ("Subj# from form: %s" % subj_new)
         c.execute("""SELECT MAX(SubjN) FROM Subjects""")
         ret = c.fetchone()[0]
         if ret:
+            print("Subj# from db: %s" % ret)
             subj_db = unicode(int(ret) + 1)
         else:
+            print("Did not get subj# from db. Using 1")
             subj_db = unicode(1)
         if (subj_new == subj_db):
             reply = QtGui.QMessageBox.question(self, 'Subject Manager',
