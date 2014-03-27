@@ -983,7 +983,7 @@ class Subject_Manager (QtGui.QWidget, form_class):
         c = conn.cursor()
         c.execute("""SELECT SubjN FROM Subjects WHERE FName='%s' AND LName='%s' AND DOB='%s'""" %
                   (unicode(self.add_fname_lineEdit.text()),unicode(self.add_lname_lineEdit.text()),unicode(self.add_birthdate_dateEdit.text())));
-        s = c.fetchone();
+        s = c.fetchone()
         if s != None:
             reply = QtGui.QMessageBox.information(self, 'Subject Manager',
              "This subject appears to be in the database.\n\n" +

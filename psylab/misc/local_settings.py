@@ -50,11 +50,17 @@ class local_settings:
             stimdir=~/Copy/Lab/stim
 
         ...where each section name should consist of os.name ('posix' or 'nt')
-        followed by a period, followed by socket.gethostname (machine name)
+        followed by a period, followed by the output of socket.gethostname 
+        (the machine name).
+        
+        There is no write or save functionality, which is by design. The 
+        intention is for the user to create the config file by hand.
 
         There are several functions for getting various types of data. But 
         get_str always works, since that is how all data are stored in the file.
         Lists of ints or floats are assumed to be comma-separated
+        Booleans [case-insensitive] should be (from the ConfigParser docs):
+        either ['1', 'yes', 'true', 'on'] or ['0', 'no', 'false', 'off']
         
         Example usage:
         
@@ -77,30 +83,68 @@ class local_settings:
         self.Conf.read(self.conf_file)
 
     def get_machine(self):
+        """Returns the identifier for the current machine (the identifier 
+            returned is the one generated, it is not read from the config file)
+        """
         return self.machine
 
+    def get_machines(self):
+        """Returns all machine identifiers in file
+        """
+        return self.Conf.sections()
+
+    def get_filename(self):
+        """Returns the name of the configuration file
+        """
+        return self.conf_file
+
     def get_keys(self):
-        keys = []
-        for item in self.Conf.items(self.machine):
-            keys.append(item[0])
-        return keys
+        """Returns a list containing all of the keys for this machine
+        """
+        return [key[0] for key in self.Conf.items(self.machine)]
+#        keys = []
+#        for item in self.Conf.items(self.machine):
+#            keys.append(item[0])
+#        return keys
+
+    def get_keyvals(self):
+        """Returns a list containing all of the key-value tuples for this machine
+        """
+        return self.Conf.items(self.machine)
 
     def get_str(self, var):
+        """Returns the value of the specified key, as a string
+        """
         return self.Conf.get(self.machine, var)
     
+    def get_bool(self, var):
+        """Returns the value of the specified key, as a boolean
+        """
+        return self.Conf.getboolean(self.machine, var)
+    
     def get_path(self, var):
+        """Returns the value of the specified key, as an expandable path
+        """
         return os.path.expanduser(self.Conf.get(self.machine, var))
     
     def get_list_int(self,var):
+        """Returns the value of the specified key, as a list of ints
+        """
         ret = self.Conf.get(self.machine, var)
         return [int(i) for i in ret.split(',')]
 
     def get_list_float(self,var):
+        """Returns the value of the specified key, as a list of floats
+        """
         ret = self.Conf.get(self.machine, var)
         return [float(i) for i in ret.split(',')]
 
     def get_int(self,var):
+        """Returns the value of the specified key, as an int
+        """
         return int(self.Conf.get(self.machine, var))
 
     def get_float(self,var):
+        """Returns the value of the specified key, as a float
+        """
         return float(self.Conf.get(self.machine, var))
