@@ -28,7 +28,7 @@ import os
 #def initialize(exp,run,var,stim,user):
 #    pass
 
-# TODO: add trialsperblock, startblock, starttrial
+# TODO: rip out stim stuff and move to psylab.misc.audio.signal_io.get_consecutive_files
 
 def pre_exp(exp, run, var, stim, user):
     # Only set these if None, in case they were set in experiment file setup, which has run already

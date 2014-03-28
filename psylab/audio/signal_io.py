@@ -79,6 +79,12 @@ class get_consecutive_files:
         random : A boolean specifying whether to randomize the file list [default = False]
         index : The starting index, if you want to skip some of the files. Not very 
                 useful if you are randomizing the list. [default = 0]
+        textfile : Path to a text file with text associated with each token. 
+                    Each line should have text for a single filename. One of the items
+                    should be the filename itself.
+        textformat : Indicates the format of each line. Should be something like 
+                     "file,kw,text" where `file` indicates the position of the filename 
+                     (file extensions are optional). 
 
         Usage:
         >>> f = get_consecutive_files(path_to_files)
@@ -86,21 +92,27 @@ class get_consecutive_files:
         'AW001.WAV'
         >>> f.get_next()
         'AW002.WAV'
+        >>> f.get_text('AW001')
+        'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
+        >>>
 
-        TODO: Add token strings
+        TODO: Add support for print-style ranges
     """
     def reset(self):
         self.ind = self.index
         if self.random:
             np.random.shuffle(self.file_list)
 
-    def __init__(self, path, file_ext='.wav;.WAV', random=False, index=0):
+    def __init__(self, path, file_ext='.wav;.WAV', random=False, index=0, textfile=None, textformat='file kw text'):
         self.path = path
         self.file_ext = file_ext.split(';')
         self.random = random
         self.file_list = []
         self.index = index
         self.ind = index
+        self.textformat = textformat
+        self.textfile = textfile
+
         files = os.listdir( self.path )
 
         for f in files:
@@ -113,10 +125,51 @@ class get_consecutive_files:
             self.file_list.sort()
         self.n = len(self.file_list)
 
+        # Text
+        if self.textfile:
+            dlm_toks = ','
+            if self.textformat.find(dlm_toks) != -1:
+                fmt_toks = self.textformat.split(dlm_toks)
+            else:
+                fmt_toks = self.textformat.split(' ')
+                dlm_toks = ' '
+            thislisth = open(textfile, 'r')
+            thislist = thislisth.readlines()
+            thislisth.close()
+            self.text = {}
+            if 'file' in fmt_toks:
+                fileind = fmt_toks.index('file')
+            for line in thislist:
+                if line != "" and line.lstrip()[0] != "#":
+                    thistext = line.split(dlm_toks,len(fmt_toks)-1)
+                    self.text[thistext[0]] = {}
+                    for tkn in fmt_toks:
+                        self.text[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
+
     def get_next(self):
+        """ Gets the next filename in the list
+        """
         item = self.file_list[self.ind]
         self.ind += 1
         if self.ind == self.n:
             self.reset()
         return item
+
+    def get_text(self, filename, item='text'):
+        """Gets a specified text item associated with the specified filename
+            Filename extension is optional. 
+        """
+        if filename in self.text.keys(): # Check filename as entered
+            filekey = filename
+        elif os.path.splitext(filename)[0] in self.text.keys():  # Check file basename
+            filekey = os.path.splitext(filename)[0]
+        if not filekey:
+            for ext in self.file_ext:
+                if filename+ext in self.text.keys(): # Check filename with extensions
+                    filekey = filename+ext
+                    break
+        if filekey:
+            return self.text[filekey][item]
+        else:
+            return None
 
