@@ -46,7 +46,7 @@ package_data = {'psylab': [ 'subject_manager/*.ui',
 requires = ['numpy (>=1.2)',]
 
 packages = ['psylab%s' % (p) for p in ['',
-                                    '.audio',
+                                    '.io',
                                     '.array',
                                     '.dataview',
                                     '.gustav',

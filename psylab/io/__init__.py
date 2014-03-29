@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2013 Christopher Brown
+# Copyright (c) 2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -24,24 +24,20 @@
 #
 
 '''
-audio - Audio-specific functions that depend on the medussa package
+io - File i/o specific functions, some of which depend on medussa
 
 Modules include:
 
-signal_io - Helper functions for reading audio data in less typical ways
+fileio - Helper functions for reading audio data in less typical ways
 listPlayer - Standalone script to play blocks of soundfiles in folders
 
 Notes
 -----
-To access TDT modules via the serial port, set both jumpers on
-the back of the OI1 to the RIGHT (can be accessed from the front
-of the XBUS rack). Jumpers to the left for AP2 control.
-
 Tested on windows and linux.
 
 Depends on medussa (http://medussa.googlecode.com)
 '''
 
-import signal_io
+from fileio import read_multi_file, read_audio_file, get_consecutive_files 
 import listPlayer
 

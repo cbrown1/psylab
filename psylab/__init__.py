@@ -34,10 +34,10 @@ In addition to the modules that are imported automatically, others include:
 
 subject_manager: Manage subjects with a useful user interface (dep: pyqt)
 tdt2: Access Tucker Davis System II hardware via serial port (dep: pyserial)
-audio: Perform tasks related to soundfile i/o (dep: medussa)
+io: Perform tasks related to file i/o (dep: medussa)
 '''
 
-__version__ = '0.3.5'
+__version__ = '0.3.7'
 
 #from array import array, nanproduct, nanmean
 #from dataview import dataview

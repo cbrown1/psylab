@@ -120,9 +120,11 @@ class get_consecutive_files:
         'AW001.WAV'
         >>> f.get_filename(10)
         'AW011.WAV'
+        >>> f.get_filename()
+        'AW012.WAV'
         >>> f.get_text('AW001')
         'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
-        >>> f.get_text('AW001','kw')
+        >>> f.get_text('AW001.WAV','kw')
         '5'
         >>>
     """
