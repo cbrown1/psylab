@@ -69,7 +69,7 @@ def read_audio_file(file_path):
     data,fs = m.read_file(file_path)
     return data,fs
 
-class consecutive_files:
+class get_consecutive_files:
     """A simple class for retrieving filesnames in a folder, one at a time
 
         This class also allows you to load bits of text associated with each
@@ -81,8 +81,6 @@ class consecutive_files:
         ----------
         path : string
             The full path where the files are.
-        name : string
-            A name to distinuish this set from others.
         file_ext : string
              A string of semicolon-separated extensions [default = '.wav;.WAV'].
         file_range : string
@@ -108,17 +106,16 @@ class consecutive_files:
 
         Functions
         ---------
-        get_filename(index, full_path)
+        get_filename(index)
             Returns a filename. if index is specified, returns that filename. If index is 
-            not specified, returns the next filename in the list. If full_path is True, 
-            returns the full path to the file, otherwise returns the filename only.
+            not specified, returns the next filename in the list.
 
         get_text(filename, [item])
             Returns text for the specified filename. [Default item = 'text']
 
         Usage
         -----
-        >>> f = consecutive_files(path_to_files)
+        >>> f = get_consecutive_files(path_to_files)
         >>> f.get_filename()
         'AW001.WAV'
         >>> f.get_filename(10)
@@ -131,12 +128,16 @@ class consecutive_files:
         '5'
         >>>
     """
-    def __init__(self, path, name='', file_ext='.wav;.WAV', file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
-        self.path = path
-        if name == '':
-            self.name = os.path.basename(path)
+    def reset(self):
+        if self.repeat:
+            self.index = 0
+            if self.random:
+                np.random.shuffle(self.file_list)
         else:
-            self.name = name
+            raise Exception('File list is exhausted!')
+
+    def __init__(self, path, file_ext='.wav;.WAV', file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
+        self.path = path
         self.file_ext = file_ext.split(';')
         self.random = random
         self.repeat = repeat
@@ -154,15 +155,14 @@ class consecutive_files:
             if ext in self.file_ext:
                 ffiles.append(f)
 
-        if self.file_range:
-            self.range = self.str_to_range(self.file_range)
+        if file_range:
+            self.range = self.str_to_range(file_range)
             i = 0
             for f in ffiles:
                 if i in self.range:
                     self.file_list.append(f)
                 i += 1
         else:
-            self.file_list = ffiles
             self.range = range(len(ffiles))
 
         if self.random:
@@ -192,27 +192,10 @@ class consecutive_files:
                     for tkn in fmt_toks:
                         self.text[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
 
-    def reset(self):
-        if self.repeat:
-            self.index = 0
-            if self.random:
-                np.random.shuffle(self.file_list)
-        else:
-            raise Exception('File list is exhausted!')
-
-    def get_filename(self, index=None, full_path=False):
+    def get_filename(self, index=None):
         """ Gets a filename.
             if index is specified, returns that filename. If index is not specified,
             returns the next filename in the list.
-
-            Parameters
-            ----------
-            index : int
-                The index of the desired filename. If unspecified, then next filename 
-                in the list is returned.
-            full_path : boolean
-                If True, returns the full path to the filename. If False, returns only
-                the filename.
         """
         if index:
             self.index = index
@@ -220,36 +203,34 @@ class consecutive_files:
             self.reset()
         item = self.file_list[self.index]
         self.index += 1
-        if full_path:
-            item = os.path.join(self.path,item)
         return item
 
-    def get_text(self, file_name=None, item='text'):
+    def get_text(self, filename, item='text'):
         """Gets a specified item of text associated with the specified filename.
-            If no filename is specified, the file name of the current index is used. 
             Filename extension is optional. The default item is 'text'.
         """
-        if not file_name:
-            file_name = self.file_list[self.index]
-        if file_name in self.text.keys(): # Check filename as entered
-            file_key = file_name
-        elif os.path.splitext(file_name)[0] in self.text.keys():  # Check file basename
-            file_key = os.path.splitext(file_name)[0]
-        else:
+        if filename in self.text.keys(): # Check filename as entered
+            filekey = filename
+        elif os.path.splitext(filename)[0] in self.text.keys():  # Check file basename
+            filekey = os.path.splitext(filename)[0]
+        if not filekey:
             for ext in self.file_ext:
-                if file_name+ext in self.text.keys(): # Check filename with extensions
-                    file_key = file_name+ext
+                if filename+ext in self.text.keys(): # Check filename with extensions
+                    filekey = filename+ext
                     break
-        if file_key:
-            return self.text[file_key][item]
+        if filekey:
+            return self.text[filekey][item]
         else:
             return None
+
 
     def str_to_range(self, s):
         """Translate a print-range style string to a list of integers
 
           The input should be a string of comma-delimited values, each of
-          which can be either a number, or a colon-delimited range. 
+          which can be either a number, or a colon-delimited range. If the
+          first token in the list is the string "random" or "r", then the
+          output list will be randomized before it is returned ("r,1:10").
 
           >>> str_to_range('1:5, 20, 22')
           [1, 2, 3, 4, 5, 20, 22]
@@ -257,6 +238,10 @@ class consecutive_files:
         s = s.strip()
         randomize = False
         tokens = [x.strip().split(":") for x in s.split(",")]
+
+        if tokens[0][0] in ["random","r","rand"]:
+            randomize = True
+            tokens = tokens[1:]
 
         # Translate ranges and enumerations into a list of int indices.
         def parse(x):
@@ -278,104 +263,4 @@ class consecutive_files:
             np.random.shuffle(result)
 
         return result
-
-class synched_consecutive_files:
-    """Class to create a synchronized group of consecutive_files lists. 
-        
-        This simple class allows you to group consecutive_files lists 
-        and synchronize their indexes. Thus, when you get a file from one 
-        list, the indexes of the other lists get incremented as well. 
-
-        A usecase is when you are running an experiment and have folders 
-        of pre-processed speech stimuli, with each folder representing a 
-        different condition. In this case, when you change conditions you 
-        want to continue with the same index you were using, so as not to
-        repeat the same speech tokens. 
-
-        Examples:
-        ---------
-
-        >>> targets = psylab.io.synched_consecutive_files(
-            psylab.io.consecutive_files(
-            path='/home/User/stim/IEEE_F1',
-            text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
-            file_range='1:100',
-            ),
-            
-            psylab.io.consecutive_files(
-            path='/home/User/stim/CUNY_F1',
-            text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
-            file_range='1:100',
-            ),
-        )
-
-        >>> targets.get_filename('IEEE_F1')
-        'AW001.WAV'
-        >>> targets.get_filename('CUNY_F1')
-        'KT002.wav'
-        >>> targets.get_text('CUNY_F1','KT002')
-        'I ENJOY TV.'
-
-
-        Notes
-        -----
-        listPlayer.py is designed to do something similar, along with a simple
-        interface to allow you to select conditions (folders) as you go, and it 
-        plays the soundfiles as well. Thus, if your stimuli are organized this
-        way and you want to run the experiment with minimal effort, listPlayer
-        is an easy way to do it. 
-    """
-    def __init__(self, *args):
-        self.group = {}
-        for arg in args:
-            self.group[arg.name] = arg
-
-    def get_filename(self, file_list, index=None, full_path=False):
-        """ Gets a filename from the specified `consecutive` list.
-            if index is specified, returns that filename. If index is not specified,
-            returns the next filename in the list.
-
-            Parameters
-            ----------
-            file_list : string
-                The name of the `consecutive` file list to draw from.
-            index : int
-                The index of the desired filename. If unspecified, then next filename 
-                in the list is returned.
-            full_path : boolean
-                If True, returns the full path to the filename. If False, returns only
-                the filename.
-        """
-        ret = ''
-        for name,g in self.group.iteritems():
-            f = g.get_filename(index, full_path)
-            if file_list == g.name:
-                ret = f
-        if ret == '':
-            return None
-        else:
-            return ret
-
-    def get_text(self, file_list, file_name=None, item='text'):
-        text = self.group[file_list].get_text(file_name, item)
-        return text
-
-    def get_index(self, file_list):
-        return self.group[file_list].index
-
-    def check_n(self, n):
-        """Checks the length of each list against the specified number
-            and returns a list of names of the lists whose lengths are smaller.
-
-            Useful to easily ensure that there are enough files in each list 
-            to do what you need to do.
-        """
-        ret = []
-        for name,g in self.group.iteritems():
-            if g.n < n:
-                ret.append(g.name)
-        if len(ret) == 0:
-            return None
-        else:
-            return ret
 

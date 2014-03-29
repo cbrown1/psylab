@@ -38,6 +38,6 @@ Tested on windows and linux.
 Depends on medussa (http://medussa.googlecode.com)
 '''
 
-from fileio import read_multi_file, read_audio_file, get_consecutive_files 
+from fileio import read_multi_file, read_audio_file, consecutive_files, synched_consecutive_files 
 import listPlayer
 
