@@ -170,8 +170,8 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
             run.condition = var.orderarray[run.block]
         if var.order == 'prompt' or run.condition+1 not in var.ignore:
             run.trials_block = 0
-            exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
             exp.utils.get_current_variables(exp, var, run.condition)
+            exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
             run.block_on = True
             while run.block_on:
                 exp.utils.get_current_stimuli(exp, stim)
