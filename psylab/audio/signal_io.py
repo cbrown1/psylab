@@ -106,22 +106,24 @@ class get_consecutive_files:
 
         Functions
         ---------
-        get_next()
-            Returns the next filename in the list.
-        get_filename(ind)
-            Returns the filename in the list specified by the index ind.
+        get_filename(index)
+            Returns a filename. if index is specified, returns that filename. If index is 
+            not specified, returns the next filename in the list.
+
         get_text(filename, [item])
             Returns text for the specified filename. [Default item = 'text']
 
         Usage
         -----
         >>> f = get_consecutive_files(path_to_files)
-        >>> f.get_next()
+        >>> f.get_filename()
         'AW001.WAV'
-        >>> f.get_next()
-        'AW002.WAV'
+        >>> f.get_filename(10)
+        'AW011.WAV'
         >>> f.get_text('AW001')
         'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
+        >>> f.get_text('AW001','kw')
+        '5'
         >>>
     """
     def reset(self):
@@ -145,19 +147,22 @@ class get_consecutive_files:
 
         files = os.listdir( self.path )
         files.sort()
-        n = len(files)
+        ffiles = []
+        for f in files:
+            fileName, ext = os.path.splitext(f)
+            if ext in self.file_ext:
+                ffiles.append(f)
+
         if file_range:
             self.range = self.str_to_range(file_range)
-        else:
-            self.range = range(n)
-
-        i = 0
-        for f in files:
-            if i in self.range:
-                fileName, ext = os.path.splitext(f)
-                if not os.path.isdir(f) and ext in self.file_ext:
+            i = 0
+            for f in ffiles:
+                if i in self.range:
                     self.file_list.append(f)
-            i += 1
+                i += 1
+        else:
+            self.range = range(len(ffiles))
+
         if self.random:
             np.random.shuffle(self.file_list)
         else:
@@ -185,19 +190,13 @@ class get_consecutive_files:
                     for tkn in fmt_toks:
                         self.text[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
 
-    def get_next(self):
-        """ Gets the next filename in the list
+    def get_filename(self, index=None):
+        """ Gets a filename.
+            if index is specified, returns that filename. If index is not specified,
+            returns the next filename in the list.
         """
-        if self.index == self.n:
-            self.reset()
-        item = self.file_list[self.index]
-        self.index += 1
-        return item
-
-    def get_filename(self, ind):
-        """ Gets the filename specified by ind
-        """
-        self.index = ind
+        if index:
+            self.index = index
         if self.index == self.n:
             self.reset()
         item = self.file_list[self.index]
@@ -205,8 +204,8 @@ class get_consecutive_files:
         return item
 
     def get_text(self, filename, item='text'):
-        """Gets a specified text item associated with the specified filename
-            Filename extension is optional. 
+        """Gets a specified item of text associated with the specified filename.
+            Filename extension is optional. The default item is 'text'.
         """
         if filename in self.text.keys(): # Check filename as entered
             filekey = filename
