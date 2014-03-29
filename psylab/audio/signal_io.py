@@ -72,21 +72,49 @@ def read_audio_file(file_path):
 class get_consecutive_files:
     """A simple class for retrieving filesnames in a folder, one at a time
 
-        When the class is created, the input arguments are:
+        This class also allows you to load bits of text associated with each
+        filename as needed. The intended use case is if you are loading stimuli 
+        in one at a time for an experiment, you might want to show info 
+        about each stimulus, such as keywords etc. 
 
-        path : The full path with the files are
-        file_ext : A string of semicolon-separated extensions [default = '.wav;.WAV']
-        random : A boolean specifying whether to randomize the file list [default = False]
-        index : The starting index, if you want to skip some of the files. Not very 
-                useful if you are randomizing the list. [default = 0]
-        textfile : Path to a text file with text associated with each token. 
-                    Each line should have text for a single filename. One of the items
-                    should be the filename itself.
-        textformat : Indicates the format of each line. Should be something like 
-                     "file,kw,text" where `file` indicates the position of the filename 
-                     (file extensions are optional). 
+        Parameters
+        ----------
+        path : string
+            The full path where the files are.
+        file_ext : string
+             A string of semicolon-separated extensions [default = '.wav;.WAV'].
+        file_range : string
+            A print-range style string, indicating the files to include. 
+            Example: '1:5, 7, 10' [default = all].
+        random : boolean
+            Whether to randomize the file order.
+        repeat : boolean
+            Whether to start again if the list is exhausted.
+        text_file : string
+            the full path to a text file that specifies text for each token.
+            There should be one line per token, and the format can be
+            specified (see below). 
+        text_format : string
+            Indicates the format of the lines in text_file. Should be something 
+            like "file,kw,text" where `file` is the only mandatory item, and 
+            indicates the position of the filename (file extensions are optional). So
+            eg., if a line in your text file is: "AW001,Palin,I came here for an argument." 
+            and you set text_format to "file,actor,text", then if you call 
+            get_text('AW001', 'text'), it would return 'I came here for an argument.'
+            Hint: The get_text function accepts a default item of 'text', so in the 
+            example get_text('AW001') would yield the same result.
 
-        Usage:
+        Functions
+        ---------
+        get_next()
+            Returns the next filename in the list.
+        get_filename(ind)
+            Returns the filename in the list specified by the index ind.
+        get_text(filename, [item])
+            Returns text for the specified filename. [Default item = 'text']
+
+        Usage
+        -----
         >>> f = get_consecutive_files(path_to_files)
         >>> f.get_next()
         'AW001.WAV'
@@ -95,30 +123,41 @@ class get_consecutive_files:
         >>> f.get_text('AW001')
         'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
         >>>
-
-        TODO: Add support for print-style ranges (str_to_range function is below)
     """
     def reset(self):
-        self.ind = self.index
-        if self.random:
-            np.random.shuffle(self.file_list)
+        if self.repeat:
+            self.index = 0
+            if self.random:
+                np.random.shuffle(self.file_list)
+        else:
+            raise Exception('File list is exhausted!')
 
-    def __init__(self, path, file_ext='.wav;.WAV', file_range=None, random=False, index=0, textfile=None, textformat='file kw text'):
+    def __init__(self, path, file_ext='.wav;.WAV', file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
         self.path = path
         self.file_ext = file_ext.split(';')
         self.random = random
+        self.repeat = repeat
         self.file_list = []
-        self.index = index
-        self.ind = index
-        self.textformat = textformat
-        self.textfile = textfile
+        self.index = 0
+        self.text_format = text_format
+        self.text_file = text_file
+        self.file_range = file_range
 
         files = os.listdir( self.path )
+        files.sort()
+        n = len(files)
+        if file_range:
+            self.range = self.str_to_range(file_range)
+        else:
+            self.range = range(n)
 
+        i = 0
         for f in files:
-            fileName, ext = os.path.splitext(f)
-            if not os.path.isdir(f) and ext in self.file_ext:
-                self.file_list.append(f)
+            if i in self.range:
+                fileName, ext = os.path.splitext(f)
+                if not os.path.isdir(f) and ext in self.file_ext:
+                    self.file_list.append(f)
+            i += 1
         if self.random:
             np.random.shuffle(self.file_list)
         else:
@@ -126,14 +165,14 @@ class get_consecutive_files:
         self.n = len(self.file_list)
 
         # Text
-        if self.textfile:
+        if self.text_file:
             dlm_toks = ','
-            if self.textformat.find(dlm_toks) != -1:
-                fmt_toks = self.textformat.split(dlm_toks)
+            if self.text_format.find(dlm_toks) != -1:
+                fmt_toks = self.text_format.split(dlm_toks)
             else:
-                fmt_toks = self.textformat.split(' ')
+                fmt_toks = self.text_format.split(' ')
                 dlm_toks = ' '
-            thislisth = open(textfile, 'r')
+            thislisth = open(self.text_file, 'r')
             thislist = thislisth.readlines()
             thislisth.close()
             self.text = {}
@@ -149,22 +188,20 @@ class get_consecutive_files:
     def get_next(self):
         """ Gets the next filename in the list
         """
-        item = self.file_list[self.ind]
-        self.ind += 1
-        if self.ind == self.n:
+        if self.index == self.n:
             self.reset()
+        item = self.file_list[self.index]
+        self.index += 1
         return item
 
     def get_filename(self, ind):
         """ Gets the filename specified by ind
         """
-        self.ind = ind
-        if self.ind == self.n:
+        self.index = ind
+        if self.index == self.n:
             self.reset()
-        item = self.file_list[self.ind]
-        self.ind += 1
-        if self.ind == self.n:
-            self.reset()
+        item = self.file_list[self.index]
+        self.index += 1
         return item
 
     def get_text(self, filename, item='text'):
@@ -186,7 +223,7 @@ class get_consecutive_files:
             return None
 
 
-    def str_to_range(s):
+    def str_to_range(self, s):
         """Translate a print-range style string to a list of integers
 
           The input should be a string of comma-delimited values, each of
