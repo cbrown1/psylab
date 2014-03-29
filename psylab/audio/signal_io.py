@@ -96,14 +96,14 @@ class get_consecutive_files:
         'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
         >>>
 
-        TODO: Add support for print-style ranges
+        TODO: Add support for print-style ranges (str_to_range function is below)
     """
     def reset(self):
         self.ind = self.index
         if self.random:
             np.random.shuffle(self.file_list)
 
-    def __init__(self, path, file_ext='.wav;.WAV', random=False, index=0, textfile=None, textformat='file kw text'):
+    def __init__(self, path, file_ext='.wav;.WAV', file_range=None, random=False, index=0, textfile=None, textformat='file kw text'):
         self.path = path
         self.file_ext = file_ext.split(';')
         self.random = random
@@ -155,6 +155,18 @@ class get_consecutive_files:
             self.reset()
         return item
 
+    def get_filename(self, ind):
+        """ Gets the filename specified by ind
+        """
+        self.ind = ind
+        if self.ind == self.n:
+            self.reset()
+        item = self.file_list[self.ind]
+        self.ind += 1
+        if self.ind == self.n:
+            self.reset()
+        return item
+
     def get_text(self, filename, item='text'):
         """Gets a specified text item associated with the specified filename
             Filename extension is optional. 
@@ -172,4 +184,45 @@ class get_consecutive_files:
             return self.text[filekey][item]
         else:
             return None
+
+
+    def str_to_range(s):
+        """Translate a print-range style string to a list of integers
+
+          The input should be a string of comma-delimited values, each of
+          which can be either a number, or a colon-delimited range. If the
+          first token in the list is the string "random" or "r", then the
+          output list will be randomized before it is returned ("r,1:10").
+
+          >>> str_to_range('1:5, 20, 22')
+          [1, 2, 3, 4, 5, 20, 22]
+        """
+        s = s.strip()
+        randomize = False
+        tokens = [x.strip().split(":") for x in s.split(",")]
+
+        if tokens[0][0] in ["random","r","rand"]:
+            randomize = True
+            tokens = tokens[1:]
+
+        # Translate ranges and enumerations into a list of int indices.
+        def parse(x):
+            if len(x) == 1:
+                if x == [""]:  # this occurs when there are trailing commas
+                    return []
+                else:
+                    #return map(int, x)
+                    return [int(x[0])-1]
+            elif len(x) == 2:
+                a,b = x
+                return range(int(a)-1, int(b))
+            else:
+                raise ValueError
+
+        result = reduce(list.__add__, [parse(x) for x in tokens])
+
+        if randomize:
+            np.random.shuffle(result)
+
+        return result
 
