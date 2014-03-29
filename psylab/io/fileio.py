@@ -82,16 +82,18 @@ class consecutive_files:
         path : string
             The full path where the files are.
         name : string
-            A name to distinuish this set from others.
+            A name to distinuish this set from others. If None, the basename of 
+            path will be used.
         file_ext : string
-             A string of semicolon-separated extensions [default = '.wav;.WAV'].
+            A string of semicolon-separated extensions to mask (eg. '.wav;.WAV'). 
+            [Default = all files]
         file_range : string
-            A print-range style string, indicating the files to include. 
-            Example: '1:5, 7, 10' [default = all].
+            A print-range style string, indicating the file indexes to include. 
+            Example: '1:5, 7, 10' would yield [1,2,3,4,5,7,10]. [default = all]
         random : boolean
-            Whether to randomize the file order.
+            Whether to randomize the file order. [default = False]
         repeat : boolean
-            Whether to start again if the list is exhausted.
+            Whether to start again if the list is exhausted. [default = False]
         text_file : string
             the full path to a text file that specifies text for each token.
             There should be one line per token, and the format can be
@@ -100,59 +102,55 @@ class consecutive_files:
             Indicates the format of the lines in text_file. Should be something 
             like "file,kw,text" where `file` is the only mandatory item, and 
             indicates the position of the filename (file extensions are optional). So
-            eg., if a line in your text file is: "AW001,Palin,I came here for an argument." 
+            eg., if a line in your text file is: "MP001,Palin,I came here for an argument." 
             and you set text_format to "file,actor,text", then if you call 
-            get_text('AW001', 'text'), it would return 'I came here for an argument.'
+            get_text('MP001', 'text'), it would return 'I came here for an argument.'
             Hint: The get_text function accepts a default item of 'text', so in the 
             example get_text('AW001') would yield the same result.
 
-        Functions
-        ---------
-        get_filename(index, full_path)
-            Returns a filename. if index is specified, returns that filename. If index is 
-            not specified, returns the next filename in the list. If full_path is True, 
-            returns the full path to the file, otherwise returns the filename only.
-
-        get_text(filename, [item])
-            Returns text for the specified filename. [Default item = 'text']
-
         Usage
         -----
-        >>> f = consecutive_files(path_to_files)
-        >>> f.get_filename()
-        'AW001.WAV'
-        >>> f.get_filename(10)
-        'AW011.WAV'
-        >>> f.get_filename()
-        'AW012.WAV'
-        >>> f.get_text('AW001')
-        'The BIRCH CANOE SLID on the SMOOTH PLANKS.'
-        >>> f.get_text('AW001.WAV','kw')
-        '5'
+        >>> f = consecutive_files('path/to/files')
+        >>> f.get_filename() # First call, so you get the first file in the list.
+        'MP001.WAV'
+        >>> f.get_text() # If you don't specify anything, return the `text` string of the current item.
+        'I came here for an argument.'
+        >>> f.get_filename(10) # Give me the 10th file in the list
+        'MP011.WAV'
+        >>> a = f.get_filename(full_path=True) # Now the next one (11th in this case), but full path
+        '/path/to/files/MP012.WAV'
+        >>> f.get_text(a) # You can pass the full path and it will try with the path and/or ext stripped
+        'Its being-hit-on-the-head lessons in here.'
+        >>> f.get_text('MP001','actor') # Wait, who said the first line?
+        'Palin'
         >>>
     """
-    def __init__(self, path, name='', file_ext='.wav;.WAV', file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
+    def __init__(self, path, name='', file_ext=None, file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
         self.path = path
         if name == '':
             self.name = os.path.basename(path)
         else:
             self.name = name
-        self.file_ext = file_ext.split(';')
+        if file_ext:
+            self.file_ext = file_ext.split(';')
+        else:
+            self.file_ext = '*'
         self.random = random
         self.repeat = repeat
         self.file_list = []
-        self.index = 0
+        self.index = -1
         self.text_format = text_format
         self.text_file = text_file
         self.file_range = file_range
 
-        files = os.listdir( self.path )
-        files.sort()
+        files = (f for f in os.listdir(self.path)
+                 if os.path.isfile(os.path.join(self.path, f)))
         ffiles = []
         for f in files:
             fileName, ext = os.path.splitext(f)
-            if ext in self.file_ext:
+            if self.file_ext == '*' or ext in self.file_ext:
                 ffiles.append(f)
+        ffiles.sort()
 
         if self.file_range:
             self.range = self.str_to_range(self.file_range)
@@ -194,7 +192,7 @@ class consecutive_files:
 
     def reset(self):
         if self.repeat:
-            self.index = 0
+            self.index = -1
             if self.random:
                 np.random.shuffle(self.file_list)
         else:
@@ -202,24 +200,26 @@ class consecutive_files:
 
     def get_filename(self, index=None, full_path=False):
         """ Gets a filename.
-            if index is specified, returns that filename. If index is not specified,
-            returns the next filename in the list.
 
             Parameters
             ----------
             index : int
                 The index of the desired filename. If unspecified, then next filename 
-                in the list is returned.
+                in the list is returned (current index+1). If positive, the filename of 
+                the specified index is returned. If negative, the filename of the  
+                current index is returned (index is unchanged). 
             full_path : boolean
                 If True, returns the full path to the filename. If False, returns only
                 the filename.
         """
         if index:
-            self.index = index
+            if index > -1: # If non-negative, use that index. (Don't change if negative)
+                self.index = index
+        else:
+            self.index += 1
         if self.index == self.n:
             self.reset()
         item = self.file_list[self.index]
-        self.index += 1
         if full_path:
             item = os.path.join(self.path,item)
         return item
@@ -228,16 +228,27 @@ class consecutive_files:
         """Gets a specified item of text associated with the specified filename.
             If no filename is specified, the file name of the current index is used. 
             Filename extension is optional. The default item is 'text'.
+
+            Parameters
+            ----------
+            file_name : string
+                The string used in the text file that you assigned `file` to in your 
+                text_format string.  
+            full_path : boolean
+                If True, returns the full path to the filename. If False, returns only
+                the filename.
         """
         if not file_name:
             file_name = self.file_list[self.index]
-        if file_name in self.text.keys(): # Check filename as entered
+        if file_name in self.text.keys(): # Try filename as entered
             file_key = file_name
-        elif os.path.splitext(file_name)[0] in self.text.keys():  # Check file basename
+        elif os.path.splitext(file_name)[0] in self.text.keys():  # Try without extension
             file_key = os.path.splitext(file_name)[0]
+        elif os.path.basename(os.path.splitext(file_name)[0]) in self.text.keys():  # Try without extension or path
+            file_key = os.path.basename(os.path.splitext(file_name)[0])
         else:
             for ext in self.file_ext:
-                if file_name+ext in self.text.keys(): # Check filename with extensions
+                if file_name+ext in self.text.keys(): # Try with extensions
                     file_key = file_name+ext
                     break
         if file_key:
@@ -255,7 +266,6 @@ class consecutive_files:
           [1, 2, 3, 4, 5, 20, 22]
         """
         s = s.strip()
-        randomize = False
         tokens = [x.strip().split(":") for x in s.split(",")]
 
         # Translate ranges and enumerations into a list of int indices.
@@ -273,9 +283,6 @@ class consecutive_files:
                 raise ValueError
 
         result = reduce(list.__add__, [parse(x) for x in tokens])
-
-        if randomize:
-            np.random.shuffle(result)
 
         return result
 
@@ -295,19 +302,19 @@ class synched_consecutive_files:
         Examples:
         ---------
 
-        >>> targets = psylab.io.synched_consecutive_files(
-            psylab.io.consecutive_files(
-            path='/home/User/stim/IEEE_F1',
-            text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
-            file_range='1:100',
-            ),
-            
-            psylab.io.consecutive_files(
-            path='/home/User/stim/CUNY_F1',
-            text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
-            file_range='1:100',
-            ),
-        )
+        >>> targets = synched_consecutive_files(
+                consecutive_files(
+                    path='/home/User/stim/IEEE_F1',
+                    text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
+                    file_range='1:100',
+                ),
+                
+                consecutive_files(
+                    path='/home/User/stim/CUNY_F1',
+                    text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
+                    file_range='1:100',
+                ),
+            )
 
         >>> targets.get_filename('IEEE_F1')
         'AW001.WAV'
@@ -362,6 +369,9 @@ class synched_consecutive_files:
 
     def get_index(self, file_list):
         return self.group[file_list].index
+
+    def get_n(self, file_list):
+        return self.group[file_list].n
 
     def check_n(self, n):
         """Checks the length of each list against the specified number
