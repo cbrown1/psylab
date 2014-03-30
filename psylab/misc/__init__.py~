@@ -27,6 +27,6 @@ import csv_inspect
 import plot_tools
 import stats_tools
 import path_tools
-import textgrid
+from .consecutive_files import consecutive_files, synched_consecutive_files 
 from .local_settings import local_settings
 

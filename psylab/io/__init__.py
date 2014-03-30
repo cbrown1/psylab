@@ -24,7 +24,7 @@
 #
 
 '''
-io - File i/o specific functions, some of which depend on medussa
+io - File i/o specific functions that depend on medussa
 
 Modules include:
 
@@ -38,6 +38,6 @@ Tested on windows and linux.
 Depends on medussa (http://medussa.googlecode.com)
 '''
 
-from fileio import read_multi_file, read_audio_file, consecutive_files, synched_consecutive_files 
+from .fileio import read_multi_file, read_audio_file
 import listPlayer
 
