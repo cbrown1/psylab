@@ -224,7 +224,7 @@ class consecutive_files:
             file_key = os.path.basename(os.path.splitext(file_name)[0])
         else:
             for ext in self.file_ext:
-                if file_name+ext in self.text.keys(): # Try adding extension, draw from file_ext
+                if file_name+ext in self.text.keys(): # Try adding extension, drawn from file_ext
                     file_key = file_name+ext
                     break
         if file_key:
@@ -242,7 +242,10 @@ class consecutive_files:
           [1, 2, 3, 4, 5, 20, 22]
         """
         s = s.strip()
-        tokens = [x.strip().split(":") for x in s.split(",")]
+        if s.count(":"):
+            tokens = [x.strip().split(":") for x in s.split(",")]
+        else:
+            tokens = [x.strip().split("-") for x in s.split(",")]
 
         # Translate ranges and enumerations into a list of int indices.
         def parse(x):
@@ -267,7 +270,7 @@ class synched_consecutive_files:
         
         This convenience class allows you to group consecutive_files lists 
         and synchronize their indexes. Thus, when the file index changes for 
-        one list, the indexes of the other lists get incremented as well. 
+        one list, the indexes of the other lists are changed as well. 
 
         An example usecase is when you are running an experiment and have  
         folders of pre-processed speech stimuli, with each folder  
@@ -278,14 +281,14 @@ class synched_consecutive_files:
 
         Examples:
         ---------
-        >>> targets = synched_consecutive_files(
-                consecutive_files(
+        >>> targets = synched_consecutive_files (
+                consecutive_files (
                     path='/home/User/stim/IEEE_F1',
                     text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
                     file_range='1:100', # Use only the first 100 tokens
                 ),
                 
-                consecutive_files(
+                consecutive_files (
                     path='/home/User/stim/CUNY_F1',
                     text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
                     file_range='1:100',

@@ -816,7 +816,10 @@ def str_to_range(s):
     """
     s = s.strip()
     randomize = False
-    tokens = [x.strip().split(":") for x in s.split(",")]
+    if s.count(":"):
+        tokens = [x.strip().split(":") for x in s.split(",")]
+    else:
+        tokens = [x.strip().split("-") for x in s.split(",")]
 
     if tokens[0][0] in ["random","r","rand"]:
         randomize = True

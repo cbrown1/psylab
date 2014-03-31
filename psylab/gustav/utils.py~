@@ -244,7 +244,6 @@ def initialize_experiment( exp, run, var, stim, user):
             for level in var.factorial[v]['levels']:
                 if level not in stim.stimvars:
                     stim.stimvars.append(level)
-                    stim.current[level].ind = run.trials_exp - 1
 
     exp.utils.process_variables(exp, var)
     run.nblocks = var.nblocks
