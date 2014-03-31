@@ -342,14 +342,16 @@ class synched_consecutive_files:
             return ret
 
     def get_text(self, file_list, file_name=None, item='text'):
-        text = self.group[file_list].get_text(file_name, item)
-        return text
+        return self.group[file_list].get_text(file_name, item)
 
     def get_index(self, file_list):
         return self.group[file_list].index
 
     def get_n(self, file_list):
         return self.group[file_list].n
+
+    def get_list_names(self):
+        return self.group.keys()
 
     def check_n(self, n):
         """Checks the length of each list against the specified number
