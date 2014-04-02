@@ -31,14 +31,14 @@ def print_pairwise_table ( tuk, sigpairsonly=False ):
     """Prints a reasonably formatted summary table, given the output of sm.stats.multicomp.pairwise_tukeyhsd
     """
     tuksumm = tuk.summary()
-    print tuksumm.title
-    print "%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0])
+    print (tuksumm.title)
+    print ("%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0]))
     for rec in tuksumm.data[1:]:
         if sigpairsonly and rec[5]:
             group1 = str(tuk.groupsunique.item(rec[0]))
             group2 = str(tuk.groupsunique.item(rec[1]))
             vals = (group1, group2) + tuple(rec[2:])
-            print "%10s %10s %8.2g %8.2g %8.2g %8s" % vals
-    print "%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0])
+            print ("%10s %10s %8.2g %8.2g %8.2g %8s" % vals)
+    print ("%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0]))
 
 

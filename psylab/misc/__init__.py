@@ -23,10 +23,10 @@
 # cbrown1@pitt.edu.
 #
 
-import csv_inspect
-import plot_tools
-import stats_tools
-import path_tools
+from . import csv_inspect
+from . import plot_tools
+from . import stats_tools
+from . import path_tools
 from .consecutive_files import consecutive_files, synched_consecutive_files 
 from .local_settings import local_settings
 
