@@ -24,11 +24,14 @@
 #
 
 """
-stats_tools - A set of helper functions for working with statsmodels and pandas
+stats_tools - Stats-related functions for working with statsmodels and pandas
 """
 
+import csv
+import numpy as np
+
 def print_pairwise_table ( tuk, sigpairsonly=False ):
-    """Prints a reasonably formatted summary table, given the output of sm.stats.multicomp.pairwise_tukeyhsd
+    """Prints a reasonably formatted summary table from output of statsmodels.stats.multicomp.pairwise_tukeyhsd
     """
     tuksumm = tuk.summary()
     print (tuksumm.title)
@@ -41,4 +44,30 @@ def print_pairwise_table ( tuk, sigpairsonly=False ):
             print ("%10s %10s %8.2g %8.2g %8.2g %8s" % vals)
     print ("%10s %10s %8s %8s %8s %8s" % tuple(tuksumm.data[0]))
 
+def csv_inspect(csv_path, vars=None):
+    if vars == None: # We just want a list of the experiment's variables
+        f = csv.reader(open(csv_path))
+        labels = f.next()
+        return labels
+    elif type(vars) == type("") or (type(vars) == type([]) and len(vars) == 1): # One var specified for level info
+        if type(vars) == type([]):
+            vars = vars[0]
+        r = csv.reader(open(csv_path))
+        n = ",".join(r.next())
+        arr = np.rec.fromrecords([tuple(x) for x in r], names=n)
+        levels = list(set(arr[vars]))
+        return levels
+    else: # We have a list of vars specified
+        r = csv.reader(open(csv_path))
+        n = ",".join(r.next())
+        arr = np.rec.fromrecords([tuple(x) for x in r], names=n)
+
+        def level(var):
+            return list(set(arr[var]))
+
+        d = {}
+        for v in vars:
+            d[v] = level(v)
+
+        return d
 

@@ -43,7 +43,10 @@ package_data = {'psylab': [ 'subject_manager/*.ui',
 #                           ],
                 }
 
-requires = ['numpy (>=1.2)',]
+requires = ['numpy (>=1.2)',
+            'scipy (>=0.12)',
+            'matplotlit (>=1.2)',
+            ]
 
 packages = ['psylab%s' % (p) for p in ['',
                                     '.io',
@@ -71,7 +74,7 @@ setup(name='PsyLab',
       description='PsyLab: Psychophysics Lab',
       long_description='''\
  Psylab is a loose collection of modules useful for various aspects of running
- psychophysics experiments, although several might be more generally useful.''',
+ psychophysics experiments, although some might be more generally useful.''',
       author='Christopher Brown',
       author_email='cbrown1@pitt.edu',
       maintainer='Christopher Brown',
@@ -87,13 +90,13 @@ setup(name='PsyLab',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
-        'Operating System :: MacOS',
-        'Operating System :: Microsoft :: Windows',
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 2.6',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: MacOS',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Multimedia :: Sound/Audio :: Speech',
         'Topic :: Multimedia :: Sound/Audio :: Analysis',
         'Topic :: Scientific/Engineering',

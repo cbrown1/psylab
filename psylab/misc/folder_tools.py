@@ -24,7 +24,7 @@
 #
 
 """
-Helper classes for working with filenames in less typical ways
+Helper classes for working with folders and files in less typical ways
 
 """
 
