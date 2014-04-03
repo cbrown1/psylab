@@ -31,16 +31,12 @@ import psylab
 version = psylab.__version__
 
 package_dir = { 'psylab': 'psylab', 
-#                'psylab_examples': 'user_scripts'
               }
 package_data = {'psylab': [ 'subject_manager/*.ui',
                             'subject_manager/*.sql',
                             'subject_manager/images/*.*',
                             'misc/*.csl',
                           ],
-#                'psylab_examples': [ '*.py',
-#                             'gustav_forms/*.py'
-#                           ],
                 }
 
 requires = ['numpy (>=1.2)',
@@ -55,7 +51,7 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.gustav',
                                     '.gustav.methods',
                                     '.gustav.frontends',
-                                    '.misc',
+                                    '.tools',
                                     '.signal',
                                     '.stats',
                                     '.subject_manager',
@@ -66,7 +62,8 @@ packages = ['psylab%s' % (p) for p in ['',
 
 requires=[
 'numpy (>=1.2)',
-'scipy',
+'scipy (>=0.12)',
+'matplotlib (>=1.1)',
 ]
 
 setup(name='PsyLab',

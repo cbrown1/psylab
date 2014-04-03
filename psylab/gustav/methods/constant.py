@@ -57,14 +57,13 @@ def pre_exp(exp, run, var, stim, user):
 
 def pre_block(exp, run, var, stim, user):
     if run.block == var.constant['startblock'] - 1:
-        run.trials_block = var.constant['starttrial']
-        run.trials_exp = (var.constant['trialsperblock'] * (var.constant['startblock']-1)) + run.trials_block - 1
+        run.trials_block = var.constant['starttrial'] - 1
+        run.trials_exp = (var.constant['trialsperblock'] * (var.constant['startblock']-1)) + (run.trials_block)
         # Move to experimentfile? Are stim issues really method related?
         for stimset in stim.stimvars:
             stim.current[stimset].ind = run.trials_exp
 
 def post_trial(exp, run, var, stim, user):
-    run.stim_index = run.trials_exp # Not used atm
     if run.trials_block == var.constant['trialsperblock']-1:
         run.block_on = False
     run.trial_on = False

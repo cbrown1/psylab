@@ -26,6 +26,9 @@
 from . import plot_tools
 from . import stats_tools
 from . import path_tools
+from . import folder_tools
+from . import config_tools
+
 from .folder_tools import consecutive_files, synched_consecutive_files 
 from .config_tools import local_settings
 
