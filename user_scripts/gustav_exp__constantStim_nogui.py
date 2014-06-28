@@ -73,6 +73,7 @@ def setup(exp,run,var,stim,user):
     of 0, -25, -50, -75,-100 & -125.
     '''
 
+    # DEPRECATED! Use tools.consecutive_files or synched_consecutive_files instead
     """STIMULUS SETS
         If you generate all your stimuli on the fly, you don't need any of these.
 

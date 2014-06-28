@@ -371,15 +371,21 @@ class synched_consecutive_files:
     def get_list_names(self):
         return self.group.keys()
 
-    def randomize(self):
+    def randomize(self, repeat=False):
         """Use a single random order for all the groups.
             
+            Parameters
+            ----------
+            repeat : bool
+                Whether to re-randomize, and recycle the lists when exhausted
+
             WARNING! This is a destructive function, in that it takes the 
             index_list of the first group it finds, randomizes it, and  
             replaces the index_list of all other groups with that same 
-            random order! ie., each file_list should have the same n.
+            random order! ie., each file_list should (will!) have the same n.
         """
-        random = True
+        self.repeat = repeat
+        self.random = True
         name,group1 = self.group.iteritems().next()
         group1_index_list = group1.index_list
         np.random.shuffle(group1_index_list)
