@@ -112,6 +112,7 @@ class consecutive_files:
         self.repeat = repeat
         self.file_list = []
         self.index = -1
+        self.index_list = []
         self.text_format = text_format
         self.text_file = text_file
         self.file_range = file_range
@@ -126,20 +127,18 @@ class consecutive_files:
         ffiles.sort()
 
         if self.file_range:
-            self.range = self.str_to_range(self.file_range)
+            index_list = self.str_to_range(self.file_range)
             i = 0
             for f in ffiles:
-                if i in self.range:
+                if i in index_list:
                     self.file_list.append(f)
                 i += 1
         else:
             self.file_list = ffiles
-            self.range = range(len(ffiles))
+        self.index_list = range(len(self.file_list))
 
         if self.random:
-            np.random.shuffle(self.file_list)
-        else:
-            self.file_list.sort()
+            np.random.shuffle(self.index_list)
         self.n = len(self.file_list)
 
         # Text
@@ -167,9 +166,9 @@ class consecutive_files:
         if self.repeat:
             self.index = -1
             if self.random:
-                np.random.shuffle(self.file_list)
+                np.random.shuffle(self.index_list)
         else:
-            raise Exception('File list is exhausted!')
+            raise Exception('%s file list is exhausted!' % self.name)
 
     def get_filename(self, index=None, full_path=False):
         """ Gets a filename.
@@ -192,7 +191,7 @@ class consecutive_files:
             self.index += 1
         if self.index == self.n:
             self.reset()
-        item = self.file_list[self.index]
+        item = self.file_list[self.index_list[self.index]]
         if full_path:
             item = os.path.join(self.path,item)
         return item
@@ -304,6 +303,15 @@ class synched_consecutive_files:
 
         Notes
         -----
+        You can also randomize the file lists in a synchronized way. After
+        creation, call randomize(), and the same random order will be used
+        for each file_list (destructive: it simply replaces the index_list
+        of each file_list with the same random order). Set the 'repeat'
+        property to True if you would like to recycle (and re-randomize) 
+        list items (If you don't need randomization, use the file_lists' 
+        'repeat' property). If you use the 'random' property of the 
+        individual file_lists, the random orders will not be synchronized.
+
         listPlayer.py is designed to do something similar, along with a simple
         interface to allow you to select conditions (folders) as you go, and it 
         plays the soundfiles as well. Thus, if your stimuli are organized this
@@ -311,6 +319,8 @@ class synched_consecutive_files:
         is an easy way to do it. 
     """
     def __init__(self, *args):
+        self.random = False
+        self.repeat = False
         self.group = {}
         for arg in args:
             self.group[arg.name] = arg
@@ -331,6 +341,14 @@ class synched_consecutive_files:
                 If True, returns the full path to the filename. If False, returns only
                 the filename.
         """
+
+        # HACK! Handle the case of synched repeating random lists
+        if self.repeat and self.random and not index:
+            if self.group[file_list].index == self.group[file_list].n-1:
+                self.randomize() # re-randomize
+                for name,g in self.group.iteritems():
+                    g.index = -1 # reset indices before the file_lists get to it
+
         ret = ''
         for name,g in self.group.iteritems():
             f = g.get_filename(index, full_path)
@@ -352,6 +370,21 @@ class synched_consecutive_files:
 
     def get_list_names(self):
         return self.group.keys()
+
+    def randomize(self):
+        """Use a single random order for all the groups.
+            
+            WARNING! This is a destructive function, in that it takes the 
+            index_list of the first group it finds, randomizes it, and  
+            replaces the index_list of all other groups with that same 
+            random order! ie., each file_list should have the same n.
+        """
+        random = True
+        name,group1 = self.group.iteritems().next()
+        group1_index_list = group1.index_list
+        np.random.shuffle(group1_index_list)
+        for name,g in self.group.iteritems():
+            g.index_list = group1_index_list
 
     def check_n(self, n):
         """Checks the length of each list against the specified number
