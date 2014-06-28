@@ -71,16 +71,15 @@ class consecutive_files:
         Usage
         -----
         Assume a folder on your system is /path/to/files and contains the following files:
-            MP001.wav
-            MP002.wav
-            MP003.wav
-            ...
-
+            |  MP001.wav
+            |  MP002.wav
+            |  MP003.wav
+            |  ...
         And there is a textfile at /path/to/MPQuotes.txt which looks like this:
-            MP001,Palin,I came here for an argument.
-            MP002,Cleese,No you didnt.
-            MP003,Chapman,Stupid git.
-            ...
+            |  MP001,Palin,I came here for an argument.
+            |  MP002,Cleese,No you didnt.
+            |  MP003,Chapman,Stupid git.
+            |  ...
 
         >>> f = consecutive_files('/path/to/files', text_file='/path/to/MPQuotes.txt', text_format='file,actor,text')
         >>> f.get_filename() # First call, so you get the first file in the list.
@@ -170,19 +169,21 @@ class consecutive_files:
         else:
             raise Exception('%s file list is exhausted!' % self.name)
 
-    def get_filename(self, index=None, full_path=False):
+    def get_filename(self, index=None, fmt='file'):
         """ Gets a filename.
 
             Parameters
             ----------
             index : int
-                The index of the desired filename. If unspecified, then next filename 
-                in the list is returned (current index+1). If positive, the filename of 
+                The index of the desired filename. If unspecified, then index  
+                is incremented and the next filename in the list is returned 
+                (current index+1). If zero or positive, the filename of 
                 the specified index is returned. If negative, the filename of the  
                 current index is returned (index is unchanged). 
-            full_path : boolean
-                If True, returns the full path to the filename. If False, returns only
-                the filename.
+            fmt : str
+                'file' returns the filename only with no path (default)
+                'base' returns the filebase with no path or extension
+                'full' returns the full file path
         """
         if index:
             if index > -1: # If non-negative, use that index. (Don't change if negative)
@@ -192,8 +193,10 @@ class consecutive_files:
         if self.index == self.n:
             self.reset()
         item = self.file_list[self.index_list[self.index]]
-        if full_path:
+        if fmt == 'full':
             item = os.path.join(self.path,item)
+        elif fmt == 'base':
+            item = os.path.splitext(item)[0]
         return item
 
     def get_text(self, file_name=None, item='text'):
@@ -286,7 +289,6 @@ class synched_consecutive_files:
                     text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
                     file_range='1:100', # Use only the first 100 tokens
                 ),
-                
                 consecutive_files (
                     path='/home/User/stim/CUNY_F1',
                     text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
@@ -325,7 +327,7 @@ class synched_consecutive_files:
         for arg in args:
             self.group[arg.name] = arg
 
-    def get_filename(self, file_list, index=None, full_path=False):
+    def get_filename(self, file_list, index=None, fmt='file'):
         """ Gets a filename from the specified `consecutive` list.
             if index is specified, returns that filename. If index is not specified,
             returns the next filename in the list.
@@ -336,10 +338,11 @@ class synched_consecutive_files:
                 The name of the `consecutive` file list to draw from.
             index : int
                 The index of the desired filename. If unspecified, then next filename 
-                in the list is returned.
-            full_path : boolean
-                If True, returns the full path to the filename. If False, returns only
-                the filename.
+                in the list is returned, and the index will be incremented.
+            fmt : str
+                'file' returns the filename only with no path (default)
+                'base' returns the filebase with no path or extension
+                'full' returns the full file path
         """
 
         # HACK! Handle the case of synched repeating random lists
@@ -351,7 +354,7 @@ class synched_consecutive_files:
 
         ret = ''
         for name,g in self.group.iteritems():
-            f = g.get_filename(index, full_path)
+            f = g.get_filename(index, fmt)
             if file_list == g.name:
                 ret = f
         if ret == '':
@@ -379,6 +382,8 @@ class synched_consecutive_files:
             repeat : bool
                 Whether to re-randomize, and recycle the lists when exhausted
 
+            Notes
+            -----
             WARNING! This is a destructive function, in that it takes the 
             index_list of the first group it finds, randomizes it, and  
             replaces the index_list of all other groups with that same 
