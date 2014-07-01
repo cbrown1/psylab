@@ -610,7 +610,7 @@ class DatasetView:
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
     
-    def save(self, filename, decimal_places=2):
+    def to_csv(self, filename, decimal_places=2):
         """Writes data to the specified filename.
             
             Overwrites file!
