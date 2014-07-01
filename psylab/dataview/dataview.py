@@ -610,7 +610,7 @@ class DatasetView:
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
     
-    def to_csv(self, filename, decimal_places=2):
+    def to_csv(self, filename, decimal_places=2, write_nan=False):
         """Writes data to the specified filename.
             
             Overwrites file!
@@ -623,8 +623,8 @@ class DatasetView:
         f.write( unicode( ",".join((",".join(self.vars),self.dataset.dv)) ) + u"\n" )
         # Data:
         for i in range(len(self.mean)):
-            #f.write( unicode( ",".join((",".join(eval(self.treatments[i])), "{:.2f}".format(self.mean[i]) )) ) + u"\n" )
-            f.write( unicode( ",".join((",".join(eval(self.treatments[i])), fmt % self.mean[i])) ) )
+            if write_nan or not np.isnan(self.mean[i]):
+                f.write( unicode( ",".join((",".join(eval(self.treatments[i])), fmt % self.mean[i])) ) )
         f.write("\n")
         f.close()
 
