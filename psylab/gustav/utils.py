@@ -32,7 +32,7 @@ import types
 from time import sleep
 from inspect import getmembers
 from functools import reduce
-from .frontends import term
+from frontends import term # FIXME: old line (from .frontends import term) was suddenly not working on py2.7/win7
 
 class exp:
     '''Experimental settings

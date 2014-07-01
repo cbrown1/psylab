@@ -35,6 +35,7 @@
 
 import numpy as np
 import csv
+import codecs
 from itertools import product
 from scipy.stats import nanmean, nanstd
 import psylab.stats
@@ -450,8 +451,10 @@ class DatasetView:
         self.dataset = None
         self.data = None
         self.treatments = None
+        self.vars = []
         self.var_dict = var_dict
         self.looks = looks
+        self.dv = None
 
         self.mean = None
         self.sd = None
@@ -469,6 +472,7 @@ class DatasetView:
         labels = []
         for (v,l) in ds.labels:
             if v in var_dict:
+                self.vars.append(v)
                 labels.append((v,tuple(var_dict[v])))
             elif v == looks:
                 labels.append((v,ds.design[v]))
@@ -605,3 +609,22 @@ class DatasetView:
             generate axis labels.
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
+    
+    def save(self, filename, decimal_places=2):
+        """Writes data to the specified filename.
+            
+            Overwrites file!
+        """
+
+        fmt = u"%" + u"1.%if\n" % decimal_places
+
+        f = codecs.open(filename, encoding='utf-8', mode='w')
+        # Header:
+        f.write( unicode( ",".join((",".join(self.vars),self.dataset.dv)) ) + u"\n" )
+        # Data:
+        for i in range(len(self.mean)):
+            #f.write( unicode( ",".join((",".join(eval(self.treatments[i])), "{:.2f}".format(self.mean[i]) )) ) + u"\n" )
+            f.write( unicode( ",".join((",".join(eval(self.treatments[i])), fmt % self.mean[i])) ) )
+        f.write("\n")
+        f.close()
+

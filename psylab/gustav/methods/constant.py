@@ -47,13 +47,13 @@ def pre_exp(exp, run, var, stim, user):
         run.gustav_is_go = False
     # Check if there are enough stimuli
     # Move to experimentfile? Are stim issues really method related?
-    for stimset in stim.stimvars:
-        if stim.sets[stimset]['type'] != 'manual':
-            if not stim.sets[stimset]['repeat']:
-                if var.constant['trialsperblock']*var.nblocks > stim.sets[stimset]['n']:
-                    raise Exception("Not enough stimulus files for stimset: " + stimset + 
-                                    "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nblocks) + 
-                                    "\nAvailable: " + str(stim.sets[stimset]['n']))
+#    for stimset in stim.stimvars:
+#        if stim.sets[stimset]['type'] != 'manual':
+#            if not stim.sets[stimset]['repeat']:
+#                if var.constant['trialsperblock']*var.nblocks > stim.sets[stimset]['n']:
+#                    raise Exception("Not enough stimulus files for stimset: " + stimset + 
+#                                    "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nblocks) + 
+#                                    "\nAvailable: " + str(stim.sets[stimset]['n']))
 
 def pre_block(exp, run, var, stim, user):
     if run.block == var.constant['startblock'] - 1:

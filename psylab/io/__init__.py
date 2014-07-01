@@ -38,6 +38,6 @@ Tested on windows and linux.
 Depends on medussa (http://medussa.googlecode.com)
 '''
 
-from .fileio import read_multi_file, read_audio_file
+from .file import read_multi_file, read_audio_file
 import listPlayer
 
