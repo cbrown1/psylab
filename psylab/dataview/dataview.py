@@ -610,21 +610,37 @@ class DatasetView:
         '''
         return np.array([eval(t)[self.dataset.index_from_var[var]] for t in self.treatments])
     
-    def to_csv(self, filename, decimal_places=2, write_nan=False):
-        """Writes data to the specified filename.
-            
-            Overwrites file!
+    def to_csv(self, filename, data="mean", decimal_places=2, write_nan=False, append=False):
+        """Writes data to the specified filename in csv format.
+
+            data can be one of "mean" [default], "sd", "se", or "n".
+            Careful! default is append=False, which overwrites output file!
+            if append==True, no header data will be written.
         """
+
+        if data=="mean":
+            data = self.mean
+        elif data=="sd":
+            data = self.sd
+        elif data=="se":
+            data = self.se
+        elif data=="n":
+            data = self.n
+            
+        if append:
+            mode = 'a'
+        else:
+            mode = 'w'
 
         fmt = u"%" + u"1.%if\n" % decimal_places
 
-        f = codecs.open(filename, encoding='utf-8', mode='w')
-        # Header:
-        f.write( unicode( ",".join((",".join(self.vars),self.dataset.dv)) ) + u"\n" )
+        f = codecs.open(filename, encoding='utf-8', mode=mode)
+        if not append:
+            # Header:
+            f.write( unicode( ",".join((",".join(self.vars),self.dataset.dv)) ) + u"\n" )
         # Data:
         for i in range(len(self.mean)):
             if write_nan or not np.isnan(self.mean[i]):
-                f.write( unicode( ",".join((",".join(eval(self.treatments[i])), fmt % self.mean[i])) ) )
-        f.write("\n")
+                f.write( unicode( ",".join((",".join(eval(self.treatments[i])), fmt % data[i])) ) )
         f.close()
 

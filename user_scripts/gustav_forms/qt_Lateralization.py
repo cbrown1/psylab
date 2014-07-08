@@ -9,7 +9,7 @@ import os, sys
 import time
 from PyQt4 import QtGui, QtCore, Qt
 import numpy as np
-import psylab.audio
+import psylab
 
 
 class Interface():
@@ -21,9 +21,9 @@ class Interface():
         pass
         self.app = QtGui.QApplication([]) # D
         if bg_image is None:
-            bg_image = '/home/code-breaker/Projects/psylab/user_scripts/gustav_forms/Images/SmileyFaces/smileyface_headphones.jpg'
+            bg_image = 'Images/SmileyFaces/smileyface_headphones.jpg'
         if feedback is None:
-            feedback = '/home/code-breaker/Projects/psylab/user_scripts/gustav_forms/Images/Fruit'
+            feedback = 'Images/Animals'
 
         self.dialog = self.Dialog(bg_image, feedback) # D
         self.dialog.show() # D
@@ -67,7 +67,7 @@ class Interface():
                     self.icon_folder = False
                 else:
                     self.icon_folder = feedback
-                    self.icon_set = psylab.audio.signal_io.get_consecutive_files(self.icon_folder,
+                    self.icon_set = psylab.tools.consecutive_files(self.icon_folder,
                                                                             file_ext='.png',
                                                                             random = True)
             else:
@@ -85,7 +85,7 @@ class Interface():
             self.respArea.setText("")
             if self.icon_folder:
                 self.iconImage.setVisible(False)
-                respIconraw = QtGui.QPixmap(os.path.join(self.icon_folder,self.icon_set.get_next()))
+                respIconraw = QtGui.QPixmap(os.path.join(self.icon_folder,self.icon_set.get_filename()))
     #            if respIconraw.width() > 48 or respIconraw.height() > 48:
     #                respIconraw = respIconraw.scaled(48,48, aspectRatioMode=QtCore.Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
                 self.iconImage.setPixmap(respIconraw)
@@ -164,7 +164,7 @@ class Interface():
     
             if self.feedback:
                 if self.icon_folder:
-                    respIconraw = QtGui.QPixmap(os.path.join(self.icon_folder,self.icon_set.get_next()))
+                    respIconraw = QtGui.QPixmap(os.path.join(self.icon_folder,self.icon_set.get_filename()))
                 else:
                     respIconraw = QtGui.QPixmap(self.respIcon_file)
                 self.respIcon_w = respIconraw.width()

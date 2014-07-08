@@ -1,36 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
-#
-# This file is part of Psylab.
-#
-# Psylab is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Psylab is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
-# cbrown1@pitt.edu.
-#
-
 import sys
 from PyQt4 import QtGui, QtCore
 import time
 
 class Interface():
-    def __init__(self, exp, run, choices):
+    def __init__(self, choices):
         self.app = QtGui.QApplication([])
-        self.dialog = self.Dialog(exp, run, choices)
+        self.dialog = self.Dialog(choices)
         self.dialog.show()
         self.dialog.setFixedSize(self.dialog.width(),self.dialog.height()) # <- Must be done after show
         self.app.processEvents()
@@ -38,17 +15,18 @@ class Interface():
 
     class Dialog(QtGui.QDialog):
 
-        def __init__(self, exp, run, choices, parent=None):
+        def __init__(self, choices, parent=None):
             QtGui.QDialog.__init__(self, parent, QtCore.Qt.WindowTitleHint)
-            self.setWindowIcon(QtGui.QIcon('shs_head16.png'))
+            #self.setWindowIcon(QtGui.QIcon('icon.png'))
             self.goodResponse = False
             self.waitingForResponse = False
             self.response = None
+            self.quitKey = '/'
             
             vbox = QtGui.QVBoxLayout()
             vbox.addStretch(1)
 
-            self.task = QtGui.QLabel(exp.prompt)
+            self.task = QtGui.QLabel()
             f = self.task.font()
             f.setPointSize(14)
             self.task.setAlignment(QtCore.Qt.AlignHCenter)
@@ -93,23 +71,20 @@ class Interface():
             vbox.addLayout(cbox)
             self.setLayout(vbox)
 
-            self.exp = exp
-            self.run = run
-
-            self.setWindowTitle("Gustav!")
+            self.setWindowTitle("Closed Set!")
             self.setModal=False
             self.setFocus()
 
         def closeEvent(self, event):
             # fake a quit:
             self.waitingForResponse = True
-            self.keyDown(self.exp, self.run, ord(self.exp.quitKey))
+            self.keyDown(ord(self.quitKey))
 
         def keyPressEvent(self, event):
-            self.keyDown(self.exp, self.run, event.key())
+            self.keyDown(event.key())
 
         def keyReleaseEvent(self, event):
-            self.keyUp(self.exp, event.key())
+            self.keyUp(event.key())
 
         def responseButtonEvent(self):
             self.setFocus()
@@ -121,16 +96,16 @@ class Interface():
                 self.response = self.getAllText()
                 self.waitingForResponse = False
 
-        def keyDown(self, exp, run, key):
+        def keyDown(self, key):
             if self.waitingForResponse:
                 if key < 256:
                     thiskey = chr(key).lower()
-                    if thiskey == self.exp.quitKey:
-                        # Close Gustav...
+                    if thiskey == self.quitKey:
+                        # Close...
                         self.response = None
                         self.waitingForResponse = False
 
-        def keyUp(self, exp, key):
+        def keyUp(self, key):
             if key == QtCore.Qt.Key_Control:
                 ctrlDown = False
             elif key == QtCore.Qt.Key_Shift:
@@ -177,9 +152,11 @@ class Interface():
 
     # End Dialog
 
-    def get_response(self):
+    def get_resp(self, prompt=None):
         """Waits modally for a full response
         """
+        if prompt:
+            self.dialog.task.setText(prompt)
         self.dialog.waitingForResponse = True
         while self.dialog.waitingForResponse:
             self.app.processEvents()
