@@ -29,6 +29,7 @@ import socket
 import datetime
 import codecs
 import types
+import collections
 from time import sleep
 from inspect import getmembers
 from functools import reduce
@@ -135,8 +136,8 @@ class exp:
     class var:
         '''Experiment variable settings
         '''
-        factorial = []
-        covariable = []
+        factorial = collections.OrderedDict()
+        covariable = collections.OrderedDict()
         ignore = []
         default = []
         current = []
@@ -240,31 +241,56 @@ def process_variables(exp):
     # Begin get number of levels
     factorial = []
     covariable = []
+    nfact = {}
+    ncov = {}
     if len(exp.var.factorial) > 0:
         exp.var.nlevels_fact = 1
-        for v in range(len(exp.var.factorial)):
-            exp.var.levelsbycond[exp.var.factorial[v]['name']] = []
-            exp.var.varlist.append(exp.var.factorial[v]['name'])
-            exp.var.factorial[v]['n'] = len(exp.var.factorial[v]['levels'])
-            exp.var.nlevels_fact *= exp.var.factorial[v]['n']
-            debug(exp, "Found factorial variable: %s [%i levels]" % (exp.var.factorial[v]['name'], len(exp.var.factorial[v]['levels'])))
+#        for v in range(len(exp.var.factorial)):
+#            exp.var.levelsbycond[exp.var.factorial[v]['name']] = []
+#            exp.var.varlist.append(exp.var.factorial[v]['name'])
+#            exp.var.factorial[v]['n'] = len(exp.var.factorial[v]['levels'])
+#            exp.var.nlevels_fact *= exp.var.factorial[v]['n']
+#            debug(exp, "Found factorial variable: %s [%i levels]" % (exp.var.factorial[v]['name'], len(exp.var.factorial[v]['levels'])))
+        for v in exp.var.factorial:
+            exp.var.levelsbycond[v] = []
+            exp.var.varlist.append(v)
+            nfact[v] = len(exp.var.factorial[v])
+            exp.var.nlevels_fact *= nfact[v]
+            debug(exp, "Found factorial variable: %s [%i levels]" % (v, len(exp.var.factorial[v])))
 
         factorial = exp.var.varlist
     nlist = 0
-    for v in range(len(exp.var.covariable)):
-        if exp.var.covariable[v]['name'] not in exp.var.levelsbycond.keys():
-            exp.var.levelsbycond[exp.var.covariable[v]['name']] = []
-        covariable.append(exp.var.covariable[v]['name'])
-        exp.var.covariable[v]['n'] = len(exp.var.covariable[v]['levels'])
+#    for v in range(len(exp.var.covariable)):
+#        if exp.var.covariable[v]['name'] not in exp.var.levelsbycond.keys():
+#            exp.var.levelsbycond[exp.var.covariable[v]['name']] = []
+#        covariable.append(exp.var.covariable[v]['name'])
+#        exp.var.covariable[v]['n'] = len(exp.var.covariable[v]['levels'])
+#        if nlist == 0 or nlist == 1:
+#            nlist = exp.var.covariable[v]['n']
+#        else:
+#            if nlist != exp.var.covariable[v]['n'] and exp.var.covariable[v]['n'] != 1:
+#                raise Exception("All 'covariable' variables must either have the same number of levels, or one level")
+#        debug(exp, "Found list variable: %s [%i levels]" % (exp.var.covariable[v]['name'], len(exp.var.covariable[v]['levels'])))
+    for v in exp.var.covariable:
+        if v not in exp.var.levelsbycond.keys():
+            exp.var.levelsbycond[v] = []
+        covariable.append(v)
+        ncov[v] = len(exp.var.covariable[v])
         if nlist == 0 or nlist == 1:
-            nlist = exp.var.covariable[v]['n']
+            nlist = ncov[v]
         else:
-            if nlist != exp.var.covariable[v]['n'] and exp.var.covariable[v]['n'] != 1:
+            if nlist != ncov[v] and ncov[v] != 1:
                 raise Exception("All 'covariable' variables must either have the same number of levels, or one level")
         debug(exp, "Found list variable: %s [%i levels]" % (exp.var.covariable[v]['name'], len(exp.var.covariable[v]['levels'])))
+#    if len(factorial) == 0:
+#        for v in range(len(exp.var.covariable)):
+#            exp.var.varlist.append(exp.var.covariable[v]['name'])
+#    exp.var.nlevels_list = nlist
+#    exp.var.nlevels_total = exp.var.nlevels_fact + exp.var.nlevels_list
+#    debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (exp.var.nlevels_total, exp.var.nlevels_fact, exp.var.nlevels_list))
     if len(factorial) == 0:
-        for v in range(len(exp.var.covariable)):
-            exp.var.varlist.append(exp.var.covariable[v]['name'])
+        for v in exp.var.covariable:
+            exp.var.varlist.append(v)
     exp.var.nlevels_list = nlist
     exp.var.nlevels_total = exp.var.nlevels_fact + exp.var.nlevels_list
     debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (exp.var.nlevels_total, exp.var.nlevels_fact, exp.var.nlevels_list))
@@ -279,36 +305,68 @@ def process_variables(exp):
 
         # create varmatrix, which will have 1 column for each variable in factorial,
         # and nlevels_fact rows containing indices to the levels of each variable
-        for v in range(len(exp.var.factorial)):
-            varmatrix[:,i] = np.tile(np.arange(exp.var.factorial[v]['n']).repeat(todo/exp.var.factorial[v]['n']),done)
-            done *= exp.var.factorial[v]['n']
-            todo /= exp.var.factorial[v]['n']
+#        for v in range(len(exp.var.factorial)):
+#            varmatrix[:,i] = np.tile(np.arange(exp.var.factorial[v]['n']).repeat(todo/exp.var.factorial[v]['n']),done)
+#            done *= exp.var.factorial[v]['n']
+#            todo /= exp.var.factorial[v]['n']
+#            i += 1
+        for v in exp.var.factorial:
+            varmatrix[:,i] = np.tile(np.arange(nfact[v]).repeat(todo/nfact[v]),done)
+            done *= nfact[v]
+            todo /= nfact[v]
             i += 1
         # For each variable, generate a list, of nlevels_fact long, of level names
-        for v in range(len(exp.var.factorial)):
+#        for v in range(len(exp.var.factorial)):
+#            for i in range(len(varmatrix)):
+#                exp.var.levelsbycond[exp.var.factorial[v]['name']].append(exp.var.factorial[v]['levels'][varmatrix[i,v]])
+        j = 0
+        for v in exp.var.factorial:
             for i in range(len(varmatrix)):
-                exp.var.levelsbycond[exp.var.factorial[v]['name']].append(exp.var.factorial[v]['levels'][varmatrix[i,v]])
+                exp.var.levelsbycond[v].append(exp.var.factorial[v][varmatrix[i,j]])
+            j += 1
 
     # Append 'covariable' levels to each list
+#    if exp.var.nlevels_list > 0:
+#        for i,v in enumerate(exp.var.varlist):
+#            gotvar = False
+#            if not v in covariable:
+#                # Variable is in factorial but not mentioned in covariable.
+#                if len(exp.var.factorial[i]['levels']) == 1:
+#                    # There is only 1 level specified in factorial. Use that for all 'covariable' conditions for that var.
+#                    for condition in range(exp.var.nlevels_list):
+#                        exp.var.levelsbycond[v].append(exp.var.factorial[i]['levels'][0])
+#                    gotvar = True
+#            elif len(exp.var.covariable[i]['levels']) == 1:
+#                # There is only one level specified. Use that for all conditions for that var.
+#                for condition in range(exp.var.nlevels_list):
+#                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][0])
+#                gotvar = True
+#            elif len(exp.var.covariable[i]['levels']) == exp.var.nlevels_list:
+#                # More than one level specified. Use them all.
+#                for condition in range(exp.var.nlevels_list):
+#                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][condition])
+#                gotvar = True
+#            if not gotvar:
+#                raise Exception("Unable to process the following variable: " + v)
     if exp.var.nlevels_list > 0:
         for i,v in enumerate(exp.var.varlist):
             gotvar = False
             if not v in covariable:
                 # Variable is in factorial but not mentioned in covariable.
-                if len(exp.var.factorial[i]['levels']) == 1:
+                if len(exp.var.factorial[i]) == 1:
                     # There is only 1 level specified in factorial. Use that for all 'covariable' conditions for that var.
                     for condition in range(exp.var.nlevels_list):
-                        exp.var.levelsbycond[v].append(exp.var.factorial[i]['levels'][0])
+                        exp.var.levelsbycond[v].append(exp.var.factorial[i][0])
                     gotvar = True
-            elif len(exp.var.covariable[i]['levels']) == 1:
+            elif len(exp.var.covariable[i]) == 1:
                 # There is only one level specified. Use that for all conditions for that var.
                 for condition in range(exp.var.nlevels_list):
-                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][0])
+                    exp.var.levelsbycond[v].append(exp.var.covariable[i][0])
                 gotvar = True
-            elif len(exp.var.covariable[i]['levels']) == exp.var.nlevels_list:
+            elif len(exp.var.covariable[i]) == exp.var.nlevels_list:
                 # More than one level specified. Use them all.
                 for condition in range(exp.var.nlevels_list):
-                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][condition])
+                    exp.var.levelsbycond[v].append(exp.var.covariable[i][condition])
                 gotvar = True
             if not gotvar:
                 raise Exception("Unable to process the following variable: " + v)
@@ -350,7 +408,7 @@ def get_current_variables(exp):
             exp.var.current[v] = exp.var.levelsbycond[v][condition]
         debug(exp, "Getting level: %s; for variable: %s" % (exp.var.current[v],v))
 
-def get_variable_strtable(var):
+def get_variable_strtable(exp):
     '''Creates a table specifying the levels of each variable for each condition
     '''
     vlength = {}
@@ -371,7 +429,7 @@ def get_variable_strtable(var):
 def menu_condition(exp):
     '''Prompts the experiment to choose the conditions to run
     '''
-    strtable = exp.utils.get_variable_strtable(var) + "\nSelected Conditions: ["
+    strtable = exp.utils.get_variable_strtable(exp) + "\nSelected Conditions: ["
     sel = []
     conditions = []
     message = ''
