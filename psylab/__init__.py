@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -37,7 +37,7 @@ tdt2: Access Tucker Davis System II hardware via serial port (dep: pyserial)
 io: Perform tasks related to file i/o (dep: medussa)
 '''
 
-__version__ = '0.3.11'
+__version__ = '0.3.12'
 
 #from array import array, nanproduct, nanmean
 #from dataview import dataview

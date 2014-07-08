@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -28,15 +28,11 @@ from random import shuffle
 import sys
 import getopt
 import numpy as np
-from . import utils
+import utils
 
 def configure(experimentFile = None, frontend = None):
 
-    var = utils.var()
-    stim = utils.stim()
     exp = utils.exp()
-    run = utils.run()
-    user = utils.user()
     exp.utils = utils
     exp.utils.get_frontend(exp, frontend)
 
@@ -52,18 +48,14 @@ def configure(experimentFile = None, frontend = None):
     sys.path.append(exp.experimentPath)
     experiment = __import__(exp.experimentBase)
 
-    experiment.setup( exp, run, var, stim, user)
+    experiment.setup( exp )
 
-    exp.frontend.show_config( exp, run, var, stim, user )
+    exp.frontend.show_config( exp )
 
 
 def info(experimentFile = None, frontend = None):
 
     exp = utils.exp()
-    run = utils.run()
-    var = utils.var()
-    stim = utils.stim()
-    user = utils.user()
     exp.utils = utils
 
     # Experiment File
@@ -78,7 +70,7 @@ def info(experimentFile = None, frontend = None):
     sys.path.append(exp.experimentPath)
     experiment = __import__(exp.experimentBase)
 
-    experiment.setup( exp, run, var, stim, user)
+    experiment.setup( exp )
 
     exp.utils.process_variables(var)
     print(exp.utils.get_variable_strtable(var))
@@ -86,10 +78,6 @@ def info(experimentFile = None, frontend = None):
 def run(experimentFile = None, subjectID = None, frontend = None, recordData = None):
 
     exp = utils.exp()
-    run = utils.run()
-    var = utils.var()
-    stim = utils.stim()
-    user = utils.user()
     exp.utils = utils
 
     sys.path.append( os.path.dirname( os.path.realpath( __file__ ) ) )
@@ -116,10 +104,10 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     sys.path.append(exp.experimentPath)
     exp.experiment = __import__(exp.experimentBase)
 
-    #var.factvars[:] = []
-    #var.listvars[:] = []
+    #exp.var.factvars[:] = []
+    #exp.var.listvars[:] = []
 
-    exp.experiment.setup( exp, run, var, stim, user )
+    exp.experiment.setup( exp )
 
     exp.method_str = exp.method
     try:
@@ -128,7 +116,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         raise Exception("Unknown experimental method: " + exp.method_str)
     exp.method = getattr(methodi, exp.method_str)
 
-    exp.utils.initialize_experiment(exp,run,var,stim,user)
+    exp.utils.initialize_experiment( exp )
     if recordData is not None:
         exp.recordData = recordData
 
@@ -146,10 +134,10 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
                 return
     else:
         print("WARNING: No data will be recorded!")
-    if var.order == 'menu':
-        exp.utils.menu_condition(exp,run,var,stim,user)
+    if exp.var.order == 'menu':
+        exp.utils.menu_condition( exp )
 
-    if run.gustav_is_go == False:
+    if exp.run.gustav_is_go == False:
         print("Gustav cancelled at user request")
         return
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
@@ -157,40 +145,39 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         print("Gustav cancelled at user request")
         return
 
-    exp.utils.update_time(run)
+    exp.utils.update_time(exp.run)
     if not os.path.isfile(exp.dataFile):
-        exp.utils.save_data(exp,run,var,stim,user, 'header')
-    exp.utils.do_event(exp,run,var,stim,user, 'pre_exp')
-    run.trials_exp = 0
-    run.gustav_is_go = True
-    while run.gustav_is_go:
-        if var.order == 'prompt':
-            exp.prompt_condition(exp,run,var,stim,user)
+        exp.utils.save_data(exp, 'header')
+    exp.utils.do_event(exp, 'pre_exp')
+    exp.run.trials_exp = 0
+    exp.run.gustav_is_go = True
+    while exp.run.gustav_is_go:
+        if exp.var.order == 'prompt':
+            exp.prompt_condition(exp)
         else:
-            run.condition = var.orderarray[run.block]
-        if var.order == 'prompt' or run.condition+1 not in var.ignore:
-            run.trials_block = 0
-            exp.utils.get_current_variables(exp, var, run.condition)
-            exp.utils.do_event(exp,run,var,stim,user, 'pre_block')
-            run.block_on = True
-            while run.block_on:
-                exp.utils.get_current_stimuli(exp, stim)
-                run.trial_on = True
-                while run.trial_on:
-                    exp.utils.do_event(exp,run,var,stim,user, 'pre_trial')
-                    exp.present_trial(exp,run,var,stim,user)
-                    exp.prompt_response(exp,run,var,stim,user)
-                    exp.utils.do_event(exp,run,var,stim,user, 'post_trial')
-                    run.trials_block += 1
-                    run.trials_exp += 1
+            exp.run.condition = exp.var.orderarray[exp.run.block]
+        if exp.var.order == 'prompt' or exp.run.condition+1 not in exp.var.ignore:
+            exp.run.trials_block = 0
+            exp.utils.get_current_variables(exp)
+            exp.utils.do_event(exp, 'pre_block')
+            exp.run.block_on = True
+            while exp.run.block_on:
+                exp.run.trial_on = True
+                while exp.run.trial_on:
+                    exp.utils.do_event(exp, 'pre_trial')
+                    exp.present_trial(exp)
+                    exp.prompt_response(exp)
+                    exp.utils.do_event(exp, 'post_trial')
+                    exp.run.trials_block += 1
+                    exp.run.trials_exp += 1
 
-            exp.utils.do_event(exp,run,var,stim,user, 'post_block')
-            run.block += 1
-            if var.order != 'prompt' and run.block == run.nblocks:
-                run.gustav_is_go = False
+            exp.utils.do_event(exp, 'post_block')
+            exp.run.block += 1
+            if exp.var.order != 'prompt' and exp.run.block == exp.run.nblocks:
+                exp.run.gustav_is_go = False
 
     # End gustav_is_go loop
-    exp.utils.do_event(exp,run,var,stim,user, 'post_exp')
+    exp.utils.do_event(exp, 'post_exp')
 
 def main(argv):
     experimentFile = None

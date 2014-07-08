@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -44,9 +44,6 @@
 	    experiment, along with all of the corresponding condition levels
 	
 """
-
-__version__ = '0.1'
-__author__ = 'Christopher Brown <c-b@asu.edu>'
 
 from .gustav import run, configure, info, main
 from . import frontends, methods

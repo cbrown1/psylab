@@ -23,14 +23,11 @@
 '''Method of constant stimuli for Gustav
 
 '''
-import os
 
 #def initialize(exp,run,var,stim,user):
 #    pass
 
-# TODO: rip out stim stuff and move to psylab.misc.audio.signal_io.get_consecutive_files
-
-def pre_exp(exp, run, var, stim, user):
+def pre_exp(exp):
     # Only set these if None, in case they were set in experiment file setup, which has run already
     if exp.logString_pre_exp == None:
         exp.logString_pre_exp = "Experiment $name started at $time\n"
@@ -42,30 +39,18 @@ def pre_exp(exp, run, var, stim, user):
         exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     if exp.logString_post_exp == None:
         exp.logString_post_exp = "\nExperiment $name ended at $time\n"
-    run.block = var.constant['startblock']-1
-    if run.block >= run.nblocks - 1:
-        run.gustav_is_go = False
-    # Check if there are enough stimuli
-    # Move to experimentfile? Are stim issues really method related?
-#    for stimset in stim.stimvars:
-#        if stim.sets[stimset]['type'] != 'manual':
-#            if not stim.sets[stimset]['repeat']:
-#                if var.constant['trialsperblock']*var.nblocks > stim.sets[stimset]['n']:
-#                    raise Exception("Not enough stimulus files for stimset: " + stimset + 
-#                                    "\nNeeded for design: " + str(var.constant['trialsperblock']*var.nblocks) + 
-#                                    "\nAvailable: " + str(stim.sets[stimset]['n']))
+    exp.run.block = exp.var.constant['startblock']-1
+    if exp.run.block >= exp.run.nblocks - 1:
+        exp.run.gustav_is_go = False
 
-def pre_block(exp, run, var, stim, user):
-    if run.block == var.constant['startblock'] - 1:
-        run.trials_block = var.constant['starttrial'] - 1
-        run.trials_exp = (var.constant['trialsperblock'] * (var.constant['startblock']-1)) + (run.trials_block)
-        # Move to experimentfile? Are stim issues really method related?
-        for stimset in stim.stimvars:
-            stim.current[stimset].ind = run.trials_exp
+def pre_block(exp):
+    if exp.run.block == exp.var.constant['startblock'] - 1:
+        exp.run.trials_block = exp.var.constant['starttrial'] - 1
+        exp.run.trials_exp = (exp.var.constant['trialsperblock'] * (exp.var.constant['startblock']-1)) + (exp.run.trials_block)
 
-def post_trial(exp, run, var, stim, user):
-    if run.trials_block == var.constant['trialsperblock']-1:
-        run.block_on = False
-    run.trial_on = False
+def post_trial(exp):
+    if exp.run.trials_block == exp.var.constant['trialsperblock']-1:
+        exp.run.block_on = False
+    exp.run.trial_on = False
 
 

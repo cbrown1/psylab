@@ -67,64 +67,61 @@ class exp:
     dataFile ='$name.csv'
     dataFile_unexpanded =''
     recordData = True
-    stimtext_fmt = 'file,kw,text'  # Default format for stimulus text files
     comments = ''
     disable_functions = []          # Experimenter can add function names as strings to disable them
     methodTypes = ['constant', 'staircase'] # TODO: remove methodTypes
     quitKeys = ['/', 'q']
-    stimTypes = ['files', 'manual']
-    varTypes = ['stim', 'manual', 'dynamic']
     eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
-    from .frontends import term
+    from frontends import term
 
-    def prompt_response(self,exp,run,var,stim,user):
+    def prompt_response(self,exp):
         while True:
             ret = exp.frontend.get_input(None, "Gustav!","Enter Response: ")
             # Check for quit
             if ret in exp.quitKeys:
                 # User wants to exit. Break out of block, gustav loops
-                run.block_on = False
-                run.gustav_is_go = False
+                exp.run.block_on = False
+                exp.run.gustav_is_go = False
                 break
             else:
                 # Its good. Record response
-                run.response = ret
+                exp.run.response = ret
                 # Exit while-True loop
                 break
             
-    def prompt_condition(self,exp,run,var,stim,user):
+    def prompt_condition(self,exp):
         while True:
-            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(var.nlevels_total)+"): ")
+            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(exp.var.nlevels_total)+"): ")
             if ret in exp.quitKeys:
-                run.block_on = False
-                run.gustav_is_go = False
+                exp.run.block_on = False
+                exp.run.gustav_is_go = False
                 break
             elif ret.isdigit():
                 iret = int(ret) - 1
-                if iret in range(var.nlevels_total):
-                    run.condition = iret
+                if iret in range(exp.var.nlevels_total):
+                    exp.run.condition = iret
                     break
 
-    def present_trial(self,exp,run,var,stim,user):
+    def present_trial(self,exp):
         pass
 
-    def pre_exp(exp,run,var,stim,user):
+    def pre_exp(exp):
         pass
 
-    def pre_block(exp,run,var,stim,user):
+    def pre_block(exp):
         pass
 
-    def pre_trial(exp,run,var,stim,user):
+    def pre_trial(exp):
         pass
 
-    def post_trial(exp,run,var,stim,user):
+    def post_trial(exp):
         pass
 
-    def post_block(exp,run,var,stim,user):
+    def post_block(exp):
         pass
 
-    def post_exp(exp,run,var,stim,user):
+    def post_exp(exp):
         pass
 
     pre_exp_ = [pre_exp]
@@ -135,64 +132,48 @@ class exp:
     post_exp_ = [post_exp]
 
 
-class var:
-    '''Experiment variable settings
-    '''
-    factorial = []
-    covariable = []
-    ignore = []
-    default = []
-    current = []
-    varlist = []
-    levelsbycond = {}
-    nlevels_fact = 0
-    nlevels_list = 0
-    nlevels_total = 0
-    order = 'natural'
-    order_ = 0
-    prompt = []
-    dynamic = {}
+    class var:
+        '''Experiment variable settings
+        '''
+        factorial = []
+        covariable = []
+        ignore = []
+        default = []
+        current = []
+        varlist = []
+        levelsbycond = {}
+        nlevels_fact = 0
+        nlevels_list = 0
+        nlevels_total = 0
+        order = 'natural'
+        order_ = 0
+        prompt = []
+        dynamic = {}
+    
+    
+    class run:
+        '''Settings associated with the details of running the experiment
+        '''
+        time = ''
+        date = ''
+        trials_block = 0     # Current trial count within a block
+        trials_exp = 0      # Current total trial count
+        block = 0      # Current block (treatment) count
+        blocks = 0     # Current total block count
+        condition = 0  # Current condition
+        block_on = True
+        trial_on = True
+        gustav_is_go = True
+        response = ''
+    
+    
+    class user:
+        '''Any user settings
+        '''
+        pass
 
 
-class stim:
-    '''Stimulus (files on disk) settings
-    '''
-    sets = {}
-    current = {}
-    stimvars = []
-    stimarray = 0
-
-
-class current_stim:
-    filename = ''
-    filebase = ''
-    info = {}
-    ind = 0
-    data = None
-
-class run:
-    '''Settings associated with the details of running the experiment
-    '''
-    time = ''
-    date = ''
-    trials_block = 0     # Current trial count within a block
-    trials_exp = 0      # Current total trial count
-    block = 0      # Current block (treatment) count
-    blocks = 0     # Current total block count
-    condition = 0  # Current condition
-    block_on = True
-    trial_on = True
-    gustav_is_go = True
-    response = ''
-
-
-class user:
-    '''Any user settings
-    '''
-    pass
-
-
-def initialize_experiment( exp, run, var, stim, user):
+def initialize_experiment( exp ):
     '''Do stuff necessary for the start of an experiment
     '''
     logpath = os.path.split(exp.logFile)
@@ -235,32 +216,22 @@ def initialize_experiment( exp, run, var, stim, user):
         exp.prompt_condition = exp.experiment.prompt_condition
         debug(exp, 'Found event in experiment: prompt_condition')
 
-    stim.get_next = exp.utils.stim_get_next
-    stim.reset_order = exp.utils.stim_reset_order
-    exp.utils.process_stimuli(exp, stim)
-    # Make a list of the stimuli that are actually used
-    for v in range(len(var.factorial)):
-        if var.factorial[v]['type'] == 'stim':
-            for level in var.factorial[v]['levels']:
-                if level not in stim.stimvars:
-                    stim.stimvars.append(level)
-
-    exp.utils.process_variables(exp, var)
-    run.nblocks = var.nblocks
+    exp.utils.process_variables(exp)
+    exp.run.nblocks = exp.var.nblocks
     if exp.recordData:
         datapath = os.path.split(exp.dataFile)
         if not os.path.isdir(datapath[0]):
             os.makedirs(datapath[0])
             debug(exp, "Created datafile path: " + datapath[0])
         exp.dataFile_unexpanded = exp.dataFile
-        exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp, run, var, stim, user)
+        exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp)
         if not os.path.isfile(exp.dataFile):
-            exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp, run, var, stim, user)
+            exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp)
             write_data(exp.dataString_header, exp.dataFile)
             debug(exp, "Created datafile: " + exp.dataFile)
 
 
-def process_variables(exp, var):
+def process_variables(exp):
     '''Processes conditions
         Factorialize all 'factorial' conditions, and add all 'covariable' conditions
         For each variable, make a list of levels for each condition
@@ -269,207 +240,142 @@ def process_variables(exp, var):
     # Begin get number of levels
     factorial = []
     covariable = []
-    if len(var.factorial) > 0:
-        var.nlevels_fact = 1
-        for v in range(len(var.factorial)):
-            var.levelsbycond[var.factorial[v]['name']] = []
-            var.varlist.append(var.factorial[v]['name'])
-            var.factorial[v]['n'] = len(var.factorial[v]['levels'])
-            var.nlevels_fact *= var.factorial[v]['n']
-            debug(exp, "Found factorial variable: %s [%i levels]" % (var.factorial[v]['name'], len(var.factorial[v]['levels'])))
+    if len(exp.var.factorial) > 0:
+        exp.var.nlevels_fact = 1
+        for v in range(len(exp.var.factorial)):
+            exp.var.levelsbycond[exp.var.factorial[v]['name']] = []
+            exp.var.varlist.append(exp.var.factorial[v]['name'])
+            exp.var.factorial[v]['n'] = len(exp.var.factorial[v]['levels'])
+            exp.var.nlevels_fact *= exp.var.factorial[v]['n']
+            debug(exp, "Found factorial variable: %s [%i levels]" % (exp.var.factorial[v]['name'], len(exp.var.factorial[v]['levels'])))
 
-        factorial = var.varlist
+        factorial = exp.var.varlist
     nlist = 0
-    for v in range(len(var.covariable)):
-        if var.covariable[v]['name'] not in var.levelsbycond.keys():
-            var.levelsbycond[var.covariable[v]['name']] = []
-        covariable.append(var.covariable[v]['name'])
-        var.covariable[v]['n'] = len(var.covariable[v]['levels'])
+    for v in range(len(exp.var.covariable)):
+        if exp.var.covariable[v]['name'] not in exp.var.levelsbycond.keys():
+            exp.var.levelsbycond[exp.var.covariable[v]['name']] = []
+        covariable.append(exp.var.covariable[v]['name'])
+        exp.var.covariable[v]['n'] = len(exp.var.covariable[v]['levels'])
         if nlist == 0 or nlist == 1:
-            nlist = var.covariable[v]['n']
+            nlist = exp.var.covariable[v]['n']
         else:
-            if nlist != var.covariable[v]['n'] and var.covariable[v]['n'] != 1:
+            if nlist != exp.var.covariable[v]['n'] and exp.var.covariable[v]['n'] != 1:
                 raise Exception("All 'covariable' variables must either have the same number of levels, or one level")
-        debug(exp, "Found list variable: %s [%i levels]" % (var.covariable[v]['name'], len(var.covariable[v]['levels'])))
+        debug(exp, "Found list variable: %s [%i levels]" % (exp.var.covariable[v]['name'], len(exp.var.covariable[v]['levels'])))
     if len(factorial) == 0:
-        for v in range(len(var.covariable)):
-            var.varlist.append(var.covariable[v]['name'])
-    var.nlevels_list = nlist
-    var.nlevels_total = var.nlevels_fact + var.nlevels_list
-    debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (var.nlevels_total, var.nlevels_fact, var.nlevels_list))
+        for v in range(len(exp.var.covariable)):
+            exp.var.varlist.append(exp.var.covariable[v]['name'])
+    exp.var.nlevels_list = nlist
+    exp.var.nlevels_total = exp.var.nlevels_fact + exp.var.nlevels_list
+    debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (exp.var.nlevels_total, exp.var.nlevels_fact, exp.var.nlevels_list))
     # End get number of levels
 
     # Begin process conditions
-    if var.nlevels_fact > 0:
+    if exp.var.nlevels_fact > 0:
         i = 0
         done = 1
-        todo = var.nlevels_fact
-        varmatrix = np.zeros((todo,len(var.factorial)),dtype=int)
+        todo = exp.var.nlevels_fact
+        varmatrix = np.zeros((todo,len(exp.var.factorial)),dtype=int)
 
         # create varmatrix, which will have 1 column for each variable in factorial,
         # and nlevels_fact rows containing indices to the levels of each variable
-        for v in range(len(var.factorial)):
-            varmatrix[:,i] = np.tile(np.arange(var.factorial[v]['n']).repeat(todo/var.factorial[v]['n']),done)
-            done *= var.factorial[v]['n']
-            todo /= var.factorial[v]['n']
+        for v in range(len(exp.var.factorial)):
+            varmatrix[:,i] = np.tile(np.arange(exp.var.factorial[v]['n']).repeat(todo/exp.var.factorial[v]['n']),done)
+            done *= exp.var.factorial[v]['n']
+            todo /= exp.var.factorial[v]['n']
             i += 1
         # For each variable, generate a list, of nlevels_fact long, of level names
-        for v in range(len(var.factorial)):
+        for v in range(len(exp.var.factorial)):
             for i in range(len(varmatrix)):
-                var.levelsbycond[var.factorial[v]['name']].append(var.factorial[v]['levels'][varmatrix[i,v]])
+                exp.var.levelsbycond[exp.var.factorial[v]['name']].append(exp.var.factorial[v]['levels'][varmatrix[i,v]])
 
     # Append 'covariable' levels to each list
-    if var.nlevels_list > 0:
-        for i,v in enumerate(var.varlist):
+    if exp.var.nlevels_list > 0:
+        for i,v in enumerate(exp.var.varlist):
             gotvar = False
             if not v in covariable:
                 # Variable is in factorial but not mentioned in covariable.
-                if len(var.factorial[i]['levels']) == 1:
+                if len(exp.var.factorial[i]['levels']) == 1:
                     # There is only 1 level specified in factorial. Use that for all 'covariable' conditions for that var.
-                    for condition in range(var.nlevels_list):
-                        var.levelsbycond[v].append(var.factorial[i]['levels'][0])
+                    for condition in range(exp.var.nlevels_list):
+                        exp.var.levelsbycond[v].append(exp.var.factorial[i]['levels'][0])
                     gotvar = True
-            elif len(var.covariable[i]['levels']) == 1:
+            elif len(exp.var.covariable[i]['levels']) == 1:
                 # There is only one level specified. Use that for all conditions for that var.
-                for condition in range(var.nlevels_list):
-                    var.levelsbycond[v].append(var.covariable[i]['levels'][0])
+                for condition in range(exp.var.nlevels_list):
+                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][0])
                 gotvar = True
-            elif len(var.covariable[i]['levels']) == var.nlevels_list:
+            elif len(exp.var.covariable[i]['levels']) == exp.var.nlevels_list:
                 # More than one level specified. Use them all.
-                for condition in range(var.nlevels_list):
-                    var.levelsbycond[v].append(var.covariable[i]['levels'][condition])
+                for condition in range(exp.var.nlevels_list):
+                    exp.var.levelsbycond[v].append(exp.var.covariable[i]['levels'][condition])
                 gotvar = True
             if not gotvar:
                 raise Exception("Unable to process the following variable: " + v)
 
     # Process order
-    if var.order == 'random':
-        var.orderarray = np.random.permutation(var.nlevels_total)
-        var.nblocks = var.nlevels_total
-    elif var.order == 'natural':
-        var.orderarray = np.arange(var.nlevels_total)
-        var.nblocks = var.nlevels_total
-    elif var.order == 'prompt':
-        var.orderarray = 0
-        var.nblocks = 999
-    elif var.order == 'menu':
-        var.orderarray = []
-        var.nblocks = 0
+    if exp.var.order == 'random':
+        exp.var.orderarray = np.random.permutation(exp.var.nlevels_total)
+        exp.var.nblocks = exp.var.nlevels_total
+    elif exp.var.order == 'natural':
+        exp.var.orderarray = np.arange(exp.var.nlevels_total)
+        exp.var.nblocks = exp.var.nlevels_total
+    elif exp.var.order == 'prompt':
+        exp.var.orderarray = 0
+        exp.var.nblocks = 999
+    elif exp.var.order == 'menu':
+        exp.var.orderarray = []
+        exp.var.nblocks = 0
     else:
-        var.orderarray = str_to_range(var.order)
-        var.nblocks = len(var.orderarray)
-    debug(exp, "Presentation order input string: " + var.order)
-    debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in var.orderarray))
+        exp.var.orderarray = str_to_range(exp.var.order)
+        exp.var.nblocks = len(exp.var.orderarray)
+    debug(exp, "Presentation order input string: " + exp.var.order)
+    debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in exp.var.orderarray))
 # End process_variables
 
 
-def process_stimuli(exp, stim):
-    '''Account for all stimuli present, and attach any associated text
-    '''
-    for stimset in stim.sets:
-        if 'type' not in stim.sets[stimset]:
-            stim.sets[stimset]['type'] = 'manual'
-        if stim.sets[stimset]['type'] != 'files':
-            stim.sets[stimset]['process'] = 'auto'
-        else:
-            # Set defaults for stim vars
-            if 'order' not in stim.sets[stimset]:
-                stim.sets[stimset]['order'] = 1
-            if 'process' not in stim.sets[stimset]:
-                stim.sets[stimset]['process'] = 'auto'
-            if 'repeat' not in stim.sets[stimset]:
-                stim.sets[stimset]['repeat'] = False
-
-            stim.current[stimset] = current_stim()
-            if 'path' not in stim.sets[stimset] or (stim.sets[stimset]['path'] == None and stim.sets[stimset]['path'] == "") :
-                raise Exception("No path set for Stimulus Set: " + str(stimset) + "\nIf you want to process manually, set 'type' to 'manual'")
-            elif stim.sets[stimset]['path']=='None':
-                pass
-            else:
-                stim.sets[stimset]['name'] = stimset
-                stim.sets[stimset]['tokens'] = []
-                if 'text' in stim.sets[stimset] and stim.sets[stimset]['text'] != '':
-                    dlm_toks = ','
-                    if stim.sets[stimset]['txtfmt'] != '':
-                        if stim.sets[stimset]['txtfmt'].find(dlm_toks) != -1:
-                            fmt_toks = stim.sets[stimset]['txtfmt'].split(dlm_toks)
-                        else:
-                            fmt_toks = stim.sets[stimset]['txtfmt'].split(' ')
-                            dlm_toks = ' '
-                    else:
-                        fmt_toks = exp.stimtext_fmt.split(dlm_toks)
-                    thislisth = open(stim.sets[stimset]['text'], 'r')
-                    thislist = thislisth.readlines()
-                    thislisth.close()
-                    thisset = {}
-                    for line in thislist:
-                        if line != "" and line.lstrip()[0] != "#":
-                            thistext = line.split(dlm_toks,len(fmt_toks)-1)
-                            thisset[thistext[0]] = {}
-                            for tkn in fmt_toks:
-                                thisset[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
-                filelist = sorted(os.listdir(stim.sets[stimset]['path']))
-                masks = [x.strip() for x in stim.sets[stimset]['mask'].split(";")]
-                for filename in filelist:
-                    Goodfile = True
-                    if 'mask' in stim.sets[stimset] and len(masks) > 0:
-                        if not any(fnmatch.fnmatch(filename, fm) for fm in masks):
-                            Goodfile = False
-                    if Goodfile:
-                        thisn = {}
-                        thisn['name'] = filename
-                        thisn['info'] = {}
-                        if 'text' in stim.sets[stimset] and stim.sets[stimset]['text'] != '':
-                            for tkn in fmt_toks:
-                                thisn['info'][tkn] = thisset[os.path.splitext(filename)[0]][tkn]
-                        stim.sets[stimset]['tokens'].append(thisn)
-                stim.reset_order(exp, stim, stimset)
-                stim.sets[stimset]['n'] = len(stim.sets[stimset]['order_'])
-        debug(exp, "Found stimulus set: %s; Type: %s" % (stimset, stim.sets[stimset]['type']))
-# End process_stimuli
-
-
-def get_current_variables(exp, var, condition):
+def get_current_variables(exp):
     '''Get current levels of each variable for a given condition
     '''
-    var.current = {}
-    for v in var.varlist:
-        if v in var.prompt:
-            ret = exp.frontend.get_input(prompt = "Enter a value for variable: %s\nor hit enter for current level (%s): " % (v, var.levelsbycond[v][condition]))
+    condition = exp.run.condition
+    exp.var.current = {}
+    for v in exp.var.varlist:
+        if v in exp.var.prompt:
+            ret = exp.frontend.get_input(prompt = "Enter a value for variable: %s\nor hit enter for current level (%s): " % (v, exp.var.levelsbycond[v][condition]))
             if ret == "":
-                var.current[v] = var.levelsbycond[v][condition]
+                exp.var.current[v] = exp.var.levelsbycond[v][condition]
             else:
-                var.current[v] = ret
+                exp.var.current[v] = ret
         else:
-            var.current[v] = var.levelsbycond[v][condition]
-        debug(exp, "Getting level: %s; for variable: %s" % (var.current[v],v))
+            exp.var.current[v] = exp.var.levelsbycond[v][condition]
+        debug(exp, "Getting level: %s; for variable: %s" % (exp.var.current[v],v))
 
 def get_variable_strtable(var):
     '''Creates a table specifying the levels of each variable for each condition
     '''
     vlength = {}
     out = "Condition"
-    for v in var.varlist:
-        vlength[v] = np.maximum(len(max(var.levelsbycond[v], key=len)), len(v)) + 2
+    for v in exp.var.varlist:
+        vlength[v] = np.maximum(len(max(exp.var.levelsbycond[v], key=len)), len(v)) + 2
         fmt = "%"+str(vlength[v])+"s"
         out += fmt % v
     out += "\n"
-    for i in range(var.nlevels_total):
+    for i in range(exp.var.nlevels_total):
         out += "%9d" % (i+1)
-        for v in var.varlist:
+        for v in exp.var.varlist:
             fmt = "%"+str(vlength[v])+"s"
-            out += fmt % var.levelsbycond[v][i]
+            out += fmt % exp.var.levelsbycond[v][i]
         out += "\n"
     return out
 
-def menu_condition(exp,run,var,stim,user):
+def menu_condition(exp):
     '''Prompts the experiment to choose the conditions to run
     '''
     strtable = exp.utils.get_variable_strtable(var) + "\nSelected Conditions: ["
     sel = []
     conditions = []
     message = ''
-    for i in range(1,var.nlevels_total+1):
+    for i in range(1,exp.var.nlevels_total+1):
         conditions.append(str(i))
     while True:
         disp = strtable
@@ -493,7 +399,7 @@ def menu_condition(exp,run,var,stim,user):
             for cond in conditions:
                 sel.append(cond)
         elif ret == exp.quitKey:
-            run.gustav_is_go = False
+            exp.run.gustav_is_go = False
             break;
         elif ret in ['c']:
             sel = []
@@ -501,72 +407,32 @@ def menu_condition(exp,run,var,stim,user):
             if len(sel) > 0:
                 sel = np.random.permutation(sel).tolist()
                 for s in sel:
-                    var.orderarray.append(int(s)-1)
-                run.nblocks = len(var.orderarray)
-                run.gustav_is_go = True
+                    exp.var.orderarray.append(int(s)-1)
+                exp.run.nblocks = len(exp.var.orderarray)
+                exp.run.gustav_is_go = True
                 break;
             else:
                 message = "You must select at least 1 condition to run!\n\n"
         elif ret in ['s']:
             if len(sel) > 0:
                 for s in sel:
-                    var.orderarray.append(int(s)-1)
-                run.nblocks = len(var.orderarray)
-                run.gustav_is_go = True
+                    exp.var.orderarray.append(int(s)-1)
+                exp.run.nblocks = len(exp.var.orderarray)
+                exp.run.gustav_is_go = True
                 break;
             else:
                 message = "You must select at least 1 condition to run!\n\n"
         elif ret.isdigit():
-            message = "Condition numbers for this experiment are 1 <= %i\n\n" % var.nlevels_total
+            message = "Condition numbers for this experiment are 1 <= %i\n\n" % exp.var.nlevels_total
         elif ret != '':
             message = "Unrecognized input: %s\n\n" % ret
             
 
-
-def get_current_stimuli(exp, stim):
-    for s in stim.stimvars:
-        if stim.sets[s]['process'] == 'auto':
-            exp.utils.stim_get_next(exp, stim, s)
-
-
-def stim_get_next(exp, stim, stimset):
-    '''Load the next stimulus for a stimulus set
-    '''
-    stim.current[stimset].ind2 = stim.sets[stimset]['order_'][stim.current[stimset].ind]
-    stim.current[stimset].filename = os.path.join(stim.sets[stimset]['path'],stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['name'])
-    stim.current[stimset].filebase = os.path.splitext(stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['name'])[0]
-    for tkn in stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['info']:
-        stim.current[stimset].info[tkn] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['info'][tkn]
-#    stim.current[stimset]['txt'] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['text']
-
-#    stim.current[stimset]['txt'] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['text']
-#    stim.current[stimset]['kw'] = stim.sets[stimset]['tokens'][stim.current[stimset].ind2]['kw']
-
-    if stim.current[stimset].ind == stim.sets[stimset]['n']:
-        if stim.sets[stimset]['repeat']:
-            stim.reset_order(exp,stim,stimset)
-        else:
-            raise Exception("Ran out of stimulus files for stimset: " + stimset)
-    debug(exp, "Getting next stimulus: %s, for set: %s" % (stim.current[stimset].filebase,stimset))
-    stim.current[stimset].ind += 1  # Index of index
-
-def stim_reset_order(exp, stim, stimset):
-    '''Resets the order of a stimulus set
-    '''
-    stim.current[stimset].ind = 0  # run.trials_exp - 1 #-1
-    if stim.sets[stimset]['order'] == 'random':
-        stim.sets[stimset]['order_'] = np.random.permutation(len(stim.sets[stimset]['tokens']))
-    elif stim.sets[stimset]['order'] == 'natural':
-        stim.sets[stimset]['order_'] = np.arange(len(stim.sets[stimset]['tokens']))
-    else:
-        stim.sets[stimset]['order_'] = str_to_range(stim.sets[stimset]['order'])
-    debug(exp, "Resetting order of stimulus set: %s" % (stimset))
-
 def update_time(run):
     '''Updates the date and time
     '''
-    run.time = datetime.datetime.now().strftime('%H:%M:%S')
-    run.date = datetime.datetime.now().strftime('%Y-%m-%d')
+    exp.run.time = datetime.datetime.now().strftime('%H:%M:%S')
+    exp.run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
 def write_data(data, filename):
@@ -582,18 +448,18 @@ def write_data(data, filename):
     f.close()
 
 
-def save_data(exp,run,var,stim,user, message):
+def save_data(exp, message):
     if exp.recordData:
         if message is not None and message != '':
-            message_exp = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
+            message_exp = exp.utils.get_expanded_vals_in_string(message, exp)
             exp.utils.write_data(message_exp, exp.dataFile)
 
 
-def log(exp,run,var,stim,user, message):
+def log(exp, message):
     '''Writes info to the console, to a log file, or both
     '''
     if message is not None and message != '':
-        message_exp = exp.utils.get_expanded_vals_in_string(message, exp, run, var, stim, user)
+        message_exp = exp.utils.get_expanded_vals_in_string(message, exp)
         if exp.logConsole:
             print(message_exp),
         if exp.logFile is not None and exp.logFile is not '':
@@ -613,17 +479,17 @@ def debug(exp, message):
             write_data(dmessage, exp.logFile)
 
         
-def do_event(exp,run,var,stim,user, event):
-    exp.utils.update_time(run)
+def do_event(exp, event):
+    exp.utils.update_time(exp.run)
     if hasattr(exp, "%s_" % event):
         funcs = getattr(exp, "%s_" % event)
         for f in funcs:
             if f.__name__ not in exp.disable_functions:
-                f(exp,run,var,stim,user)
+                f(exp)
     if hasattr(exp, 'logString_%s' % event):
-        exp.utils.log(exp,run,var,stim,user, getattr(exp, 'logString_%s' % event))
+        exp.utils.log(exp, getattr(exp, 'logString_%s' % event))
     if hasattr(exp, 'dataString_%s' % event):
-        exp.utils.save_data(exp,run,var,stim,user, getattr(exp, 'dataString_%s' % event))
+        exp.utils.save_data(exp, getattr(exp, 'dataString_%s' % event))
     debug(exp, "Event: %s" % (event))
         
 def get_frontend(exp, frontend):
@@ -668,7 +534,7 @@ def obj_to_str(obj, name, indent=''):
 
     return outstr
 
-def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
+def get_expanded_vals_in_string(instr, exp):
     """Replaces all variable references with the specified variable's current value
 
         Here is a list of available variable references:
@@ -685,10 +551,6 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         $conditions      : The total number of conditions
         $time            : The time the session started
         $date            : The date the session started
-        $stim_kw[name]   : The current kw value for the specified stimulus set
-        $stim_file[name] : The current filename for the specified stimulus set
-        $stim_text[name] : The current text for the specified stimulus set
-        $stim_ind[name]  : The current file ind for the specified stimulus set
         $var[varname]    : varname is the name of one of your variables
         $currentvars[';']: A delimited list of the current levels of all vars
                             The delimiter can be specified (use empty brackets
@@ -705,31 +567,24 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
     outstr = outstr.replace("$comment", exp.comments)
     outstr = outstr.replace("$host", exp.host)
     outstr = outstr.replace("$subj", exp.subjID)
-    outstr = outstr.replace("$trial_block", str(run.trials_block+1))
-    outstr = outstr.replace("$trial", str(run.trials_exp+1))
-    outstr = outstr.replace("$blocks", str(run.nblocks))
-    outstr = outstr.replace("$block", str(run.block+1))
-    outstr = outstr.replace("$conditions", str(var.nlevels_total))
-    outstr = outstr.replace("$condition", str(run.condition+1))
-    outstr = outstr.replace("$time", run.time)
-    outstr = outstr.replace("$date", run.date)
-    outstr = outstr.replace("$response", run.response)
+    outstr = outstr.replace("$trial_block", str(exp.run.trials_block+1))
+    outstr = outstr.replace("$trial", str(exp.run.trials_exp+1))
+    outstr = outstr.replace("$blocks", str(exp.run.nblocks))
+    outstr = outstr.replace("$block", str(exp.run.block+1))
+    outstr = outstr.replace("$conditions", str(exp.var.nlevels_total))
+    outstr = outstr.replace("$condition", str(exp.run.condition+1))
+    outstr = outstr.replace("$time", exp.run.time)
+    outstr = outstr.replace("$date", exp.run.date)
+    outstr = outstr.replace("$response", exp.run.response)
 
-    for s in stim.stimvars:
-        outstr = outstr.replace("$stim_file["+stim.sets[s]['name']+"]", stim.current[s].filebase)
-        outstr = outstr.replace("$stim_ind["+stim.sets[s]['name']+"]", str(stim.current[s].ind))
-        for tkn in stim.current[s].info:
-            search_str = "$stim_%s[%s]" % (tkn, stim.sets[s]['name'])
-            outstr = outstr.replace(search_str, stim.current[s].info[tkn])
-
-    # This func gets called from initialize (for datafilename), and var.current is not set at that point
-    if len(var.current)>0:
+    # This func gets called from initialize (for datafilename), and exp.var.current is not set at that point
+    if len(exp.var.current)>0:
         currentvars = []
         currentvarsvals = []
-        for key in var.current:
-            currentvars.append(var.current[key])
-            currentvarsvals.append(key + " = " + var.current[key])
-            outstr = outstr.replace("$var["+key+"]", var.current[key])
+        for key in exp.var.current:
+            currentvars.append(exp.var.current[key])
+            currentvarsvals.append(key + " = " + exp.var.current[key])
+            outstr = outstr.replace("$var["+key+"]", exp.var.current[key])
 
         got_cv = True # TODO: Look into generators
         while got_cv:
@@ -752,7 +607,7 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
                 got_cv = False
 
     varlist = []
-    for key in var.varlist:
+    for key in exp.var.varlist:
         varlist.append(key)
 
     got_cv = True
@@ -765,14 +620,14 @@ def get_expanded_vals_in_string(instr, exp, run, var, stim, user):
         else:
             got_cv = False
 
-    items = getmembers(user)
+    items = getmembers(exp.user)
     for key, val in items:
         if key[:2] != "__":
             outstr = outstr.replace("$user["+str(key)+"]", str(val))
             outstr = outstr.replace("@user["+str(key)+"]", str(key))
 
-    if hasattr(var,'dynamic'):
-        for key, val in var.dynamic.items():
+    if hasattr(exp.var,'dynamic'):
+        for key, val in exp.var.dynamic.items():
             outstr = outstr.replace("$dynamic["+str(key)+"]", str(val))
             outstr = outstr.replace("@dynamic["+str(key)+"]", str(key))
 
