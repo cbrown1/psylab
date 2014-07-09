@@ -178,7 +178,7 @@ def initialize_experiment( exp ):
     '''
     logpath = os.path.split(exp.logFile)
     if not os.path.isdir(logpath[0]):
-        print("Creating logfile path: " + logpath[0])
+        print("Created logfile path: " + logpath[0])
         os.makedirs(logpath[0])
     # For logfile name, we expand date and exp name only and dont do full  
     # variable expansion because many variables haven't been set yet.
@@ -188,6 +188,9 @@ def initialize_experiment( exp ):
     if not os.path.isfile(exp.logFile):
         exp.logString_header = exp.logString_header.replace("$date", date)
         write_data(exp.logString_header, exp.logFile)
+        debug(exp, 'Created log file: %s' % exp.logFile)
+    else:
+        debug(exp, 'Found log file: %s' % exp.logFile)
 
     exp.utils.get_frontend(exp, exp.frontend)
     debug(exp, 'Got frontend: %s' % exp.frontend.name)
@@ -381,6 +384,7 @@ def get_variable_strtable(exp):
 def menu_condition(exp):
     '''Prompts the experiment to choose the conditions to run
     '''
+    debug(exp, "Deriving presentation order via menu")
     strtable = exp.utils.get_variable_strtable(exp) + "\nSelected Conditions: ["
     sel = []
     conditions = []
