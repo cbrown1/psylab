@@ -70,7 +70,6 @@ class exp:
     recordData = True
     comments = ''
     disable_functions = []          # Experimenter can add function names as strings to disable them
-    methodTypes = ['constant', 'staircase'] # TODO: remove methodTypes
     quitKeys = ['/', 'q']
     eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
@@ -220,17 +219,23 @@ def initialize_experiment( exp ):
     exp.utils.process_variables(exp)
     exp.run.nblocks = exp.var.nblocks
     if exp.recordData:
+        debug(exp, 'Data will be recorded')
         datapath = os.path.split(exp.dataFile)
         if not os.path.isdir(datapath[0]):
             os.makedirs(datapath[0])
             debug(exp, "Created datafile path: " + datapath[0])
+        else:
+            debug(exp, "Found datafile path: " + datapath[0])
         exp.dataFile_unexpanded = exp.dataFile
         exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp)
         if not os.path.isfile(exp.dataFile):
             exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp)
             write_data(exp.dataString_header, exp.dataFile)
             debug(exp, "Created datafile: " + exp.dataFile)
-
+        else:
+            debug(exp, "Found datafile: " + exp.dataFile)
+    else:
+        debug(exp, 'Data will not be recorded')
 
 def process_variables(exp):
     '''Processes conditions
@@ -395,7 +400,9 @@ def menu_condition(exp):
         disp += "%11s - run exp using selected conditions in selected order\n" % 's'
         disp += "%11s - clear condition list\n" % 'c'
         disp += "%11s - quit\n" % (exp.quitKey)
-        term.clearscreen()
+        # Poor man's clearscreen: Prepend blank lines (assume console is 25 lines long)
+        if disp.count('\n') < 25:
+            disp = '\n' * (25-disp.count('\n')) + disp 
         message = ''
         ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
