@@ -149,7 +149,13 @@ class exp:
         order_ = 0
         prompt = []
         dynamic = {}
-    
+        def add_fact(self, **kwargs):
+            for key in kwargs:
+                factorial[key] = kwargs[key]
+        def add_cov(self, **kwargs):
+            for key in kwargs:
+                self.covariable[key] = kwargs[key]
+
     
     class run:
         '''Settings associated with the details of running the experiment
@@ -168,7 +174,12 @@ class exp:
     
     
     class user:
-        '''Any user settings
+        '''Convenience container for user settings
+        '''
+        pass
+
+    class stim:
+        '''Convenience container for stimulus stuff
         '''
         pass
 
@@ -575,7 +586,8 @@ def get_expanded_vals_in_string(instr, exp):
                             instead of just 'val'
         @currentvars     : Same as currentvars, but you will get var names 
                             instead of values (eg., for datafile header). 
-        $user[varname]   : The value of a user variables
+        $user[varname]   : The value of a user variable
+        $stim[varname]   : The value of a stim variable
     """
 
     outstr = instr.replace("$name", exp.name)
@@ -641,6 +653,12 @@ def get_expanded_vals_in_string(instr, exp):
         if key[:2] != "__":
             outstr = outstr.replace("$user["+str(key)+"]", str(val))
             outstr = outstr.replace("@user["+str(key)+"]", str(key))
+
+    items = getmembers(exp.stim)
+    for key, val in items:
+        if key[:2] != "__":
+            outstr = outstr.replace("$stim["+str(key)+"]", str(val))
+            outstr = outstr.replace("@stim["+str(key)+"]", str(key))
 
     if hasattr(exp.var,'dynamic'):
         for key, val in exp.var.dynamic.items():

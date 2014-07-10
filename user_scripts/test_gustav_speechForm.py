@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from forms import qt_speech as theForm
+from gustav_forms import qt_Speech as theForm
 
 ExpName = "An Experiment!"
 ExpVars = "Conditions: 1,2,3\nData File: data.dat" 

@@ -2,7 +2,6 @@
 README
 setup.py
 psylab/__init__.py
-psylab/fileio.py
 psylab/array/__init__.py
 psylab/array/array.py
 psylab/array/nan.py
@@ -22,15 +21,9 @@ psylab/gustav/methods/__init__.py
 psylab/gustav/methods/adaptive.py
 psylab/gustav/methods/constant.py
 psylab/io/__init__.py
+psylab/io/file.py
 psylab/io/fileio.py
 psylab/io/listPlayer.py
-psylab/misc/__init__.py
-psylab/misc/config_tools.py
-psylab/misc/folder_tools.py
-psylab/misc/jounal-of-the-acoustical-society-of-america.csl
-psylab/misc/path_tools.py
-psylab/misc/plot_tools.py
-psylab/misc/stats_tools.py
 psylab/signal/__init__.py
 psylab/signal/atten.py
 psylab/signal/compensate.py
@@ -113,3 +106,9 @@ psylab/tdt2/__init__.py
 psylab/tdt2/pa4.py
 psylab/tdt2/wg1.py
 psylab/tdt2/xb1.py
+psylab/tools/__init__.py
+psylab/tools/config_tools.py
+psylab/tools/folder_tools.py
+psylab/tools/path_tools.py
+psylab/tools/plot_tools.py
+psylab/tools/stats_tools.py
