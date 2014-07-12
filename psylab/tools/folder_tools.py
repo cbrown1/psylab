@@ -294,6 +294,8 @@ class synched_consecutive_files:
                     text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
                     file_range='1:100',
                 ),
+                random=False,
+                repeat=False,
             )
 
         >>> targets.get_filename('IEEE_F1')
@@ -320,12 +322,43 @@ class synched_consecutive_files:
         way and you want to run the experiment with minimal effort, listPlayer
         is an easy way to do it. 
     """
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         self.random = False
         self.repeat = False
         self.group = {}
         for arg in args:
             self.group[arg.name] = arg
+        for key, value in kwargs.items():
+            if key == 'random':
+                self.random = value
+            elif key == 'repeat':
+                self.repeat = value
+        if self.random:
+            self.randomize(self)
+        
+    def randomize(self, repeat=None):
+        """Use a single random order for all the groups.
+            
+            Parameters
+            ----------
+            repeat : bool
+                Whether to re-randomize, and recycle the lists when exhausted
+
+            Notes
+            -----
+            WARNING! This is a destructive function, in that it takes the 
+            index_list of the first group it finds, randomizes it, and  
+            replaces the index_list of all other groups with that same 
+            random order! ie., each file_list should (will!) have the same n.
+        """
+        if repeat:
+            self.repeat = repeat
+        self.random = True
+        name,group1 = self.group.iteritems().next()
+        group1_index_list = group1.index_list
+        np.random.shuffle(group1_index_list)
+        for name,g in self.group.iteritems():
+            g.index_list = group1_index_list
 
     def get_filename(self, file_list, index=None, fmt='file'):
         """ Gets a filename from the specified `consecutive` list.
@@ -373,29 +406,6 @@ class synched_consecutive_files:
 
     def get_list_names(self):
         return self.group.keys()
-
-    def randomize(self, repeat=False):
-        """Use a single random order for all the groups.
-            
-            Parameters
-            ----------
-            repeat : bool
-                Whether to re-randomize, and recycle the lists when exhausted
-
-            Notes
-            -----
-            WARNING! This is a destructive function, in that it takes the 
-            index_list of the first group it finds, randomizes it, and  
-            replaces the index_list of all other groups with that same 
-            random order! ie., each file_list should (will!) have the same n.
-        """
-        self.repeat = repeat
-        self.random = True
-        name,group1 = self.group.iteritems().next()
-        group1_index_list = group1.index_list
-        np.random.shuffle(group1_index_list)
-        for name,g in self.group.iteritems():
-            g.index_list = group1_index_list
 
     def check_n(self, n):
         """Checks the length of each list against the specified number
