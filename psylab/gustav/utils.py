@@ -345,7 +345,7 @@ def process_variables(exp):
         exp.var.orderarray = np.arange(exp.var.nlevels_total)
         exp.var.nblocks = exp.var.nlevels_total
     elif exp.var.order == 'prompt':
-        exp.var.orderarray = 0
+        exp.var.orderarray = []
         exp.var.nblocks = 999
     elif exp.var.order == 'menu':
         exp.var.orderarray = []

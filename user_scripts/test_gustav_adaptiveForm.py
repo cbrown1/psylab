@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from forms import qt_adaptive as theForm
+from gustav_forms import qt_Adaptive as theForm
 import time
 
 validKeys = '1,2'.split(',')
