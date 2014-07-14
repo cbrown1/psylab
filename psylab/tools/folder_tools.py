@@ -115,6 +115,7 @@ class consecutive_files:
         self.text_format = text_format
         self.text_file = text_file
         self.file_range = file_range
+        self.n = 0
 
         files = (f for f in os.listdir(self.path)
                  if os.path.isfile(os.path.join(self.path, f)))
@@ -185,13 +186,15 @@ class consecutive_files:
                 'base' returns the filebase with no path or extension
                 'full' returns the full file path
         """
-        if index:
+        if index != 0 and not index:
+            self.index += 1
+            if self.index == self.n:
+                print("Reset! %i" % index)
+                self.reset()
+        else:
+            print("Got index: %i" % index)
             if index > -1: # If non-negative, use that index. (Don't change if negative)
                 self.index = index
-        else:
-            self.index += 1
-        if self.index == self.n:
-            self.reset()
         item = self.file_list[self.index_list[self.index]]
         if fmt == 'full':
             item = os.path.join(self.path,item)
@@ -326,6 +329,8 @@ class synched_consecutive_files:
         self.random = False
         self.repeat = False
         self.group = {}
+        self.n = None
+        self.index = -1
         for arg in args:
             self.group[arg.name] = arg
         for key, value in kwargs.items():
@@ -333,10 +338,20 @@ class synched_consecutive_files:
                 self.random = value
             elif key == 'repeat':
                 self.repeat = value
+            
+        n = np.inf
+        for name,g in self.group.iteritems():
+            if g.n < n:
+                if n is not np.inf:
+                    raise Exception("synched_consecutive_files members have unequal n's.")
+                n = g.n
+        self.n = n
+        self.index_list = range(self.n)
         if self.random:
-            self.randomize(self)
+            self.randomize()
+            
         
-    def randomize(self, repeat=None):
+    def randomize(self):
         """Use a single random order for all the groups.
             
             Parameters
@@ -351,14 +366,15 @@ class synched_consecutive_files:
             replaces the index_list of all other groups with that same 
             random order! ie., each file_list should (will!) have the same n.
         """
-        if repeat:
-            self.repeat = repeat
         self.random = True
-        name,group1 = self.group.iteritems().next()
-        group1_index_list = group1.index_list
-        np.random.shuffle(group1_index_list)
-        for name,g in self.group.iteritems():
-            g.index_list = group1_index_list
+
+        np.random.shuffle(self.index_list)
+
+#        name,group1 = self.group.iteritems().next()
+#        group1_index_list = group1.index_list
+#        np.random.shuffle(group1_index_list)
+#        for name,g in self.group.iteritems():
+#            g.index_list = group1_index_list
 
     def get_filename(self, file_list, index=None, fmt='file'):
         """ Gets a filename from the specified `consecutive` list.
@@ -378,48 +394,34 @@ class synched_consecutive_files:
                 'full' returns the full file path
         """
 
-        # HACK! Handle the case of synched repeating random lists
-        if self.repeat and self.random and not index:
-            if self.group[file_list].index == self.group[file_list].n-1:
-                self.randomize() # re-randomize
-                for name,g in self.group.iteritems():
-                    g.index = -1 # reset indices before the file_lists get to it
+        # Check if index needs to be reset (only do so if repeat==True, if no 
+        # no index is requested, and if we are at the end of the list)
+        if index != 0 and not index:
+            if self.repeat and  self.index == self.n-1:
+                # FIXME: 0 == None logically
+                self.index = 0
+                if self.random:
+                    self.randomize()
+            else:
+                self.index += 1
+            index = self.index_list[self.index]
+            print(index)
+
+#        # HACK! Handle the case of synched repeating random lists
+#        if self.repeat and self.random and not index:
+#            if self.group[file_list].index == self.group[file_list].n-1:
+#                self.randomize() # re-randomize
+#                for name,g in self.group.iteritems():
+#                    g.index = -1 # reset indices before the file_lists get to it
 
         ret = ''
         for name,g in self.group.iteritems():
-            f = g.get_filename(index, fmt)
             if file_list == g.name:
-                ret = f
-        if ret == '':
-            return None
-        else:
-            return ret
+                ret = g.get_filename(index, fmt)
+        return ret
 
     def get_text(self, file_list, file_name=None, item='text'):
         return self.group[file_list].get_text(file_name, item)
 
-    def get_index(self, file_list):
-        return self.group[file_list].index
-
-    def get_n(self, file_list):
-        return self.group[file_list].n
-
     def get_list_names(self):
         return self.group.keys()
-
-    def check_n(self, n):
-        """Checks the length of each list against the specified number
-            and returns a list of names of the lists whose lengths are smaller.
-
-            Useful to easily ensure that there are enough files in each list 
-            to do what you need to do.
-        """
-        ret = []
-        for name,g in self.group.iteritems():
-            if g.n < n:
-                ret.append(g.name)
-        if len(ret) == 0:
-            return None
-        else:
-            return ret
-
