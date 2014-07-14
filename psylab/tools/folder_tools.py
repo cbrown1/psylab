@@ -189,10 +189,8 @@ class consecutive_files:
         if index != 0 and not index:
             self.index += 1
             if self.index == self.n:
-                print("Reset! %i" % index)
                 self.reset()
         else:
-            print("Got index: %i" % index)
             if index > -1: # If non-negative, use that index. (Don't change if negative)
                 self.index = index
         item = self.file_list[self.index_list[self.index]]
@@ -310,13 +308,15 @@ class synched_consecutive_files:
 
         Notes
         -----
-        You can also randomize the file lists in a synchronized way. After
-        creation, call randomize(), and the same random order will be used
-        for each file_list (destructive: it simply replaces the index_list
-        of each file_list with the same random order). Set the 'repeat'
+        synched_consecutive_files keeps its own index and index_list, and 
+        makes calls to consecutive_files always using an index. Thus, the 
+        index and index_list data in each consecutive_files instance is 
+        unused.
+        
+        Randomization is also done in a synchronized way. That is, the same 
+        random order will be used for each file_list. Set the 'repeat'
         property to True if you would like to recycle (and re-randomize) 
-        list items (If you don't need randomization, use the file_lists' 
-        'repeat' property). If you use the 'random' property of the 
+        list items. Remember: If you use the 'random' property of the 
         individual file_lists, the random orders will not be synchronized.
 
         listPlayer.py is designed to do something similar, along with a simple
@@ -367,14 +367,8 @@ class synched_consecutive_files:
             random order! ie., each file_list should (will!) have the same n.
         """
         self.random = True
-
         np.random.shuffle(self.index_list)
 
-#        name,group1 = self.group.iteritems().next()
-#        group1_index_list = group1.index_list
-#        np.random.shuffle(group1_index_list)
-#        for name,g in self.group.iteritems():
-#            g.index_list = group1_index_list
 
     def get_filename(self, file_list, index=None, fmt='file'):
         """ Gets a filename from the specified `consecutive` list.
@@ -394,25 +388,14 @@ class synched_consecutive_files:
                 'full' returns the full file path
         """
 
-        # Check if index needs to be reset (only do so if repeat==True, if no 
-        # no index is requested, and if we are at the end of the list)
-        if index != 0 and not index:
+        if index != 0 and not index: # 0 == None
             if self.repeat and  self.index == self.n-1:
-                # FIXME: 0 == None logically
                 self.index = 0
                 if self.random:
                     self.randomize()
             else:
                 self.index += 1
             index = self.index_list[self.index]
-            print(index)
-
-#        # HACK! Handle the case of synched repeating random lists
-#        if self.repeat and self.random and not index:
-#            if self.group[file_list].index == self.group[file_list].n-1:
-#                self.randomize() # re-randomize
-#                for name,g in self.group.iteritems():
-#                    g.index = -1 # reset indices before the file_lists get to it
 
         ret = ''
         for name,g in self.group.iteritems():
