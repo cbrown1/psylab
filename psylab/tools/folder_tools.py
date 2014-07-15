@@ -97,7 +97,15 @@ class consecutive_files:
         'Chapman'
         >>>
     """
-    def __init__(self, path, name='', file_ext=None, file_range=None, random=False, repeat=False, text_file=None, text_format='file kw text'):
+    def __init__(self, path, name='', 
+                 file_ext=None, 
+                 file_range=None, 
+                 skip=[], 
+                 use=[], 
+                 random=False, 
+                 repeat=False, 
+                 text_file=None, 
+                 text_format='file kw text'):
         self.path = path
         if name == '':
             self.name = os.path.basename(path)
@@ -116,6 +124,8 @@ class consecutive_files:
         self.text_file = text_file
         self.file_range = file_range
         self.n = 0
+        self.skip = skip
+        self.use = use
 
         files = (f for f in os.listdir(self.path)
                  if os.path.isfile(os.path.join(self.path, f)))
@@ -342,6 +352,12 @@ class synched_consecutive_files:
         plays the soundfiles as well. Thus, if your stimuli are organized this
         way and you want to run an experiment with minimal effort, listPlayer
         is an easy way to do it. 
+        
+        TODO: [Newbug] Add skip and use list properties to consecutive files. 
+        But how? Reduce file_list on initialize? Or filter during get_filename? 
+        skip_list is probably not needed, since it is to allow sampling 
+        without replacement, which is built-in currently. How to handle 
+        possible unequal n's (eg., due to filtering)?
     """
     def __init__(self, *args, **kwargs):
         self.random = False
@@ -412,6 +428,38 @@ class synched_consecutive_files:
         for name,g in self.group.iteritems():
             if file_list == g.name:
                 ret = g.get_filename(index, fmt)
+        return ret
+
+    def get_filenames_list(self, index=None, fmt='file'):
+        """ Gets a filename from the specified `consecutive` list.
+            if index is specified, returns that filename. If index is not specified,
+            returns the next filename in the list.
+
+            Parameters
+            ----------
+            file_list : string
+                The name of the `consecutive` file list to draw from.
+            index : int
+                The index of the desired filename. If unspecified, then next filename 
+                in the list is returned, and the index will be incremented.
+            fmt : str
+                'file' returns the filename only with no path (default)
+                'base' returns the filebase with no path or extension
+                'full' returns the full file path
+        """
+
+        if index != 0 and not index: # 0 == None
+            if self.repeat and  self.index == self.n-1:
+                self.index = 0
+                if self.random:
+                    self.randomize()
+            else:
+                self.index += 1
+            index = self.index_list[self.index]
+
+        ret = []
+        for name,g in self.group.iteritems():
+            ret.append(g.get_filename(index, fmt))
         return ret
 
     def get_text(self, file_list, file_name=None, item='text'):
