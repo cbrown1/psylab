@@ -70,18 +70,18 @@ class consecutive_files:
 
         Usage
         -----
-        Assume a folder on your system is /path/to/files and contains the following files:
+        Assume a folder on your system is /path/to/FCircus and contains the following files:
             |  MP001.wav
             |  MP002.wav
             |  MP003.wav
             |  ...
-        And there is a textfile at /path/to/MPQuotes.txt which looks like this:
+        And there is a textfile at /path/to/FCircus.txt which looks like this:
             |  MP001,Palin,I came here for an argument.
             |  MP002,Cleese,No you didnt.
             |  MP003,Chapman,Stupid git.
             |  ...
 
-        >>> f = consecutive_files('/path/to/files', text_file='/path/to/MPQuotes.txt', text_format='file,actor,text')
+        >>> f = consecutive_files('/path/to/FCircus', text_file='/path/to/FCircus.txt', text_format='file,actor,text')
         >>> f.get_filename() # First call, so you get the first file in the list.
         'MP001.WAV'
         >>> f.get_text() # If you don't specify anything, return the `text` string of the current item.
@@ -282,32 +282,50 @@ class synched_consecutive_files:
         the same index you were using, so as not to repeat the same speech
         tokens. 
 
+        Parameters
+        ----------
+        *args : tuple
+            consecutive_files objects.
+        random : bool
+            Whether to randomize the lists. Randomization is synchronized, 
+            meaning all lists will have the same random order
+        repeat : bool
+            Whether to repeat the lists when they are exhausted. If random is 
+            true, the lists will be re-randomized.
+
         Examples:
         ---------
-        >>> targets = synched_consecutive_files (
-                consecutive_files (
-                    path='/home/User/stim/IEEE_F1',
-                    text_file='/home/User/stim/_Keywords/IEEE_F1.txt',
-                    file_range='1:100', # Use only the first 100 tokens
-                ),
-                consecutive_files (
-                    path='/home/User/stim/CUNY_F1',
-                    text_file='/home/User/stim/_Keywords/CUNY_F1.txt',
+        >>> quotes = synched_consecutive_files (
+                consecutive_files(
+                    path='/path/to/FCircus', 
+                    text_file='/path/to/FCircus.txt', 
+                    text_format='file,actor,text'
                     file_range='1:100',
+                ),
+
+                consecutive_files (
+                    path='/path/to/HGrail', 
+                    text_file='/path/to/HGrail.txt', 
+                    text_format='file,actor,text'
+                    file_range='201:300',
                 ),
                 random=False,
                 repeat=False,
             )
 
-        >>> targets.get_filename('IEEE_F1')
-        'AW001.WAV'
-        >>> targets.get_filename('CUNY_F1')
-        'KT002.wav'
-        >>> targets.get_text('CUNY_F1','KT002')
-        'I ENJOY TV.'
+        >>> quotes.get_filename('FCircus')
+        'FC001.WAV'
+        >>> quotes.get_filename('HGrail')
+        'HG202.wav'
+        >>> quotes.get_text('HGrail','HG202.wav')
+        'Strange women lying in ponds distributing swords is no basis for a system of government.'
 
         Notes
         -----
+        All consecutive_files lists must have the same n, anything else will 
+        cause an exception since synching file lists with unequal n's doesn't 
+        make sense. 
+        
         synched_consecutive_files keeps its own index and index_list, and 
         makes calls to consecutive_files always using an index. Thus, the 
         index and index_list data in each consecutive_files instance is 
@@ -322,7 +340,7 @@ class synched_consecutive_files:
         listPlayer.py is designed to do something similar, along with a simple
         interface to allow you to select conditions (folders) as you go, and it 
         plays the soundfiles as well. Thus, if your stimuli are organized this
-        way and you want to run the experiment with minimal effort, listPlayer
+        way and you want to run an experiment with minimal effort, listPlayer
         is an easy way to do it. 
     """
     def __init__(self, *args, **kwargs):
@@ -354,17 +372,10 @@ class synched_consecutive_files:
     def randomize(self):
         """Use a single random order for all the groups.
             
-            Parameters
-            ----------
-            repeat : bool
-                Whether to re-randomize, and recycle the lists when exhausted
-
             Notes
             -----
-            WARNING! This is a destructive function, in that it takes the 
-            index_list of the first group it finds, randomizes it, and  
-            replaces the index_list of all other groups with that same 
-            random order! ie., each file_list should (will!) have the same n.
+            This function is called during initialization if the 'random' 
+            parameter is set. It simply randomizes the index_list. 
         """
         self.random = True
         np.random.shuffle(self.index_list)
