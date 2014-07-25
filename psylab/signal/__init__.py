@@ -51,7 +51,7 @@ mls - Generates maximum-length sequences
 ms2samp - Converts milliseconds to samples
 normalize - Normalizes wavefiles, so that the overall peak is 1
 oct2f - Calculates frequencies from octaves
-peak_pick_nofm - An n-of-m peak picking strategy
+pick_peaks - Finds rms peaks in signals
 pink - Generates pink noise
 place2f - Converts a basilar membrane place (mm) to a frequency (Hz)
 ramps - Applies ramps to the onsets and/or offsets of a signal
@@ -91,7 +91,7 @@ from .magspec import magspec
 from .mix import mix
 from .ms2samp import ms2samp
 from .normalize import normalize
-from .peakpick import peak_pick_nofm
+from .peakpick import pick_peaks
 from .pink import pink
 from .ramps import ramps
 from .rir import rir, fconv

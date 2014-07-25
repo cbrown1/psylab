@@ -26,8 +26,8 @@
 import numpy as np
 from .window import sliding_window
 
-def peak_pick_nofm(sig, n, window_size):
-    """ An n-of-m peak picking strategy
+def pick_peaks(sig, n, window_size):
+    """ An peak picking strategy
         Slides an rms window through the channels of signal, then picks n 
         peaks. Assumes a 2d array with data along axis 0, channels on axis 1.
         Returns a tuple containing an array of channel indexes, and an array 
@@ -39,7 +39,9 @@ def peak_pick_nofm(sig, n, window_size):
             The input signal it should be a 2-dimensional array, where the 
             signal data is along axis 0, and the channels are along axis 1
         n : scalar
-            The number of peaks to select
+            The number of peaks to select in each window. Useful for 
+            implementing an 'n of m' strategy, where m is the total number 
+            of channels (specified by axis 1 of the input array)
         window_size : scalar
             The size of the analysis window, in samples
 
@@ -53,8 +55,10 @@ def peak_pick_nofm(sig, n, window_size):
 
         Notes
         -----
-        The order of each output array is not from lowest channel to highest
-        but from lowest rms to highest
+        The order of each output array is from lowest to highest rms, not 
+        from lowest to highest channel
+        
+        Depends on sliding_window, a vectorized windowing function
         
         Example
         -------
@@ -67,7 +71,7 @@ def peak_pick_nofm(sig, n, window_size):
         signal = np.random.randn(10,m)
         signal[:,1] *= 1.2 # make 2nd channel slightly higher on average
         
-        ch,rms = peak_pick_nofm(signal, n, window_size)
+        ch,rms = pick_peaks(signal, n, window_size)
     """
     # Number of channels is set by axis 1 of sig (sig must be 2d)
     if len(sig.shape) != 2:
