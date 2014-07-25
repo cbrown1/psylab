@@ -53,4 +53,3 @@ def post_trial(exp):
         exp.run.block_on = False
     exp.run.trial_on = False
 
-

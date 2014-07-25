@@ -51,13 +51,14 @@ mls - Generates maximum-length sequences
 ms2samp - Converts milliseconds to samples
 normalize - Normalizes wavefiles, so that the overall peak is 1
 oct2f - Calculates frequencies from octaves
+peak_pick_nofm - An n-of-m peak picking strategy
 pink - Generates pink noise
 place2f - Converts a basilar membrane place (mm) to a frequency (Hz)
 ramps - Applies ramps to the onsets and/or offsets of a signal
 rir - Generates room impulse responses
 rms - Computes the root-mean-square of a signal
 samp2ms - Converts samples to milliseconds
-sinegen - Generates pure tones
+sliding_window - Apply a sliding window to a signal for vectorized processing
 smooth - Smooths a signal using windowing
 specgram - Plots a nice spectrogram
 specplot - Plots magnitude spectra
@@ -90,6 +91,7 @@ from .magspec import magspec
 from .mix import mix
 from .ms2samp import ms2samp
 from .normalize import normalize
+from .peakpick import peak_pick_nofm
 from .pink import pink
 from .ramps import ramps
 from .rir import rir, fconv
@@ -102,4 +104,5 @@ from .spl import spl2sp, spl2si, sp2spl, si2spl
 from .tone import tone
 from .t60 import t60
 from .vocoder import vocoder, vocoder_overlap
+from .window import sliding_window
 from .zeropad import zeropad

@@ -23,9 +23,9 @@
 # cbrown1@pitt.edu.
 #
 
-from distutils.core import setup
+#from distutils.core import setup
 from distutils.sysconfig import get_python_lib
-#from setuptools import setup
+from setuptools import setup
 import sys, os
 import psylab
 version = psylab.__version__

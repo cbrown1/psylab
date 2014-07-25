@@ -24,8 +24,9 @@
 #
 
 import numpy as np
+from .window import sliding_window
 
-def rms(data):
+def rms(sig):
     '''Computes the root-mean-square of a signal
         
         Returns the root-mean-square of an array of numbers, working along the 
@@ -41,5 +42,30 @@ def rms(data):
         y : scalar
             The root-mean-square of the input.
     '''
-    #from scipy import mean, sqrt
-    return np.sqrt(np.mean(data**2.,axis=0))
+    return np.sqrt(np.mean(sig**2.,axis=0))
+
+def rms_win(sig, window_size):
+    '''Slides a window through the signal and computes an rms, with no overlap
+
+        Parameters
+        ----------
+        sig : array
+            The input signal.
+        window_size : int
+            The size of the analysis window
+        
+        Returns
+        -------
+        y : array
+            The root-mean-square values of the windowed input signal.
+            
+        Notes
+        -----
+        
+        Depends on window
+    '''
+    if len(data.shape) < 2:
+        ws = window_size
+    else:
+        ws = (window_size,data.shape[1])
+    return np.sqrt(np.mean(sliding_window(sig,ws)**2,axis=1))
