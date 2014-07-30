@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -36,8 +36,8 @@ from functools import reduce
 from frontends import term # FIXME: old line (from .frontends import term) was suddenly not working on py2.7/win7
 
 class exp:
-    '''Experimental settings
-    '''
+    """Experimental settings
+    """
     name = ''
     host = socket.gethostname()
     subjID = ''
@@ -92,7 +92,7 @@ class exp:
             
     def prompt_condition(self,exp):
         while True:
-            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-"+str(exp.var.nlevels_total)+"): ")
+            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-{:})".format(exp.var.nlevels_total))
             if ret in exp.quitKeys:
                 exp.run.block_on = False
                 exp.run.gustav_is_go = False
@@ -133,8 +133,8 @@ class exp:
 
 
     class var:
-        '''Experiment variable settings
-        '''
+        """Experiment variable settings
+        """
         factorial = collections.OrderedDict()
         covariable = collections.OrderedDict()
         ignore = []
@@ -158,8 +158,8 @@ class exp:
 
     
     class run:
-        '''Settings associated with the details of running the experiment
-        '''
+        """Settings associated with the details of running the experiment
+        """
         time = ''
         date = ''
         trials_block = 0     # Current trial count within a block
@@ -174,23 +174,25 @@ class exp:
     
     
     class user:
-        '''Convenience container for user settings
-        '''
+        """Convenience container for user settings
+        """
         pass
 
     class stim:
-        '''Convenience container for stimulus stuff
-        '''
+        """Convenience container for stimulus stuff
+        """
         pass
 
 
 def initialize_experiment( exp ):
-    '''Do stuff necessary for the start of an experiment
-    '''
+    """Do stuff necessary for the start of an experiment
+    """
     logpath = os.path.split(exp.logFile)
     if not os.path.isdir(logpath[0]):
-        print("Created logfile path: " + logpath[0])
+        print("Created logfile path: {}".format(logpath[0]))
         os.makedirs(logpath[0])
+    else:
+        debug(exp, "Found logfile path: {}".format(logpath[0]))
     # For logfile name, we expand date and exp name only and dont do full  
     # variable expansion because many variables haven't been set yet.
     date = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -199,63 +201,63 @@ def initialize_experiment( exp ):
     if not os.path.isfile(exp.logFile):
         exp.logString_header = exp.logString_header.replace("$date", date)
         write_data(exp.logString_header, exp.logFile)
-        debug(exp, 'Created log file: %s' % exp.logFile)
+        debug(exp, "Created log file: {}".format(exp.logFile))
     else:
-        debug(exp, 'Found log file: %s' % exp.logFile)
+        debug(exp, "Found log file: {}".format(exp.logFile))
 
     exp.utils.get_frontend(exp, exp.frontend)
-    debug(exp, 'Got frontend: %s' % exp.frontend.name)
+    debug(exp, "Got frontend: {}".format(exp.frontend.name))
     # For each event type, look for a function in method, and in experiment.
     # If a function is found, add to list to be run during that event. 
     for event in exp.eventTypes:
         if hasattr(exp.method, event):
-            thisstr = '%s_' % event
+            thisstr = "{}_".format(event)
             thisfunclist = getattr(exp, thisstr)
             thisfunclist.append(getattr(exp.method, event))
-            debug(exp, 'Found event in method: %s' % event)
+            debug(exp, "Found event in method: {}".format(event))
         if hasattr(exp.experiment, event):
-            thisstr = '%s_' % event
+            thisstr = "{}_".format(event)
             thisfunclist = getattr(exp, thisstr)
             thisfunclist.append(getattr(exp.experiment, event))
-            debug(exp, 'Found event in experiment: %s' % event)
+            debug(exp, "Found event in experiment: {}".format(event))
 
     # A few 'special' events that should only occur (if at all) in the experiment file:
-    if hasattr(exp.experiment, 'present_trial'):
+    if hasattr(exp.experiment, "present_trial"):
         exp.present_trial = exp.experiment.present_trial
-        debug(exp, 'Found event in experiment: present_trial')
-    if hasattr(exp.experiment, 'prompt_response'):
+        debug(exp, "Found event in experiment: present_trial")
+    if hasattr(exp.experiment, "prompt_response"):
         exp.prompt_response = exp.experiment.prompt_response
-        debug(exp, 'Found event in experiment: prompt_response')
-    if hasattr(exp.experiment, 'prompt_condition'):
+        debug(exp, "Found event in experiment: prompt_response")
+    if hasattr(exp.experiment, "prompt_condition"):
         exp.prompt_condition = exp.experiment.prompt_condition
-        debug(exp, 'Found event in experiment: prompt_condition')
+        debug(exp, "Found event in experiment: prompt_condition")
 
     exp.utils.process_variables(exp)
     exp.run.nblocks = exp.var.nblocks
     if exp.recordData:
-        debug(exp, 'Data will be recorded')
+        debug(exp, "Data will be recorded")
         datapath = os.path.split(exp.dataFile)
         if not os.path.isdir(datapath[0]):
             os.makedirs(datapath[0])
-            debug(exp, "Created datafile path: " + datapath[0])
+            debug(exp, "Created datafile path: {}".format(datapath[0]))
         else:
-            debug(exp, "Found datafile path: " + datapath[0])
+            debug(exp, "Found datafile path: {}".format(datapath[0]))
         exp.dataFile_unexpanded = exp.dataFile
         exp.dataFile = get_expanded_vals_in_string(exp.dataFile, exp)
         if not os.path.isfile(exp.dataFile):
             exp.dataString_header = get_expanded_vals_in_string(exp.dataString_header, exp)
             write_data(exp.dataString_header, exp.dataFile)
-            debug(exp, "Created datafile: " + exp.dataFile)
+            debug(exp, "Created datafile: {}".format(exp.dataFile))
         else:
-            debug(exp, "Found datafile: " + exp.dataFile)
+            debug(exp, "Found datafile: {}".format(exp.dataFile))
     else:
-        debug(exp, 'Data will not be recorded')
+        debug(exp, "Data will not be recorded")
 
 def process_variables(exp):
-    '''Processes conditions
+    """Processes conditions
         Factorialize all 'factorial' conditions, and add all 'covariable' conditions
         For each variable, make a list of levels for each condition
-    '''
+    """
 
     # Begin get number of levels
     factorial = []
@@ -269,7 +271,7 @@ def process_variables(exp):
             exp.var.varlist.append(v)
             nfact[v] = len(exp.var.factorial[v])
             exp.var.nlevels_fact *= nfact[v]
-            debug(exp, "Found factorial variable: %s [%i levels]" % (v, len(exp.var.factorial[v])))
+            debug(exp, "Found factorial variable: {} [{:} levels]".format(v, len(exp.var.factorial[v])))
 
         factorial = exp.var.varlist
     nlist = 0
@@ -283,13 +285,13 @@ def process_variables(exp):
         else:
             if nlist != ncov[v] and ncov[v] != 1:
                 raise Exception("All 'covariable' variables must either have the same number of levels, or one level")
-        debug(exp, "Found list variable: %s [%i levels]" % (v, len(exp.var.covariable[v])))
+        debug(exp, "Found list variable: {} [{:} levels]".format(v, len(exp.var.covariable[v])))
     if len(factorial) == 0:
         for v in exp.var.covariable:
             exp.var.varlist.append(v)
     exp.var.nlevels_list = nlist
     exp.var.nlevels_total = exp.var.nlevels_fact + exp.var.nlevels_list
-    debug(exp, "Counted total conditions: %i [%i fact, %i list]" % (exp.var.nlevels_total, exp.var.nlevels_fact, exp.var.nlevels_list))
+    debug(exp, "Counted total conditions: {:} [{:} fact, {:} list]".format(exp.var.nlevels_total, exp.var.nlevels_fact, exp.var.nlevels_list))
     # End get number of levels
 
     # Begin process conditions
@@ -335,71 +337,74 @@ def process_variables(exp):
                     exp.var.levelsbycond[v].append(exp.var.covariable[v][condition])
                 gotvar = True
             if not gotvar:
-                raise Exception("Unable to process the following variable: " + v)
+                raise Exception("Unable to process the following variable: {}".format(v))
 
     # Process order
-    if exp.var.order == 'random':
+    if exp.var.order == "random":
         exp.var.orderarray = np.random.permutation(exp.var.nlevels_total)
         exp.var.nblocks = exp.var.nlevels_total
-    elif exp.var.order == 'natural':
+    elif exp.var.order == "natural":
         exp.var.orderarray = np.arange(exp.var.nlevels_total)
         exp.var.nblocks = exp.var.nlevels_total
-    elif exp.var.order == 'prompt':
+    elif exp.var.order == "prompt":
         exp.var.orderarray = []
         exp.var.nblocks = 999
-    elif exp.var.order == 'menu':
+    elif exp.var.order == "menu":
         exp.var.orderarray = []
         exp.var.nblocks = 0
     else:
         exp.var.orderarray = str_to_range(exp.var.order)
         exp.var.nblocks = len(exp.var.orderarray)
-    debug(exp, "Presentation order input string: " + exp.var.order)
-    debug(exp, "Presentation order generated: " + ", ".join(str(i) for i in exp.var.orderarray))
+    debug(exp, "Presentation order input string: {}".format(exp.var.order))
+    debug(exp, "Presentation order generated: {}".format(", ".join(str(i) for i in exp.var.orderarray)))
 # End process_variables
 
 
 def get_current_variables(exp):
-    '''Get current levels of each variable for a given condition
-    '''
+    """Get current levels of each variable for a given condition
+    """
     condition = exp.run.condition
     exp.var.current = {}
     for v in exp.var.varlist:
         if v in exp.var.prompt:
-            ret = exp.frontend.get_input(prompt = "Enter a value for variable: %s\nor hit enter for current level (%s): " % (v, exp.var.levelsbycond[v][condition]))
+            ret = exp.frontend.get_input(prompt = "Enter a value for variable: {}\nor hit enter for current level ({}): ".format(v, exp.var.levelsbycond[v][condition]))
             if ret == "":
                 exp.var.current[v] = exp.var.levelsbycond[v][condition]
             else:
                 exp.var.current[v] = ret
         else:
             exp.var.current[v] = exp.var.levelsbycond[v][condition]
-        debug(exp, "Getting level: %s; for variable: %s" % (exp.var.current[v],v))
+        debug(exp, "Getting level: {}; for variable: {}".format(exp.var.current[v],v))
 
 def get_variable_strtable(exp):
-    '''Creates a table specifying the levels of each variable for each condition
-    '''
+    """Creates a table specifying the levels of each variable for each condition
+    """
     vlength = {}
     out = "Condition"
     for v in exp.var.varlist:
         vlength[v] = np.maximum(len(max(exp.var.levelsbycond[v], key=len)), len(v)) + 2
-        fmt = "%"+str(vlength[v])+"s"
-        out += fmt % v
+        #fmt = "%"+str(vlength[v])+"s"
+        #out += fmt % v
+        out += "{{: >{:}d}}".format(vlength[v]).format(v)
     out += "\n"
     for i in range(exp.var.nlevels_total):
-        out += "%9d" % (i+1)
+        #out += "%9d" % (i+1)
+        out += "{: >9d}".format(i+1)
         for v in exp.var.varlist:
-            fmt = "%"+str(vlength[v])+"s"
-            out += fmt % exp.var.levelsbycond[v][i]
+            #fmt = "%"+str(vlength[v])+"s"
+            #out += fmt % exp.var.levelsbycond[v][i]
+            out += "{{: >{:}d}}".format(vlength[v]).format(exp.var.levelsbycond[v][i])
         out += "\n"
     return out
 
 def menu_condition(exp):
-    '''Prompts the experiment to choose the conditions to run
-    '''
+    """Prompts the experiment to choose the conditions to run
+    """
     debug(exp, "Deriving presentation order via menu")
     strtable = exp.utils.get_variable_strtable(exp) + "\nSelected Conditions: ["
     sel = []
     conditions = []
-    message = ''
+    message = ""
     for i in range(1,exp.var.nlevels_total+1):
         conditions.append(str(i))
     while True:
@@ -410,27 +415,32 @@ def menu_condition(exp):
         if not exp.recordData:
             disp += "  [NO DATA WILL BE RECORDED]"
         disp += ":\nCondition # - Add condition\n"
-        disp += "%11s - Add all conditions\n" % 'a'
-        disp += "%11s - run exp using selected conditions in random order\n" % 'r'
-        disp += "%11s - run exp using selected conditions in selected order\n" % 's'
-        disp += "%11s - clear condition list\n" % 'c'
-        disp += "%11s - quit\n" % (exp.quitKey)
+        disp += "{: >11}  -Add all conditions\n".format('a')
+        disp += "{: >11} - Run exp using selected conditions in random order\n".format('r')
+        disp += "{: >11} - Run exp using selected conditions in selected order\n".format('s')
+        disp += "{: >11} - Clear condition list\n".format('c')
+        disp += "{: >11} - Quit\n".format(exp.quitKey)
+        #disp += "%11s - Add all conditions\n" % 'a'
+        #disp += "%11s - run exp using selected conditions in random order\n" % 'r'
+        #disp += "%11s - run exp using selected conditions in selected order\n" % 's'
+        #disp += "%11s - clear condition list\n" % 'c'
+        #disp += "%11s - quit\n" % (exp.quitKey)
         # Poor man's clearscreen: Prepend blank lines (assume console is 25 lines long)
-        if disp.count('\n') < 25:
-            disp = '\n' * (25-disp.count('\n')) + disp 
-        message = ''
+        if disp.count("\n") < 25:
+            disp = "\n" * (25-disp.count('\n')) + disp 
+        message = ""
         ret = exp.term.get_input(parent=None, title = "Gustav!", prompt = disp)
         if ret in conditions:
             sel.append(ret)
-        elif ret in ['a']:
+        elif ret in ["a"]:
             for cond in conditions:
                 sel.append(cond)
         elif ret == exp.quitKey:
             exp.run.gustav_is_go = False
             break;
-        elif ret in ['c']:
+        elif ret in ["c"]:
             sel = []
-        elif ret in ['r']:
+        elif ret in ["r"]:
             if len(sel) > 0:
                 sel = np.random.permutation(sel).tolist()
                 for s in sel:
@@ -440,7 +450,7 @@ def menu_condition(exp):
                 break;
             else:
                 message = "You must select at least 1 condition to run!\n\n"
-        elif ret in ['s']:
+        elif ret in ["s"]:
             if len(sel) > 0:
                 for s in sel:
                     exp.var.orderarray.append(int(s)-1)
@@ -450,21 +460,21 @@ def menu_condition(exp):
             else:
                 message = "You must select at least 1 condition to run!\n\n"
         elif ret.isdigit():
-            message = "Condition numbers for this experiment are 1 <= %i\n\n" % exp.var.nlevels_total
-        elif ret != '':
-            message = "Unrecognized input: %s\n\n" % ret
+            message = "Condition numbers for this experiment are 1 <= {:}\n\n".format(exp.var.nlevels_total)
+        elif ret != "":
+            message = "Unrecognized input: {}\n\n".format(ret)
             
 
 def update_time(run):
-    '''Updates the date and time
-    '''
+    """Updates the date and time
+    """
     exp.run.time = datetime.datetime.now().strftime('%H:%M:%S')
     exp.run.date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 
 def write_data(data, filename):
-    '''Data IO.
-    '''
+    """Data IO.
+    """
     if os.path.isfile(filename):
         f = codecs.open(filename, encoding='utf-8', mode='a')
     else:
@@ -483,8 +493,8 @@ def save_data(exp, message):
 
 
 def log(exp, message):
-    '''Writes info to the console, to a log file, or both
-    '''
+    """Writes info to the console, to a log file, or both
+    """
     if message is not None and message != '':
         message_exp = exp.utils.get_expanded_vals_in_string(message, exp)
         if exp.logConsole:
@@ -494,12 +504,12 @@ def log(exp, message):
 
         
 def debug(exp, message):
-    '''Writes debug info to the console, to a log file, or both
-    '''
+    """Writes debug info to the console, to a log file, or both
+    """
     if exp.debug:
         time = datetime.datetime.now().strftime('%H:%M:%S')
         date = datetime.datetime.now().strftime('%Y-%m-%d')
-        dmessage = "DEBUG %s,%s: %s" % (date, time, message)
+        dmessage = "DEBUG {},{}: {}".format(date, time, message)
         if exp.logConsole:
             print(dmessage)
         if exp.logFile is not None and exp.logFile is not '':
@@ -508,56 +518,56 @@ def debug(exp, message):
         
 def do_event(exp, event):
     exp.utils.update_time(exp.run)
-    if hasattr(exp, "%s_" % event):
-        funcs = getattr(exp, "%s_" % event)
+    if hasattr(exp, "{}_".format(event)):
+        funcs = getattr(exp, "{}_".format(event))
         for f in funcs:
             if f.__name__ not in exp.disable_functions:
                 f(exp)
-    if hasattr(exp, 'logString_%s' % event):
-        exp.utils.log(exp, getattr(exp, 'logString_%s' % event))
-    if hasattr(exp, 'dataString_%s' % event):
-        exp.utils.save_data(exp, getattr(exp, 'dataString_%s' % event))
-    debug(exp, "Event: %s" % (event))
+    if hasattr(exp, "logString_{}".format(event)):
+        exp.utils.log(exp, getattr(exp, "logString_{}".format(event)))
+    if hasattr(exp, "dataString_{}".format(event)):
+        exp.utils.save_data(exp, getattr(exp, "dataString_{}".format(event)))
+    debug(exp, "Event: {}".format(event))
         
 def get_frontend(exp, frontend):
-    '''Tries to load the specified frontend
-    '''
+    """Tries to load the specified frontend
+    """
     frontend_s = frontend
     if frontend_s not in exp.frontendTypes:
         print("Unknown frontend. Using tk")
-        frontend = 'tk'
-
+        frontend = "tk"
     try:
-        frontend = __import__('frontends',globals(), locals(), frontend)
+        frontend = __import__("frontends",globals(), locals(), frontend)
     except ImportError:
-        raise Exception("Could not import frontend "+frontend)
+        raise Exception("Could not import frontend: {}".format(frontend))
     exp.frontend = getattr(frontend, frontend_s)
-    debug(exp, "Getting frontend: %s" % (exp.frontend.name))
+    debug(exp, "Getting frontend: {}".format(exp.frontend.name))
 
-def obj_to_str(obj, name, indent=''):
+def obj_to_str(obj, name, indent=""):
     """Returns formatted, python-callable string representations of objects
         including classes, dicts, lists, and other built-in var types
     """
     if isinstance(obj, dict):
-        outstr = "%s%s = {\n" % (indent, name)
+        outstr = "{}{} = {\n".format(indent, name)
         for key, val in obj.items():
             if key[:2] != "__":
-                outstr += "%s    '%s' : %r,\n" % (indent, key,val)
-        outstr += "%s}\n" % indent
+                #outstr += "%s    '%s' : %r,\n" % (indent, key,val)
+                outstr += "{}    '{}' : {},\n".format(indent, key, repr(val))
+        outstr += "{}}}\n".format(indent)
     elif isinstance(obj, list):
-        outstr = "%s%s = [\n" % (indent, name)
+        outstr = "{}{} = [\n".format(indent, name)
         for val in obj:
-            outstr += "%s    %r,\n" % (indent, val)
+            outstr += "{}    {},\n".format(indent, repr(val))
         outstr += "%s]\n" % indent
     elif isinstance(obj,(types.ClassType,types.InstanceType)):
-        outstr = "%sclass %s():\n" % (indent, name)
+        outstr = "{}class {}():\n".format(indent, name)
         items = getmembers(obj)
         for key, val in items:
             if key[:2] != "__":
-                outstr += "%s    %s = %r\n" % (indent, key,val)
-        outstr += "%s\n" % indent
+                outstr += "{}    {} = {}\n".format(indent, key, repr(val))
+        outstr += "{}\n".format(indent)
     else:
-        outstr = "%s%s = %r\n" % (indent, name, obj)
+        outstr = "{}{} = {}\n".format(indent, name, repr(obj))
 
     return outstr
 
