@@ -419,7 +419,7 @@ def menu_condition(exp):
         disp += "{: >11} - Run exp using selected conditions in random order\n".format('r')
         disp += "{: >11} - Run exp using selected conditions in selected order\n".format('s')
         disp += "{: >11} - Clear condition list\n".format('c')
-        disp += "{: >11} - Quit\n".format(exp.quitKey)
+        disp += "{: >11} - Quit\n".format(",".join(exp.quitKeys))
         #disp += "%11s - Add all conditions\n" % 'a'
         #disp += "%11s - run exp using selected conditions in random order\n" % 'r'
         #disp += "%11s - run exp using selected conditions in selected order\n" % 's'
@@ -435,7 +435,7 @@ def menu_condition(exp):
         elif ret in ["a"]:
             for cond in conditions:
                 sel.append(cond)
-        elif ret == exp.quitKey:
+        elif ret in exp.quitKeys:
             exp.run.gustav_is_go = False
             break;
         elif ret in ["c"]:
