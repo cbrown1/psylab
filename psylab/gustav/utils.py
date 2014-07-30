@@ -385,7 +385,7 @@ def get_variable_strtable(exp):
         vlength[v] = np.maximum(len(max(exp.var.levelsbycond[v], key=len)), len(v)) + 2
         #fmt = "%"+str(vlength[v])+"s"
         #out += fmt % v
-        out += "{{: >{:}d}}".format(vlength[v]).format(v)
+        out += "{{: >{:}}}".format(vlength[v]).format(v)
     out += "\n"
     for i in range(exp.var.nlevels_total):
         #out += "%9d" % (i+1)
@@ -393,7 +393,7 @@ def get_variable_strtable(exp):
         for v in exp.var.varlist:
             #fmt = "%"+str(vlength[v])+"s"
             #out += fmt % exp.var.levelsbycond[v][i]
-            out += "{{: >{:}d}}".format(vlength[v]).format(exp.var.levelsbycond[v][i])
+            out += "{{: >{:}}}".format(vlength[v]).format(exp.var.levelsbycond[v][i])
         out += "\n"
     return out
 
@@ -415,7 +415,7 @@ def menu_condition(exp):
         if not exp.recordData:
             disp += "  [NO DATA WILL BE RECORDED]"
         disp += ":\nCondition # - Add condition\n"
-        disp += "{: >11}  -Add all conditions\n".format('a')
+        disp += "{: >11} - Add all conditions\n".format('a')
         disp += "{: >11} - Run exp using selected conditions in random order\n".format('r')
         disp += "{: >11} - Run exp using selected conditions in selected order\n".format('s')
         disp += "{: >11} - Clear condition list\n".format('c')
