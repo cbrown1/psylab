@@ -20,12 +20,21 @@
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-'''Method of constant stimuli for Gustav
+"""Method of constant stimuli for Gustav
 
-'''
+    This method has three properties, which should be set in pre_exp:
+    
+    exp.var.constant = {
+        'trialsperblock' : 10,
+        'startblock' : 1,
+        'starttrial' : 1,
+        }
 
-#def initialize(exp,run,var,stim,user):
-#    pass
+    trialsperblock sets the number of trials to run for each block, or 
+        combination of experimental variable levels.
+        
+    startblock and starttrial are intended for crash recovery, 
+"""
 
 def pre_exp(exp):
     # Only set these if None, in case they were set in experiment file setup, which has run already
@@ -39,7 +48,9 @@ def pre_exp(exp):
         exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     if exp.logString_post_exp == None:
         exp.logString_post_exp = "\nExperiment $name ended at $time\n"
+        
     exp.run.block = exp.var.constant['startblock']-1
+        
     if exp.run.block >= exp.run.nblocks - 1:
         exp.run.gustav_is_go = False
 

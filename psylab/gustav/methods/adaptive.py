@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -20,9 +20,28 @@
 # Comments and/or additions are welcome. Send e-mail to: cbrown1@pitt.edu.
 #
 
-'''Adaptive tracking method for Gustav
+"""Adaptive tracking method for Gustav
 
-'''
+    This method has several properties that must be set in pre_exp:
+    
+    exp.var.dynamic = {
+            'name': '',          # Name of the dynamic variable
+            'units': '',         # Units of the dynamic variable
+            'alternatives': 2,   # Number of alternatives
+            'steps': [0, 0],     # Stepsizes to use at each reversal (len = #revs)
+            'downs': 2,          # Number of 'downs'
+            'ups': 1,            # Number of 'ups'
+            'val_start': 0,      # Starting value
+            'val_floor': 0,      # Floor; don't go below this
+            'val_ceil': 0,       # Ceiling; don't go above this
+            'val_floor_n': 3,    # Number of consecutive floor values at which to quit
+            'val_ceil_n': 3,     # Number of consecutive ceiling values at which to quit
+            'run_n_trials': 0,   # Set to non-zero to run exactly this number of trials
+            'max_trials': 0,     # Maximum number of trials to run
+            'vals_to_avg': 0,    # The number of values to average
+            'step': step,        # [optional] A custom step function
+           }
+"""
 import os, codecs
 import numpy as np
 
@@ -51,7 +70,7 @@ dynamic_vars_block = {           # Might be useful for stimgen or at end of bloc
             'values_at_rev': [], # Values at reversals
             'good_run': False,   # True if the run finished normally, otherwise False
            }
-dynamic_vars_track = {           # Tracking (prob not useful, so not accessible)
+dynamic_vars_track = {           # Tracking stuff
             'value': 0,          # Current dynamic value
             'val_floor_count': 0,# Number of consecutive floor trials
             'val_ceil_count': 0, # Number of consecutive ceiling trials
@@ -73,14 +92,29 @@ dynamic_vars_track = {           # Tracking (prob not useful, so not accessible)
            }
 
 def step(exp):
+    """ The step function
+        
+        Increments dynamic['value'] as needed, using the appropriate value from dynamic['steps']
+        
+        You can create your own custom step function in your gustav experiment 
+        script by creating the function, then specifying it:
+
+        def step(exp):
+            exp.var.dynamic['value'] += exp.var.dynamic['cur_step'] * exp.var.dynamic['steps'][exp.var.dynamic['n_reversals']]
+            exp.var.dynamic['value'] = max(exp.var.dynamic['value'], exp.var.dynamic['val_floor'])
+            exp.var.dynamic['value'] = min(exp.var.dynamic['value'], exp.var.dynamic['val_ceil'])
+        exp.var.dynamic['step'] = step
+    """
     exp.var.dynamic['value'] += exp.var.dynamic['cur_step'] * exp.var.dynamic['steps'][exp.var.dynamic['n_reversals']]
     exp.var.dynamic['value'] = max(exp.var.dynamic['value'], exp.var.dynamic['val_floor'])
     exp.var.dynamic['value'] = min(exp.var.dynamic['value'], exp.var.dynamic['val_ceil'])
 
 
 def track(exp):
+    """ The tracking function
+    """
     exp.var.dynamic['values'].append(exp.var.dynamic['value'])
-    if exp.var.dynamic['cur_correct']:
+    if exp.var.dynamic['cur_correct']:                         #It's a down
         exp.var.dynamic['cur_dns'] += 1                        # Increment dns
         exp.var.dynamic['cur_ups'] = 0                         # Reset ups
         if exp.var.dynamic['cur_dns'] == exp.var.dynamic['downs']: # If we have the right number of dns
@@ -89,7 +123,7 @@ def track(exp):
             if exp.var.dynamic['prev_dir'] == -1:              #  If previous direction was dn
                 exp.var.dynamic['track'].append(0)             #   No reversal
                 exp.var.dynamic['cur_status'] = " "
-            elif exp.var.dynamic['prev_dir'] == 0:             #  If no previous direction (must be start)
+            elif exp.var.dynamic['prev_dir'] == 0:             #  No previous direction (must be start)
                 exp.var.dynamic['prev_dir'] = -1               #   Set prev_dir
                 exp.var.dynamic['track'].append(0)             #   Don't record this as a change
                 exp.var.dynamic['init_dir'] = -1               #   Set initial direction
@@ -99,15 +133,15 @@ def track(exp):
                 exp.var.dynamic['track'].append(-1)            #   Record reversal
                 exp.var.dynamic['n_reversals'] += 1            #   Count it
                 exp.var.dynamic['values_at_rev'].append(exp.var.dynamic['value'])
-                exp.var.dynamic['cur_status'] = "-%g" % len(exp.var.dynamic['values_at_rev'])
+                exp.var.dynamic['cur_status'] = "-{:}".format(len(exp.var.dynamic['values_at_rev']))
         else:
             exp.var.dynamic['cur_step'] = 0                    #  No current step
             exp.var.dynamic['track'].append(0)                 #   No reversal
             exp.var.dynamic['cur_status'] = " "
-    else:
+    else:                                                      #It's an up
         exp.var.dynamic['cur_dns'] = 0                         # Reset dns
         exp.var.dynamic['cur_ups'] += 1                        # Increment ups
-        if exp.var.dynamic['cur_ups'] == exp.var.dynamic['ups']:   # If we have the right number of ups
+        if exp.var.dynamic['cur_ups'] == exp.var.dynamic['ups']: # If we have the right number of ups
             exp.var.dynamic['cur_step'] = 1                    #  Set current step
             exp.var.dynamic['cur_ups'] = 0                     #  Reset ups
             if exp.var.dynamic['prev_dir'] == 1:               #  If previous direction was up
@@ -123,9 +157,9 @@ def track(exp):
                 exp.var.dynamic['track'].append(1)             #   Record reversal
                 exp.var.dynamic['n_reversals'] += 1            #   Count it
                 exp.var.dynamic['values_at_rev'].append(exp.var.dynamic['value'])
-                exp.var.dynamic['cur_status'] = "+%g" % len(exp.var.dynamic['values_at_rev'])
-        else:
-            exp.var.dynamic['cur_step'] = 0                    #  No current step
+                exp.var.dynamic['cur_status'] = "+{:}".format(len(exp.var.dynamic['values_at_rev']))
+        else:                                                  # Not a reversal
+            exp.var.dynamic['cur_step'] = 0                    #   No current step
             exp.var.dynamic['track'].append(0)                 #   No reversal
             exp.var.dynamic['cur_status'] = " "
 
@@ -136,12 +170,12 @@ def finish_trial(exp):
     if exp.var.dynamic['value'] == exp.var.dynamic['val_floor']:
         if exp.var.dynamic['cur_step'] == -1:
             exp.var.dynamic['val_floor_count'] += 1
-            exp.var.dynamic['cur_status'] = "f%g" % exp.var.dynamic['val_floor_count']
+            exp.var.dynamic['cur_status'] = "f{:}".format(exp.var.dynamic['val_floor_count'])
         elif  not exp.var.dynamic['cur_correct']:
             exp.var.dynamic['val_floor_count'] = 0
         if exp.var.dynamic['val_floor_count'] == exp.var.dynamic['val_floor_n']:
             exp.run.block_on = False
-            exp.var.dynamic['msg'] = '%g consecutive floor trials reached' % exp.var.dynamic['val_floor_n']
+            exp.var.dynamic['msg'] = "{:} consecutive floor trials reached".format(exp.var.dynamic['val_floor_n'])
     else:
         exp.var.dynamic['val_floor_count'] = 0
     if exp.var.dynamic['value'] == exp.var.dynamic['val_ceil']:
@@ -227,6 +261,11 @@ def pre_exp(exp):
 
 
 def save_data_block(exp):
+    """ Write data for a run (a block) in a pythonic way
+
+        The files are written so as to be an executable python script, 
+        and the data for runs are stored in python classes.
+    """
     if os.path.isfile(exp.dataFile):
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='a')
     else:
