@@ -492,7 +492,7 @@ def log(exp, message):
         if exp.logFile is not None and exp.logFile is not '':
             write_data(message_exp, exp.logFile)
 
-        
+    
 def debug(exp, message):
     """Writes debug info to the console, to a log file, or both
     """
@@ -503,6 +503,8 @@ def debug(exp, message):
         if exp.logConsole:
             print(dmessage)
         if exp.logFile is not None and exp.logFile is not '':
+            if dmessage[-1:] != "\n":
+                dmessage += "\n"
             write_data(dmessage, exp.logFile)
 
         

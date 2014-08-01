@@ -23,28 +23,23 @@
 # cbrown1@pitt.edu.
 #
 
-"""Gustav - A Python module to run psychophysical experiments
+"""Gustav: An event-based framework for psychophysical experiments
 
-    The goal of Gustav is to handle the routines that are common across
-    experiments (like the psychophysical procedure, keeping track of stimulus
-    and condition orders, recording response data, etc), to allow the 
-    experimenter to worry about the things that are unique to each experiment
-    (like the experimental design, stimulus generation, etc.).
- 
-    See one of the settings.py files for more information.
-	
-	The main functions in Gustav are:
-	
-	    run - runs an experiment
-	    
-	    configure [not currently working] - intended to be a gui to help 
-	    with experimental design
-	    
-	    list_conditions - simply lists all of the conditions in an 
-	    experiment, along with all of the corresponding condition levels
-	
+    Gustav tries to handle all of the aspects of experimentation that are 
+    common across experiments (organizing and enumerating experimental 
+    variables, the psychophysical procedure, interacting with subjects, 
+    logging, saving data, etc.), and leaves to the experimenter the aspects 
+    that are unique to each experiment (stimulus generation and delivery, etc). 
+    
+    An experiment is represented by a Gustav experiment file, which is simply 
+    a python script that has various functions and properties specified. For 
+    example, the setup function is where many aspects of the experiment are 
+    set, such as the name of the experiment, where and how to save data, what 
+    the experimental variables and their levels are, and so on. The best way 
+    to understand how one works is to have a look at one. See one of the 
+    gustav_settings.py files for more information.
+
 """
 
-from .gustav import run, configure, info, main
+from .gustav import run, info, main
 from . import frontends, methods
-
