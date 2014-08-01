@@ -22,11 +22,11 @@
 
 """Adaptive tracking method for Gustav
 
-    This method has several properties that must be set in pre_exp:
+    This method has several required properties that must be set in pre_exp:
     
     exp.var.dynamic = {
             'name': '',          # Name of the dynamic variable
-            'units': '',         # Units of the dynamic variable
+            'units': '',         # Units of the dynamic variable (dB, etc.)
             'alternatives': 2,   # Number of alternatives
             'steps': [0, 0],     # Stepsizes to use at each reversal (len = #revs)
             'downs': 2,          # Number of 'downs'
@@ -37,9 +37,9 @@
             'val_floor_n': 3,    # Number of consecutive floor values at which to quit
             'val_ceil_n': 3,     # Number of consecutive ceiling values at which to quit
             'run_n_trials': 0,   # Set to non-zero to run exactly this number of trials
-            'max_trials': 0,     # Maximum number of trials to run
-            'vals_to_avg': 0,    # The number of values to average
-            'step': step,        # [optional] A custom step function
+            'max_trials': 0,     # Set a specific maximum number of trials to run (0=ignore)
+            'vals_to_avg': 0,    # The number of values (at reversal) to average
+            'step': step,        # A custom step function [optional]
            }
 """
 import os, codecs
@@ -181,12 +181,12 @@ def finish_trial(exp):
     if exp.var.dynamic['value'] == exp.var.dynamic['val_ceil']:
         if exp.var.dynamic['cur_step'] == 1:
             exp.var.dynamic['val_ceil_count'] += 1
-            exp.var.dynamic['cur_status'] = "c%g" % exp.var.dynamic['val_ceil_count']
+            exp.var.dynamic['cur_status'] = "c{:}".format(exp.var.dynamic['val_ceil_count'])
         elif exp.var.dynamic['cur_correct']:  # At ceil, correct, but not a step. So reset ceil_count
             exp.var.dynamic['val_ceil_count'] = 0
         if exp.var.dynamic['val_ceil_count'] == exp.var.dynamic['val_ceil_n']:
             exp.run.block_on = False
-            exp.var.dynamic['msg'] = '%g consecutive ceiling trials reached' % exp.var.dynamic['val_ceil_n']
+            exp.var.dynamic['msg'] = "{:} consecutive ceiling trials reached".format(exp.var.dynamic['val_ceil_n'])
     else:
         exp.var.dynamic['val_ceil_count'] = 0
 
@@ -194,23 +194,23 @@ def finish_trial(exp):
         if exp.var.dynamic['run_n_trials'] > 0 and exp.run.trials_block == exp.var.dynamic['run_n_trials']:
             exp.run.block_on = False
             exp.var.dynamic['good_run'] = True
-            exp.var.dynamic['msg'] = '%g trials reached' % exp.var.dynamic['run_n_trials']
+            exp.var.dynamic['msg'] = "{:} trials reached".format(exp.var.dynamic['run_n_trials'])
         elif exp.var.dynamic['max_trials'] > 0 and exp.run.trials_block == exp.var.dynamic['max_trials']:
             exp.run.block_on = False
             exp.var.dynamic['good_run'] = True
-            exp.var.dynamic['msg'] = 'A maximum of %g trials reached' % exp.var.dynamic['max_trials']
+            exp.var.dynamic['msg'] = "A maximum of {:} trials reached".format(exp.var.dynamic['max_trials'])
         elif exp.var.dynamic['n_reversals'] == len(exp.var.dynamic['steps']):
             exp.run.block_on = False
             exp.var.dynamic['good_run'] = True
-            exp.var.dynamic['msg'] = '%g reversals reached' % len(exp.var.dynamic['steps'])
+            exp.var.dynamic['msg'] = "{:} reversals reached".format(len(exp.var.dynamic['steps']))
 
 def pre_block(exp):
     missing_vars = ''
     for key,val in dynamic_vars_user.items():
         if not exp.var.dynamic.has_key(key):
-            missing_vars += "exp.var.dynamic['" + key + "']\n"
+            missing_vars += "exp.var.dynamic['{}']\n".format(key)
     if missing_vars != '':
-            raise Exception("The following dynamic variables must be set: \n\n%s" % missing_vars)
+            raise Exception("The following dynamic variables must be set: \n\n{}".format(missing_vars))
     d = exp.var.dynamic.copy()
     exp.var.dynamic = dynamic_vars_block.copy()
     exp.var.dynamic.update(dynamic_vars_track.copy())
@@ -271,10 +271,10 @@ def save_data_block(exp):
     else:
         f = codecs.open(exp.dataFile, encoding='utf-8', mode='w')
         f.write("# -*- coding: utf-8 -*-\n\n# A datafile created by Gustav!\n\n")
-        f.write("# Experiment: %s\n\n'''%s\n'''\n\n" % (exp.name, exp.comments))
+        f.write("# Experiment: {}\n\n'''{}\n'''\n\n".format(exp.name, exp.comments))
         
-    f.write("class block_%s_%s ():\n" % (exp.run.date.replace("-","_"), exp.run.time.replace(":","_")))
-    indent='    '
+    f.write("class block_{}_{} ():\n".format(exp.run.date.replace("-","_"), exp.run.time.replace(":","_")))
+    indent="    "
     f.write(exp.utils.obj_to_str(exp.name,'name',indent))
     f.write(exp.utils.obj_to_str(exp.note,'note',indent))
     f.write(exp.utils.obj_to_str(exp.subjID,'subjID',indent))

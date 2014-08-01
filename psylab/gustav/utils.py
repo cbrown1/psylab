@@ -58,9 +58,9 @@ class exp:
     logFile = 'gustav_logfile_$date.log'
     logFile_unexpanded = ""
     logConsole = True
-    dataString_pre_exp = ''   #Write this string to datafile at exp begin
-    dataString_pre_block = '' #Write this string to datafile before every block
-    dataString_pre_trial = '' #Write this string to datafile before every trial
+    dataString_pre_exp = ''    #Write this string to datafile at exp begin
+    dataString_pre_block = ''  #Write this string to datafile before every block
+    dataString_pre_trial = ''  #Write this string to datafile before every trial
     dataString_post_trial = '' #Write this string to datafile after every trial
     dataString_post_block = '' #Write this string to datafile after every block
     dataString_post_exp = ''   #Write this string to datafile at exp end
@@ -383,16 +383,11 @@ def get_variable_strtable(exp):
     out = "Condition"
     for v in exp.var.varlist:
         vlength[v] = np.maximum(len(max(exp.var.levelsbycond[v], key=len)), len(v)) + 2
-        #fmt = "%"+str(vlength[v])+"s"
-        #out += fmt % v
         out += "{{: >{:}}}".format(vlength[v]).format(v)
     out += "\n"
     for i in range(exp.var.nlevels_total):
-        #out += "%9d" % (i+1)
         out += "{: >9d}".format(i+1)
         for v in exp.var.varlist:
-            #fmt = "%"+str(vlength[v])+"s"
-            #out += fmt % exp.var.levelsbycond[v][i]
             out += "{{: >{:}}}".format(vlength[v]).format(exp.var.levelsbycond[v][i])
         out += "\n"
     return out
@@ -411,7 +406,7 @@ def menu_condition(exp):
         disp = strtable
         for s in sel:
             disp += " " + s
-        disp += " ]\n\n%sMenu" % message
+        disp += " ]\n\n{}Menu".format(message)
         if not exp.recordData:
             disp += "  [NO DATA WILL BE RECORDED]"
         disp += ":\nCondition # - Add condition\n"
@@ -420,11 +415,6 @@ def menu_condition(exp):
         disp += "{: >11} - Run exp using selected conditions in selected order\n".format('s')
         disp += "{: >11} - Clear condition list\n".format('c')
         disp += "{: >11} - Quit\n".format(",".join(exp.quitKeys))
-        #disp += "%11s - Add all conditions\n" % 'a'
-        #disp += "%11s - run exp using selected conditions in random order\n" % 'r'
-        #disp += "%11s - run exp using selected conditions in selected order\n" % 's'
-        #disp += "%11s - clear condition list\n" % 'c'
-        #disp += "%11s - quit\n" % (exp.quitKey)
         # Poor man's clearscreen: Prepend blank lines (assume console is 25 lines long)
         if disp.count("\n") < 25:
             disp = "\n" * (25-disp.count('\n')) + disp 
@@ -551,14 +541,13 @@ def obj_to_str(obj, name, indent=""):
         outstr = "{}{} = {\n".format(indent, name)
         for key, val in obj.items():
             if key[:2] != "__":
-                #outstr += "%s    '%s' : %r,\n" % (indent, key,val)
                 outstr += "{}    '{}' : {},\n".format(indent, key, repr(val))
         outstr += "{}}}\n".format(indent)
     elif isinstance(obj, list):
         outstr = "{}{} = [\n".format(indent, name)
         for val in obj:
             outstr += "{}    {},\n".format(indent, repr(val))
-        outstr += "%s]\n" % indent
+        outstr += "{}]\n".format(indent)
     elif isinstance(obj,(types.ClassType,types.InstanceType)):
         outstr = "{}class {}():\n".format(indent, name)
         items = getmembers(obj)
@@ -615,7 +604,7 @@ def get_expanded_vals_in_string(instr, exp):
     outstr = outstr.replace("$date", exp.run.date)
     outstr = outstr.replace("$response", exp.run.response)
 
-    # This func gets called from initialize (for datafilename), and exp.var.current is not set at that point
+    # This func gets called from setup (for datafilename), and exp.var.current is not set at that point
     if len(exp.var.current)>0:
         currentvars = []
         currentvarsvals = []

@@ -85,7 +85,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     if experimentFile == None:
         experimentFile = exp.term.get_file(None, "Open Gustav Experiment File", "", "Python or Plain Text Files (*.py *.txt);;All files (*.*)")
         if experimentFile == '':
-            print("Gustav cancelled at user request")
+            exp.utils.log(exp, "Gustav cancelled at user request (Prompt for Experiment File)")
             return
 
     if subjectID == None:
@@ -93,7 +93,7 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
         q = exp.quitKeys
         q.append('')
         if exp.subjID in q:
-            print("Gustav cancelled at user request")
+            exp.utils.log(exp, "Gustav cancelled at user request (Prompt for Subject ID)")
             return
     else:
         exp.subjID = str(subjectID)
@@ -104,16 +104,13 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
     sys.path.append(exp.experimentPath)
     exp.experiment = __import__(exp.experimentBase)
 
-    #exp.var.factvars[:] = []
-    #exp.var.listvars[:] = []
-
     exp.experiment.setup( exp )
 
     exp.method_str = exp.method
     try:
         methodi = __import__('methods',globals(), locals(), exp.method_str)
     except ImportError:
-        raise Exception("Unknown experimental method: " + exp.method_str)
+        raise Exception("Error importing experimental method: " + exp.method_str)
     exp.method = getattr(methodi, exp.method_str)
 
     exp.utils.initialize_experiment( exp )
@@ -130,19 +127,19 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
             ret = exp.frontend.get_yesno(None, title = "Gustav!", 
                     prompt = "exp.recordData == True, but no dataStrings were found so no data will be record data.\nAre you sure you want to continue?")
             if not ret:
-                print("Gustav cancelled at user request")
+                exp.utils.log(exp, "Gustav cancelled at user request (Prompt to record data)")
                 return
     else:
-        print("WARNING: No data will be recorded!")
+        exp.utils.log(exp, "WARNING: No data will be recorded!")
     if exp.var.order == 'menu':
         exp.utils.menu_condition( exp )
 
     if exp.run.gustav_is_go == False:
-        print("Gustav cancelled at user request")
+        exp.utils.log(exp, "Gustav cancelled at user request (Prompt to select conditions)")
         return
     ret = exp.frontend.get_yesno(None, title = "Gustav!", prompt = "Ready to begin testing?")
     if not ret:
-        print("Gustav cancelled at user request")
+        exp.utils.log(exp, "Gustav cancelled at user request (Prompt to begin testing)")
         return
 
     exp.utils.update_time(exp.run)

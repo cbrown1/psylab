@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -31,15 +31,28 @@
         }
 
     trialsperblock sets the number of trials to run for each block, or 
-        combination of experimental variable levels.
+        combination of experimental variable levels. This parameter is required.
         
-    startblock and starttrial are intended for crash recovery, 
+    startblock and starttrial are intended for crash recovery, and are optional.
 """
+
+constant_vars = {
+    'trialsperblock' : 10,
+    'startblock' : 1,
+    'starttrial' : 1,
+    }
 
 def pre_exp(exp):
     # Only set these if None, in case they were set in experiment file setup, which has run already
+    if not exp.var.constant.has_key('trialsperblock'):
+        raise Exception("The following constant variables must be set: \n\nexp.var.constant['trialsperblock']\n")
+    if not exp.var.constant.has_key('startblock'):
+        exp.var.constant['startblock'] = 1
+    if not exp.var.constant.has_key('starttrial'):
+        exp.var.constant['starttrial'] = 1
+
     if exp.logString_pre_exp == None:
-        exp.logString_pre_exp = "Experiment $name started at $time\n"
+        exp.logString_pre_exp = "Experiment started: $name. Date: $date, Time: $time, Subject #: $subj\n"
     if exp.logString_pre_block == None:
         exp.logString_pre_block = "\n Block $block of $blocks started at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     if exp.logString_post_trial == None:
@@ -47,7 +60,7 @@ def pre_exp(exp):
     if exp.logString_post_block == None:
         exp.logString_post_block = " Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     if exp.logString_post_exp == None:
-        exp.logString_post_exp = "\nExperiment $name ended at $time\n"
+        exp.logString_post_exp = "\nExperiment ended: $name. Date: $date, Time: $time, Subject #: $subj\n"
         
     exp.run.block = exp.var.constant['startblock']-1
         
