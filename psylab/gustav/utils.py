@@ -92,7 +92,7 @@ class exp:
             
     def prompt_condition(self,exp):
         while True:
-            ret = exp.term.get_input(None, "Gustav!","Enter Condition # (1-{:})".format(exp.var.nlevels_total))
+            ret = exp.frontend.get_input(None, "Gustav!","Enter Condition # (1-{:})".format(exp.var.nlevels_total))
             if ret in exp.quitKeys:
                 exp.run.block_on = False
                 exp.run.gustav_is_go = False
@@ -149,12 +149,6 @@ class exp:
         order_ = 0
         prompt = []
         dynamic = {}
-        def add_fact(self, **kwargs):
-            for key in kwargs:
-                factorial[key] = kwargs[key]
-        def add_cov(self, **kwargs):
-            for key in kwargs:
-                self.covariable[key] = kwargs[key]
 
     
     class run:
@@ -355,8 +349,8 @@ def process_variables(exp):
     else:
         exp.var.orderarray = str_to_range(exp.var.order)
         exp.var.nblocks = len(exp.var.orderarray)
-    debug(exp, "Presentation order input string: {}".format(exp.var.order))
-    debug(exp, "Presentation order generated: {}".format(", ".join(str(i) for i in exp.var.orderarray)))
+    debug(exp, "Got presentation order input string: {}".format(exp.var.order))
+    debug(exp, "Generated presentation order: {}".format(", ".join(str(i) for i in exp.var.orderarray)))
 # End process_variables
 
 
@@ -509,6 +503,7 @@ def debug(exp, message):
 
         
 def do_event(exp, event):
+    debug(exp, "Begin Event: {}".format(event))
     exp.utils.update_time(exp.run)
     if hasattr(exp, "{}_".format(event)):
         funcs = getattr(exp, "{}_".format(event))
@@ -519,28 +514,29 @@ def do_event(exp, event):
         exp.utils.log(exp, getattr(exp, "logString_{}".format(event)))
     if hasattr(exp, "dataString_{}".format(event)):
         exp.utils.save_data(exp, getattr(exp, "dataString_{}".format(event)))
-    debug(exp, "Event: {}".format(event))
+    debug(exp, "End Event: {}".format(event))
+        
         
 def get_frontend(exp, frontend):
     """Tries to load the specified frontend
     """
     frontend_s = frontend
     if frontend_s not in exp.frontendTypes:
-        print("Unknown frontend. Using tk")
+        exp.utils.log(exp, "Unknown frontend. Using tk")
         frontend = "tk"
     try:
         frontend = __import__("frontends",globals(), locals(), frontend)
     except ImportError:
         raise Exception("Could not import frontend: {}".format(frontend))
     exp.frontend = getattr(frontend, frontend_s)
-    debug(exp, "Getting frontend: {}".format(exp.frontend.name))
+    debug(exp, "Got frontend: {}".format(exp.frontend.name))
 
 def obj_to_str(obj, name, indent=""):
     """Returns formatted, python-callable string representations of objects
         including classes, dicts, lists, and other built-in var types
     """
     if isinstance(obj, dict):
-        outstr = "{}{} = {\n".format(indent, name)
+        outstr = "{}{} = {{\n".format(indent, name)
         for key, val in obj.items():
             if key[:2] != "__":
                 outstr += "{}    '{}' : {},\n".format(indent, key, repr(val))
@@ -559,8 +555,8 @@ def obj_to_str(obj, name, indent=""):
         outstr += "{}\n".format(indent)
     else:
         outstr = "{}{} = {}\n".format(indent, name, repr(obj))
-
     return outstr
+
 
 def get_expanded_vals_in_string(instr, exp):
     """Replaces all variable references with the specified variable's current value
@@ -615,7 +611,7 @@ def get_expanded_vals_in_string(instr, exp):
             currentvarsvals.append(key + " = " + exp.var.current[key])
             outstr = outstr.replace("$var["+key+"]", exp.var.current[key])
 
-        got_cv = True # TODO: Look into generators
+        got_cv = True
         while got_cv:
             expr, delim = get_arg(outstr,"$currentvarsvals")
             if expr != "":

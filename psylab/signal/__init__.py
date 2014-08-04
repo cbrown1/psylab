@@ -39,8 +39,9 @@ f2erbs - Converts frequency values to erb numbers
 f2place - Converts a frequency (Hz) to a basilar membrane place (mm)
 f2oct - Calculates the distance in octaves between two frequencies
 fconv - Convolves two signals using FFT-based fast convolution
-filterbank - Filters the input array with a bank of filters [UNTESTED]
+filter_bank - Filters the input array with a bank of filters
 freq_compress - Performs frequency compression on a signal
+freqs_logspace - Computes a range of frequencies evenly spaced in log space
 gso - Varies the inter-aural correlation of a stereo signal
 hcomplex - Generates harmonic complexes
 interp - Interpolates a signal to a specified number of points
@@ -81,9 +82,10 @@ from .atten import atten
 from .compensate import compensate
 from .envelope import envelope
 from .equate import equate
-from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .f0 import f0
+from .filter import freqs_logspace, filter_bank
 from .freq_compression import freq_compress
+from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .gso import gso
 from .interp import interp
 from .lts import lts
@@ -103,6 +105,6 @@ from .specplot import specplot
 from .spl import spl2sp, spl2si, sp2spl, si2spl
 from .tone import tone
 from .t60 import t60
-from .vocoder import vocoder, vocoder_overlap
+from .vocoder import vocoder, vocoder_vect, vocoder_overlap
 from .window import sliding_window
 from .zeropad import zeropad

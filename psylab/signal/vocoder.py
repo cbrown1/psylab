@@ -25,7 +25,9 @@
 
 import numpy as np
 from scipy.signal import filter_design as filters, lfilter, filtfilt
+import scipy.signal
 from .tone import tone
+
 
 def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     '''Implements an envelope vocoder
@@ -107,6 +109,7 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     else:
         carriers = np.zeros((len(signal), channels))
 
+    ret = np.zeros((len(signal),channels))
     for i in range(channels):
         # Estimate filters
         finhi=np.float32(inlo)*10.**(ininterval*(i+1))
@@ -124,6 +127,7 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
         ## Filter input
         Sig_sub = lfilter(b_sub_hp, a_sub_hp, signal)
         Sig_sub = lfilter(b_sub_lp, a_sub_lp, Sig_sub)
+#        ret[:,i] = Sig_sub.copy()
         rms_Sig_sub = np.sqrt(np.mean(Sig_sub**2))
         Sig_env_sub = lfilter(b_env,a_env,np.maximum(Sig_sub,0))
         peak = Sig_env_sub.max()
@@ -145,10 +149,96 @@ def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
             carriers += Mod_carrier_filt/np.sqrt(np.mean(Mod_carrier_filt**2))*rms_Sig_sub
         else:
             carriers[:,i] = Mod_carrier_filt/np.sqrt(np.mean(Mod_carrier_filt**2))*rms_Sig_sub
+#    return ret
     if sumchannels:
         return carriers * ( np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(carriers**2)) )
     else:
         return carriers
+
+def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
+    """A 'vectorized' vocoder implementation
+    
+        This is vectorized as much as possible. But it probably isn't much 
+        of an improvement on speed, since the filtering is still in a 
+        loop. 
+    
+    """
+    outlo = kwargs.get('outlo', inlo) 
+    outhi = kwargs.get('outhi', inhi) 
+    envfilter = kwargs.get('envfilter', 400) 
+    noise = kwargs.get('noise', False) 
+    sumchannels = kwargs.get('sumchannels', True) 
+    order = kwargs.get('order', 3)
+    compression_ratio = kwargs.get('compression_ratio', 1) 
+    gate = kwargs.get('gate', None)
+    nyq = fs/2.
+    
+    def f_logspace(start, stop, n):
+        n_arr = np.arange(n+1)
+        interval = np.log10(stop/float(start))/float(n)
+        freqs = start*10.**(interval*n_arr)
+        return freqs
+        
+    #try:
+    #    # This is actually pretty slow
+    #    #raise Exception
+    #    import brian
+    #    import brian.hears as bh
+    #    def bp_filt_bank(signal, fs, cfs):
+    #        filterbank = bh.Butterworth(bh.Sound(signal,fs*brian.Hz), cfs.size-1, order, cfs, 'bandpass')
+    #        out = filterbank.process()
+    #        return out
+    #except:
+    def filter_bank(signal, fs, cfs, btype='band'):
+        if len(signal.shape) == 1:
+            out = np.tile(signal,(cfs.size-1,1)).T
+        else:
+            out = signal
+        for i in range(len(cfs)-1):
+            if btype in ['high', 'band']:
+                b_hp,a_hp=scipy.signal.filter_design.butter(order,(cfs[i]/nyq),btype='high')
+                out[:,i] = scipy.signal.lfilter(b_hp,a_hp,out[:,i])
+            if btype in ['low','band']:
+                b_lp,a_lp=scipy.signal.filter_design.butter(order,(cfs[i+1]/nyq))
+                out[:,i] = scipy.signal.lfilter(b_lp,a_lp,out[:,i])
+        return out
+    
+    # Compute cutoff frequencies
+    inf = f_logspace(inlo, inhi, channels)
+    outf= f_logspace(outlo, outhi, channels)
+    
+    # Analysis filterbank
+    sig_fb = filter_bank(signal, fs, inf)
+    
+    # Extract envelope
+    env_cfs = np.concatenate (( np.zeros(1), np.minimum((outf[1:] - outf[:-1])/2, envfilter) ))
+    envelopes = filter_bank(np.maximum(sig_fb,0), fs, env_cfs, btype='low')
+
+    # Generate carriers
+    if noise:
+        carrier = np.random.randn(signal.size)
+        carrier = carrier/np.max(np.abs(carrier))
+        carriers = filter_bank(carrier,fs,outf)
+    else:
+        fcarriers = (outf[1:]+outf[:-1]) / 2.
+        carriers = np.sin(2*np.pi * np.cumsum(np.ones((signal.size,channels))*fcarriers,axis=0) / fs)
+    
+    # Modulate
+    voc = carriers * envelopes
+    
+    # Post filter
+    voc = filter_bank(voc, fs, outf)
+    
+    # Equate
+    voc = voc * (np.sqrt(np.mean(sig_fb**2.,axis=0)) / np.sqrt(np.mean(voc**2.,axis=0)))
+    
+    scale = np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(voc.sum(axis=1)**2))
+    
+    if sumchannels:
+        voc = voc.sum(axis=1)
+
+    return voc * scale
+   
 
 def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
     '''Prototype vocoder where channel width is independent of channel spacing

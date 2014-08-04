@@ -28,6 +28,7 @@ frequency.py - A collection of functions for various frequency conversions.
 
 Functions include:
 
+f_logspace - Calculates a frequency range in logspace
 f2oct - Calculates octaves from frequencies
 oct2f - Calculates frequencies from octaves
 f2erbs - Converts frequency values to erb numbers
@@ -41,6 +42,33 @@ numpy
 '''
 
 import numpy as np
+
+
+def f_logspace(start, stop, n):
+    '''Calculates a frequency range in logspace
+        
+        Returns a number frequencies within the specified range, in log space.
+        The array returns will have a length of n + 1.
+    
+        Parameters
+        ----------
+        start : scalar
+            The start frequency frequency. 
+        stop : scalar
+            The end frequency.
+        n : scalar
+            The number of frequencies to compute.
+        
+        Returns
+        -------
+        freqs : array
+            An array of frequencies.
+    '''
+    n_arr = np.arange(n+1)
+    interval = np.log10(stop/float(start))/float(n)
+    freqs = start*10.**(interval*n_arr)
+    return freqs
+
 
 def oct2f(cf, oct):
     '''Calculates frequencies from octaves

@@ -61,8 +61,8 @@ def rms_win(sig, window_size):
             
         Notes
         -----
-        
         Depends on window
+
     '''
     if len(data.shape) < 2:
         ws = window_size

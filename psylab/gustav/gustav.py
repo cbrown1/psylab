@@ -129,6 +129,8 @@ def run(experimentFile = None, subjectID = None, frontend = None, recordData = N
             if not ret:
                 exp.utils.log(exp, "Gustav cancelled at user request (Prompt to record data)")
                 return
+            else:
+                exp.utils.log(exp, "WARNING: No data will be recorded!")
     else:
         exp.utils.log(exp, "WARNING: No data will be recorded!")
     if exp.var.order == 'menu':
