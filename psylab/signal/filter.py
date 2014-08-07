@@ -26,7 +26,7 @@
 import numpy as np
 import scipy.signal
 
-def filter_bank(signal, fs, cfs, btype='band'):
+def filter_bank(signal, fs, order, cfs, btype='band'):
     """Filters the input array with a bank of filters
         
         Filters a signal with the cutoff frequencies specified in cfs. 
@@ -46,6 +46,8 @@ def filter_bank(signal, fs, cfs, btype='band'):
             The input signal
         fs : scalar
             The sampling frequency
+        order : scalar
+            The filter order to use
         cfs : array
             An array of cutoff frequencies
         btype : str
@@ -61,12 +63,16 @@ def filter_bank(signal, fs, cfs, btype='band'):
         out = np.tile(signal,(cfs.size-1,1)).T
     else:
         out = signal
+    if isinstance(order, (int,float)) == 1:
+        order = np.tile(signal,(cfs.size,)).T
+
+    nyq = fs/2.    
     for i in range(len(cfs)-1):
         if btype in ['high', 'band']:
-            b_hp,a_hp=scipy.signal.filter_design.butter(order,(cfs[i]/nyq),btype='high')
+            b_hp,a_hp=scipy.signal.filter_design.butter(order[i],(cfs[i]/nyq),btype='high')
             out[:,i] = scipy.signal.lfilter(b_hp,a_hp,out[:,i])
         if btype in ['low','band']:
-            b_lp,a_lp=scipy.signal.filter_design.butter(order,(cfs[i+1]/nyq))
+            b_lp,a_lp=scipy.signal.filter_design.butter(order[i],(cfs[i+1]/nyq))
             out[:,i] = scipy.signal.lfilter(b_lp,a_lp,out[:,i])
     return out
 

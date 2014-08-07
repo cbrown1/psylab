@@ -163,13 +163,13 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         loop. 
     
     """
-    outlo = kwargs.get('outlo', inlo) 
-    outhi = kwargs.get('outhi', inhi) 
-    envfilter = kwargs.get('envfilter', 400) 
-    noise = kwargs.get('noise', False) 
-    sumchannels = kwargs.get('sumchannels', True) 
+    outlo = kwargs.get('outlo', inlo)
+    outhi = kwargs.get('outhi', inhi)
+    envfilter = kwargs.get('envfilter', 400)
+    noise = kwargs.get('noise', False)
+    sumchannels = kwargs.get('sumchannels', True)
     order = kwargs.get('order', 3)
-    compression_ratio = kwargs.get('compression_ratio', 1) 
+    compression_ratio = kwargs.get('compression_ratio', 1)
     gate = kwargs.get('gate', None)
     nyq = fs/2.
     

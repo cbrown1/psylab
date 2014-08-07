@@ -31,6 +31,7 @@ Functions include:
 
 atten - Attenuates input array by a dB value
 compensate - Shapes the input array in the frequency domain
+compress - Applies simple, single-channel compression to input signal signal
 envelope - Extracts the amplitude envelope from a signal
 equate - Equates wavefiles in rms
 erbs2f - Converts erb numbers to frequency values
@@ -80,6 +81,7 @@ from time import sleep
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 from .atten import atten
 from .compensate import compensate
+from .compression import compress
 from .envelope import envelope
 from .equate import equate
 from .f0 import f0
