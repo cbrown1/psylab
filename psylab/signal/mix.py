@@ -29,20 +29,26 @@ from .zeropad import zeropad
 def mix( *args, **kwargs ):
     '''Mixes [adds] signals at specified offsets, zero padding as needed
 
-        This function may be useful when you need to combine two or more signals
-        that may be of varying lengths, or when some amout of delay is needed in
-        one or more of the signals.
+        This function may be useful when you need to combine two or more 
+        signals that may be of varying lengths, or when some amout of delay is 
+        needed in one or more of the signals. The reason for the existence of 
+        this function is that doing this kind of thing by hand is actually a 
+        pain in the ass with numpy, which makes working with both 1-d and 2-d 
+        arrays tedious (eg., look at all the if statements in the code). 
 
         Parameters
         ----------
         args : tuple of 1-d arrays
             A number of arrays to be combined.
-
         offsets : list of scalars
             An optional list of offset values, in samples. Should be either
             ommitted or set to `None` for no offsets. The list will be zero-
-            padded If it is shorter in length than the number of input arrays,
+            padded if it is shorter in length than the number of input arrays,
             and truncated if it is longer.
+        as_channels : bool
+            True to combine signals along dim 1 (ie., as separate audio 
+            channels), False to sum all signals into a single channel 
+            [default = False]
 
         Returns
         -------
@@ -75,10 +81,23 @@ def mix( *args, **kwargs ):
         offsets = list(offsets_a)
     else:
         offsets = list(np.zeros(len(args)))
+        
+    if 'as_channels' in kwargs and kwargs['as_channels'] is not None:
+        as_channels = kwargs['as_channels']
+    else:
+        as_channels = False
 
     for sig,off in zip(args,offsets):
-        prepad = np.zeros((off,))
+        if len(sig.shape) == 1:
+            prepad = np.zeros((off,))
+        else:
+            prepad = np.zeros((off,sig.shape[1]))
         this = np.concatenate((prepad, sig))
         this,out = zeropad(this,out)
-        out = out + this
+        if as_channels:
+            out = np.vstack((out.T,this.T)).T
+        else:
+            out = out + this
+    if as_channels:
+        out = out[:,1:] # Channel 1 is all zeros (from instantiation), so remove
     return out
