@@ -45,7 +45,9 @@ freq_compress - Performs frequency compression on a signal
 freqs_logspace - Computes a range of frequencies evenly spaced in log space
 gso - Varies the inter-aural correlation of a stereo signal
 hcomplex - Generates harmonic complexes
+ild - Applies an interaural level difference to a signal
 interp - Interpolates a signal to a specified number of points
+itd - Applies an interaural time difference to a signal
 lts - Computes a long-term spectrum of a signal
 magspec - Computes the magnitude spectrum of a signal
 mix - Mixes [adds] signals, zero padding as needed and at specified offsets
@@ -80,6 +82,7 @@ from numpy.fft import fft, ifft
 from time import sleep
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 from .atten import atten
+from .binaural import itd, ild, gso
 from .compensate import compensate
 from .compression import compress
 from .envelope import envelope
@@ -88,22 +91,17 @@ from .f0 import f0
 from .filter import freqs_logspace, filter_bank
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
-from .gso import gso
 from .interp import interp
-from .lts import lts
-from .magspec import magspec
 from .mix import mix
-from .ms2samp import ms2samp
 from .normalize import normalize
 from .peakpick import pick_peaks
 from .pink import pink
 from .ramps import ramps
 from .rir import rir, fconv
 from .rms import rms
-from .samp2ms import samp2ms
+from .samp import samp2ms, ms2samp
 from .smooth import smooth
-from .specgram import specgram
-from .specplot import specplot
+from .spec import lts, magspec, specgram, specplot
 from .spl import spl2sp, spl2si, sp2spl, si2spl
 from .tone import tone
 from .t60 import t60

@@ -25,6 +25,26 @@
 
 import numpy as np
 
+def samp2ms(samples, fs):
+    '''Converts samples to milliseconds
+        
+        Returns a number of ms for a given number of samples
+        
+        Parameters
+        ----------
+        samples: scalar
+            A number of samples.
+        fs: scalar
+            The sampling frequency.
+        
+        Returns
+        -------
+        y : scalar
+            A number of milliseconds.
+    '''
+    return (np.float32(samples)/np.float32(fs))*1000.
+
+
 def ms2samp(ms, fs):
     '''Converts milliseconds to samples
         

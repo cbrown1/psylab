@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -25,8 +25,11 @@
 
 import numpy as np
 
-def hcomplex(f, fs, **kwargs):
+def hcomplex_old(f, fs, **kwargs):
     '''Generates harmonic complexes
+        
+        This is the unvectorized, lame version which might have some 
+        value as it may be easier to see what's going on.         
         
         Parameters
         ----------
@@ -73,3 +76,36 @@ def hcomplex(f, fs, **kwargs):
         buff = np.ones(dur) * comp[i];
         y = y + (amp * np.sin(2 * np.pi * np.cumsum(buff) / fs));
     return y;
+
+def hcomplex(f, fs, dur, ncomponents, amp=1, offset=0):
+    '''Generates harmonic complexes
+        
+        Parameters
+        ----------
+        f :  scalar
+            fundamental frequency
+        fs : scalar
+            sampling frequency
+        dur : scalar
+            duration in ms
+        ncomponents : scalar
+            number of harmonic components
+        amp : scalar
+            amplitude values less than or equal to 0 are treated as dB (re: 
+            +-1), and values greater than 0 are used to scale the waveform 
+            peak linearly. default is 1
+        offset : scalar
+            offset in Hz. Eg., offset = 2 would yield 102, 202, 302, 402, etc.
+          
+        Returns
+        -------
+        y : array
+            The waveform
+    '''    
+    if amp <= 0:
+        amp = 10. ** (amp / 20.);
+    dur = np.round((dur / 1000.) * fs);
+    fh = ((np.arange(ncomponents) + 1) * f) + offset
+    out = np.sin(2*np.pi * np.cumsum(np.ones((dur,ncomponents))*fh,axis=0) / fs) * amp
+    return out.sum(axis=1)
+    

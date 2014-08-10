@@ -24,6 +24,8 @@
 #
 
 import numpy as np
+from matplotlib import colors, pyplot as pp
+
 
 def lts(sig, wsize, overlap=0, window=None):
     """Computes a long-term spectrum of a signal
@@ -86,3 +88,80 @@ def lts(sig, wsize, overlap=0, window=None):
     
     ltfft += np.real(np.fft.rfft(sig[pt:]*w,wsize))
     return np.abs(ltfft / (n+1))
+
+
+def magspec(wave,fs,fftsize=8192):
+    '''Computes the magnitude spectrum of a signal
+    
+        Performs an fft on the input, and passes back an array of frequency 
+        values, and an array of magnitude values, suitable for plotting. The 
+        magnitude spectrum is in dB (20*log10).
+    '''
+    #amp=np.abs(np.fft.fft(wave,fftsize));
+    #fsize = np.round(len(amp)/2.)-1;
+    #outamp= amp[0:np.round(len(amp)/2)-1];
+    
+    outamp = 20*np.log10(lts(wave, fftsize))
+    #outamp=20*log10(outamp/max(outamp));
+    f = np.linspace(1, fs/2, (fftsize/2)+1)
+    return f,outamp
+
+
+def specplot(signal, fs, plotspec='b-',log=False, fighandle=None):
+    '''Plots magnitude spectra
+        
+        Plots a magnitude spectrum of the waveform. You can overlay 
+        several spectra on top of one another, and specify different
+        plot properties.
+        
+       Parameters
+       ----------
+       signal : array
+          The input signal.
+       fs : scalar
+          The sampling frequency
+       plotspec : string
+          A matlab (matplotlib) style string specifying the plot 
+          properties (eg., 'b-')
+       log : bool
+          Specfies wheter the x-axis is log or linear
+       fighandle : Int
+          A matplotlib figure handle to plot to
+
+    '''
+    if fighandle is None:
+      fighandle = 4639 # An int unlikely to have been used
+    
+    if pp.fignum_exists(fighandle):  # MPL > 0.98.6svn
+      pp.figure(fighandle).get_axes()[0].set_autoscale_on(False)
+
+    h = pp.figure(num=fighandle)
+    h.canvas.set_window_title('Spectrum Plot')
+    x,y = magspec(signal,fs)
+    if log:
+      pp.semilogx(x,y,plotspec,figure=fighandle)
+    else:
+      pp.plot(x,y,plotspec,figure=fighandle)
+    pp.xlabel('Frequency (Hz)')
+    pp.ylabel('Magnitude (dB)')
+    pp.show()
+
+
+def specgram(signal, fs):
+    '''Plots a nice spectrogram
+  
+       Parameters
+       ----------
+       signal : array
+          The input signal.
+       fs : scalar
+          The sampling frequency
+    '''
+
+    cdict = {'red': ((0.0, 0.0, 0.0), (0.5, 0.2, 0.2), (0.78, 0.6, 0.6), (1.0, 1.0, 1.0)), 
+    'green': ((0.0, 0.0, 0.0), (0.93, 0.0, 0.0), (1.0, 0.9, 0.9)), 
+    'blue': ((0.0, 0.0, 0.0), (1.0, 0.0, 0.0))}
+    my_cmap = colors.LinearSegmentedColormap('my_colormap',cdict,256)
+    s1 = pp.specgram(signal,Fs=fs,NFFT=1024,noverlap=1000,cmap=my_cmap,scale_by_freq=False)
+
+
