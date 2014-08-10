@@ -69,6 +69,7 @@ specplot - Plots magnitude spectra
 t60 - Estimates reverberation time
 tone - Generates pure tones
 vocoder - Implements an envelope vocoder
+white - Generates white noise
 zeropad - Zero pads the shorter of two or more arrays
 
 Dependencies:
@@ -76,7 +77,6 @@ Dependencies:
 numpy, scipy
 '''
 
-# A few imports for convenience
 from numpy.random import randn, rand
 from numpy.fft import fft, ifft
 from time import sleep
@@ -91,11 +91,12 @@ from .f0 import f0
 from .filter import freqs_logspace, filter_bank
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
+from .hcomplex import hcomplex, hcomplex_old
 from .interp import interp
 from .mix import mix
+from .noise import pink, white, irn, mls
 from .normalize import normalize
 from .peakpick import pick_peaks
-from .pink import pink
 from .ramps import ramps
 from .rir import rir, fconv
 from .rms import rms

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2012 Christopher Brown
+# Copyright (c) 2009 by Julius O. Smith III
+# Copyright (c) 2010-2014 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -24,11 +25,122 @@
 #
 
 import numpy as np
-import random
+from scipy.signal import lfilter
+
+def white(n, channels=None):
+    """Generates white noise
+    
+        The noise is normalized (peak == 1)
+
+        Parameters
+        ----------
+        n : scalar
+            A number of samples (dim 0)
+        channels : scalar
+            A number of channels (dim 1)
+        
+        Returns
+        -------
+        y : array
+            The white noise.
+    """
+    if channels:
+        out = np.random.randn(n, channels)
+    else:
+        out = np.random.randn(n)
+    return out/np.max(np.abs(out), axis=0)
+        
+    
+def pink(n, channels=None):
+    """Generates pink noise
+    
+        The noise is normalized (peak == 1)
+
+        Parameters
+        ----------
+        n : scalar
+            A number of samples (dim 0)
+        channels : scalar
+            A number of channels (dim 1)
+        
+        Returns
+        -------
+        y : array
+            The pink noise.
+        
+        Notes
+        -----
+        Adapted from: 
+        https://ccrma.stanford.edu/~jos/sasp/Example_Synthesis_1_F_Noise.html
+        Citation:
+        Smith, Julius O. Spectral Audio Signal Processing, October 2008 Draft,
+        http://ccrma.stanford.edu/~jos/sasp/, online book, accessed May 2009.
+    """
+
+    b = np.array((0.049922035, -0.095993537, 0.050612699, -0.004408786))
+    a = np.array((1, -2.494956002, 2.017265875, -0.522189400))
+    nT60 = np.round(np.log(1000)/(1-np.max(np.abs(np.roots(a))))) # T60 est.
+    if channels:
+        v = np.random.randn(n+nT60, channels) # Gaussian white noise: N(0,1)
+        x = np.zeros_like(v)
+        for i in np.arange(channels):
+            x[:,i] = lfilter(b,a,v[:,i])   # Apply 1/F roll-off to PSD
+        out = x[nT60+1:,:]                 # Skip transient response
+    else:
+        x = lfilter(b,a,v)                 # Apply 1/F roll-off to PSD
+        out = x[nT60+1:]                   # Skip transient response
+    return out/np.max(np.abs(out), axis=0)
+
+
+def irn(dur, fs, delay, gain, its, type=1):
+    '''Generates iterated rippled noise
+    
+        Generates iterated rippled noise, or noise with a rippled spectrum, by 
+        implementing a delay-attenuate-add method. 
+        
+        Parameters
+        ----------
+        dur : scalar
+            Duration of the noise, in s.
+        fs : scalar
+            The sample frequency.
+        delay : scalar
+            The delay, in ms. The F0 of the pitch will be 1/delay.
+        gain : scalar
+            The attenuation. The strength of the pitch is set by the gain.
+        its : scalar
+            The number of iterations.
+        type : scalar
+            1 = IRNO; 2 = IRNS.
+        
+        Returns
+        -------
+        y : array
+            The rippled noise.
+    '''
+    dd = dur/1000.;
+    wbn = np.random.randn(fs);
+    rip = wbn;
+    
+    if type == 1:
+        for it in range(its):
+            rip[:fs-delay] = rip[delay:fs];
+            rip = ( rip * gain ) + wbn;
+        
+    elif type == 2:
+        for it in range(its):
+            rip1 = rip;
+            rip[:fs-delay] = rip[delay:fs];
+            rip = rip + ( gain * rip1 );
+    
+    rip = rip / np.max(np.abs(rip))
+    return rip[:np.round(dd * fs)];
+
+# MLS stuff here
 
 # Encodings of primitive polynomials for use as tap values,
 # decremented to account for mapping onto zero-indexed arrays.
-taps = {2 : [1, 0],
+mls_taps = {2 : [1, 0],
         3 : [2, 0],
         4 : [3, 0],
         5 : [4, 1],
@@ -63,7 +175,7 @@ taps = {2 : [1, 0],
 
 # Encodings of the above polynomials as binary digits in a hexadecimal representation.
 # For a given k in "taps", the argument to np.uint32 is determined by sum([2**i for i in taps[k]])
-bintaps = {2 : np.uint32(3),
+mls_bintaps = {2 : np.uint32(3),
            3 : np.uint32(5),
            4 : np.uint32(9),
            5 : np.uint32(18),
@@ -97,9 +209,9 @@ bintaps = {2 : np.uint32(3),
           }
 
 def generate_lfsr(n, use_rand_seed):
-    toggle_mask = bintaps[n]
+    toggle_mask = mls_bintaps[n]
     if use_rand_seed:
-        lfsr = np.uint32(random.randint(1, (2**n - 1)))
+        lfsr = np.uint32(np.random.randint(1, (2**n - 1)))
     else:
         lfsr = np.uint32(1)
 
@@ -156,3 +268,4 @@ def mls(n, rand_seed=False):
             return 1
     zero_to_neg_one = lambda x: x
     return np.array([zero_to_neg_one(lfsr.next()) for i in xrange(seqlen)], np.int32)
+
