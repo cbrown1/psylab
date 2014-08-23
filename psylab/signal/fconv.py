@@ -49,8 +49,11 @@ def convolve(x, h):
             
         Notes
         -----
-        This is slower than np.convolve (by about half), even when using a
-        relatively high number of channels (tested to 32 channels)
+        This is slower than np.convolve. My performance test (using 3s of 
+        audio @ 44.1k) shows it is about half the speed of np.convolve with 
+        1-d arrays, and the speed difference decreases as the number of 
+        channels increases (performance was about .75 that of np.convolve when 
+        x had 32-channels).
     '''
     def nextpow2(x):  
         return 2**(x-1).bit_length()
