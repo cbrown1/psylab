@@ -27,7 +27,7 @@ import numpy as np
 from .window import sliding_window
 
 def pick_peaks(sig, n, window_size):
-    """ An peak picking strategy
+    """ A peak picking strategy
         Slides an rms window through the channels of signal, then picks n 
         peaks. Assumes a 2d array with data along axis 0, channels on axis 1.
         Returns a tuple containing an array of channel indexes, and an array 
@@ -82,8 +82,17 @@ def pick_peaks(sig, n, window_size):
     rms = np.sqrt(np.mean(sliding_window(sig,(window_size,m))**2,axis=1))
     # Sort & take last n indexes, along dim 1
     peak_channels = np.argsort(rms,1)[:,-n:]
-    # Do the same for rms
-    rms.sort()
-    peak_rms = rms[:,-n:]
+    peak_channels.sort(axis=1)
+    
+    peak_channels = peak_channels.repeat(window_size, axis=0)
+    rms = rms.repeat(window_size,axis=0)
+    
+    indices = peak_channels.ravel() + np.repeat(range(0, rms.shape[1]*rms.shape[0], rms.shape[1]), peak_channels.shape[1])
+    peak_rms = rms.ravel()[indices]
+    peak_rms = peak_rms.reshape(peak_channels.shape)
+    
+#    # Do the same for rms
+#    rms.sort()
+#    peak_rms = rms[:,-n:]
     
     return peak_channels,peak_rms

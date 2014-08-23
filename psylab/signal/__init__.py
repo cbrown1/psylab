@@ -88,6 +88,7 @@ from .compression import compress
 from .envelope import envelope
 from .equate import equate
 from .f0 import f0
+from .fconv import convolve
 from .filter import freqs_logspace, filter_bank
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place

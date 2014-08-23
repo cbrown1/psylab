@@ -27,6 +27,8 @@ import numpy as np
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 import scipy.signal
 from .tone import tone
+from .peakpick import pick_peaks
+from .zeropad import zeropad
 
 
 def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
@@ -171,6 +173,7 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
     order = kwargs.get('order', 3)
     compression_ratio = kwargs.get('compression_ratio', 1)
     gate = kwargs.get('gate', None)
+    ace = kwargs.get('ace', None)
     nyq = fs/2.
     
     def f_logspace(start, stop, n):
@@ -223,21 +226,36 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         fcarriers = (outf[1:]+outf[:-1]) / 2.
         carriers = np.sin(2*np.pi * np.cumsum(np.ones((signal.size,channels))*fcarriers,axis=0) / fs)
     
-    # Modulate
-    voc = carriers * envelopes
-    
-    # Post filter
-    voc = filter_bank(voc, fs, outf)
-    
-    # Equate
-    voc = voc * (np.sqrt(np.mean(sig_fb**2.,axis=0)) / np.sqrt(np.mean(voc**2.,axis=0)))
-    
-    scale = np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(voc.sum(axis=1)**2))
-    
+    if ace:
+        wsize = np.round((.02)*fs) # 20ms analysis window
+        peaks,rms = pick_peaks(voc, ace, wsize) 
+        carriers, peaks, rms = zeropad(carriers,peaks,rms)
+        # Generate 1-d index array
+        indices = peaks.ravel() + np.repeat(range(0, carriers.shape[1]*carriers.shape[0], carriers.shape[1]), peaks.shape[1])
+        # Pull out the carriers, atten
+        out = rms.ravel()[indices] * carriers.ravel()[indices]
+        # Back to 2-d
+        voc = out.reshape(peaks.shape)
+        
+    else:
+        # Modulate
+        voc = carriers * envelopes
+        
+        # Post filter
+        voc = filter_bank(voc, fs, outf)
+        
+        # Equate each channel
+        voc *= np.sqrt(np.mean(sig_fb**2.,axis=0)) / np.sqrt(np.mean(voc**2.,axis=0))
+        
+        
+        
+    # Equate overal signal
+    voc *= np.sqrt(np.mean(signal**2)) / np.sqrt(np.mean(voc.sum(axis=1)**2))
+
     if sumchannels:
         voc = voc.sum(axis=1)
 
-    return voc * scale
+    return voc
    
 
 def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
