@@ -46,6 +46,11 @@ def convolve(x, h):
         -------
         y : array
             x convolved with h.
+            
+        Notes
+        -----
+        This is slower than np.convolve (by about half), even when using a
+        relatively high number of channels (tested to 32 channels)
     '''
     def nextpow2(x):  
         return 2**(x-1).bit_length()
