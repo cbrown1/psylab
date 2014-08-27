@@ -58,6 +58,7 @@ oct2f - Calculates frequencies from octaves
 pick_peaks - Finds rms peaks in signals
 pink - Generates pink noise
 place2f - Converts a basilar membrane place (mm) to a frequency (Hz)
+pre_emphasis - Applies a pre-emphasis filter to a signal
 ramps - Applies ramps to the onsets and/or offsets of a signal
 rir - Generates room impulse responses
 rms - Computes the root-mean-square of a signal
@@ -88,7 +89,7 @@ from .compression import compress
 from .envelope import envelope
 from .equate import equate
 from .f0 import f0
-from .filter import freqs_logspace, filter_bank
+from .filter import freqs_logspace, filter_bank, pre_emphasis
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .hcomplex import hcomplex, hcomplex_old

@@ -68,5 +68,3 @@ def read_multi_file (folder, file_base, file_ext):
 def read_audio_file(file_path):
     data,fs = m.read_file(file_path)
     return data,fs
-
-

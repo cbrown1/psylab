@@ -26,6 +26,29 @@
 import numpy as np
 import scipy.signal
 
+def pre_emphasis(signal, fs, hp=50):
+    """Applies a pre-emphasis filter to a signal
+        
+        Applies a 6 dB per octave highpass filter to the specified signal. 
+    
+        Parameters
+        ----------
+        signal : 1-d array
+            The input signal
+        fs : scalar
+            The sampling frequency
+        hp : scalar
+            The high-pass cutoff frequency to use [default = 50 Hz]
+            
+        Notes
+        -----
+        The formula for alpha was taken from PRAAT.
+    """
+    alpha = np.exp(-2 * np.pi * hp / fs) # PRAAT
+    sig = np.insert(signal,0,0)
+    return sig[1:] - alpha * sig[:-1]
+    
+
 def filter_bank(signal, fs, order, cfs, btype='band'):
     """Filters the input array with a bank of filters
         
