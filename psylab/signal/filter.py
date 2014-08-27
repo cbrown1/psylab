@@ -54,9 +54,9 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
         
         Filters a signal with the cutoff frequencies specified in cfs. 
         
-        The returned array will be 2-d with one fewer column (dim=1) than 
-        len(cfs). cfs[:-1] will be used as highpass cutoff frequencies, and 
-        cfs[1:] will be used as lowpass cutoff frequencies. 
+        Note: The returned array will be 2-d with one fewer column (dim=1) 
+        than len(cfs). cfs[:-1] will be used as highpass cutoff frequencies, 
+        and cfs[1:] will be used as lowpass cutoff frequencies. 
         
         The signal can either be 1-d, or 2-d where shape[1]==len(cfs)-1 
         (ie., it can already have been filter_banked; eg., bandpass 
@@ -87,7 +87,7 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
     else:
         out = signal
     if isinstance(order, (int,float)) == 1:
-        order = np.tile(signal,(cfs.size,)).T
+        order = np.tile(order,(cfs.size,)).T
 
     nyq = fs/2.    
     for i in range(len(cfs)-1):

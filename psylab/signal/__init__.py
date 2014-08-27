@@ -86,6 +86,7 @@ from .atten import atten
 from .binaural import itd, ild, gso
 from .compensate import compensate
 from .compression import compress
+from .convolution import convolve
 from .envelope import envelope
 from .equate import equate
 from .f0 import f0
