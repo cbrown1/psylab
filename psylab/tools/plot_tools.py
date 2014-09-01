@@ -46,18 +46,31 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
-def ax_on_page(page_width=8.5, page_height=11.):
-    """Returns a matplotlib axes that resides on a full page,
-        such as what is required when figures are attached to a manuscript. 
-        The page itself is also an axes with units in inches, so it is easy 
-        to place text (eg, Fig captions, etc) and other items on it. 
+
+def ax_on_page(background=None, page_width=8.5., page_height=11, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
+    """Returns a matplotlib axes that resides on a page,
+        such as to create a slide for a presenation, or a figure page for a 
+        manuscript. The page itself is also an axes with units in inches, so 
+        it is easy to place text (eg, Titles, Fig captions, etc) and other 
+        items on it. 
         
         Parameters
         ----------
+        background: str
+            The path to an image to be used as the background. If supplied,
+            page_width and page_height are ignored
         page_width: scalar
             The width of the page, in inches. [default = 8.5]
         page_height: scalar
             The height of the page, in inches. [default = 11]
+        ax_width: scalar
+            The width of the axes, in inches. [default = 6]
+        ax_height: scalar
+            The height of the axes, in inches. [default = 4.5]
+        ax_x: scalar
+            The x location of the axes, in inches. [default = centered]
+        ax_y: scalar
+            The y location of the axes, in inches. [default = centered]
 
         Returns
         -------
@@ -73,27 +86,42 @@ def ax_on_page(page_width=8.5, page_height=11.):
         Example:
         
         # Generate axes with default page size
-        f,ap,ax = ax_on_page()
+        f,ap,ax = ax_on_slide()
         # plot something
         h = ax.plot([1,2,3])
         # add some text to the page, towards the bottom, centered:
-        ap.text(4.25,10,"Fig. 2", horizontalalignment='center')
+        ap.text(5.5,1,"A slide title!", horizontalalignment='center', fontsize='x-large')
     """
-
-    f = plt.figure(figsize=(page_width, page_height))
+    if background is not None:
+        z = plt.imread(background)
+        fi = plt.figimage(z)
+        f = fi.figure
+    else:
+        f = plt.figure(figsize=(page_width, page_height))
     # Set up a `page` axis, to place text etc.
     ap = f.add_axes([0, 0, 1, 1])
+    ap.set_axis_bgcolor('none')
     ap.set_xticks([])
     ap.set_yticks([])
     for spine in ap.spines:
         ap.spines[spine].set_visible(False)
-    ap.set_xlim([0, 8.5]) # Page coordinates are
-    ap.set_ylim([0, 11])  # now in units of inches
+    ap.set_xlim([0, page_width]) # Page coordinates are
+    ap.set_ylim([0, page_height])  # now in units of inches
     ap.invert_yaxis()
-    # TODO: Do a better job computing axes size
-    ax = f.add_axes([.2, .3, .5*page_height/page_width, .5*page_width/page_height])
+    
+    if not ax_x: 
+        ax_x = (page_width/2 - ax_width/2)
+    ax_x /= page_width
+    if not ax_y:
+        ax_y = (page_height/2 - ax_height/2)
+    ax_y /= page_height
+
+    ax_w = ax_width / page_width
+    ax_h = ax_height / page_height
+    ax = f.add_axes([ax_x, ax_y, ax_w, ax_h])
 
     return f,ap,ax
+
 
 def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
