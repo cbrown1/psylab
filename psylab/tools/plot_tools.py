@@ -47,7 +47,7 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
 
-def ax_on_page(background=None, page_width=8.5., page_height=11, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
+def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
     """Returns a matplotlib axes that resides on a page,
         such as to create a slide for a presenation, or a figure page for a 
         manuscript. The page itself is also an axes with units in inches, so 
