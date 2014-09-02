@@ -46,7 +46,7 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
-def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
+def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None, dpi=None):
     """Returns a matplotlib axes that resides on a page,
         such as to create a slide for a presenation, or a figure page for a 
         manuscript. The page itself is also an axes with units in inches, so 
@@ -77,6 +77,10 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         ax_y: scalar
             The y location of the lower-left corner of the axes, in inches. 
             [default = centered]
+        dpi: scalar
+            The resolution, in dots-per-inch, to use. Because the coordinates 
+            used are inches, you might want to set this value. 
+            [default = matplotlib's default; f.get_dpi()]
 
         Returns
         -------
@@ -96,6 +100,12 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         blank space above and below. As a result, in this example if you set 
         ax_y, the image will appear to be above that position because of the 
         blank space below it. 
+        
+        Another potential confusion stems from the fact that when saving a fig,
+        the default resolution may be different than the display resolution. 
+        So, when saving figures, be sure to use the same dpi as the figure:
+        
+        plt.savefig('example.png',dpi = f.get_dpi())
 
         Example:
         
@@ -113,11 +123,14 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
     ax_height = float(ax_height)
     
     if page_image is not None:
-        dpi = float(plt.figure().dpi)
+        if dpi is not None:
+            dpi = float(dpi)
+        else: 
+            dpi = float(plt.figure().dpi)
         z = plt.imread(page_image)
         page_width = z.shape[1] / dpi
         page_height = z.shape[0] / dpi
-        f = plt.figure(figsize=(page_width, page_height))
+        f = plt.figure(figsize=(page_width, page_height), dpi=dpi)
         fi = f.figimage(z)
     else:
         f = plt.figure(figsize=(page_width, page_height))
@@ -154,6 +167,7 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
             ax.spines[spine].set_visible(False)
         
     return f,ap,ax
+
 
 def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
