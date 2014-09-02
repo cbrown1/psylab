@@ -79,8 +79,10 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
             [default = centered]
         dpi: scalar
             The resolution, in dots-per-inch, to use. Because the coordinates 
-            used are inches, you might want to set this value. 
-            [default = matplotlib's default; f.get_dpi()]
+            used are inches, you might want to set this value. The default is 
+            matplotlib's savefig default (plt.rcParams[savefig.dpi]) because 
+            then if you save the figure, any images will be scaled correctly. 
+            
 
         Returns
         -------
@@ -106,6 +108,11 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         So, when saving figures, be sure to use the same dpi as the figure:
         
         plt.savefig('example.png',dpi = f.get_dpi())
+        
+        If you use images and would like to save to a vector format (svg, pdf), 
+        try using a dpi of 72 for both ax_on_page and savefig, which is the 
+        only resolution that produces good-looking vector-based figures on my 
+        machine.
 
         Example:
         
@@ -125,8 +132,10 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
     if page_image is not None:
         if dpi is not None:
             dpi = float(dpi)
-        else: 
-            dpi = float(plt.figure().dpi)
+        else:
+            # Default to savefig.dpi, so it looks good when saving
+            dpi = float(plt.rcParams['savefig.dpi'])
+            #dpi = float(plt.rcParams['figure.dpi'])
         z = plt.imread(page_image)
         page_width = z.shape[1] / dpi
         page_height = z.shape[0] / dpi
