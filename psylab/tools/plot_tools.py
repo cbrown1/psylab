@@ -46,8 +46,7 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
-
-def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
+def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None):
     """Returns a matplotlib axes that resides on a page,
         such as to create a slide for a presenation, or a figure page for a 
         manuscript. The page itself is also an axes with units in inches, so 
@@ -56,21 +55,28 @@ def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_
         
         Parameters
         ----------
-        background: str
+        page_image: str
             The path to an image to be used as the background. If supplied,
             page_width and page_height are ignored
         page_width: scalar
             The width of the page, in inches. [default = 8.5]
         page_height: scalar
             The height of the page, in inches. [default = 11]
+        ax_image: str
+            The path to an image to be shown on the axes. If supplied,
+            ax_width and ax_height are used as maximum constraints (aspect 
+            ratio will be maintained), and all axes ticks marks and spines 
+            will be turned off
         ax_width: scalar
             The width of the axes, in inches. [default = 6]
         ax_height: scalar
             The height of the axes, in inches. [default = 4.5]
         ax_x: scalar
-            The x location of the axes, in inches. [default = centered]
+            The x location of the lower-left corner of the axes, in inches. 
+            [default = centered]
         ax_y: scalar
-            The y location of the axes, in inches. [default = centered]
+            The y location of the lower-left corner of the axes, in inches. 
+            [default = centered]
 
         Returns
         -------
@@ -83,6 +89,14 @@ def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_
 
         Notes
         -----
+        When using an axis image, there is at least one possibly unexpected 
+        outcome. Because the aspect ratio is maintained, if the image is less 
+        than the axes along an axis, there will be space on either side of the 
+        image. For example, an image that is wide and short will likely have 
+        blank space above and below. As a result, in this example if you set 
+        ax_y, the image will appear to be above that position because of the 
+        blank space below it. 
+
         Example:
         
         # Generate axes with default page size
@@ -92,10 +106,19 @@ def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_
         # add some text to the page, towards the bottom, centered:
         ap.text(5.5,1,"A slide title!", horizontalalignment='center', fontsize='x-large')
     """
-    if background is not None:
-        z = plt.imread(background)
-        fi = plt.figimage(z)
-        f = fi.figure
+    
+    page_width = float(page_width)
+    page_height = float(page_height)
+    ax_width = float(ax_width)
+    ax_height = float(ax_height)
+    
+    if page_image is not None:
+        dpi = float(plt.figure().dpi)
+        z = plt.imread(page_image)
+        page_width = z.shape[1] / dpi
+        page_height = z.shape[0] / dpi
+        f = plt.figure(figsize=(page_width, page_height))
+        fi = f.figimage(z)
     else:
         f = plt.figure(figsize=(page_width, page_height))
     # Set up a `page` axis, to place text etc.
@@ -105,23 +128,32 @@ def ax_on_page(background=None, page_width=8.5, page_height=11, ax_width=6., ax_
     ap.set_yticks([])
     for spine in ap.spines:
         ap.spines[spine].set_visible(False)
-    ap.set_xlim([0, page_width]) # Page coordinates are
+    ap.set_xlim([0, page_width])   # Page coordinates are
     ap.set_ylim([0, page_height])  # now in units of inches
     ap.invert_yaxis()
-    
-    if not ax_x: 
-        ax_x = (page_width/2 - ax_width/2)
+
+    # Compute x, y, w, h of axes
+    ax_w = ax_width / page_width # Coordinates are 0-1
+    ax_h = ax_height / page_height
+
+    if ax_x is None:
+        ax_x = (page_width - ax_width) / 2 # Default = center
     ax_x /= page_width
-    if not ax_y:
-        ax_y = (page_height/2 - ax_height/2)
+    if ax_y is None:
+        ax_y = (page_height - ax_height) / 2
     ax_y /= page_height
 
-    ax_w = ax_width / page_width
-    ax_h = ax_height / page_height
     ax = f.add_axes([ax_x, ax_y, ax_w, ax_h])
 
+    if ax_image:
+        z = plt.imread(ax_image)
+        ax.imshow(z)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for spine in ax.spines:
+            ax.spines[spine].set_visible(False)
+        
     return f,ap,ax
-
 
 def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
