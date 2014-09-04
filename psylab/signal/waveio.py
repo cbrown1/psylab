@@ -30,7 +30,7 @@
 # Comments and/or additions are welcome (send e-mail to: c-b@asu.edu).
 # 
 
-import numpy
+import numpy as np
 import struct
 import warnings
 
@@ -63,7 +63,7 @@ def _read_data_chunk(fid, noc, bits):
         fmt = '<i'
     size = struct.unpack(fmt,fid.read(4))[0]
     if bits == 8:
-        data = numpy.fromfile(fid, dtype=numpy.ubyte, count=size)
+        data = np.fromfile(fid, dtype=np.ubyte, count=size)
         if noc > 1:
             data = data.reshape(-1,noc)
     else:
@@ -72,7 +72,7 @@ def _read_data_chunk(fid, noc, bits):
             dtype = '>i%d' % bytes
         else:
             dtype = '<i%d' % bytes
-        data = numpy.fromfile(fid, dtype=dtype, count=size//bytes)
+        data = np.fromfile(fid, dtype=dtype, count=size//bytes)
         if noc > 1:
             data = data.reshape(-1,noc)
     return data
@@ -186,7 +186,7 @@ def wavread(filename):
     '''
     
     fs,data = read(filename)
-    return numpy.float64(data/32768.),fs
+    return np.float64(data/32768.),fs
 
 def wavwrite(data,fs,filename):
     '''Writes wavefiles 
@@ -202,22 +202,25 @@ def wavwrite(data,fs,filename):
         filename : string
             Path to the wavefile to write
     '''
-    write(filename, fs, numpy.int16(data*32768))
+    write(filename, fs, np.int16(data*32768))
 
 
 def pcm2float(sig, dtype=np.float64):
     """Convert PCM signal to floating point with a range from -1 to 1.
         Use dtype=np.float32 for single precision.
+
         Parameters
         ----------
         sig : array_like
-        Input array, must have (signed) integral type.
+            Input array, must have (signed) integral type.
         dtype : data-type, optional
-        Desired (floating point) data type.
+            Desired (floating point) data type.
+        
         Returns
         -------
         ndarray
-        normalized floating point data.
+            normalized floating point data.
+
         See Also
         --------
         dtype

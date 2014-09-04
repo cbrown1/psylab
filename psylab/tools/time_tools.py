@@ -23,5 +23,5 @@ class timer():
         Found at:
         http://mrooney.blogspot.com/2009/07/simple-timing-of-python-code.html
     """
-   def __enter__(self): self.start = time.time()
-   def __exit__(self, *args): print time.time() - self.start
+    def __enter__(self): self.start = time.time()
+    def __exit__(self, *args): print time.time() - self.start

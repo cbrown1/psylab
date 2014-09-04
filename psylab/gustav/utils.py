@@ -29,11 +29,16 @@ import socket
 import datetime
 import codecs
 import types
+import textwrap
 import collections
 from time import sleep
 from inspect import getmembers
 from functools import reduce
 from frontends import term # FIXME: old line (from .frontends import term) was suddenly not working on py2.7/win7
+
+# TODO: use textwrap to format exp.note for datafile:
+# wrapper = textwrap.TextWrapper(initial_indent="# ", subsequent_indent="# ")
+# But where to put it? Should the datafile header be created automatically? 
 
 class exp:
     """Experimental settings
@@ -137,9 +142,9 @@ class exp:
         """
         factorial = collections.OrderedDict()
         covariable = collections.OrderedDict()
+        current = collections.OrderedDict()
         ignore = []
         default = []
-        current = []
         varlist = []
         levelsbycond = {}
         nlevels_fact = 0
@@ -358,7 +363,8 @@ def get_current_variables(exp):
     """Get current levels of each variable for a given condition
     """
     condition = exp.run.condition
-    exp.var.current = {}
+    #exp.var.current = {}
+    exp.var.current = collections.OrderedDict()
     for v in exp.var.varlist:
         if v in exp.var.prompt:
             ret = exp.frontend.get_input(prompt = "Enter a value for variable: {}\nor hit enter for current level ({}): ".format(v, exp.var.levelsbycond[v][condition]))
@@ -606,10 +612,12 @@ def get_expanded_vals_in_string(instr, exp):
     if len(exp.var.current)>0:
         currentvars = []
         currentvarsvals = []
-        for key in exp.var.current:
-            currentvars.append(exp.var.current[key])
-            currentvarsvals.append(key + " = " + exp.var.current[key])
-            outstr = outstr.replace("$var["+key+"]", exp.var.current[key])
+        for key, val in exp.var.current.iteritems():
+        #for key in exp.var.current:
+            print key, val
+            currentvars.append(val)
+            currentvarsvals.append("{} = {}".format(key, val))
+            outstr = outstr.replace("$var[{}]".format(key), val)
 
         got_cv = True
         while got_cv:
