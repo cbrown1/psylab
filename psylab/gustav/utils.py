@@ -613,8 +613,6 @@ def get_expanded_vals_in_string(instr, exp):
         currentvars = []
         currentvarsvals = []
         for key, val in exp.var.current.iteritems():
-        #for key in exp.var.current:
-            print key, val
             currentvars.append(val)
             currentvarsvals.append("{} = {}".format(key, val))
             outstr = outstr.replace("$var[{}]".format(key), val)
