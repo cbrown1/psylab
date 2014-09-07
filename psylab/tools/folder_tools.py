@@ -60,10 +60,19 @@ class concurrent_files:
         replacement : boolean
             Whether to sample with replacement. If True, 'random' and 'repeat' 
             parameters are ignored. [default = False]
+        use : dict
+            The keys are basenames from path_list, the vals are lists of 
+            filenames to specifically use. If this is specified, only filenames 
+            on this list are used and all others are skipped. This overrides 
+            skip.
+        skip : dict
+            The keys are basenames from path_list, the vals are lists of 
+            filenames to ignore.
         text_file : string
             the full path to a text file that specifies text for each token.
             There should be one line per token, and the format can be
-            specified (see below). 
+            specified (see below). Because one textfile is assumed, all 
+            filenames must be unique.
         text_format : string
             Indicates the format of the lines in text_file. Should be something 
             like "file,kw,text" where `file` is the only mandatory item, and 
@@ -72,43 +81,17 @@ class concurrent_files:
 
         Usage
         -----
-        Assume a folder on your system is /path/to/FCircus and contains the following files:
-            |  MP001.wav
-            |  MP002.wav
-            |  MP003.wav
-            |  ...
-        And there is a textfile at /path/to/FCircus.txt which looks like this:
-            |  MP001,Palin,I came here for an argument.
-            |  MP002,Cleese,No you didnt.
-            |  MP003,Chapman,Stupid git.
-            |  ...
-
-        >>> f = consecutive_files('/path/to/FCircus', text_file='/path/to/FCircus.txt', text_format='file,actor,text')
-        >>> f.get_filename() # First call, so you get the first file in the list.
-        'MP001.WAV'
-        >>> f.get_text() # If you don't specify anything, return the `text` string of the current item.
-        'I came here for an argument.'
-        >>> f.get_filename(10) # Give me the 10th file in the list
-        'MP011.WAV'
-        >>> a = f.get_filename(full_path=True) # Now the next one (11th in this case), but with the full path
-        >>> a
-        '/path/to/files/MP012.WAV'
-        >>> f.get_text(a) # You can pass the full path and it will still try to get it right
-        'Its being-hit-on-the-head lessons in here.'
-        >>> f.get_text('MP003','actor') # Wait, who said `Stupid git`?
-        'Chapman'
-        >>>
     """
     def __init__(self, path_list, 
                  file_ext=None, 
                  file_range=None,              # Not yet implemented
-                 skip=[], 
-                 use=[],
+                 skip=None, 
+                 use=None,
                  random=False,
                  repeat=False,
                  replacement=False,
-                 text_file=None,               # Not yet implemented
-                 text_format='file kw text'):  # Not yet implemented
+                 text_file=None,
+                 text_format='file kw text'):
         self.path_list = path_list
         if file_ext:
             self.file_ext = file_ext.split(';')
@@ -124,17 +107,52 @@ class concurrent_files:
         self.text_file = text_file
         self.file_range = file_range
         self.n = 0
-        self.skip = skip
-        self.use = use
-
+        if skip: self.skip = skip
+        else: self.skip = {}
+        if use: self.use = use
+        else: self.use = {}
+        for path in path_list:
+            name = os.path.basename(path)
+            if not name in self.skip.keys():
+                self.skip[name] = []
+            if not name in self.use.keys():
+                self.use[name] = None
+                
         for path in path_list:
             name = os.path.basename(path)
             files = {'files': []}
             for f in os.listdir(path):
-                if os.path.isfile(os.path.join(path, f)) and not f in skip:
-                    files['files'].append(os.path.join(path,f))
+                if os.path.isfile(os.path.join(path, f)):
+                    if self.use[name]: # If we are using `use`, then only add if filename is specified
+                        if f in self.use[name] or os.path.splitext(f)[0] in self.use[name]:
+                            files['files'].append(os.path.join(path,f))
+                    elif not f in self.skip[name] and not os.path.splitext(f)[0] in self.skip[name]:
+                        files['files'].append(os.path.join(path,f))
             self.file_dict[name] = files
             self.reset(name)
+
+        # Text
+        if self.text_file:
+            dlm_toks = ','
+            if self.text_format.find(dlm_toks) != -1:
+                fmt_toks = self.text_format.split(dlm_toks)
+            else:
+                fmt_toks = self.text_format.split(' ')
+                dlm_toks = ' '
+            thislisth = open(self.text_file, 'r')
+            thislist = thislisth.readlines()
+            thislisth.close()
+            self.text = {}
+            if 'file' in fmt_toks:
+                fileind = fmt_toks.index('file')
+            else: fileind = 0
+            for line in thislist:
+                if line != "" and line.lstrip()[0] != "#":
+                    thistext = line.split(dlm_toks,len(fmt_toks)-1)
+                    self.text[thistext[fileind]] = {}
+                    for tkn in fmt_toks:
+                        self.text[thistext[fileind]][tkn] = thistext[fmt_toks.index(tkn)].strip()
+
 
     def reset(self, name):
         self.file_dict[name]['index'] = -1
@@ -188,6 +206,50 @@ class concurrent_files:
                         f.append(filepath)
                         got_file = True
         return f
+
+    def get_text(self, file_names=None, item='text', delim=" "):
+        """Gets a specified items of text associated with each specified filename.
+            If no filenames are specified, the file name of the current indexes are used. 
+            The filename extension is optional. The default item is 'text'.
+
+            Parameters
+            ----------
+            file_names : string
+                The name of the file that you want text for. It should be the string used 
+                in the text file that you assigned `file` to in your text_format string. 
+                However, the function will make several attempts at matching the name, 
+                including removing the file extension, etc. [default = current file name]  
+            item : string
+                The name of the text item you would like. It should be one of the items you
+                specified in the text_format argument when you instantiated the class. 
+                [default = `text`]
+            delim : string
+                The character string to separate each token with. [default = " "]
+        """
+        file_keys = []
+        if not file_names:
+            file_names = []
+            for name, files in self.file_dict.iteritems():
+                file_names.append(files['files'][files['index']])
+        for file_name in file_names:
+            if file_name in self.text.keys():  # Try filename as is
+                file_keys.append(file_name)
+            elif os.path.basename(file_name) in self.text.keys():  # Try stripping path
+                file_keys.append(os.path.basename(file_name))
+            elif os.path.basename(os.path.splitext(file_name)[0]) in self.text.keys():  # Try stripping both path and extension
+                file_keys.append(os.path.basename(os.path.splitext(file_name)[0]))
+            else:
+                for ext in self.file_ext:
+                    if file_name+ext in self.text.keys(): # Try adding extension, drawn from file_ext
+                        file_keys.append(file_name+ext)
+                        break
+        if file_keys:
+            file_texts =[]
+            for key in file_keys:
+                file_texts.append(self.text[key][item])
+            return delim.join(file_texts)
+        else:
+            return None
 
 
 class consecutive_files:
