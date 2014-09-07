@@ -29,7 +29,166 @@ Helper classes for working with folders and files in less typical ways
 """
 
 import os
+import collections
 import numpy as np
+
+
+class concurrent_files:
+    """A simple class for retrieving filenames from several folders, one at a time
+
+        This class tries to make it easy to access files in a folder 
+        one-at-a-time, and to access bits of text associated with each
+        filename as needed. The intended use case is if you are running an 
+        experiment and need to load a stimulus in for each trial, you might 
+        also want to show some text info about each stimulus, such as 
+        keywords etc. 
+
+        Parameters
+        ----------
+        path_list : list of strings
+            A list of the the full paths where the files are.
+        file_ext : string
+            A string of semicolon-separated extensions to mask (eg. '.wav;.WAV'). 
+            [Default = all files]
+        file_range : string
+            A print-range style string, indicating the file indexes to include. 
+            Example: '1:5, 7, 10' would yield [1,2,3,4,5,7,10]. [default = all]
+        random : boolean
+            Whether to randomize the file order. [default = False]
+        repeat : boolean
+            Whether to start again if the list is exhausted. [default = False]
+        replacement : boolean
+            Whether to sample with replacement. If True, 'random' and 'repeat' 
+            parameters are ignored. [default = False]
+        text_file : string
+            the full path to a text file that specifies text for each token.
+            There should be one line per token, and the format can be
+            specified (see below). 
+        text_format : string
+            Indicates the format of the lines in text_file. Should be something 
+            like "file,kw,text" where `file` is the only mandatory item, and 
+            indicates the position of the filename which is used as the 
+            identifier.
+
+        Usage
+        -----
+        Assume a folder on your system is /path/to/FCircus and contains the following files:
+            |  MP001.wav
+            |  MP002.wav
+            |  MP003.wav
+            |  ...
+        And there is a textfile at /path/to/FCircus.txt which looks like this:
+            |  MP001,Palin,I came here for an argument.
+            |  MP002,Cleese,No you didnt.
+            |  MP003,Chapman,Stupid git.
+            |  ...
+
+        >>> f = consecutive_files('/path/to/FCircus', text_file='/path/to/FCircus.txt', text_format='file,actor,text')
+        >>> f.get_filename() # First call, so you get the first file in the list.
+        'MP001.WAV'
+        >>> f.get_text() # If you don't specify anything, return the `text` string of the current item.
+        'I came here for an argument.'
+        >>> f.get_filename(10) # Give me the 10th file in the list
+        'MP011.WAV'
+        >>> a = f.get_filename(full_path=True) # Now the next one (11th in this case), but with the full path
+        >>> a
+        '/path/to/files/MP012.WAV'
+        >>> f.get_text(a) # You can pass the full path and it will still try to get it right
+        'Its being-hit-on-the-head lessons in here.'
+        >>> f.get_text('MP003','actor') # Wait, who said `Stupid git`?
+        'Chapman'
+        >>>
+    """
+    def __init__(self, path_list, 
+                 file_ext=None, 
+                 file_range=None,              # Not yet implemented
+                 skip=[], 
+                 use=[],
+                 random=False,
+                 repeat=False,
+                 replacement=False,
+                 text_file=None,               # Not yet implemented
+                 text_format='file kw text'):  # Not yet implemented
+        self.path_list = path_list
+        if file_ext:
+            self.file_ext = file_ext.split(';')
+        else:
+            self.file_ext = '*'
+        self.random = random
+        self.repeat = repeat
+        self.replacement = replacement
+        self.file_dict = collections.OrderedDict()
+        self.index = -1
+        self.index_list = []
+        self.text_format = text_format
+        self.text_file = text_file
+        self.file_range = file_range
+        self.n = 0
+        self.skip = skip
+        self.use = use
+
+        for path in path_list:
+            name = os.path.basename(path)
+            files = {'files': []}
+            for f in os.listdir(path):
+                if os.path.isfile(os.path.join(path, f)) and not f in skip:
+                    files['files'].append(os.path.join(path,f))
+            self.file_dict[name] = files
+            self.reset(name)
+
+    def reset(self, name):
+        self.file_dict[name]['index'] = -1
+        if self.random:
+            np.random.shuffle(self.file_dict[name]['files'])
+        else:
+            self.file_dict[name]['files'].sort()
+        
+
+    def get_filenames(self, use=None, skip=None):
+        f = []
+        for name, files in self.file_dict.iteritems():
+            got_file = False
+            reset = False
+
+            if use and use.has_key(name):
+                if isinstance(use[name], str):
+                    this_use = [use[name]]
+                else: this_use = use[name]
+            else: this_use = files['files']
+
+            if skip and skip.has_key(name):
+                if isinstance(skip[name], str):
+                    this_skip = [skip[name]]
+                else: this_skip = skip[name]
+            else: this_skip = []
+
+            while not got_file:
+                if self.replacement:
+                    # The only time replacement makes sense is if random=True and repeat = True
+                    # So don't worry about those parameters
+                    files['index'] = np.random.randint(len(files['files']))
+                else:
+                    files['index'] += 1
+                    if files['index'] == len(files['files']):
+                        if self.repeat:
+                            # Protect against possible infinit loop: no need to reset more than once
+                            if reset:
+                                raise Exception("'%s' file list contains no allowable files (ie., that are not in skip)!" % name)
+                            else:
+                                self.reset(name)
+                                reset = True
+                        else: 
+                            raise Exception('%s file list is exhausted!' % name)
+                
+                filepath = files['files'][files['index']]
+                filename = os.path.split(filepath)[1]
+                basename = os.path.splitext(filename)[0]
+                if filepath in this_use or filename in this_use or basename in this_use:
+                    if not filename in this_skip and not basename in this_skip:
+                        f.append(filepath)
+                        got_file = True
+        return f
+
 
 class consecutive_files:
     """A simple class for retrieving filesnames in a folder, one at a time
