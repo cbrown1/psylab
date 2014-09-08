@@ -34,32 +34,30 @@ import numpy as np
 
 
 class concurrent_files:
-    """A simple class for retrieving filenames from several folders, one at a time
+    """A simple class for retrieving one filename each from several folders. 
 
-        This class tries to make it easy to access files in a folder 
-        one-at-a-time, and to access bits of text associated with each
+        This class tries to make it easy to access files in folders 
+        one-each-at-a-time, and to access bits of text associated with each
         filename as needed. The intended use case is if you are running an 
-        experiment and need to load a stimulus in for each trial, you might 
-        also want to show some text info about each stimulus, such as 
-        keywords etc. 
+        experiment and need to load in one stimulus from each folder for each 
+        trial, (as with the Coordinate-Response Measure set, or the 'NewBugs', 
+        and you might also want to show some text info about each stimulus, 
+        such as keywords etc. 
 
         Parameters
         ----------
         path_list : list of strings
-            A list of the the full paths where the files are.
+            A list of the the paths where the files are.
         file_ext : string
             A string of semicolon-separated extensions to mask (eg. '.wav;.WAV'). 
             [Default = all files]
-        file_range : string
-            A print-range style string, indicating the file indexes to include. 
-            Example: '1:5, 7, 10' would yield [1,2,3,4,5,7,10]. [default = all]
         random : boolean
             Whether to randomize the file order. [default = False]
         repeat : boolean
             Whether to start again if the list is exhausted. [default = False]
         replacement : boolean
             Whether to sample with replacement. If True, 'random' and 'repeat' 
-            parameters are ignored. [default = False]
+            parameters are ignored (and assumed True). [default = False]
         use : dict
             The keys are basenames from path_list, the vals are lists of 
             filenames to specifically use. If this is specified, only filenames 
@@ -101,12 +99,8 @@ class concurrent_files:
         self.repeat = repeat
         self.replacement = replacement
         self.file_dict = collections.OrderedDict()
-        self.index = -1
-        self.index_list = []
         self.text_format = text_format
         self.text_file = text_file
-        self.file_range = file_range
-        self.n = 0
         if skip: self.skip = skip
         else: self.skip = {}
         if use: self.use = use
@@ -123,11 +117,12 @@ class concurrent_files:
             files = {'files': []}
             for f in os.listdir(path):
                 if os.path.isfile(os.path.join(path, f)):
-                    if self.use[name]: # If we are using `use`, then only add if filename is specified
-                        if f in self.use[name] or os.path.splitext(f)[0] in self.use[name]:
+                    if self.file_ext == "*" or os.path.splitext(f)[1].lower() in self.file_ext:
+                        if self.use[name]: # If we are using `use`, then only add if filename is specified
+                            if f in self.use[name] or os.path.splitext(f)[0] in self.use[name]:
+                                files['files'].append(os.path.join(path,f))
+                        elif not f in self.skip[name] and not os.path.splitext(f)[0] in self.skip[name]:
                             files['files'].append(os.path.join(path,f))
-                    elif not f in self.skip[name] and not os.path.splitext(f)[0] in self.skip[name]:
-                        files['files'].append(os.path.join(path,f))
             self.file_dict[name] = files
             self.reset(name)
 
@@ -239,14 +234,22 @@ class concurrent_files:
             elif os.path.basename(os.path.splitext(file_name)[0]) in self.text.keys():  # Try stripping both path and extension
                 file_keys.append(os.path.basename(os.path.splitext(file_name)[0]))
             else:
+                got_file = False
                 for ext in self.file_ext:
                     if file_name+ext in self.text.keys(): # Try adding extension, drawn from file_ext
                         file_keys.append(file_name+ext)
+                        got_file = True
                         break
+                if not got_file:
+                    file_keys.append("[]") # None found. Add placeholder.
+                    
         if file_keys:
             file_texts =[]
             for key in file_keys:
-                file_texts.append(self.text[key][item])
+                if key == "[]":
+                    file_texts.append(key)
+                else:
+                    file_texts.append(self.text[key][item])
             return delim.join(file_texts)
         else:
             return None
@@ -353,7 +356,7 @@ class consecutive_files:
         ffiles = []
         for f in files:
             fileName, ext = os.path.splitext(f)
-            if self.file_ext == '*' or ext in self.file_ext:
+            if self.file_ext == '*' or ext.lower() in self.file_ext:
                 ffiles.append(f)
         ffiles.sort()
 
@@ -498,6 +501,7 @@ class consecutive_files:
         result = reduce(list.__add__, [parse(x) for x in tokens])
 
         return result
+
 
 class synched_consecutive_files:
     """Class to create a synchronized group of consecutive_files lists. 
