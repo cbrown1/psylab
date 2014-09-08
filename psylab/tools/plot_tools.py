@@ -46,6 +46,12 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
+
+def update_plotline(line, x, y):
+    line.set_data(x, y)
+    line.get_axes().get_figure().canvas.draw()
+
+
 def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None, dpi=None):
     """Returns a matplotlib axes that resides on a page,
         such as to create a slide for a presenation, or a figure page for a 

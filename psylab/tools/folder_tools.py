@@ -183,7 +183,7 @@ class concurrent_files:
             self.file_dict[name]['files'].sort()
         
 
-    def get_filenames(self, use=None, skip=None):
+    def get_filenames(self, use=None, skip=None, fmt='file'):
         f = []
         for name, files in self.file_dict.iteritems():
             got_file = False
@@ -224,7 +224,9 @@ class concurrent_files:
                 basename = os.path.splitext(filename)[0]
                 if filepath in this_use or filename in this_use or basename in this_use:
                     if not filename in this_skip and not basename in this_skip:
-                        f.append(filepath)
+                        if fmt == 'full': f.append(filepath)
+                        elif fmt == 'base': f.append(basename)
+                        else: f.append(filename)
                         got_file = True
         return f
 
