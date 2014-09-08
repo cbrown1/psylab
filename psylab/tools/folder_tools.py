@@ -33,6 +33,32 @@ import collections
 import numpy as np
 
 
+class cd:
+    """Context manager for changing the current working directory
+    
+        Usage
+        -----
+        with cd("/new/path") 
+            # We are now in the new path
+            pass
+        # We are now in the previous path
+           
+        Notes
+        -----
+        Copy/pasted on 2014-09-07 from:
+        http://stackoverflow.com/questions/431684/how-do-i-cd-in-python
+    """
+    def __init__(self, newPath):
+        self.newPath = newPath
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)
+    
+
 class concurrent_files:
     """A simple class for retrieving one filename each from several folders. 
 
