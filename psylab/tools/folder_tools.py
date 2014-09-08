@@ -241,12 +241,12 @@ class concurrent_files:
                         got_file = True
                         break
                 if not got_file:
-                    file_keys.append("[]") # None found. Add placeholder.
+                    file_keys.append("[[%s]]" % os.path.basename(file_name)) # None found. Use filename.
                     
         if file_keys:
             file_texts =[]
             for key in file_keys:
-                if key == "[]":
+                if key[:2] == "[[" and key[-2:] == "]]":
                     file_texts.append(key)
                 else:
                     file_texts.append(self.text[key][item])
