@@ -389,12 +389,13 @@ class consecutive_files:
             self.text = {}
             if 'file' in fmt_toks:
                 fileind = fmt_toks.index('file')
+            else: fileind = 0
             for line in thislist:
                 if line != "" and line.lstrip()[0] != "#":
                     thistext = line.split(dlm_toks,len(fmt_toks)-1)
-                    self.text[thistext[0]] = {}
+                    self.text[thistext[fileind]] = {}
                     for tkn in fmt_toks:
-                        self.text[thistext[0]][tkn] = thistext[fmt_toks.index(tkn)].strip()
+                        self.text[thistext[fileind]][tkn] = thistext[fmt_toks.index(tkn)].strip()
 
     def reset(self):
         if self.repeat:
@@ -410,7 +411,7 @@ class consecutive_files:
             Parameters
             ----------
             index : int
-                The index of the desired filename. If unspecified, then index  
+                The index of the desired filename. If unspecified, then index
                 is incremented and the next filename in the list is returned 
                 (current index+1). If zero or positive, the filename of 
                 the specified index is returned. If negative, the filename of the  
