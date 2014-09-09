@@ -65,10 +65,10 @@ class concurrent_files:
         This class tries to make it easy to access files in folders 
         one-each-at-a-time, and to access bits of text associated with each
         filename as needed. The intended use case is if you are running an 
-        experiment and need to load in one stimulus from each folder for each 
-        trial, (as with the Coordinate-Response Measure set, or the 'NewBugs', 
-        and you might also want to show some text info about each stimulus, 
-        such as keywords etc. 
+        experiment and need to load in one stimulus from each folder at a time 
+        (for each trial), as with the Coordinate-Response Measure set, or the 
+        'NewBugs', and you might also want to show some text info about each 
+        stimulus, such as keywords etc. 
 
         Parameters
         ----------
@@ -100,7 +100,7 @@ class concurrent_files:
         text_format : string
             Indicates the format of the lines in text_file. Should be something 
             like "file,kw,text" where `file` is the only mandatory item, and 
-            indicates the position of the filename which is used as the 
+            indicates the position of the filename, which is used as the 
             identifier.
 
         Usage
@@ -108,14 +108,13 @@ class concurrent_files:
     """
     def __init__(self, path_list, 
                  file_ext=None, 
-                 file_range=None,              # Not yet implemented
                  skip=None, 
                  use=None,
                  random=False,
                  repeat=False,
                  replacement=False,
                  text_file=None,
-                 text_format='file kw text'):
+                 text_format='file,text'):
         self.path_list = path_list
         if file_ext:
             self.file_ext = file_ext.split(';')
@@ -139,7 +138,7 @@ class concurrent_files:
                 self.use[name] = None
                 
         for path in path_list:
-            name = os.path.basename(path)
+            name = os.path.basename(path.rstrip(os.sep))
             files = {'files': []}
             for f in os.listdir(path):
                 if os.path.isfile(os.path.join(path, f)):
@@ -183,7 +182,29 @@ class concurrent_files:
             self.file_dict[name]['files'].sort()
         
 
-    def get_filenames(self, use=None, skip=None, fmt='file'):
+    def get_filenames(self, use=None, skip=None, fmt='full'):
+        """ Gets a list of filenames.
+
+            Parameters
+            ----------
+            use : dict
+                A dictionary with keys as list names and vals as lists of 
+                filenames. If specified, then only the files listed will be 
+                drawn from. You can specify only the list names you want.
+            skip : dict
+                A dictionary with keys as list names and vals as lists of 
+                filenames. If specified, then the files listed will be 
+                ignored. You can specify only the list names you want.
+            fmt : str
+                'file' returns the filename only with no path
+                'base' returns the filebase with no path or extension
+                'full' returns the full file path (default)
+                
+            Returns
+            -------
+            list
+                A list of filenames, one from each file list.
+        """
         f = []
         for name, files in self.file_dict.iteritems():
             got_file = False
@@ -248,6 +269,11 @@ class concurrent_files:
                 [default = `text`]
             delim : string
                 The character string to separate each token with. [default = " "]
+                
+            Returns
+            -------
+            str
+                A list of tokens.
         """
         file_keys = []
         if not file_names:
@@ -261,6 +287,8 @@ class concurrent_files:
                 file_keys.append(os.path.basename(file_name))
             elif os.path.basename(os.path.splitext(file_name)[0]) in self.text.keys():  # Try stripping both path and extension
                 file_keys.append(os.path.basename(os.path.splitext(file_name)[0]))
+            elif os.path.join(name,os.path.basename(file_name)) in self.text.keys(): # Try name/filename.ext (1 textfile is used for multiple folders)
+                file_keys.append(os.path.join(name,os.path.basename(file_name)))
             else:
                 got_file = False
                 for ext in self.file_ext:
@@ -270,7 +298,6 @@ class concurrent_files:
                         break
                 if not got_file:
                     file_keys.append("[[%s]]" % os.path.basename(file_name)) # None found. Use filename.
-                    
         if file_keys:
             file_texts =[]
             for key in file_keys:
@@ -360,7 +387,7 @@ class consecutive_files:
                  text_format='file kw text'):
         self.path = path
         if name == '':
-            self.name = os.path.basename(path)
+            self.name = os.path.basename(path.rstrip(os.sep))
         else:
             self.name = name
         if file_ext:
@@ -433,7 +460,7 @@ class consecutive_files:
         else:
             raise Exception('%s file list is exhausted!' % self.name)
 
-    def get_filename(self, index=None, fmt='file'):
+    def get_filename(self, index=None, fmt='full'):
         """ Gets a filename.
 
             Parameters
@@ -447,7 +474,7 @@ class consecutive_files:
             fmt : str
                 'file' returns the filename only with no path (default)
                 'base' returns the filebase with no path or extension
-                'full' returns the full file path
+                'full' returns the full file path (default)
         """
         if index != 0 and not index:
             self.index += 1
@@ -479,6 +506,11 @@ class consecutive_files:
                 The name of the text item you would like. It should be one of the items you
                 specified in the text_format argument when you instantiated the class. 
                 [default = `text`]
+                
+            Returns
+            -------
+            str
+                A token.
         """
         if not file_name:
             file_name = self.file_list[self.index]

@@ -39,7 +39,6 @@ io: Perform tasks related to file i/o (dep: medussa)
 
 __version__ = '0.4.5'
 
-#from array import array, nanproduct, nanmean
 #from dataview import dataview
 from . import tools
 from . import signal
