@@ -46,7 +46,6 @@ requires = ['numpy (>=1.2)',
 
 packages = ['psylab%s' % (p) for p in ['',
                                     '.io',
-                                    '.array',
                                     '.dataview',
                                     '.gustav',
                                     '.gustav.methods',
