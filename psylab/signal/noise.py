@@ -87,6 +87,7 @@ def pink(n, channels=None):
             x[:,i] = lfilter(b,a,v[:,i])   # Apply 1/F roll-off to PSD
         out = x[nT60+1:,:]                 # Skip transient response
     else:
+        v = np.random.randn(n+nT60) # Gaussian white noise: N(0,1)
         x = lfilter(b,a,v)                 # Apply 1/F roll-off to PSD
         out = x[nT60+1:]                   # Skip transient response
     return out/np.max(np.abs(out), axis=0)

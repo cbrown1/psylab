@@ -197,6 +197,7 @@ def initialize_experiment( exp ):
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     exp.logFile = exp.logFile.replace("$date", date)
     exp.logFile = exp.logFile.replace("$name", exp.name)
+    exp.logFile = exp.logFile.replace("$host", exp.host)
     if not os.path.isfile(exp.logFile):
         exp.logString_header = exp.logString_header.replace("$date", date)
         write_data(exp.logString_header, exp.logFile)
