@@ -25,6 +25,7 @@
 #
 
 import numpy as np
+import collections
 
 def convolve(x, h):
     '''Convolves two signals using FFT-based fast convolution
@@ -81,3 +82,58 @@ def convolve(x, h):
     y = m*y
 
     return y
+
+
+class hrtf_data():
+    """Helper class for handling hrtf data
+        
+        Notes
+        -----
+        Assumes datafile is a 2-dimensional numpy array saved with np.save, with 
+        the coefficients along dim 1 and each available azimuth along dim 2. 
+        
+        Further assumes that the azimuths are evenly distributed in a full 
+        circle, starting with 0 degrees (ie., if there are four azimuths, they 
+        are assumed to be 0, 90, 180, and 270). Thus, all data in a datafile 
+        should be for a single elevation. 
+    """
+    def __init__(self, file_path):
+        self.data = np.load(file_path)
+        self.degrees_separation = 360./self.data.shape[1]
+        if len(self.data.shape) == 1:
+            self.locations = np.array((0))
+        else:
+            self.locations = np.round(np.arange(0, 360, self.degrees_separation))
+
+#    @property
+#    def azimuths(self):
+#        return self.data.keys()
+
+    def get_left_right_inds(self, az):
+        l = (int(az) % 360) / self.degrees_separation
+        r = ((360-(int(az) % 360)) % 360) / self.degrees_separation
+        return (l,r)
+
+    def get_left_right_data(self, az):
+        (l,r) = self.get_left_right_inds(int(az))
+        l_data = self.data[l]
+        r_data = self.data[r]
+        return (l_data, r_data)
+        
+    def apply_left_right_data(self, signal, az):
+        (l,r) = self.get_left_right_data(int(az))
+        sig_out = np.zeros_like(signal)
+        sig_out[:,0] = np.convolve(signal[:,0],l)
+        sig_out[:,1] = np.convolve(signal[:,1],r)
+
+    def get_ind(self, az):
+        return (int(az) % 360)/ self.degrees_separation
+        
+    def get_data(self, az):
+        i = self.get_ind(int(az))
+        return self.data[i]
+    
+    def apply_data(self, signal, az):
+        data = self.get_data(int(az))
+        sig_out = np.zeros_like(signal)
+        sig_out = np.convolve(signal,data)

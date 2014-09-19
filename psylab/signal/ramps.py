@@ -54,10 +54,6 @@ def ramps(data, fs, duration=10, shape='raisedcosine', set='onoff'):
         y : array
             The ramped signal.
         
-        Notes
-        -----
-        TODO: Change dur,shape,set to kwargs
-        TODO: Make it work for n-dimensional input
     '''
     dur = np.round(np.float32(duration)*(np.float32(fs)/1000.))
     wspace=np.round(2.*dur)
@@ -73,18 +69,16 @@ def ramps(data, fs, duration=10, shape='raisedcosine', set='onoff'):
         rf = np.concatenate((r, r[::-1]),1)
     else:
         raise Exception("shape not recognized")
+    
+    if len(data.shape) == 2:
+        rf_1d = rf.copy()
+        for c in range(data.shape[1]-1):
+            rf = np.column_stack((rf, rf_1d))
 
     y = data
-# This used to work for multi-dimension data:
-#    for i in range(0,ndim(data)):
-#        if set in ['on', 'onoff']:
-#            data[0:dur,i] = data[0:dur,i]*rf[0:dur]
-#        if set in ['off', 'onoff']:
-#            durp1 = dur-1
-#            data[-(durp1):,i] = data[-(durp1):,i]*rf[-(durp1):]
     if set in ['on', 'onoff']:
-        y[0:dur] = y[0:dur]*rf[0:dur]
+        y[0:dur,] = y[0:dur,]*rf[0:dur,]
     if set in ['off', 'onoff']:
         durp1 = dur-1
-        y[-(durp1):] = y[-(durp1):]*rf[-(durp1):]
+        y[-(durp1):,] = y[-(durp1):,]*rf[-(durp1):,]
     return y

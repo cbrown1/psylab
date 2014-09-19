@@ -45,6 +45,7 @@ freq_compress - Performs frequency compression on a signal
 freqs_logspace - Computes a range of frequencies evenly spaced in log space
 gso - Varies the inter-aural correlation of a stereo signal
 hcomplex - Generates harmonic complexes
+hrtf_data - Helper class for handling hrtf data
 ild - Applies an interaural level difference to a signal
 interp - Interpolates a signal to a specified number of points
 itd - Applies an interaural time difference to a signal
@@ -86,7 +87,6 @@ from .atten import atten
 from .binaural import itd, ild, gso
 from .compensate import compensate
 from .compression import compress
-from .convolution import convolve
 from .envelope import envelope
 from .equate import equate
 from .f0 import f0
@@ -94,6 +94,7 @@ from .filter import freqs_logspace, filter_bank, pre_emphasis
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
 from .hcomplex import hcomplex, hcomplex_old
+from .hrtf import convolve, hrtf_data
 from .interp import interp
 from .mix import mix
 from .noise import pink, white, irn, mls

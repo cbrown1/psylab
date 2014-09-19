@@ -35,22 +35,29 @@ def tone(f, fs, dur, **kwargs):
             frequency is created. If f is a 2-element array, the values will be
             the start and end frequecies of a linear frequency sweep. If f is
             an array of length > 2, the values will be the instantaneous
-            frequency of an arbitrary (but nonetheless pure) waveform. In this
-            case, dur will be ignored, and the output array will be the same
-            length (the same number of samples) as input f.
+            sinusoidal frequency of the resulting signal. In this case, dur will 
+            be ignored, and the output signal will be the same length (the same 
+            number of samples) as input f.
         fs: scalar
             The sampling frequency.
         dur : scalar
-            The duration in ms.
+            The duration in ms. 
 
         Kwargs
         ------
         amp : scalar/array
-            Amplitude values less than or equal to 0 are treated as dB (re:
-             +-1), and values greater than 0 are used to scale the waveform
-             peak linearly. default is 1
-        phase : scalar
-            The starting phase in degrees. default is 0
+            The amplitude of the signal. If amp is a scalar, the entire signal 
+            is scaled to amp. If it is an array, it must be the same length as 
+            the resulting signal, and the elements of amp will be the 
+            instantaneous amplitude of the resulting signal. Amplitude values 
+            less than or equal to 0 are assumed to be in units of dB (re:+-1), 
+            and values greater than 0 are used to scale the waveform peak 
+            linearly. [default is 1]
+        phase : scalar/array
+            The phase of the signal, in degrees. If phase is a scalar, it is the 
+            starting phase of the signal. If it is an array, it must be the same 
+            length as the resulting signal, and the elements of phase will be 
+            the instantaneous phase of the signal. [default = 0]
 
         Returns
         -------
@@ -76,35 +83,35 @@ def tone(f, fs, dur, **kwargs):
 
     '''
 
-    amp = kwargs.get('amp', 1);
-    phase = kwargs.get('phase', 0);
+    amp = kwargs.get('amp', 1.)
+    phase = kwargs.get('phase', 0.)
 
-    f = np.array(np.float64(f));
-    fs = np.float64(fs);
-    dur = np.float64(dur);
-    amp = np.array(np.float64(amp));
-    phase = np.float64(phase)*np.pi/180.;
+    f = np.array(np.float64(f))
+    fs = np.float64(fs)
+    dur = np.float64(dur)
+    amp = np.array(np.float64(amp))
+    phase = np.float64(phase)*np.pi/180.
 
     if f.size == 2:
-        dur = np.round((dur / 1000.) * fs);
-        freq = np.linspace(f[0], f[1], dur);
+        dur = np.round((dur / 1000.) * fs)
+        freq = np.linspace(f[0], f[1], dur)
     elif f.size == 1:
-        dur = np.round((dur / 1000.) * fs);
-        freq = np.ones(dur) * f;
+        dur = np.round((dur / 1000.) * fs)
+        freq = np.ones(dur) * f
     else:
-        dur = f.size;
-        freq = f;
+        dur = f.size
+        freq = f
 
     if amp.size == 2:
         if not amp[0] > 0 or not amp[1] > 0:
             raise Exception('When generating amplitude sweeps, linear scaling must be used (ie., .01 < amp < 1.0')
-        amp1 = np.linspace(amp[0], amp[1], dur);
+        amp1 = np.linspace(amp[0], amp[1], dur)
     elif amp.size == 1:
         if amp <= 0:
-            amp1 = np.ones(dur) * 10. ** (amp / 20.);
+            amp1 = np.ones(dur) * 10. ** (amp / 20.)
         else:
-            amp1 = np.ones(dur) * amp;
+            amp1 = np.ones(dur) * amp
     else:
-        amp1 = amp;
+        amp1 = amp
 
-    return amp1 * np.sin(phase + (2. * np.pi * np.cumsum(freq) / fs));
+    return amp1 * np.sin(phase + (2. * np.pi * np.cumsum(freq) / fs))
