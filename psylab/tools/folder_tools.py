@@ -105,6 +105,34 @@ class concurrent_files:
 
         Usage
         -----
+        Assume a folder on your system is stim/ and contains the following subfolders:
+            |  1_Names/
+            |    01_Bill.wav
+            |    02_John.wav
+            |    03_Mary.wav
+            |  2_Verbs/
+            |    01_took.wav
+            |    02_had.wav
+            |    03_sold.wav
+            |  3_Numbers/
+            |    01_one.wav
+            |    02_two.wav
+            |    03_three.wav
+            |  4_Objects/
+            |    01_clips.wav
+            |    02_socks.wav
+            |    03_pens.wav
+            |  ...
+
+        >>> f = concurrent_files(['stim/1_Names', 
+                                  'stim/2_Verb',
+                                  'stim/3_Numbers',
+                                  'stim/4_Objects'],
+                                  use={'1_Names':'01_Bill.wav'} # Only use name Bill
+                                  )
+        >>> f.get_filenames(fmt='file')
+        ['01_Bill.WAV', '01_took.wav', '01_one.wav', '01_clips.wav']
+        >>>
     """
     def __init__(self, path_list, 
                  file_ext=None, 

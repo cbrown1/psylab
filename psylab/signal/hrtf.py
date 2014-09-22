@@ -93,9 +93,9 @@ class hrtf_data():
         the coefficients along dim 1 and each available azimuth along dim 2. 
         
         Further assumes that the azimuths are evenly distributed in a full 
-        circle, starting with 0 degrees (ie., if there are four azimuths, they 
-        are assumed to be 0, 90, 180, and 270). Thus, all data in a datafile 
-        should be for a single elevation. 
+        circle, in integer degrees starting with 0 (ie., if there are four 
+        azimuths, they are assumed to be 0, 90, 180, and 270). Thus, all data 
+        in a datafile should be for a single elevation. 
     """
     def __init__(self, file_path):
         self.data = np.load(file_path)
@@ -103,15 +103,16 @@ class hrtf_data():
         if len(self.data.shape) == 1:
             self.locations = np.array((0))
         else:
-            self.locations = np.round(np.arange(0, 360, self.degrees_separation))
+            self.locations = np.round(np.linspace(0,360,self.data.shape[1]+1)[:-1])
+#            self.locations = np.round(np.arange(0, 360, self.degrees_separation))
 
 #    @property
 #    def azimuths(self):
 #        return self.data.keys()
 
     def get_left_right_inds(self, az):
-        l = int((int(az) % 360) / self.degrees_separation)
-        r = int(((360-(int(az) % 360)) % 360) / self.degrees_separation)
+        l = np.round((int(az) % 360) / self.degrees_separation)
+        r = np.round(((360-(int(az) % 360)) % 360) / self.degrees_separation)
         return (l,r)
 
     def get_left_right_data(self, az):
@@ -127,7 +128,7 @@ class hrtf_data():
         sig_out[:,1] = np.convolve(signal[:,1],r)
 
     def get_ind(self, az):
-        return int((int(az) % 360)/ self.degrees_separation)
+        return np.round((int(az) % 360)/ self.degrees_separation)
         
     def get_data(self, az):
         i = self.get_ind(int(az))
