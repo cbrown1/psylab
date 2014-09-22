@@ -110,8 +110,8 @@ class hrtf_data():
 #        return self.data.keys()
 
     def get_left_right_inds(self, az):
-        l = (int(az) % 360) / self.degrees_separation
-        r = ((360-(int(az) % 360)) % 360) / self.degrees_separation
+        l = int((int(az) % 360) / self.degrees_separation)
+        r = int(((360-(int(az) % 360)) % 360) / self.degrees_separation)
         return (l,r)
 
     def get_left_right_data(self, az):
@@ -127,7 +127,7 @@ class hrtf_data():
         sig_out[:,1] = np.convolve(signal[:,1],r)
 
     def get_ind(self, az):
-        return (int(az) % 360)/ self.degrees_separation
+        return int((int(az) % 360)/ self.degrees_separation)
         
     def get_data(self, az):
         i = self.get_ind(int(az))

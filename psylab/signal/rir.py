@@ -233,8 +233,8 @@ def rir(fs, rm, src, mic, n, r):
     '''
     
     nn = np.array(range(-n, n+1))
-    rms = nn + 0.5 - 0.5*(-1)**nn
-    srcs = (-1)**nn
+    rms = nn + 0.5 - 0.5*(-1.)**nn
+    srcs = (-1.)**nn
 
     xi = srcs*src[0] + rms*rm[0]-mic[0]
     yj = srcs*src[1] + rms*rm[1]-mic[1]
@@ -246,7 +246,7 @@ def rir(fs, rm, src, mic, n, r):
     time = np.round(fs*d/343) + 1
 
     e,f,g = meshgrid(nn, nn, nn, indexing="ij")
-    c = r**(abs(e) + abs(f) + abs(g))
+    c = r**(np.abs(e) + np.abs(f) + np.abs(g))
     e = c/d
 
     # Equivalent to Matlab: h = full(sparse(time(:),1,e(:)))
@@ -256,4 +256,4 @@ def rir(fs, rm, src, mic, n, r):
     for i in xrange(len(timeflat)):
         h[int(timeflat[i])-1] = eflat[i]
 
-    return h
+    return h/np.max(np.abs(h))
