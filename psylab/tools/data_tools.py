@@ -39,3 +39,11 @@ def read_csv(filename, comment="#"):
             if line != "":
                 lines += line + "\n"
     return StringIO(lines)
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
