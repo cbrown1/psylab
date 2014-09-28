@@ -54,7 +54,6 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.signal',
                                     '.stats',
                                     '.subject_manager',
-                                    '.tdt2'
                                     ]
             ]
 #packages.append('psylab_examples')

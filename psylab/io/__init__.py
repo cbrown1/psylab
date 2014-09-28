@@ -24,20 +24,19 @@
 #
 
 '''
-io - File i/o specific functions that depend on medussa
+io - input / output functions that have dependencies
 
-Modules include:
+Because of the dependencies, each module must be imported specifically
 
-fileio - Helper functions for reading audio data in less typical ways
-listPlayer - Standalone script to play blocks of soundfiles in folders
+Modules include [dependencies in brackets]:
+
+fileio - Helper functions for reading audio data in less typical ways [medussa]
+listPlayer - Standalone script to play blocks of soundfiles in folders [medussa]
+hid - Access human interface devices like joysticks [linux]
+tdt2 - Control Tucker Davis Technologies System 2 hardware from the serial port [pyserial]
 
 Notes
 -----
-Tested on windows and linux.
+hid is linux only. Other modules tested on windows and linux.
 
-Depends on medussa (http://medussa.googlecode.com)
 '''
-
-from .audio import read_multi_file, read_audio_file
-import listPlayer
-

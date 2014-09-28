@@ -55,8 +55,9 @@ listPlayer.py --folder=/path/to/conditionFolders
 listPlayer.py --folder=/path/to/conditionFolders --skip=100 --n=20
 listPlayer.py --folder=/path/to/conditionFolders --filemask=.wav;.flac
 
-Notes:
-Depends on medussa to play soundfiles (http://medussa.us)
+Dependencies
+------------
+medussa [http://medussa.googlecode.com]
 """
 
 import os

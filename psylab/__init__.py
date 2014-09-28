@@ -37,7 +37,7 @@ tdt2: Access Tucker Davis System II hardware via serial port (dep: pyserial)
 io: Perform tasks related to file i/o (dep: medussa)
 '''
 
-__version__ = '0.4.5'
+__version__ = '0.4.6.0'
 
 #from dataview import dataview
 from . import tools

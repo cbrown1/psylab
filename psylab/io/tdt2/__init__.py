@@ -45,7 +45,9 @@ You can use tdt2.scan_ports() to return a list of available ports
 
 Tested on windows and linux.
 
-Depends on pyserial (http://sourceforge.net/projects/pyserial/)
+Dependencies
+------------
+pyserial [http://sourceforge.net/projects/pyserial/]
 '''
 
 import serial

@@ -52,6 +52,10 @@ def read_multi_file (folder, file_base, file_ext):
         the function will read in all three of these files, and 
         you would pass 'track01' as the file_base parameter, and 
         '.flac' as the file_ext parameter. 
+        
+        Dependencies
+        ------------
+        Medussa [http://medussa.googlecode.com]
     
     """
     files = glob.glob(os.path.join(folder,file_base+'*'+file_ext))
