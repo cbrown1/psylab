@@ -34,7 +34,7 @@ class joystick():
         Example
         -------
         >>> j = joystick()
-        >>> def get_j1axh_until_b2():
+        >>> def get_j1axh_until_b2(): # Return Horz axis value of j1 when b2 is pressed
                 wait = True
                 while wait:
                     c,e,d = j.listen()
@@ -93,6 +93,48 @@ class joystick():
                 raise Exception, "No valid devices found!"
         self.device = self.known_devices[self.dev_name]
 
+    def calibrate_axis(self, control_id):
+        """ Simple calibration routine for a specified joystick axis."
+
+            Returns the min, max, and center values, in that order.
+        """
+        ev = []
+        wait = True
+        ax_min = 255
+        ax_max = 0
+        for key, val in self.device['control_types'].items():
+            if val == 'Joystick':
+                j_id = key
+            if val == "Button":
+                b_id = key
+        for key, val in self.device['control_ids'].items():
+            if val == control_id:
+                c_id = key
+            if val == "1":
+                b1_id = key
+        if not c_id:
+            raise Exception, "Not a valid control_id!"
+        else:
+            if control_id[-4:] == "Horz":
+                direction = "left and right"
+            else:
+                direction = "up and down"
+            print("Move {} {}, then return to center and press button {} when finished").format(control_id, direction, "1")
+            pipe = open(self.dev_name, 'r')
+            while wait:
+                for character in pipe.read(1):
+                    ev.append( '{:02X}'.format(ord(character)) )
+                if len(ev) == 8:
+                    if ev[0] in self.device['control_types'].keys():
+                        if ev[0] == j_id and ev[2] == c_id:
+                            data = int(ev[4], 16)
+                            ax_min = min(ax_min, data)
+                            ax_max = max(ax_max, data)
+                        elif ev[0] == b_id and ev[2] == b1_id and ev[4] == '00':
+                            wait = False
+                    ev = []
+            pipe.close()
+            return (ax_min, ax_max, data)
 
     def debug(self, dur=15, verbose=False):
         print("debug will run for specified secs and print all joystick activity")
@@ -143,7 +185,7 @@ class joystick():
                     control_type = self.device['control_types'][ ev[0] ]
                     if ev[2] in self.device['control_ids'].keys():
                         control_id = self.device['control_ids'][ ev[2] ]
-                        data = str(int(ev[4], 16))
+                        data = int(ev[4], 16)
                         wait = False
                     else:
                         # This shouldn't happen
