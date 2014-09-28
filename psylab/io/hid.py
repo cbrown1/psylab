@@ -58,6 +58,7 @@ class joystick():
     """
     known_devices =  {'/dev/input/by-id/usb-Gravis_Eliminator_AfterShock-event-joystick':
                        {
+                        'name' : "Gravis Eliminator Aftershock",
                         'control_types' : {'01': "Button",
                                            '03': "Joystick"
                                           },
@@ -92,11 +93,23 @@ class joystick():
             if not self.dev_name:
                 raise Exception, "No valid devices found!"
         self.device = self.known_devices[self.dev_name]
+        self.name = self.device['name']
+        self.n_joysticks = 0
+        self.n_buttons = 0
+        for key,val in self.device['control_ids'].items():
+            if len(val) <= 2:
+                self.n_buttons += 1
+            elif val[-4:] == 'Horz':
+                self.n_joysticks += 1
 
     def calibrate_axis(self, control_id):
         """ Simple calibration routine for a specified joystick axis."
 
             Returns the min, max, and center values, in that order.
+
+            Example
+            -------
+            ret = j.calibrate_axis('1 Horz')
         """
         ev = []
         wait = True
@@ -167,9 +180,9 @@ class joystick():
                 For Joysticks, it will be the joystick number, followed 
                 by a space, folowed by the axis along which the change occurred.
                 Eg, "2 Horz" or "3 Vert"
-            data : str
-                The state of the change. 
-                For buttons, "1" = Down; "0" = Up
+            data : int
+                The state of the change.
+                For buttons, 1 = Down; 0 = Up
                 For joysticks, it will be an int 0 <= 255, where 127 is roughly 
                 centered, 0 is all the way to the left (or up), and 255 is fully 
                 right (or down)
