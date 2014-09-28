@@ -26,7 +26,7 @@
 
 import numpy as np
 
-def itd( signal, fs, itd ):
+def apply_itd( signal, fs, itd ):
     '''Applies an interaural time difference to a signal
 
         Convenience function to apply an itd to a signal. Accepts both 1d and 
@@ -53,7 +53,7 @@ def itd( signal, fs, itd ):
         Examples
         --------
         >>> a = np.ones(5)
-        >>> itd(a,5,400000)
+        >>> apply_itd(a,5,400000)
         array([[ 0.,  1.],
                [ 0.,  1.],
                [ 1.,  1.],
@@ -61,7 +61,7 @@ def itd( signal, fs, itd ):
                [ 1.,  1.],
                [ 1.,  0.],
                [ 1.,  0.]])
-        >>> itd(a,5,-200000)
+        >>> apply_itd(a,5,-200000)
         array([[ 1.,  0.],
                [ 1.,  1.],
                [ 1.,  1.],
@@ -94,7 +94,7 @@ def itd( signal, fs, itd ):
     return out
     
 
-def ild(signal, ild):
+def apply_ild(signal, ild):
     '''Applies an interaural level difference to a signal
 
         Convenience function to apply an ild to a signal. Accepts both 1d and 
@@ -123,13 +123,13 @@ def ild(signal, ild):
         Examples
         --------
         >>> a = np.ones(5)
-        >>> ild(a,6)
+        >>> apply_ild(a,6)
         array([[ 0.50119163,  1.        ],
                [ 0.50119163,  1.        ],
                [ 0.50119163,  1.        ],
                [ 0.50119163,  1.        ],
                [ 0.50119163,  1.        ]])
-        >>> ild(a,-12)
+        >>> apply_ild(a,-12)
         array([[ 1.        ,  0.25119305],
                [ 1.        ,  0.25119305],
                [ 1.        ,  0.25119305],
@@ -194,3 +194,4 @@ def gso(sig, rho):
     y[:,1] = rho * xL + alpha * xRstar
 
     return y
+    
