@@ -30,7 +30,7 @@ Because of the dependencies, each module must be imported specifically
 
 Modules include [dependencies in brackets]:
 
-fileio - Helper functions for reading audio data in less typical ways [medussa]
+audio - Helper functions for reading audio data in less typical ways [medussa]
 listPlayer - Standalone script to play blocks of soundfiles in folders [medussa]
 hid - Access human interface devices like joysticks [linux]
 tdt2 - Control Tucker Davis Technologies System 2 hardware from the serial port [pyserial]

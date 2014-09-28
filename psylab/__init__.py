@@ -32,12 +32,14 @@ useful.
 
 In addition to the modules that are imported automatically, others include:
 
-subject_manager: Manage subjects with a useful user interface (dep: pyqt)
-tdt2: Access Tucker Davis System II hardware via serial port (dep: pyserial)
-io: Perform tasks related to file i/o (dep: medussa)
+subject_manager: Manage subjects with a useful user interface [dep: pyqt]
+io.tdt2: Access Tucker Davis System II hardware via serial port dep: pyserial]
+io.audio: Perform tasks related to file i/o [dep: medussa]
+io.listPlayer - Standalone script to play blocks of soundfiles in folders [dep: medussa]
+io.hid - Access human interface devices like joysticks [dep: linux]
 '''
 
-__version__ = '0.4.6.0'
+__version__ = '0.4.6.1'
 
 #from dataview import dataview
 from . import tools
