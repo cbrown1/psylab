@@ -84,7 +84,7 @@ from numpy.fft import fft, ifft
 from time import sleep
 from scipy.signal import filter_design as filters, lfilter, filtfilt
 from .atten import atten
-from .binaural import itd, ild, gso
+from .binaural import apply_itd, apply_ild, gso
 from .compensate import compensate
 from .compression import compress
 from .envelope import envelope
