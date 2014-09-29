@@ -102,52 +102,71 @@ class joystick():
             elif val[-4:] == 'Horz':
                 self.n_joysticks += 1
 
-    def calibrate_axis(self, control_id):
-        """ Simple calibration routine for a specified joystick axis."
+    def calibrate_joystick(self, joystick):
+        """ Simple calibration routine for a specified joystick."
 
-            Returns the min, max, and center values, in that order.
+            Returns a tuple: (h_min, h_max, h_center, v_min, v_max, v_center)
 
             Example
             -------
-            ret = j.calibrate_axis('1 Horz')
+            ret = j.calibrate_joystick(1) # Calibrate joystick 1
         """
         ev = []
         wait = True
-        ax_min = 255
-        ax_max = 0
+        c_js_id_h = None
+        c_js_id_v = None
+        ax_h_cen = None
+        ax_h_min = 999
+        ax_h_max = -999
+        ax_v_cen = None
+        ax_v_min = 999
+        ax_v_max = -999
+        data = None
+        # Get joystick and button ids
         for key, val in self.device['control_types'].items():
             if val == 'Joystick':
-                j_id = key
+                c_js_id = key
             if val == "Button":
-                b_id = key
+                c_bt_id = key
+        # Get ids for button 1 (for exit) and for the h and v axes of specified joystick
         for key, val in self.device['control_ids'].items():
-            if val == control_id:
-                c_id = key
             if val == "1":
                 b1_id = key
-        if not c_id:
-            raise Exception, "Not a valid control_id!"
+            elif val[-4:] in ['Vert', 'Horz']:
+                n,ax = val.split(" ")
+                if int(n) == int(joystick):
+                    if ax == 'Vert':
+                        c_js_id_v = key
+                    elif ax == 'Horz':
+                        c_js_id_h = key
+        if not c_js_id_h or not c_js_id_v:
+            raise Exception, "Could not find axis info on joystick {}".format(str(joystick))
         else:
-            if control_id[-4:] == "Horz":
-                direction = "left and right"
-            else:
-                direction = "up and down"
-            print("Move {} {}, then return to center and press button {} when finished").format(control_id, direction, "1")
+            print("Move joystick {} around its perimeter, then return to center and press button {} to end.").format(str(joystick), "1")
             pipe = open(self.dev_name, 'r')
             while wait:
                 for character in pipe.read(1):
                     ev.append( '{:02X}'.format(ord(character)) )
                 if len(ev) == 8:
                     if ev[0] in self.device['control_types'].keys():
-                        if ev[0] == j_id and ev[2] == c_id:
-                            data = int(ev[4], 16)
-                            ax_min = min(ax_min, data)
-                            ax_max = max(ax_max, data)
-                        elif ev[0] == b_id and ev[2] == b1_id and ev[4] == '00':
+                        if ev[0] == c_js_id:
+                            if ev[2] == c_js_id_v:
+                                ax_v_cen = int(ev[4], 16)
+                                ax_v_min = min(ax_v_min, ax_v_cen)
+                                ax_v_max = max(ax_v_max, ax_v_cen)
+                            elif ev[2] == c_js_id_h:
+                                ax_h_cen = int(ev[4], 16)
+                                ax_h_min = min(ax_h_min, ax_h_cen)
+                                ax_h_max = max(ax_h_max, ax_h_cen)
+                        elif ev[0] == c_bt_id and ev[2] == b1_id and ev[4] == '00':
                             wait = False
                     ev = []
             pipe.close()
-            return (ax_min, ax_max, data)
+            if ax_h_min ==  999: ax_h_min = None
+            if ax_h_max == -999: ax_h_max = None
+            if ax_v_min ==  999: ax_v_min = None
+            if ax_v_max == -999: ax_v_max = None
+            return (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
 
     def debug(self, dur=15, verbose=False):
         print("debug will run for specified secs and print all joystick activity")
