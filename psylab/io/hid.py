@@ -103,7 +103,7 @@ class joystick():
                 self.n_joysticks += 1
 
     def calibrate_joystick(self, joystick):
-        """ Simple calibration routine for a specified joystick."
+        """ Simple calibration routine for the specified joystick."
 
             Returns a tuple: (h_min, h_max, h_center, v_min, v_max, v_center)
 
@@ -113,15 +113,16 @@ class joystick():
         """
         ev = []
         wait = True
+        # Control IDs for axes
         c_js_id_h = None
         c_js_id_v = None
+        # Data:
         ax_h_cen = None
         ax_h_min = 999
         ax_h_max = -999
         ax_v_cen = None
         ax_v_min = 999
         ax_v_max = -999
-        data = None
         # Get joystick and button ids
         for key, val in self.device['control_types'].items():
             if val == 'Joystick':
