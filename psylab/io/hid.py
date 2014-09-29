@@ -105,7 +105,20 @@ class joystick():
     def calibrate_joystick(self, joystick):
         """ Simple calibration routine for the specified joystick."
 
-            Returns a tuple: (h_min, h_max, h_center, v_min, v_max, v_center)
+            Returns
+            -------
+            h_min : int
+                The horizontal axis minimum (left-most)
+            h_max : int
+                The horizontal axis maximum (right-most)
+            h_center : int
+                The horizontal axis center
+            v_min : int
+                The vertical axis minimum (top-most)
+            v_max : int
+                The vertical axis minimum (bottom-most)
+            v_center : int
+                The vertical axis center
 
             Example
             -------
