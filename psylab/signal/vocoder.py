@@ -207,23 +207,23 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         return out
     
     # Compute cutoff frequencies
-    inf = f_logspace(inlo, inhi, channels)
-    outf= f_logspace(outlo, outhi, channels)
+    cfs_in = f_logspace(inlo, inhi, channels)
+    cfs_out= f_logspace(outlo, outhi, channels)
     
     # Analysis filterbank
-    sig_fb = filter_bank(signal, fs, inf)
+    sig_fb = filter_bank(signal, fs, cfs_in)
     
     # Extract envelope
-    env_cfs = np.concatenate (( np.zeros(1), np.minimum((outf[1:] - outf[:-1])/2, envfilter) ))
+    env_cfs = np.concatenate (( np.zeros(1), np.minimum((cfs_out[1:] - cfs_out[:-1])/2, envfilter) ))
     envelopes = filter_bank(np.maximum(sig_fb,0), fs, env_cfs, btype='low')
 
     # Generate carriers
     if noise:
         carrier = np.random.randn(signal.size)
         carrier = carrier/np.max(np.abs(carrier))
-        carriers = filter_bank(carrier,fs,outf)
+        carriers = filter_bank(carrier,fs,cfs_out)
     else:
-        fcarriers = (outf[1:]+outf[:-1]) / 2.
+        fcarriers = (cfs_out[1:]+cfs_out[:-1]) / 2.
         carriers = np.sin(2*np.pi * np.cumsum(np.ones((signal.size,channels))*fcarriers,axis=0) / fs)
     
     if ace:
@@ -242,7 +242,7 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         voc = carriers * envelopes
         
         # Post filter
-        voc = filter_bank(voc, fs, outf)
+        voc = filter_bank(voc, fs, cfs_out)
         
         # Equate each channel
         voc *= np.sqrt(np.mean(sig_fb**2.,axis=0)) / np.sqrt(np.mean(voc**2.,axis=0))
