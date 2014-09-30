@@ -191,5 +191,5 @@ def compression_apply(signal, gain):
     lin_gain = 10.**(gain/20.)
     
     # apply gain
-    sigout = sig * lin_gain
+    sigout = signal * lin_gain
     return sigout
