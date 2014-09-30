@@ -77,8 +77,12 @@ class joystick():
                                            '36': '7',
                                            '37': '8',
                                            '38': '9',
-                                           '39': '10'
+                                           '39': '10',
                                           },
+                        'joystick_cal' : {'1': (12, 232, 122, 17, 232, 127),
+                                          '2': (12, 232, 112, 7, 232, 132),
+                                          '3': (0,  255, 127, 0, 255, 127),
+                                         },
                        },
                    }
     def __init__(self, device=None):
@@ -94,6 +98,7 @@ class joystick():
                 raise Exception, "No valid devices found!"
         self.device = self.known_devices[self.dev_name]
         self.name = self.device['name']
+        self.joystick_cal = self.device['joystick_cal']
         self.n_joysticks = 0
         self.n_buttons = 0
         for key,val in self.device['control_ids'].items():
@@ -102,7 +107,7 @@ class joystick():
             elif val[-4:] == 'Horz':
                 self.n_joysticks += 1
 
-    def calibrate_joystick(self, joystick):
+    def calibrate_joystick(self, joystick=1):
         """ Simple calibration routine for the specified joystick."
 
             Returns
@@ -180,6 +185,8 @@ class joystick():
             if ax_h_max == -999: ax_h_max = None
             if ax_v_min ==  999: ax_v_min = None
             if ax_v_max == -999: ax_v_max = None
+            
+            self.known_devices[self.dev_name]['joystick_cal'][str(joystick)] = (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
             return (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
 
     def debug(self, dur=15, verbose=False):
@@ -199,6 +206,19 @@ class joystick():
                     ev = []
         pipe.close()
 
+    def normalize_joystick_data(self, control_id, data):
+        joystick,ax = control_id.split(" ")
+        if ax == "Horz": 
+            id_coeff = -1
+        else: 
+            id_coeff = 2
+        minim = float(self.joystick_cal[joystick][(1+id_coeff)])
+        maxim = float(self.joystick_cal[joystick][(2+id_coeff)])
+        center = float(self.joystick_cal[joystick][3+id_coeff])
+        if data > center:
+            return int((data / maxim)*(255. - center) + center)
+        else:
+            return int(((data - minim) / (center - minim)) * center)
 
     def listen(self):
         """Returns state change info of the device
@@ -231,7 +251,7 @@ class joystick():
                     control_type = self.device['control_types'][ ev[0] ]
                     if ev[2] in self.device['control_ids'].keys():
                         control_id = self.device['control_ids'][ ev[2] ]
-                        data = int(ev[4], 16)
+                        data = self.normalize_joystick_data(control_id, int(ev[4], 16))
                         wait = False
                     else:
                         # This shouldn't happen

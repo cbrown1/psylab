@@ -26,7 +26,7 @@
 
 import numpy as np
 
-def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay_audio=False, make_up=False):
+def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay_audio=False, make_up=False, return_gain_function=False):
     """Applies simple, single-channel compression to input signal sig in the
         time domain. Optionally returns the gain control signal in addition to
         the compressed signal.   
@@ -85,15 +85,17 @@ def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay
             attack time [default = False]
         make_up : bool
             If true, make-up gain is applied [default = False]
+        return_gain_function : bool
+            If True, the returned array is the gain control signal
+            If False, the returned array is the input signal with gc applied [default]
         
         Returns
         -------
         y : array
-            The compressed output signal
-        gain : array
-            The sample-by-sample gain (in dB) applied by the compressor (Note: 
-            the effect of the delay_audio option is not accounted for in the 
-            returned gain control signal)
+            Either the compressed output signal or the sample-by-sample gain 
+            (in dB) applied by the compressor (Note: the effect of the 
+            delay_audio option is not accounted for in the returned gain control 
+            signal)
 
         Notes
         -----
@@ -140,6 +142,9 @@ def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay
     # apply the compression rule to give the gain to be applied at these samples
     gain[idx] = (threshold + (d_dB[idx] - threshold) / comp_ratio) - d_dB[idx]
     
+    if return_gain_function:
+        return gain
+    
     # if required, delay the audio signal before applying the gain signal
     if delay_audio:
        sig = np.roll(sig, ndelay)
@@ -154,7 +159,7 @@ def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay
        sigout = sigout*make_up_gain
        gain +=make_up_gain
     
-    return sigout, gain
+    return sigout
 
 
 def compression_apply(signal, gain):
