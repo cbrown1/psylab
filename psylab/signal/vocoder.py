@@ -29,7 +29,7 @@ import scipy.signal
 from .tone import tone
 from .peakpick import pick_peaks
 from .zeropad import zeropad
-
+from .filter import filter_bank, freqs_logspace
 
 def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     '''Implements an envelope vocoder
@@ -170,18 +170,12 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
     envfilter = kwargs.get('envfilter', 400)
     noise = kwargs.get('noise', False)
     sumchannels = kwargs.get('sumchannels', True)
-    order = kwargs.get('order', 3)
+    order = kwargs.get('order', 6)
     compression_ratio = kwargs.get('compression_ratio', 1)
     gate = kwargs.get('gate', None)
     ace = kwargs.get('ace', None)
     nyq = fs/2.
     
-    def f_logspace(start, stop, n):
-        n_arr = np.arange(n+1)
-        interval = np.log10(stop/float(start))/float(n)
-        freqs = start*10.**(interval*n_arr)
-        return freqs
-        
     #try:
     #    # This is actually pretty slow
     #    #raise Exception
@@ -192,36 +186,23 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
     #        out = filterbank.process()
     #        return out
     #except:
-    def filter_bank(signal, fs, cfs, btype='band'):
-        if len(signal.shape) == 1:
-            out = np.tile(signal,(cfs.size-1,1)).T
-        else:
-            out = signal
-        for i in range(len(cfs)-1):
-            if btype in ['high', 'band']:
-                b_hp,a_hp=scipy.signal.filter_design.butter(order,(cfs[i]/nyq),btype='high')
-                out[:,i] = scipy.signal.lfilter(b_hp,a_hp,out[:,i])
-            if btype in ['low','band']:
-                b_lp,a_lp=scipy.signal.filter_design.butter(order,(cfs[i+1]/nyq))
-                out[:,i] = scipy.signal.lfilter(b_lp,a_lp,out[:,i])
-        return out
-    
+        
     # Compute cutoff frequencies
-    cfs_in = f_logspace(inlo, inhi, channels)
-    cfs_out= f_logspace(outlo, outhi, channels)
+    cfs_in = freqs_logspace(inlo, inhi, channels)
+    cfs_out= freqs_logspace(outlo, outhi, channels)
     
     # Analysis filterbank
-    sig_fb = filter_bank(signal, fs, cfs_in)
+    sig_fb = filter_bank(signal, fs, order, cfs_in)
     
     # Extract envelope
     env_cfs = np.concatenate (( np.zeros(1), np.minimum((cfs_out[1:] - cfs_out[:-1])/2, envfilter) ))
-    envelopes = filter_bank(np.maximum(sig_fb,0), fs, env_cfs, btype='low')
+    envelopes = filter_bank(np.maximum(sig_fb,0), fs, order, env_cfs, btype='low')
 
     # Generate carriers
     if noise:
         carrier = np.random.randn(signal.size)
         carrier = carrier/np.max(np.abs(carrier))
-        carriers = filter_bank(carrier,fs,cfs_out)
+        carriers = filter_bank(carrier,fs,order,cfs_out)
     else:
         fcarriers = (cfs_out[1:]+cfs_out[:-1]) / 2.
         carriers = np.sin(2*np.pi * np.cumsum(np.ones((signal.size,channels))*fcarriers,axis=0) / fs)
@@ -242,7 +223,7 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         voc = carriers * envelopes
         
         # Post filter
-        voc = filter_bank(voc, fs, cfs_out)
+        voc = filter_bank(voc, fs, order, cfs_out)
         
         # Equate each channel
         voc *= np.sqrt(np.mean(sig_fb**2.,axis=0)) / np.sqrt(np.mean(voc**2.,axis=0))

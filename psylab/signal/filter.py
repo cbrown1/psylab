@@ -97,6 +97,8 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
         if btype in ['low','band']:
             b_lp,a_lp=scipy.signal.filter_design.butter(order[i],(cfs[i+1]/nyq))
             out[:,i] = scipy.signal.lfilter(b_lp,a_lp,out[:,i])
+    if len(cfs) == 2:
+        out = out.flatten()
     return out
 
 
