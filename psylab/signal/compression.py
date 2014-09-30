@@ -188,7 +188,7 @@ def compression_apply(signal, gain):
         Research, Nottingham
     """
     # convert sample-by-sample gain in dB to array of linear scale factors
-    lin_gain = 10.^(gain/20)
+    lin_gain = 10.**(gain/20.)
     
     # apply gain
     sigout = sig * lin_gain

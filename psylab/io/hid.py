@@ -207,10 +207,13 @@ class joystick():
         pipe.close()
 
     def normalize_joystick_data(self, control_id, data):
+        """Scales the value in data to the range 0 >= 255, 
+            based on the calibration values for the specified control.
+        """
         joystick,ax = control_id.split(" ")
-        if ax == "Horz": 
+        if ax == "Horz":
             id_coeff = -1
-        else: 
+        else:
             id_coeff = 2
         minim = float(self.joystick_cal[joystick][(1+id_coeff)])
         maxim = float(self.joystick_cal[joystick][(2+id_coeff)])
