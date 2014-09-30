@@ -112,6 +112,7 @@ def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay
     # release times (corresponding to 1/e time constants of the peak detector)
     alpha = np.exp(-1. / ((attack/1000.)*fs))
     beta = np.exp(-1. / ((release/1000.)*fs))
+    aConst = (1-alpha)
 
     if delay_audio:
        ndelay = np.round((attack/1000.)*fs/2)
@@ -121,11 +122,12 @@ def compress(sig, fs, threshold, comp_ratio, attack, release, ref_spl=110, delay
     d = np.zeros_like(sig)
     # loop to calculate peak detector output over the duration of the signal
     # (note that first sample of peak detector output is always zero here)
-    for n in range(1, len(sig)):
-        if np.abs(sig[n]) >= d[n-1]:
-            d[n] = alpha*d[n-1] + (1-alpha)*np.abs(sig[n])
+    for thisPtr in range( 1, len( sig ) ):
+        prevPtr = thisPtr - 1
+        if ( sig[ thisPtr] < d[prevPtr] ):
+            d[  thisPtr] = d[prevPtr] * beta
         else:
-            d[n] = beta*d[n-1]
+            d[  thisPtr] = d[prevPtr] * alpha + ( sig[thisPtr] * aConst )
 
     # calculate peak detector output level in dB SPL
     d_dB = threshold + 20.*np.log10(d / thresh_peff)
