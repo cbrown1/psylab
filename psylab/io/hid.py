@@ -25,6 +25,7 @@
 
 import sys, os
 import time
+import numpy as np
 
 class joystick():
     """Class to access joystick data on linux with no dependencies
@@ -85,6 +86,8 @@ class joystick():
                                          },
                        },
                    }
+    
+    
     def __init__(self, device=None):
         if device:
             self.dev_name = device
@@ -101,11 +104,17 @@ class joystick():
         self.joystick_cal = self.device['joystick_cal']
         self.n_joysticks = 0
         self.n_buttons = 0
+        for key,val in self.device['control_types'].items():
+            if val == 'Joystick':
+                self.id_joystick = key
+            elif val == 'Button':
+                self.id_button = key
         for key,val in self.device['control_ids'].items():
             if len(val) <= 2:
                 self.n_buttons += 1
             elif val[-4:] == 'Horz':
                 self.n_joysticks += 1
+
 
     def calibrate_joystick(self, joystick=1):
         """ Simple calibration routine for the specified joystick."
@@ -131,9 +140,6 @@ class joystick():
         """
         ev = []
         wait = True
-        # Control IDs for axes
-        c_js_id_h = None
-        c_js_id_v = None
         # Data:
         ax_h_cen = None
         ax_h_min = 999
@@ -141,17 +147,11 @@ class joystick():
         ax_v_cen = None
         ax_v_min = 999
         ax_v_max = -999
-        # Get joystick and button ids
-        for key, val in self.device['control_types'].items():
-            if val == 'Joystick':
-                c_js_id = key
-            if val == "Button":
-                c_bt_id = key
         # Get ids for button 1 (for exit) and for the h and v axes of specified joystick
         for key, val in self.device['control_ids'].items():
             if val == "1":
                 b1_id = key
-            elif val[-4:] in ['Vert', 'Horz']:
+            elif len(val) > 2 and val[-4:] in ['Vert', 'Horz']:
                 n,ax = val.split(" ")
                 if int(n) == int(joystick):
                     if ax == 'Vert':
@@ -168,7 +168,7 @@ class joystick():
                     ev.append( '{:02X}'.format(ord(character)) )
                 if len(ev) == 8:
                     if ev[0] in self.device['control_types'].keys():
-                        if ev[0] == c_js_id:
+                        if ev[0] == self.id_joystick:
                             if ev[2] == c_js_id_v:
                                 ax_v_cen = int(ev[4], 16)
                                 ax_v_min = min(ax_v_min, ax_v_cen)
@@ -177,7 +177,7 @@ class joystick():
                                 ax_h_cen = int(ev[4], 16)
                                 ax_h_min = min(ax_h_min, ax_h_cen)
                                 ax_h_max = max(ax_h_max, ax_h_cen)
-                        elif ev[0] == c_bt_id and ev[2] == b1_id and ev[4] == '00':
+                        elif ev[0] == self.id_button and ev[2] == b1_id and ev[4] == '00':
                             wait = False
                     ev = []
             pipe.close()
@@ -188,6 +188,7 @@ class joystick():
             
             self.known_devices[self.dev_name]['joystick_cal'][str(joystick)] = (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
             return (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
+
 
     def debug(self, dur=15, verbose=False):
         print("debug will run for specified secs and print all joystick activity")
@@ -206,6 +207,7 @@ class joystick():
                     ev = []
         pipe.close()
 
+
     def normalize_joystick_data(self, control_id, data):
         """Scales the value in data to the range 0 >= 255, 
             based on the calibration values for the specified control.
@@ -219,9 +221,10 @@ class joystick():
         maxim = float(self.joystick_cal[joystick][(2+id_coeff)])
         center = float(self.joystick_cal[joystick][3+id_coeff])
         if data > center:
-            return int((data / maxim)*(255. - center) + center)
+            return np.minimum(int((data / maxim)*(255. - center) + center), 255)
         else:
-            return int(((data - minim) / (center - minim)) * center)
+            return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
+
 
     def listen(self):
         """Returns state change info of the device
@@ -254,7 +257,9 @@ class joystick():
                     control_type = self.device['control_types'][ ev[0] ]
                     if ev[2] in self.device['control_ids'].keys():
                         control_id = self.device['control_ids'][ ev[2] ]
-                        data = self.normalize_joystick_data(control_id, int(ev[4], 16))
+                        data = int(ev[4], 16)
+                        if ev[0] == self.id_joystick:
+                            data = self.normalize_joystick_data(control_id, data)
                         wait = False
                     else:
                         # This shouldn't happen
