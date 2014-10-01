@@ -117,7 +117,10 @@ class joystick():
 
 
     def calibrate_joystick(self, joystick=1):
-        """ Simple calibration routine for the specified joystick."
+        """ Simple calibration routine for the specified joystick.
+        
+            Returns the calibration data as a tuple, and also stores and uses 
+            it (cal data are applied by default).
 
             Returns
             -------
@@ -226,8 +229,14 @@ class joystick():
             return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
 
 
-    def listen(self):
+    def listen(self, cal=True):
         """Returns state change info of the device
+        
+            Parameters
+            ----------
+            cal : bool
+                Whether to return normalized (calibrated) joystick data. 
+                [default = True]
             
             Returns
             -------
@@ -258,7 +267,7 @@ class joystick():
                     if ev[2] in self.device['control_ids'].keys():
                         control_id = self.device['control_ids'][ ev[2] ]
                         data = int(ev[4], 16)
-                        if ev[0] == self.id_joystick:
+                        if ev[0] == self.id_joystick and cal:
                             data = self.normalize_joystick_data(control_id, data)
                         wait = False
                     else:
