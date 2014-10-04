@@ -40,6 +40,29 @@ from frontends import term # FIXME: old line (from .frontends import term) was s
 # wrapper = textwrap.TextWrapper(initial_indent="# ", subsequent_indent="# ")
 # But where to put it? Should the datafile header be created automatically? 
 
+#TODO: Modularize/standardize input methods. 
+# That is, implement modular, reuseable input methods that can be 
+# attached to gui forms with support for callbacks (instead of polling):
+# Single-key keyboard input [numeric only or ascii]
+# Multi-key keyboard input [numeric only or ascii]
+# Mouse click input
+# Joystick input
+# etc
+# The idea is you could have a single callback in your experiment script which 
+# gets called everytime a registered imput method is used (keypress, etc). 
+# Experimenter could then check for method and value in the callback function:
+# def response(ev):
+#     if ev.method = 'keypress' and ev.val = '2':
+#        # Got valid response
+
+
+# TODO: Implement experiment templates, which are typical combinations of 
+# experimental classes (forms, input methods, datafile formats, psychophysical 
+# procedures, etc). The templates would work like methods, with relevant 
+# functions implemented as needed (pre_exp, etc) and inserted and run between 
+# method and experiment script functions. They would drastically simplify the 
+# experiment script, ideally down to a few settings in setup, and stimgen. 
+
 class exp:
     """Experimental settings
     """
