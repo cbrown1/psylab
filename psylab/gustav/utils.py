@@ -63,6 +63,11 @@ from frontends import term # FIXME: old line (from .frontends import term) was s
 # method and experiment script functions. They would drastically simplify the 
 # experiment script, ideally down to a few settings in setup, and stimgen. 
 
+# TODO: Prepend all exp.vars that are 'known' to gustav (ie., called by name in 
+# utils) with an underscore,to differentiate them from exp.vars that are 
+# optional (eg., exp.validKeys). Alternative is to put optional vars into 
+# exp.exp, but this seems lame.
+
 class exp:
     """Experimental settings
     """

@@ -85,7 +85,24 @@ class joystick():
                                           '3': (0,  255, 127, 0, 255, 127),
                                          },
                        },
-                   }
+                       '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
+                       {
+                        'name' : "Atari 2600 Paddles",
+                        'control_types' : {'01': "Button",
+                                           '03': "Joystick"
+                                          },
+                        'control_ids' :   {'00': '1 Horz', # Joysticks
+                                           '01': '2 Horz',
+                                           '20': '1', # Buttons
+                                           '28': '2',
+                                          },
+                        'joystick_cal' : {'1': (12, 232, 122, 17, 232, 127),
+                                          '2': (12, 232, 112, 7, 232, 132),
+                                          '3': (0,  255, 127, 0, 255, 127),
+                                         },
+                       },
+                       
+                       }
     
     
     def __init__(self, device=None):
