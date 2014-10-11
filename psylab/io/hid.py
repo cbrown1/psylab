@@ -30,7 +30,12 @@ import numpy as np
 class joystick():
     """Class to access joystick data on linux with no dependencies
         
-        You will need to find the values for your hardware.
+        You will need to find the values for your hardware. You can use 
+        joystick.debug to help. 
+        
+        This approach will only work with older-style joysticks. It does not 
+        work with xinput and perhaps some other newer types. If it shows up
+        in /dev/input/by-id/, it should work. 
         
         Example
         -------
@@ -57,8 +62,9 @@ class joystick():
         ------------
         linux OS
     """
-    known_devices =  {'/dev/input/by-id/usb-Gravis_Eliminator_AfterShock-event-joystick':
-                       {
+    known_devices =  {
+                        '/dev/input/by-id/usb-Gravis_Eliminator_AfterShock-event-joystick':
+                        {
                         'name' : "Gravis Eliminator Aftershock",
                         'control_types' : {'01': "Button",
                                            '03': "Joystick"
@@ -80,11 +86,13 @@ class joystick():
                                            '38': '9',
                                            '39': '10',
                                           },
-                        'joystick_cal' : {'1': (12, 232, 122, 17, 232, 127),
-                                          '2': (12, 232, 112, 7, 232, 132),
-                                          '3': (0,  255, 127, 0, 255, 127),
+                                              # H-Low, H-Hi, H-C, V-Lo, V-Hi, V-C
+                        'joystick_cal' : {'1': (12,    232,  122, 17,   232,  127),
+                                          '2': (12,    232,  112, 7,    232,  132),
+                                          '3': (0,     255,  127, 0,    255,  127),
                                          },
                        },
+                       
                        '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
                        {
                         'name' : "Atari 2600 Paddles",
@@ -96,10 +104,7 @@ class joystick():
                                            '20': '1', # Buttons
                                            '28': '2',
                                           },
-                        'joystick_cal' : {'1': (12, 232, 122, 17, 232, 127),
-                                          '2': (12, 232, 112, 7, 232, 132),
-                                          '3': (0,  255, 127, 0, 255, 127),
-                                         },
+                        'joystick_cal' : None, #Paddles seem to work better without calibration
                        },
                        
                        }
@@ -284,7 +289,7 @@ class joystick():
                     if ev[2] in self.device['control_ids'].keys():
                         control_id = self.device['control_ids'][ ev[2] ]
                         data = int(ev[4], 16)
-                        if ev[0] == self.id_joystick and cal:
+                        if ev[0] == self.id_joystick and cal and self.device['joystick_cal']:
                             data = self.normalize_joystick_data(control_id, data)
                         wait = False
                     else:
