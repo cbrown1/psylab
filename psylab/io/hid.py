@@ -93,6 +93,33 @@ class joystick():
                                          },
                        },
                        
+                        '/dev/input/by-id/usb-Microntek_USB_Joystick-event-joystick':
+                        {
+                        'name' : "USB Gamepad",
+                        'control_types' : {'01': "Button",
+                                           '03': "Joystick"
+                                          },
+                        'control_ids' :   {'00': '1 Horz', # Joysticks
+                                           '01': '1 Vert',
+                                           '02': '2 Horz',
+                                           '05': '2 Vert',
+                                           '10': '3 Horz',
+                                           '11': '3 Vert',
+                                           '20': '1', # Buttons
+                                           '21': '2',
+                                           '22': '3',
+                                           '23': '4',
+                                           '24': '5',
+                                           '25': '6',
+                                           '26': '7',
+                                           '27': '8',
+                                           '28': '9',
+                                           '29': '10',
+                                           '2A': '11',
+                                           '2B': '12',
+                                          },
+                        'joystick_cal' : None, 
+                       },
                        '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
                        {
                         'name' : "Atari 2600 Paddles",
@@ -297,5 +324,6 @@ class joystick():
                         ev = []
                 else:
                     ev = []
+#            time.sleep(.001)
         pipe.close()
         return (control_type, control_id, data)
