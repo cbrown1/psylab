@@ -28,6 +28,7 @@ plot_tools - A set of helper functions for formatting matplotlib figures
 """
 
 from matplotlib import pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 colors_asu = {}
@@ -50,6 +51,77 @@ font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 def update_plotline(line, x, y):
     line.set_data(x, y)
     line.get_axes().get_figure().canvas.draw()
+
+
+class data_interaction():
+    """Simple class to help view data interactively
+    
+        It will generate a matplotlib figure with a slider for each variable 
+        specified, having a number of ticks equal to the number of 
+        levels for that variable. 
+        
+        The usecase for this is when you have multiple levels of multiple 
+        variables, and it would be useful to see how your data change as 
+        the levels do. So in your callback, you can update a figure with 
+        new data based on the current variable levels, and then as you slide
+        the sliders, the figure will be updated. 
+        
+        Parameters
+        ----------
+        data: dict
+            dict with variable names as keys and lists of levels as vals. 
+        callback: function
+            The name of a function to call when a slider is moved. should 
+            accept a dict that will contain variable names as keys and the 
+            current variable levels as vals.
+            
+        Example
+        -------
+        # Assume raw_data is a pandas object with variables 'color',
+        # 'position', 'quality', and 'Resp'
+        >>> keyvals = {'color': ['red','blue','green'], 
+                       'position': ['left','right','center','up','down'],
+                       'quality': ['good','bad']}
+        >>> data = raw_data.copy()  # Make an intial plot
+        >>> for key,val in keyvals.iteritems():
+                data = data[ data[key] == val[0] ]
+        >>> p, = plt.plot(data['Resp'])
+        >>> update(current): # function will run everytime a slider is updated
+                data = raw_data.copy()
+                # Filter data to include only current levels
+                for key,val in current.iteritems:
+                    data = data[ data[ key ] == val ]
+                p.set_ydata(data['Resp'])
+                p.axes.figure.canvas.draw_idle()
+        >>> d = data_interaction(keyvals, update)
+    """
+
+    def __init__(self, vars_vals_dict, callback):
+        self.vars_vals = vars_vals_dict
+        self.callback = callback
+        tb = mpl.rcParams['toolbar']
+        mpl.rcParams['toolbar'] = 'None'
+        self.fig, self.axs = plt.subplots(len(vars_vals_dict), 1, sharex=True, figsize=(3, .5*len(vars_vals_dict)))
+        self.fig.canvas.set_window_title("Data x")
+        mpl.rcParams['toolbar'] = tb
+        self.fig.subplots_adjust(left=0.25, right=0.75, hspace = 0.1)
+
+        self.sliders = []
+        for i in range(len(self.vars_vals)):
+            key = self.vars_vals.keys()[i]
+            n = len(self.vars_vals[key])
+            sl = mpl.widgets.Slider(self.axs[i], key, valmin=0, valmax=n-1, dragging=True)
+            sl.on_changed(self.update)
+            self.sliders.append(sl)
+
+    def update(self, val):
+        current_vals = {}
+        for i in range(len(self.vars_vals)):
+            key = self.vars_vals.keys()[i]
+            val = self.vars_vals[ key ][int(self.sliders[i].val)]
+            current_vals[key] = val
+            self.sliders[i].valtext.set_text(val)
+        self.callback(current_vals)
 
 
 def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None, dpi=None):
