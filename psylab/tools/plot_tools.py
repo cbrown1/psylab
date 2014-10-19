@@ -110,7 +110,8 @@ class data_interaction():
         for i in range(len(self.vars_vals)):
             key = self.vars_vals.keys()[i]
             n = len(self.vars_vals[key])
-            sl = Slider(self.axs[i], key, valmin=0, valmax=n-1, dragging=True, valfmt="None")
+            # TODO: All sliders end up with the same max here
+            sl = Slider(self.axs[i], key, 0., 100., valfmt="None")
             sl.on_changed(self.update)
             sl.valtext.set_text(self.vars_vals[key][0])
             self.sliders.append(sl)
@@ -119,7 +120,8 @@ class data_interaction():
         current_vals = {}
         for i in range(len(self.vars_vals)):
             key = self.vars_vals.keys()[i]
-            val = self.vars_vals[ key ][int(self.sliders[i].val)]
+            v = int((self.sliders[i].val / 100.) * len(self.vars_vals[key])-1)
+            val = self.vars_vals[ key ][v]
             current_vals[key] = val
             self.sliders[i].valtext.set_text(val)
         self.callback(current_vals)
@@ -534,7 +536,6 @@ class Slider(AxesWidget):
         knob.  See the :class:`matplotlib.patches.Rectangle` documentation
         valid property names (e.g., *facecolor*, *edgecolor*, *alpha*, ...)
         """
-        print ('yes')
         AxesWidget.__init__(self, ax)
 
         self.valmin = valmin
