@@ -110,8 +110,9 @@ class data_interaction():
         for i in range(len(self.vars_vals)):
             key = self.vars_vals.keys()[i]
             n = len(self.vars_vals[key])
-            sl = mpl.widgets.Slider(self.axs[i], key, valmin=0, valmax=n-1, dragging=True)
+            sl = Slider(self.axs[i], key, valmin=0, valmax=n-1, dragging=True, valfmt="None")
             sl.on_changed(self.update)
+            sl.valtext.set_text(self.vars_vals[key][0])
             self.sliders.append(sl)
 
     def update(self, val):
@@ -421,3 +422,238 @@ def plot_discrete_signal(x,y):
     plt.plot(x,y,'ko')
     plt.vlines(pos,zp,y[pos])
     plt.vlines(neg,zn,y[neg])
+
+
+class Widget(object):
+    """
+    Abstract base class for GUI neutral widgets
+    """
+    drawon = True
+    eventson = True
+
+
+class AxesWidget(Widget):
+    """Widget that is connected to a single :class:`~matplotlib.axes.Axes`.
+
+    Attributes:
+
+    *ax* : :class:`~matplotlib.axes.Axes`
+        The parent axes for the widget
+    *canvas* : :class:`~matplotlib.backend_bases.FigureCanvasBase` subclass
+        The parent figure canvas for the widget.
+    *active* : bool
+        If False, the widget does not respond to events.
+    """
+    def __init__(self, ax):
+        self.ax = ax
+        self.canvas = ax.figure.canvas
+        self.cids = []
+        self.active = True
+
+    def connect_event(self, event, callback):
+        """Connect callback with an event.
+
+        This should be used in lieu of `figure.canvas.mpl_connect` since this
+        function stores call back ids for later clean up.
+        """
+        cid = self.canvas.mpl_connect(event, callback)
+        self.cids.append(cid)
+
+    def disconnect_events(self):
+        """Disconnect all events created by this widget."""
+        for c in self.cids:
+            self.canvas.mpl_disconnect(c)
+
+    def ignore(self, event):
+        """Return True if event should be ignored.
+
+        This method (or a version of it) should be called at the beginning
+        of any event callback.
+        """
+        return not self.active
+
+
+class Slider(AxesWidget):
+    """
+    A slider representing a floating point range
+
+    The following attributes are defined
+      *ax*        : the slider :class:`matplotlib.axes.Axes` instance
+
+      *val*       : the current slider value
+
+      *vline*     : a :class:`matplotlib.lines.Line2D` instance
+                     representing the initial value of the slider
+
+      *poly*      : A :class:`matplotlib.patches.Polygon` instance
+                     which is the slider knob
+
+      *valfmt*    : the format string for formatting the slider text
+
+      *label*     : a :class:`matplotlib.text.Text` instance
+                     for the slider label
+
+      *closedmin* : whether the slider is closed on the minimum
+
+      *closedmax* : whether the slider is closed on the maximum
+
+      *slidermin* : another slider - if not *None*, this slider must be
+                     greater than *slidermin*
+
+      *slidermax* : another slider - if not *None*, this slider must be
+                     less than *slidermax*
+
+      *dragging*  : allow for mouse dragging on slider
+
+    Call :meth:`on_changed` to connect to the slider event
+    """
+    def __init__(self, ax, label, valmin, valmax, valinit=0.5, valfmt='%1.2f',
+                 closedmin=True, closedmax=True, slidermin=None, slidermax=None,
+                 dragging=True, **kwargs):
+        """
+        Create a slider from *valmin* to *valmax* in axes *ax*
+
+        *valinit*
+            The slider initial position
+
+        *label*
+            The slider label
+
+        *valfmt*
+            Used to format the slider value
+
+        *closedmin* and *closedmax*
+            Indicate whether the slider interval is closed
+
+        *slidermin* and *slidermax*
+            Used to constrain the value of this slider to the values
+            of other sliders.
+
+        additional kwargs are passed on to ``self.poly`` which is the
+        :class:`matplotlib.patches.Rectangle` which draws the slider
+        knob.  See the :class:`matplotlib.patches.Rectangle` documentation
+        valid property names (e.g., *facecolor*, *edgecolor*, *alpha*, ...)
+        """
+        print ('yes')
+        AxesWidget.__init__(self, ax)
+
+        self.valmin = valmin
+        self.valmax = valmax
+        self.val = valinit
+        self.valinit = valinit
+        self.poly = ax.axvspan(valmin,valinit,0,1, **kwargs)
+
+        self.vline = ax.axvline(valinit,0,1, color='r', lw=1)
+
+
+        self.valfmt=valfmt
+        ax.set_yticks([])
+        ax.set_xlim((valmin, valmax))
+        ax.set_xticks([])
+        ax.set_navigate(False)
+
+        self.connect_event('button_press_event', self._update)
+        self.connect_event('button_release_event', self._update)
+        if dragging:
+            self.connect_event('motion_notify_event', self._update)
+        self.label = ax.text(-0.02, 0.5, label, transform=ax.transAxes,
+                             verticalalignment='center',
+                             horizontalalignment='right')
+
+        if self.valfmt == "None":
+            self.valtext = ax.text(1.02, 0.5, " ",
+                                   transform=ax.transAxes,
+                                   verticalalignment='center',
+                                   horizontalalignment='left')
+        else:
+            self.valtext = ax.text(1.02, 0.5, valfmt%valinit,
+                                   transform=ax.transAxes,
+                                   verticalalignment='center',
+                                   horizontalalignment='left')
+
+        self.cnt = 0
+        self.observers = {}
+
+        self.closedmin = closedmin
+        self.closedmax = closedmax
+        self.slidermin = slidermin
+        self.slidermax = slidermax
+        self.drag_active  = False
+
+    def _update(self, event):
+        'update the slider position'
+        if self.ignore(event):
+            return
+
+        if event.button != 1:
+            return
+
+        if event.name == 'button_press_event' and event.inaxes == self.ax:
+            self.drag_active = True
+            event.canvas.grab_mouse(self.ax)
+
+        if not self.drag_active:
+            return
+
+        elif ((event.name == 'button_release_event')
+             or (event.name == 'button_press_event' and event.inaxes != self.ax)):
+            self.drag_active = False
+            event.canvas.release_mouse(self.ax)
+            return
+
+        val = event.xdata
+        if val <= self.valmin:
+            if not self.closedmin:
+                return
+            val = self.valmin
+        elif val >= self.valmax:
+            if not self.closedmax:
+                return
+            val = self.valmax
+
+        if self.slidermin is not None and val <= self.slidermin.val:
+            if not self.closedmin:
+                return
+            val = self.slidermin.val
+
+        if self.slidermax is not None and val >= self.slidermax.val:
+            if not self.closedmax:
+                return
+            val = self.slidermax.val
+
+        self.set_val(val)
+
+    def set_val(self, val):
+        xy = self.poly.xy
+        xy[2] = val, 1
+        xy[3] = val, 0
+        self.poly.xy = xy
+        if self.valfmt is not "None":
+            self.valtext.set_text(self.valfmt%val)
+        if self.drawon: self.ax.figure.canvas.draw()
+        self.val = val
+        if not self.eventson: return
+        for cid, func in self.observers.iteritems():
+            func(val)
+
+    def on_changed(self, func):
+        """
+        When the slider value is changed, call *func* with the new
+        slider position
+
+        A connection id is returned which can be used to disconnect
+        """
+        cid = self.cnt
+        self.observers[cid] = func
+        self.cnt += 1
+        return cid
+
+    def disconnect(self, cid):
+        'remove the observer with connection id *cid*'
+        try: del self.observers[cid]
+        except KeyError: pass
+
+    def reset(self):
+        "reset the slider to the initial value if needed"
+        if (self.val != self.valinit):
+            self.set_val(self.valinit)
