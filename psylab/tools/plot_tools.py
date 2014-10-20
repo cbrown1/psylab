@@ -53,18 +53,23 @@ def update_plotline(line, x, y):
     line.get_axes().get_figure().canvas.draw()
 
 
-class data_interaction():
-    """Simple class to help view data interactively
+class slider_array():
+    """Provide a set of sliders to manipulate the levels of a set of variables
     
-        It will generate a matplotlib figure with a slider for each variable 
-        specified, having a number of ticks equal to the number of 
-        levels for that variable. 
+        Given a dict with variable names as keys and lists of levels as vals, 
+        this class provides a matplotlib figure with a slider for each 
+        variable specified, each having a number of ticks equal to the number 
+        of levels for that variable.
         
-        The usecase for this is when you have multiple levels of multiple 
-        variables, and it would be useful to see how your data change as 
-        the levels do. So in your callback, you can update a figure with 
-        new data based on the current variable levels, and then as you slide
-        the sliders, the figure will be updated. 
+        You also specify a callback function, which recevies an updated dict
+        of vars and current levels whenever a slider is moved. 
+        
+        One usecase for this is for interacting with factorial data. Suppose 
+        you have multiple levels of multiple factorialized variables, and it 
+        would be useful to see how your data change as the levels do. You can 
+        specify a callback in which you would update a figure with new data 
+        based on the current combination of variable levels, and then as you 
+        slide the sliders, the figure will be updated. 
         
         Parameters
         ----------
@@ -93,35 +98,41 @@ class data_interaction():
                     data = data[ data[ key ] == val ]
                 p.set_ydata(data['Resp'])
                 p.axes.figure.canvas.draw_idle()
-        >>> d = data_interaction(keyvals, update)
+        >>> d = slider_array(keyvals, update)
     """
 
-    def __init__(self, vars_vals_dict, callback):
-        self.vars_vals = vars_vals_dict
+    def __init__(self, vars_dict, callback):
+        self.vars_dict = vars_dict
+        self.keys = []
+        self.vals = []
+        for key, val in vars_dict.iteritems():
+            self.keys.append(key)
+            self.vals.append(val)
         self.callback = callback
         tb = mpl.rcParams['toolbar']
         mpl.rcParams['toolbar'] = 'None'
-        self.fig, self.axs = plt.subplots(len(vars_vals_dict), 1, sharex=True, figsize=(3, .5*len(vars_vals_dict)))
+        self.fig, self.axs = plt.subplots(len(self.keys), 1, sharex=True, figsize=(3, .5*len(self.vals)))
         self.fig.canvas.set_window_title("Data x")
         mpl.rcParams['toolbar'] = tb
         self.fig.subplots_adjust(left=0.25, right=0.75, hspace = 0.1)
 
         self.sliders = []
-        for i in range(len(self.vars_vals)):
-            key = self.vars_vals.keys()[i]
-            n = len(self.vars_vals[key])
-            # TODO: All sliders end up with the same max here
+        for i in range(len(self.keys)):
+            key = self.keys[i]
+            n = len(self.vals[i])
             sl = Slider(self.axs[i], key, 0., 100., valfmt="None")
             sl.on_changed(self.update)
-            sl.valtext.set_text(self.vars_vals[key][0])
+            sl.valtext.set_text(self.vals[i][0])
             self.sliders.append(sl)
 
     def update(self, val):
         current_vals = {}
-        for i in range(len(self.vars_vals)):
-            key = self.vars_vals.keys()[i]
-            v = int((self.sliders[i].val / 100.) * len(self.vars_vals[key])-1)
-            val = self.vars_vals[ key ][v]
+        for i in range(len(self.keys)):
+            key = self.keys[i]
+            v = ( (self.sliders[i].val / 100.) * (len(self.vals[i])-1) )
+            v = np.maximum(v,0)
+            v = np.minimum(int(round(v)), len(self.vals[i])- (1/ len(self.vals[i])))
+            val = self.vals[i][v]
             current_vals[key] = val
             self.sliders[i].valtext.set_text(val)
         self.callback(current_vals)
