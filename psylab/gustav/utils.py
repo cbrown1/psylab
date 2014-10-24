@@ -29,16 +29,11 @@ import socket
 import datetime
 import codecs
 import types
-import textwrap
 import collections
 from time import sleep
 from inspect import getmembers
 from functools import reduce
 from frontends import term # FIXME: old line (from .frontends import term) was suddenly not working on py2.7/win7
-
-# TODO: use textwrap to format exp.note for datafile:
-# wrapper = textwrap.TextWrapper(initial_indent="# ", subsequent_indent="# ")
-# But where to put it? Should the datafile header be created automatically? 
 
 #TODO: Modularize/standardize input methods. 
 # That is, implement modular, reuseable input methods that can be 
@@ -624,7 +619,7 @@ def get_expanded_vals_in_string(instr, exp):
 
     outstr = instr.replace("$name", exp.name)
     outstr = outstr.replace("$note", exp.note)
-    outstr = outstr.replace("$comment", exp.comments)
+    outstr = outstr.replace("$comments", "\n# ".join(exp.comments.split('\n')) )
     outstr = outstr.replace("$host", exp.host)
     outstr = outstr.replace("$subj", exp.subjID)
     outstr = outstr.replace("$trial_block", str(exp.run.trials_block+1))

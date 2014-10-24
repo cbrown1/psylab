@@ -133,6 +133,19 @@ class joystick():
                                           },
                         'joystick_cal' : None, #Paddles seem to work better without calibration
                        },
+                       '/dev/input/by-id/usb-retronicdesign.com_Retro_Joystick_Adapter_v3.0_000000-event-joystick':
+                       {
+                        'name' : "Atari 2600 Joystick",
+                        'control_types' : {'01': "Button",
+                                           '03': "Joystick"
+                                          },
+                        'control_ids' :   {'00': '1 Horz', # Joysticks
+                                           '01': '2 Horz',
+                                           '20': '1', # Buttons
+                                           '28': '2',
+                                          },
+                        'joystick_cal' : None, #Paddles seem to work better without calibration
+                       },
                        
                        }
     
@@ -243,7 +256,7 @@ class joystick():
 
 
     def debug(self, dur=15, verbose=False):
-        print("debug will run for specified secs and print all joystick activity")
+        print("debug will run for {:} secs and print all activity on device: {}".format(dur, self.name))
         start = time.time()
         ev = []
         pipe = open(self.dev_name, 'r')
@@ -258,6 +271,7 @@ class joystick():
                             print("Control type: {} | Control id: {} | Data: {}".format(ev[0], ev[2], ev[4]))
                     ev = []
         pipe.close()
+        print("debug done")
 
 
     def normalize_joystick_data(self, control_id, data):
