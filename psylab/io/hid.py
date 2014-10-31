@@ -24,6 +24,7 @@
 #
 
 import sys, os
+import select
 import time
 import numpy as np
 
@@ -166,6 +167,7 @@ class joystick():
         self.joystick_cal = self.device['joystick_cal']
         self.n_joysticks = 0
         self.n_buttons = 0
+        self.pipe = None
         for key,val in self.device['control_types'].items():
             if val == 'Joystick':
                 self.id_joystick = key
@@ -291,6 +293,18 @@ class joystick():
         else:
             return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
 
+    def start(self):
+        self.pipe = open(self.dev_name, 'r')
+        # remove any pending events
+        while 1:
+            (r, w, e) = select.select([self.pipe], [], [], 0)
+            if not r:
+                break
+            c = self.pipe.read(8)
+
+    def stop(self):
+        self.pipe.close()
+        self.pipe = None
 
     def listen(self, cal=True):
         """Returns state change info of the device
@@ -319,25 +333,26 @@ class joystick():
                 right (or down)
         """
         ev = []
-        wait = True
-        pipe = open(self.dev_name, 'r')
-        while wait:
-            for character in pipe.read(1):
+        ret = None,None,None
+        if not self.pipe:
+            self.start()
+        (r, w, e) = select.select([self.pipe], [], [], 0)
+        if r:
+            c = self.pipe.read(8)
+            ev = []
+            for character in c:
                 ev.append( '{:02X}'.format(ord(character)) )
-            if len(ev) == 8:
-                if ev[0] in self.device['control_types'].keys():
-                    control_type = self.device['control_types'][ ev[0] ]
-                    if ev[2] in self.device['control_ids'].keys():
-                        control_id = self.device['control_ids'][ ev[2] ]
-                        data = int(ev[4], 16)
-                        if ev[0] == self.id_joystick and cal and self.device['joystick_cal']:
-                            data = self.normalize_joystick_data(control_id, data)
-                        wait = False
-                    else:
-                        # This shouldn't happen
-                        ev = []
+            if ev[0] in self.device['control_types'].keys():
+                control_type = self.device['control_types'][ ev[0] ]
+                if ev[2] in self.device['control_ids'].keys():
+                    control_id = self.device['control_ids'][ ev[2] ]
+                    data = int(ev[4], 16)
+                    if ev[0] == self.id_joystick and cal and self.device['joystick_cal']:
+                        data = self.normalize_joystick_data(control_id, data)
+                    ret = (control_type, control_id, data)
                 else:
+                    # This shouldn't happen
                     ev = []
-#            time.sleep(.001)
-        pipe.close()
-        return (control_type, control_id, data)
+            else:
+                ev = []
+        return ret
