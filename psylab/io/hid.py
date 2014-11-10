@@ -87,11 +87,14 @@ class joystick():
                                            '38': '9',
                                            '39': '10',
                                           },
-                                              # H-Low, H-Hi, H-C, V-Lo, V-Hi, V-C
-                        'joystick_cal' : {'1': (12,    232,  122, 17,   232,  127),
-                                          '2': (12,    232,  112, 7,    232,  132),
-                                          '3': (0,     255,  127, 0,    255,  127),
+                        'calibration' : { '00': (12, 232, 122),
+                                          '01': (17, 232, 127),
+                                          '05': (12, 232, 112), 
+                                          '02': (7,  232, 132),
+                                          '07': (0,  255, 127), 
+                                          '03': (0,  255, 127),
                                          },
+                        'cal_center' : True,
                        },
                        
                         '/dev/input/by-id/usb-Microntek_USB_Joystick-event-joystick':
@@ -119,7 +122,8 @@ class joystick():
                                            '2A': '11',
                                            '2B': '12',
                                           },
-                        'joystick_cal' : None, 
+                        'calibration' : {}, 
+                        'cal_center' : True,
                        },
                        '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
                        {
@@ -132,7 +136,8 @@ class joystick():
                                            '20': '1', # Buttons
                                            '28': '2',
                                           },
-                        'joystick_cal' : None, #Paddles seem to work better without calibration
+                        'calibration' : {},
+                        'cal_center' : False, #Paddles don't have a center
                        },
                        '/dev/input/by-id/usb-retronicdesign.com_Retro_Joystick_Adapter_v3.0_000000-event-joystick':
                        {
@@ -145,13 +150,14 @@ class joystick():
                                            '20': '1', # Buttons
                                            '28': '2',
                                           },
-                        'joystick_cal' : None, #Paddles seem to work better without calibration
+                        'calibration' : {},
+                        'cal_center' : True,
                        },
                        
                        }
     
     
-    def __init__(self, device=None):
+    def __init__(self, device=None, timeout=.5):
         if device:
             self.dev_name = device
         else:
@@ -162,9 +168,11 @@ class joystick():
                     break
             if not self.dev_name:
                 raise Exception, "No valid devices found!"
+        self.timeout = timeout
         self.device = self.known_devices[self.dev_name]
         self.name = self.device['name']
-        self.joystick_cal = self.device['joystick_cal']
+        self.calibration = self.device['calibration']
+        self.cal_center = self.device['cal_center']
         self.n_joysticks = 0
         self.n_buttons = 0
         self.pipe = None
@@ -207,6 +215,8 @@ class joystick():
         """
         ev = []
         wait = True
+        c_js_id_h = None
+        c_js_id_v = None
         # Data:
         ax_h_cen = None
         ax_h_min = 999
@@ -225,36 +235,48 @@ class joystick():
                         c_js_id_v = key
                     elif ax == 'Horz':
                         c_js_id_h = key
-        if not c_js_id_h or not c_js_id_v:
+        if not c_js_id_h and not c_js_id_v:
             raise Exception, "Could not find axis info on joystick {}".format(str(joystick))
-        else:
-            print("Move joystick {} around its perimeter, then return to center and press button {} to end.").format(str(joystick), "1")
-            pipe = open(self.dev_name, 'r')
-            while wait:
-                for character in pipe.read(1):
-                    ev.append( '{:02X}'.format(ord(character)) )
-                if len(ev) == 8:
-                    if ev[0] in self.device['control_types'].keys():
-                        if ev[0] == self.id_joystick:
-                            if ev[2] == c_js_id_v:
-                                ax_v_cen = int(ev[4], 16)
-                                ax_v_min = min(ax_v_min, ax_v_cen)
-                                ax_v_max = max(ax_v_max, ax_v_cen)
-                            elif ev[2] == c_js_id_h:
-                                ax_h_cen = int(ev[4], 16)
-                                ax_h_min = min(ax_h_min, ax_h_cen)
-                                ax_h_max = max(ax_h_max, ax_h_cen)
-                        elif ev[0] == self.id_button and ev[2] == b1_id and ev[4] == '00':
-                            wait = False
-                    ev = []
-            pipe.close()
-            if ax_h_min ==  999: ax_h_min = None
-            if ax_h_max == -999: ax_h_max = None
-            if ax_v_min ==  999: ax_v_min = None
-            if ax_v_max == -999: ax_v_max = None
-            
-            self.known_devices[self.dev_name]['joystick_cal'][str(joystick)] = (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
-            return (ax_h_min, ax_h_max, ax_h_cen, ax_v_min, ax_v_max, ax_v_cen)
+
+        print("Move joystick {} around its perimeter, then return to center and press button {} to end.").format(str(joystick), "1")
+        pipe = open(self.dev_name, 'r')
+        while wait:
+            for character in pipe.read(1):
+                ev.append( '{:02X}'.format(ord(character)) )
+            if len(ev) == 8:
+                if ev[0] in self.device['control_types'].keys():
+                    if ev[0] == self.id_joystick:
+                        if ev[2] == c_js_id_v:
+                            ax_v_cen = int(ev[4], 16)
+                            ax_v_min = min(ax_v_min, ax_v_cen)
+                            ax_v_max = max(ax_v_max, ax_v_cen)
+                        elif ev[2] == c_js_id_h:
+                            ax_h_cen = int(ev[4], 16)
+                            ax_h_min = min(ax_h_min, ax_h_cen)
+                            ax_h_max = max(ax_h_max, ax_h_cen)
+                    elif ev[0] == self.id_button and ev[2] == b1_id and ev[4] == '00':
+                        wait = False
+                ev = []
+        pipe.close()
+        if ax_h_min ==  999: ax_h_min = None
+        if ax_h_max == -999: ax_h_max = None
+        if ax_v_min ==  999: ax_v_min = None
+        if ax_v_max == -999: ax_v_max = None
+        if c_js_id_h:
+            if self.known_devices[self.dev_name]['cal_center']:
+                data = (ax_h_min, ax_h_max, ax_h_cen)
+            else:
+                data = (ax_h_min, ax_h_max)
+            print data
+            print c_js_id_h
+            self.known_devices[self.dev_name]['calibration'][str(c_js_id_h)] = data
+        if c_js_id_v:
+            if self.known_devices[self.dev_name]['cal_center']:
+                data = (ax_v_min, ax_v_max, ax_v_cen)
+            else:
+                data = (ax_v_min, ax_v_max)
+            self.known_devices[self.dev_name]['calibration'][str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
+            self.calibration[str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
 
 
     def debug(self, dur=15, verbose=False):
@@ -280,30 +302,23 @@ class joystick():
         """Scales the value in data to the range 0 >= 255, 
             based on the calibration values for the specified control.
         """
-        joystick,ax = control_id.split(" ")
-        if ax == "Horz":
-            id_coeff = -1
+        minim = float(self.calibration[control_id][ 0 ] )
+        maxim = float(self.calibration[control_id][ 1 ] )
+        if self.cal_center:
+            center = float(self.calibration[control_id][ 2 ] )
+            if data > center:
+                return np.minimum(int((data / maxim)*(255. - center) + center), 255)
+            else:
+                return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
         else:
-            id_coeff = 2
-        minim = float(self.joystick_cal[joystick][(1+id_coeff)])
-        maxim = float(self.joystick_cal[joystick][(2+id_coeff)])
-        center = float(self.joystick_cal[joystick][3+id_coeff])
-        if data > center:
-            return np.minimum(int((data / maxim)*(255. - center) + center), 255)
-        else:
-            return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
+            return np.maximum(int(((data - minim) / (maxim - minim)) * maxim), 0)
 
     def start(self):
-        self.pipe = open(self.dev_name, 'r')
-        # remove any pending events
-        while 1:
-            (r, w, e) = select.select([self.pipe], [], [], 0)
-            if not r:
-                break
-            c = self.pipe.read(8)
+        self.pipe = os.open( self.dev_name, os.O_RDONLY | os.O_NONBLOCK )
+#        self.pipe = open(self.dev_name, 'rb', buffering=0)
 
     def stop(self):
-        self.pipe.close()
+        os.close(self.pipe)
         self.pipe = None
 
     def listen(self, cal=True):
@@ -336,23 +351,33 @@ class joystick():
         ret = None,None,None
         if not self.pipe:
             self.start()
-        (r, w, e) = select.select([self.pipe], [], [], 0)
-        if r:
-            c = self.pipe.read(8)
-            ev = []
-            for character in c:
-                ev.append( '{:02X}'.format(ord(character)) )
-            if ev[0] in self.device['control_types'].keys():
-                control_type = self.device['control_types'][ ev[0] ]
-                if ev[2] in self.device['control_ids'].keys():
-                    control_id = self.device['control_ids'][ ev[2] ]
-                    data = int(ev[4], 16)
-                    if ev[0] == self.id_joystick and cal and self.device['joystick_cal']:
-                        data = self.normalize_joystick_data(control_id, data)
-                    ret = (control_type, control_id, data)
-                else:
-                    # This shouldn't happen
-                    ev = []
+
+        timeout_start = time.time()
+        while time.time() - timeout_start < self.timeout:
+            try:
+                rawdata = os.read(self.pipe, 1024)
+            except:
+                # No data read
+                pass
             else:
                 ev = []
+                i = 0
+                for character in rawdata:
+                    ev.append( '{:02X}'.format(ord(character)) )
+                    # When we have 8 characters, check if it is a meaningful event
+                    if len(ev) == 8:
+                        if ev[0] in self.device['control_types'].keys():
+                            control_type = self.device['control_types'][ ev[0] ]
+                            if ev[2] in self.device['control_ids'].keys():
+                                control_id = self.device['control_ids'][ ev[2] ]
+                                data = int(ev[4], 16)
+                                if ev[0] == self.id_joystick and cal and self.calibration.has_key(control_id):
+                                    data = self.normalize_joystick_data(control_id, data)
+                                return control_type, control_id, data
+                            else:
+                                # This shouldn't happen
+                                ev = []
+                        else:
+                            ev = []
+        # Timed out. Return Nones
         return ret

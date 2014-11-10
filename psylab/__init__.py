@@ -39,7 +39,7 @@ io.listPlayer - Standalone script to play blocks of soundfiles in folders [dep: 
 io.hid - Access human interface devices like joysticks [dep: linux]
 '''
 
-__version__ = '0.4.6.5'
+__version__ = '0.4.7.0'
 
 #from dataview import dataview
 from . import tools
