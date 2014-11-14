@@ -63,11 +63,11 @@ def sliding_window(sig, ws, ss = None, flatten = True):
           * Other minor cleanup
     '''
     
-    if isinstance(ws,int):
+    if isinstance(ws, (int,float)):
         ws = (ws,)
     if None is ss:
         ss = ws
-    elif isinstance(ss,int):
+    elif isinstance(ss, (int,float)):
         ss = (ss,)
     
     # convert ws, ss, and a.shape to numpy arrays so that we can do math in every

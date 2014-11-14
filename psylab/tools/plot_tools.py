@@ -47,6 +47,77 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
+from itertools import groupby
+
+# A roughly estimated points to pixels conversion dict
+pt2px = {
+6: 8,
+7: 9,
+7.5: 10,
+8: 11,
+9: 12,
+10: 13,
+10.5: 14,
+11: 15,
+12: 16,
+13: 17,
+13.5: 18,
+14: 19,
+14.5: 20,
+15: 21,
+16: 22,
+17: 23,
+18: 24,
+20: 26,
+22: 29,
+24: 32,
+26: 35,
+27: 36,
+28: 37,
+29: 38,
+30: 40,
+32: 42,
+34: 45,
+36: 48,
+}
+
+def show_all_markers(x,y, ms=None, dpi=None):
+    """Given arrays x and y, returns them with x values adjusted so those with 
+        common y values do not overlap. 
+        
+        Example
+        -------
+        CA = [0,4,0,3,0,5]  
+        CB = [0,0,4,4,2,2,2,2,3,0,5]  
+        
+        x,y = show_all_markers(CA, CB, ms=12)
+        
+        ret = plt.plot(x, y, 'o', ms=12)
+        plt.xlim((0,3))
+    """
+
+    xout = []
+    yout = []
+    if ms:
+        ms = float(ms)
+    else:
+        ms = float(plt.rcParams['lines.markersize'])
+    if dpi:
+        dpi = float(dpi)
+    else:
+        dpi = float(plt.rcParams['figure.dpi'])
+    for indx, klass in enumerate([x, y]):
+        klass = groupby(sorted(klass))
+        for item, objt in klass:
+            objt = list(objt)
+            points = len(objt)
+            pos = 1 + indx + (1 - points) / 50.
+            for item in objt:
+                xout.append(pos)
+                yout.append(item)
+                pos += (ms/dpi)/2
+    return xout,yout
+
 
 def update_plotline(line, x, y):
     line.set_data(x, y)

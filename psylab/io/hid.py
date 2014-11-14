@@ -125,6 +125,20 @@ class joystick():
                         'calibration' : {}, 
                         'cal_center' : True,
                        },
+                       '/dev/input/by-id/usb-Psylab_Atari_Paddles-event-joystick':
+                       {
+                        'name' : "Atari 2600 Paddles",
+                        'control_types' : {'01': "Button",
+                                           '03': "Joystick"
+                                          },
+                        'control_ids' :   {'00': '1 Horz', # Paddle 1
+                                           '01': '2 Horz', # Paddle 2
+                                           '20': '1', # Button 1
+                                           '28': '2', # Button 2
+                                          },
+                        'calibration' : {},
+                        'cal_center' : False, #Paddles don't have a center
+                       },
                        '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
                        {
                         'name' : "Atari 2600 Paddles",
@@ -157,8 +171,9 @@ class joystick():
                        }
     
     
-    def __init__(self, device=None, timeout=.5):
+    def __init__(self, device=None, timeout=.2):
         if device:
+            # TODO: Check if given dev is valid
             self.dev_name = device
         else:
             self.device = None

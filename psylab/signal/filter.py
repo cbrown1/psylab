@@ -89,7 +89,7 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
     if isinstance(order, (int,float)) == 1:
         order = np.tile(order,(cfs.size,)).T
 
-    nyq = fs/2.    
+    nyq = fs/2.
     for i in range(len(cfs)-1):
         if btype in ['high', 'band']:
             b_hp,a_hp=scipy.signal.filter_design.butter(order[i],(cfs[i]/nyq),btype='high')
