@@ -22,10 +22,12 @@
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
-from StringIO import StringIO
 import numpy as np
-
 
 def read_csv(filename, comment="#"): 
     """Gracefully handle comments and blank lines when reading csv files.

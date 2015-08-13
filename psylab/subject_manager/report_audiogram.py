@@ -150,7 +150,7 @@ def is_number(s):
     try:
         float(s)
         return True
-    except ValueError, TypeError:
+    except (ValueError, TypeError) as e:
         return False
 
 def proc_subject(db, SubjN):

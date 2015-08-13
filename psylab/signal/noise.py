@@ -254,7 +254,7 @@ def mls(n, rand_seed=False):
         assert type(n) == type(1) # Ensure 'n' is an int
         assert 2 <= n <= 32
     except:
-        print "n must be an integer in the interval [2, 32]."
+        print("n must be an integer in the interval [2, 32].")
 
     seqlen = 2**n - 1;
 

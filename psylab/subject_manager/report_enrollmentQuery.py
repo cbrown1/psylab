@@ -34,8 +34,8 @@ protocols = []
 
 def proc_main(db):
     d = {}
-    conn = sqlite3.connect(db);
-    c = conn.cursor();
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
     c.execute("""SELECT Protocol FROM Protocols""")
     for row in c:
         protocols.append(row[0])
@@ -56,231 +56,231 @@ def proc_main(db):
     enddate = str(param.end)
     protocol = protocols[param.protocol]
 
-    c.execute("""SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s'""" % (protocol,startdate,protocol,enddate));
+    c.execute("""SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s'""" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        raise Exception, "SQLError: No records found";
-    d['all'] = fetch[0];
+        raise Exception("SQLError: No records found")
+    d['all'] = fetch[0]
 
 
     ######################################################### GENDER
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allm'] = 0;
+        d['allm'] = 0
     else: 
-        d['allm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female'" % (protocol,startdate,protocol,enddate));
+        d['allm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allf'] = 0;
+        d['allf'] = 0
     else: 
-        d['allf'] = fetch[0];
+        d['allf'] = fetch[0]
 
 
     ######################################################### ETHNIC (Hispanic, etc)
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Hispanic/Latino'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Hispanic/Latino'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allhm'] = 0;
+        d['allhm'] = 0
     else: 
-        d['allhm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Hispanic/Latino'" % (protocol,startdate,protocol,enddate));
+        d['allhm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Hispanic/Latino'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allhf'] = 0;
+        d['allhf'] = 0
     else: 
-        d['allhf'] = fetch[0];
+        d['allhf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Not Hispanic'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Not Hispanic'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allnhm'] = 0;
+        d['allnhm'] = 0
     else: 
-        d['allnhm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Not Hispanic'" % (protocol,startdate,protocol,enddate));
+        d['allnhm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Not Hispanic'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allnhf'] = 0;
+        d['allnhf'] = 0
     else: 
-        d['allnhf'] = fetch[0];
+        d['allnhf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Unknown'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND EthnicID = 'Unknown'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['alluhm'] = 0;
+        d['alluhm'] = 0
     else: 
-        d['alluhm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Unknown'" % (protocol,startdate,protocol,enddate));
+        d['alluhm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND EthnicID = 'Unknown'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['alluhf'] = 0;
+        d['alluhf'] = 0
     else: 
-        d['alluhf'] = fetch[0];
+        d['alluhf'] = fetch[0]
 
 
     ######################################################### RACE - ALL
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'White'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'White'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allwm'] = 0;
+        d['allwm'] = 0
     else: 
-        d['allwm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'White'" % (protocol,startdate,protocol,enddate));
+        d['allwm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'White'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allwf'] = 0;
+        d['allwf'] = 0
     else: 
-        d['allwf'] = fetch[0];
+        d['allwf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Black'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Black'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allbm'] = 0;
+        d['allbm'] = 0
     else: 
-        d['allbm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Black'" % (protocol,startdate,protocol,enddate));
+        d['allbm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Black'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allbf'] = 0;
+        d['allbf'] = 0
     else: 
-        d['allbf'] = fetch[0];
+        d['allbf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allam'] = 0;
+        d['allam'] = 0
     else: 
-        d['allam'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate));
+        d['allam'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allaf'] = 0;
+        d['allaf'] = 0
     else: 
-        d['allaf'] = fetch[0];
+        d['allaf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allpm'] = 0;
+        d['allpm'] = 0
     else: 
-        d['allpm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate));
+        d['allpm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allpf'] = 0;
+        d['allpf'] = 0
     else: 
-        d['allpf'] = fetch[0];
+        d['allpf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allnm'] = 0;
+        d['allnm'] = 0
     else: 
-        d['allnm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate));
+        d['allnm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allnf'] = 0;
+        d['allnf'] = 0
     else: 
-        d['allnf'] = fetch[0];
+        d['allnf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Male' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allmm'] = 0;
+        d['allmm'] = 0
     else: 
-        d['allmm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate));
+        d['allmm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND Gender = 'Female' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['allmf'] = 0;
+        d['allmf'] = 0
     else: 
-        d['allmf'] = fetch[0];
+        d['allmf'] = fetch[0]
 
 
     ######################################################### RACE - WITHIN HISPANIC
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'White'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'White'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hwm'] = 0;
+        d['hwm'] = 0
     else: 
-        d['hwm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'White'" % (protocol,startdate,protocol,enddate));
+        d['hwm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'White'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hwf'] = 0;
+        d['hwf'] = 0
     else: 
-        d['hwf'] = fetch[0];
+        d['hwf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Black'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Black'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hbm'] = 0;
+        d['hbm'] = 0
     else: 
-        d['hbm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Black'" % (protocol,startdate,protocol,enddate));
+        d['hbm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Black'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hbf'] = 0;
+        d['hbf'] = 0
     else: 
-        d['hbf'] = fetch[0];
+        d['hbf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['ham'] = 0;
+        d['ham'] = 0
     else: 
-        d['ham'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate));
+        d['ham'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Asian'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['haf'] = 0;
+        d['haf'] = 0
     else: 
-        d['haf'] = fetch[0];
+        d['haf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hpm'] = 0;
+        d['hpm'] = 0
     else: 
-        d['hpm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate));
+        d['hpm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Pacific'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hpf'] = 0;
+        d['hpf'] = 0
     else: 
-        d['hpf'] = fetch[0];
+        d['hpf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hnm'] = 0;
+        d['hnm'] = 0
     else: 
-        d['hnm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate));
+        d['hnm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Native American'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hnf'] = 0;
+        d['hnf'] = 0
     else: 
-        d['hnf'] = fetch[0];
+        d['hnf'] = fetch[0]
 
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate));
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Male' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hmm'] = 0;
+        d['hmm'] = 0
     else: 
-        d['hmm'] = fetch[0];
-    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate));
+        d['hmm'] = fetch[0]
+    c.execute("SELECT COUNT(*) FROM Subjects WHERE Protocol_%s > '%s' AND Protocol_%s <= '%s' AND EthnicID = 'Hispanic/Latino' AND Gender = 'Female' AND Race = 'Mixed/Other'" % (protocol,startdate,protocol,enddate))
     fetch = c.fetchone()
     if fetch == None: 
-        d['hmf'] = 0;
+        d['hmf'] = 0
     else: 
-        d['hmf'] = fetch[0];
+        d['hmf'] = fetch[0]
 
     c.close()
     conn.close()
@@ -315,16 +315,16 @@ def proc_main(db):
     data += "<tr><th>Total</th><td><em>"+str(d['allhf'])+"</em></td><td><em>"+str(d['allhm'])+"</em></td><td><em>"+str(d['allhm']+d['allhf'])+"</em></td></tr>\n"
 
     data += "</table></body></html>\n"
-    outfile = 'EnrollmentData_%s_%s_%s.html' % (protocol,startdate,enddate);
-    f=open(outfile, 'w');
-    f.write(data);
-    f.close();
+    outfile = 'EnrollmentData_%s_%s_%s.html' % (protocol,startdate,enddate)
+    f=open(outfile, 'w')
+    f.write(data)
+    f.close()
     if os.name == "nt":
-        os.system(outfile);
+        os.system(outfile)
     elif os.name == "posix":
-        os.system("xdg-open " + outfile);
+        os.system("xdg-open " + outfile)
     elif os.name == "mac":
-        os.system("open " + outfile);
+        os.system("open " + outfile)
 
 
 if __name__ == "__main__":

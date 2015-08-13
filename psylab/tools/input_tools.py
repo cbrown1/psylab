@@ -22,7 +22,7 @@ class joystick():
                     c,e,d = j.listen()
                     if c == "Joystick" and e == "1 Horz":
                         # Gather horizontal axis data from joystick 1
-                        print d
+                        print(d)
                         data = d
                     elif c == "Button" and e == "2" and d == "0":
                         # Wait until button 2 is released (data==0)
@@ -68,7 +68,7 @@ class joystick():
                     self.dev_name = dev
                     break
             if not self.dev_name:
-                raise Exception, "No valid devices found!"
+                raise Exception("No valid devices found!")
         self.device = self.known_devices[self.dev_name]
  
     def debug(self, dur=15, verbose=False):
@@ -81,7 +81,7 @@ class joystick():
                 ev.append( '{:02X}'.format(ord(character)) )
                 if len(ev) == 8:
                     if verbose:
-                        print ev
+                        print(ev)
                     else:
                         if ev[0] in self.device['controls'].keys():
                             print("Control: {} | Id: {} | Data: {}".format(ev[0], ev[2], ev[4]))

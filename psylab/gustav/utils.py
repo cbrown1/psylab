@@ -33,7 +33,7 @@ import collections
 from time import sleep
 from inspect import getmembers
 from functools import reduce
-from frontends import term # FIXME: old line (from .frontends import term) was suddenly not working on py2.7/win7
+from .frontends import term
 
 #TODO: Modularize/standardize input methods. 
 # That is, implement modular, reuseable input methods that can be 
@@ -101,7 +101,7 @@ class exp:
     quitKeys = ['/', 'q']
     eventTypes = [ 'pre_exp', 'pre_block', 'pre_trial', 'post_trial', 'post_block', 'post_exp' ]
     frontendTypes = ['qt', 'tk', 'term']
-    from frontends import term
+    from .frontends import term
 
     def prompt_response(self,exp):
         while True:

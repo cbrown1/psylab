@@ -182,7 +182,7 @@ class joystick():
                     self.dev_name = dev
                     break
             if not self.dev_name:
-                raise Exception, "No valid devices found!"
+                raise Exception("No valid devices found!")
         self.timeout = timeout
         self.device = self.known_devices[self.dev_name]
         self.name = self.device['name']
@@ -251,7 +251,7 @@ class joystick():
                     elif ax == 'Horz':
                         c_js_id_h = key
         if not c_js_id_h and not c_js_id_v:
-            raise Exception, "Could not find axis info on joystick {}".format(str(joystick))
+            raise Exception("Could not find axis info on joystick {}".format(str(joystick)))
 
         print("Move joystick {} around its perimeter, then return to center and press button {} to end.").format(str(joystick), "1")
         pipe = open(self.dev_name, 'r')
@@ -282,8 +282,8 @@ class joystick():
                 data = (ax_h_min, ax_h_max, ax_h_cen)
             else:
                 data = (ax_h_min, ax_h_max)
-            print data
-            print c_js_id_h
+            print (data)
+            print (c_js_id_h)
             self.known_devices[self.dev_name]['calibration'][str(c_js_id_h)] = data
         if c_js_id_v:
             if self.known_devices[self.dev_name]['cal_center']:
@@ -304,7 +304,7 @@ class joystick():
                 ev.append( '{:02X}'.format(ord(character)) )
                 if len(ev) == 8:
                     if verbose:
-                        print ev
+                        print (ev)
                     else:
                         if ev[0] in self.device['control_types'].keys():
                             print("Control type: {} | Control id: {} | Data: {}".format(ev[0], ev[2], ev[4]))

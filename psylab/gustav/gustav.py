@@ -28,7 +28,7 @@ from random import shuffle
 import sys
 import getopt
 import numpy as np
-import utils
+from . import utils
 
 def configure(experimentFile = None, frontend = None):
 

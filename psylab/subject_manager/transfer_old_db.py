@@ -40,7 +40,7 @@ c1.execute("SELECT ID,SubjN,FName,LName,DOB,Today,Gender,Email,Phone,Race,Ethnic
 recs = c1.fetchall()
 
 for rec in recs:
-    print rec[0]
+    print(rec[0])
     if rec[13] == 'Y':
         Contact = 'True'
     else:

@@ -173,13 +173,14 @@ if __name__ == '__main__':
     filemask = ['.wav']
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hf:s:n:m:", ["help", "folder=", "skip=", "n=", "filemask="])
-    except getopt.error, msg:
-        print msg
-        print "for help use --help"
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err) # will print something like "option -a not recognized"
+        usage()
         sys.exit(2)
     for var, val in opts:
         if var in ("-h", "--help"):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
         elif var in ["--folder", "-f"]:
             folder = val
