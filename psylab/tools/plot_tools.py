@@ -740,3 +740,114 @@ class Slider(AxesWidget):
         "reset the slider to the initial value if needed"
         if (self.val != self.valinit):
             self.set_val(self.valinit)
+
+def table(col_widths, row_heights, cols=None, rows=None, labels=None):
+
+    """Generates tables in mpl with basic control over cell height and width
+    
+        Also provides a simple (feature-limited) option to add labels to 
+        individual cells
+        
+        The target usecase of this function is to generate simple tables that 
+        can be saved to pdf or another format to be included , eg., in lab 
+        worksheets, for use as data-entry tables by students in a lab class, 
+        
+        Parameters
+        ----------
+        col_widths: scalar or array
+            The width(s) of the columns. If an array is used, its length will
+            specify the number of columns (and cols is ignored), and each list
+            item is the length of each correspoding column. If a scalar is 
+            used, all columns will have the same width, and the number of 
+            columns must be specified using cols. 
+        row_heights: scalar or array
+            The height(s) of the rows. If an array is used, its length will
+            specify the number of rows (and rows is ignored), and each list
+            item is the height of each corresponding row. If a scalar is used, 
+            all rows will have the same height, and the number of rows must be 
+            specified using rows. 
+        cols : Scalar
+            The number of columns, only used if column_widths is a scalar
+        rows : Scalar
+            The number of rows, only used if row_heights is a scalar
+        labels : dict
+            A dict to specify cell labels. Each key is a string representation 
+            of a 2-element tuple, where the first element is the row number and 
+            the second element is the column number (top to bottom) of the cell
+            in which to apply the label. Each value is the string label. All 
+            labels will be centered both vertically and horizontally within a 
+            cell. Eg: labels = {'1,2': 'Row1Col2', '2,0': 'Row2Col0'}
+
+        Returns
+        -------
+        ax: mpl axes handle
+            A handle to the newly created matplotlib axes that holds the table
+            
+        Example
+        -------------
+        # Four columns
+        col_widths = [1, 2, .5, 1, 1]
+        # Five rows
+        row_heights = [.5, .5, .33,.25,.25]
+        # Add some labels
+        labels = {'1,0': 'Label 1', '3,1': 'Another'}
+        ax = table(col_widths, row_heights, labels=labels)
+        
+
+    """
+
+    x = [0]
+    y = [0]
+    w = 0
+    h = 0
+    if isinstance(col_widths, (int, float)):
+        c = cols
+        cw = col_widths
+        col_widths = []
+        for i in np.arange(c):
+            col_widths.append(cw)
+    else:
+        c = len(col_widths)
+    for i in np.arange(c):
+        w += col_widths[i]
+        x.append(w)
+
+    if isinstance(row_heights, (int, float)):
+        r = rows
+        rh = row_heights
+        row_heights = []
+        for i in np.arange(r):
+            row_heights.append(rh)
+    else:
+        r = len(row_heights)
+    for i in np.arange(r):
+        h += row_heights[i]
+        y.append(h)
+
+    page_width = w
+    page_height = h
+
+    f = plt.figure(figsize=(page_width, page_height))
+    ap = f.add_axes([0, 0, 1, 1])
+    ap.set_axis_bgcolor('none')
+    ap.set_xticks([])
+    ap.set_yticks([])
+    for spine in ap.spines:
+        ap.spines[spine].set_visible(False)
+    ap.set_xlim([0, page_width])   # Page coordinates are
+    ap.set_ylim([0, page_height])  # now in units of inches
+    ap.invert_yaxis()
+
+    ap.hlines(y, 0, page_width)
+    ap.vlines(x, 0, page_height)
+
+    if labels:
+        for i,label in labels.iteritems():
+            cell_x,cell_y = i.split(',')
+            cell_x = int(cell_x)
+            cell_y = int(cell_y)
+            lx = x[cell_x] + (x[cell_x+1]-x[cell_x])/2
+            ly = x[cell_y] + (y[cell_y+1]-y[cell_y])/2
+            ap.text(lx, ly, label, ha='center', va='center')
+
+    return ap
