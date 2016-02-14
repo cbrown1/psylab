@@ -777,9 +777,13 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             A dict to specify cell labels. Each key is a string representation 
             of a 2-element tuple, where the first element is the row number and 
             the second element is the column number (top to bottom) of the cell
-            in which to apply the label. Each value is the string label. All 
-            labels will be centered both vertically and horizontally within a 
-            cell. Eg: labels = {'1,2': 'Row1Col2', '2,0': 'Row2Col0'}
+            in which to apply the label. Each value is either a string (the 
+            label text) or a list. If a list is specified, the first element is 
+            the string label, the second is an mpl fontdict (eg., 
+            {'weight': 'bold', 'ha': 'left'}), and the third is optionally a 
+            float indicating the amount of padding, which is used when an 
+            alignment is not center. By default, labels will be centered both 
+            vertically and horizontally within a cell.
         hmerge : list
             A list of indices. For each item listed, merge it with the cell to 
             the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be 
@@ -794,7 +798,6 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             other cells, this will have no visible effect since the borders of 
             those cells will still be visible
 
-
         Returns
         -------
         ax: mpl axes handle
@@ -807,7 +810,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
         # Five rows
         row_heights = [.5, .5, .33,.25,.25]
         # Add some labels
-        labels = {'1,0': 'Label 1', '3,1': 'Another'}
+        labels = {'1,0': 'Label 1', '3,1': ['Another', {'weight': 'bold'}] }
         # Merge cells 1,1 and 2,1
         hmerge = ['1,1']
         ax = table(col_widths, row_heights, labels=labels, hmerge=hmerge)
@@ -957,11 +960,45 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
 
     if labels:
         for i,label in labels.iteritems():
+            if isinstance(label, list):
+                l = label[0]
+                fd = label[1]
+                if len(label) == 3:
+                    pad = label[2]
+                else:
+                    pad = .1
+            else:
+                l = label
+                fd = {'weight': 'normal'}
+                pad = .1
+            
             cell_x,cell_y = i.split(',')
             cell_x = int(cell_x)
             cell_y = int(cell_y)
-            lx = x[cell_x] + (x[cell_x+1]-x[cell_x])/2
-            ly = x[cell_y] + (y[cell_y+1]-y[cell_y])/2
-            ap.text(lx, ly, label, ha='center', va='center')
+
+            if fd.has_key('ha'):
+                if fd['ha'] == 'left':
+                    lx = x[cell_x] + pad
+                elif fd['ha'] == 'right':
+                    lx = x[cell_x+1] - pad
+                else:
+                    lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
+            else:
+                fd['ha'] = 'center'
+                lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
+
+            if fd.has_key('va'):
+                if fd['va'] == 'top':
+                    ly = y[cell_y] + pad
+                elif fd['va'] == 'bottom':
+                    ly = y[cell_y+1] - pad
+                else:
+                    ly = y[cell_y] + ((y[cell_y+1]-y[cell_y])/2.)
+            else:
+                fd['va'] = 'center'
+                ly = y[cell_y] + ((y[cell_y+1]-y[cell_y])/2.)
+
+
+            ap.text(lx, ly, l, fd)
 
     return ap
