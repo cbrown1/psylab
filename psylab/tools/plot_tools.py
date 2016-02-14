@@ -741,10 +741,13 @@ class Slider(AxesWidget):
         if (self.val != self.valinit):
             self.set_val(self.valinit)
 
-def table(col_widths, row_heights, cols=None, rows=None, labels=None):
+def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[], vmerge=[], omit=[]):
 
     """Generates tables in mpl with basic control over cell height and width
     
+        Cells can be merged horizontally and/or vertically, and the borders 
+        for particular cells can be omitted from drawing
+        
         Also provides a simple (feature-limited) option to add labels to 
         individual cells
         
@@ -777,6 +780,20 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None):
             in which to apply the label. Each value is the string label. All 
             labels will be centered both vertically and horizontally within a 
             cell. Eg: labels = {'1,2': 'Row1Col2', '2,0': 'Row2Col0'}
+        hmerge : list
+            A list of indices. For each item listed, merge it with the cell to 
+            the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be 
+            merged. Must be < the number of columns
+        vmerge : list
+            A list of indices. For each item listed, merge it with the cell 
+            below. Eg., if an item is '0,1', then 0,1 and 0,2 will be 
+            merged. Must be < the number of rows
+        omit : list
+            A list of indices to cells that should not be drawn. Note that if 
+            a cell is specified that is surrounded on all four sides with 
+            other cells, this will have no visible effect since the borders of 
+            those cells will still be visible
+
 
         Returns
         -------
@@ -791,8 +808,9 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None):
         row_heights = [.5, .5, .33,.25,.25]
         # Add some labels
         labels = {'1,0': 'Label 1', '3,1': 'Another'}
-        ax = table(col_widths, row_heights, labels=labels)
-        
+        # Merge cells 1,1 and 2,1
+        hmerge = ['1,1']
+        ax = table(col_widths, row_heights, labels=labels, hmerge=hmerge)
 
     """
 
@@ -827,6 +845,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None):
     page_width = w
     page_height = h
 
+    # Create mpl figure, remove all default items (ticks, spines, etc)
     f = plt.figure(figsize=(page_width, page_height))
     ap = f.add_axes([0, 0, 1, 1])
     ap.set_axis_bgcolor('none')
@@ -838,8 +857,103 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None):
     ap.set_ylim([0, page_height])  # now in units of inches
     ap.invert_yaxis()
 
-    ap.hlines(y, 0, page_width)
-    ap.vlines(x, 0, page_height)
+    # Draw each cell as a rect
+    # xx and yy are the x and y coords of the current rect
+    yy = 0
+    y_ind = 0
+    hmerged = []
+    vmerged = []
+    # For all subsequent comments, assume:
+    # Current cell in loop is 0,0, & that 
+    # hmerge = ['0,0', '1,0'] (cells to horizontally merge: 0,0 1,0 2,0), 
+    # and vmerge = ['0,0'] (cells to vertically merge: 0,0 0,1)
+    for yh in row_heights:
+        #print ("Y{:}: {:}".format(y_ind, yy))
+        xx = 0
+        x_ind = 0
+        for xw in col_widths:
+            #print ("  X{:}: {:}".format(x_ind, xx))
+            ind = ",".join((str(x_ind), str(y_ind)))
+            if ind not in hmerged and ind not in vmerged:
+                #print ("    not a previous merge {}".format(ind))
+                # Temp lists
+                this_hmerged = []
+                this_vmerged = []
+                # Ind lists
+                got_hmerged = []
+                got_vmerged = []
+                xwm = xw
+                # For each cell, find each subsequent cell to merge
+                for x_ind_m in np.arange(x_ind, len(col_widths)-1):
+                    ind_m = ",".join((str(x_ind_m), str(y_ind)))
+                    #print ("      checking: {}".format(ind_m))
+                    # 0,0 is in list, which means 1,0 should be merged, and added to merged list (same for 2,0)
+                    if ind_m in hmerge and ind_m not in hmerged:
+                        #print ("      vmerge: {}".format(ind_m))
+                        xwm += col_widths[x_ind_m+1] # add width of 1,0
+                        ind_m_next = ",".join((str(x_ind_m+1), str(y_ind))) # Generate ind for 1,0 (and then 2,0)
+                        #print ("      adding ind to hmerge: {}".format(ind_m_next))
+                        # Add 1,0 and 2,0 to a temp hmerged
+                        this_hmerged.append(ind_m_next)
+                        # Add 1 and 2 to hmerge ind list, so that 1,1 and 2,1 will eventually be added
+                        #print ("      adding x_ind to got_hmerge: {:}".format(x_ind_m+1))
+                        got_hmerged.append(x_ind_m+1)
+                    else:
+                        break
+
+                yhm = yh
+                # Same for columns
+                for y_ind_m in np.arange(y_ind, len(row_heights)-1):
+                    ind_m = ",".join((str(x_ind), str(y_ind_m)))
+                    if ind_m in vmerge and ind_m not in vmerged:
+                        yhm += row_heights[y_ind_m+1]
+                        ind_m_next = ",".join((str(x_ind), str(y_ind_m+1)))
+                        this_vmerged.append(ind_m_next)
+                        got_vmerged.append(y_ind_m+1)
+                    else:
+                        break
+
+                for this in this_hmerged:
+                    # Add merged cells for current row
+                    #print ("    adding temp hmerge to hmerge: {}".format(this))
+                    hmerged.append(this)
+                    for vm in got_vmerged:
+                        for hm in got_hmerged:
+                            # Create indices for all merged cells not in current row and not in current column ie., 1,1 2,1
+                            this_i = ",".join((str(hm), str(vm)))
+                            #print ("    building ind for non-current row/cell to add to hmerge: {}".format(this_i))
+                            # Add those to hmerged
+                            hmerged.append(this_i)
+
+                for this in this_vmerged:
+                    # Add merged cells for current column
+                    vmerged.append(this)
+                    for vm in got_vmerged:
+                        for hm in got_hmerged:
+                            # Create indices for all merged cells not in current row and not current column ie., 1,1 2,1
+                            this_i = ",".join((str(hm), str(vm)))
+                            # Add those to vmerged
+                            vmerged.append(this_i)
+                    
+                if ind not in omit:
+                    ap.add_patch(
+                        mpl.patches.Rectangle(
+                            (xx, yy),
+                            xwm,
+                            yhm,
+                            fill=False      # remove background
+                        ))
+            else:
+                #print ("    a previous merge: {}".format(ind))
+                pass
+            
+            xx += xw
+            x_ind += 1
+        yy += yh
+        y_ind += 1
+
+#    ap.hlines(y, 0, page_width)
+#    ap.vlines(x, 0, page_height)
 
     if labels:
         for i,label in labels.iteritems():
