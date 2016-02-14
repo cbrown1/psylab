@@ -976,28 +976,23 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             cell_x = int(cell_x)
             cell_y = int(cell_y)
 
-            if fd.has_key('ha'):
-                if fd['ha'] == 'left':
-                    lx = x[cell_x] + pad
-                elif fd['ha'] == 'right':
-                    lx = x[cell_x+1] - pad
-                else:
-                    lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
-            else:
+            if not fd.has_key('ha'):
                 fd['ha'] = 'center'
+            if fd['ha'] == 'left':
+                lx = x[cell_x] + pad
+            elif fd['ha'] == 'right':
+                lx = x[cell_x+1] - pad
+            else:
                 lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
 
-            if fd.has_key('va'):
-                if fd['va'] == 'top':
-                    ly = y[cell_y] + pad
-                elif fd['va'] == 'bottom':
-                    ly = y[cell_y+1] - pad
-                else:
-                    ly = y[cell_y] + ((y[cell_y+1]-y[cell_y])/2.)
-            else:
+            if not fd.has_key('va'):
                 fd['va'] = 'center'
+            if fd['va'] == 'top':
+                ly = y[cell_y] + pad
+            elif fd['va'] == 'bottom':
+                ly = y[cell_y+1] - pad
+            else:
                 ly = y[cell_y] + ((y[cell_y+1]-y[cell_y])/2.)
-
 
             ap.text(lx, ly, l, fd)
 
