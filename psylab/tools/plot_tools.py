@@ -748,8 +748,8 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
         Cells can be merged horizontally and/or vertically, and the borders 
         for particular cells can be omitted from drawing
         
-        Also provides a simple (feature-limited) option to add labels to 
-        individual cells
+        Also provides facility to add labels to individual cells, with the 
+        ability to format and align each label, and specify cell padding.
         
         The target usecase of this function is to generate simple tables that 
         can be saved to pdf or another format to be included , eg., in lab 
