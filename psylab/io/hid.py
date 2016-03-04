@@ -282,14 +282,15 @@ class joystick():
                 data = (ax_h_min, ax_h_max, ax_h_cen)
             else:
                 data = (ax_h_min, ax_h_max)
-            print (data)
-            print (c_js_id_h)
+            print ("Control ID: {:}; data: {}".format(c_js_id_h, data))
             self.known_devices[self.dev_name]['calibration'][str(c_js_id_h)] = data
+            self.calibration[str(c_js_id_h)] = (ax_h_min, ax_h_max, ax_h_cen)
         if c_js_id_v:
             if self.known_devices[self.dev_name]['cal_center']:
                 data = (ax_v_min, ax_v_max, ax_v_cen)
             else:
                 data = (ax_v_min, ax_v_max)
+            print ("Control ID: {:}; data: {}".format(c_js_id_v, data))
             self.known_devices[self.dev_name]['calibration'][str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
             self.calibration[str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
 
@@ -307,7 +308,8 @@ class joystick():
                         print (ev)
                     else:
                         if ev[0] in self.device['control_types'].keys():
-                            print("Control type: {} | Control id: {} | Data: {}".format(ev[0], ev[2], ev[4]))
+                            ndata = self.normalize_joystick_data(ev[2], int(ev[4], 16))
+                            print("Control type: {} | Control id: {} | Data: {} | Normalized data: {:}".format(ev[0], ev[2], ev[4], ndata))
                     ev = []
         pipe.close()
         print("debug done")
@@ -322,10 +324,13 @@ class joystick():
         if self.cal_center:
             center = float(self.calibration[control_id][ 2 ] )
             if data > center:
+                #print("In: {:} | Out: {:}".format(data, np.minimum(int((data / maxim)*(255. - center) + center), 255)))
                 return np.minimum(int((data / maxim)*(255. - center) + center), 255)
             else:
+                #print("In: {:} | Out: {:}".format(data, np.maximum(int(((data - minim) / (center - minim)) * center), 0)))
                 return np.maximum(int(((data - minim) / (center - minim)) * center), 0)
         else:
+            #print("In: {:} | Out: {:}".format(data, np.maximum(int(((data - minim) / (maxim - minim)) * maxim), 0)))
             return np.maximum(int(((data - minim) / (maxim - minim)) * maxim), 0)
 
     def start(self):

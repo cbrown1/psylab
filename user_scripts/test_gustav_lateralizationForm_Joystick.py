@@ -6,7 +6,7 @@ Created on Sun Feb  9 16:01:24 2014
 """
 import time
 import numpy as np
-from gustav_forms import qt_Lateralization_Joystick as theForm
+from gustav_forms import qt_LateralizationFusion_Joystick as theForm
 
 # The form uses psylab.io.hid, which requires linux!
 # Make sure a joystick (or atari paddle) is plugged in.
