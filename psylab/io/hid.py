@@ -26,6 +26,7 @@
 import sys, os
 import select
 import time
+import yaml
 import numpy as np
 
 class joystick():
@@ -63,115 +64,13 @@ class joystick():
         ------------
         linux OS
     """
-    known_devices =  {
-                        '/dev/input/by-id/usb-Gravis_Eliminator_AfterShock-event-joystick':
-                        {
-                        'name' : "Gravis Eliminator Aftershock",
-                        'control_types' : {'01': "Button",
-                                           '03': "Joystick"
-                                          },
-                        'control_ids' :   {'00': '1 Horz', # Joysticks
-                                           '01': '1 Vert',
-                                           '02': '2 Vert',
-                                           '03': '3 Vert',
-                                           '05': '2 Horz',
-                                           '07': '3 Horz',
-                                           '30': '1', # Buttons
-                                           '31': '2',
-                                           '32': '3',
-                                           '33': '4',
-                                           '34': '5',
-                                           '35': '6',
-                                           '36': '7',
-                                           '37': '8',
-                                           '38': '9',
-                                           '39': '10',
-                                          },
-                        'calibration' : { '00': (12, 232, 122),
-                                          '01': (17, 232, 127),
-                                          '05': (12, 232, 112), 
-                                          '02': (7,  232, 132),
-                                          '07': (0,  255, 127), 
-                                          '03': (0,  255, 127),
-                                         },
-                        'cal_center' : True,
-                       },
-                       
-                        '/dev/input/by-id/usb-Microntek_USB_Joystick-event-joystick':
-                        {
-                        'name' : "USB Gamepad",
-                        'control_types' : {'01': "Button",
-                                           '03': "Joystick"
-                                          },
-                        'control_ids' :   {'00': '1 Horz', # Joysticks
-                                           '01': '1 Vert',
-                                           '02': '2 Horz',
-                                           '05': '2 Vert',
-                                           '10': '3 Horz',
-                                           '11': '3 Vert',
-                                           '20': '1', # Buttons
-                                           '21': '2',
-                                           '22': '3',
-                                           '23': '4',
-                                           '24': '5',
-                                           '25': '6',
-                                           '26': '7',
-                                           '27': '8',
-                                           '28': '9',
-                                           '29': '10',
-                                           '2A': '11',
-                                           '2B': '12',
-                                          },
-                        'calibration' : {}, 
-                        'cal_center' : True,
-                       },
-                       '/dev/input/by-id/usb-Psylab_Atari_Paddles-event-joystick':
-                       {
-                        'name' : "Atari 2600 Paddles",
-                        'control_types' : {'01': "Button",
-                                           '03': "Joystick"
-                                          },
-                        'control_ids' :   {'00': '1 Horz', # Paddle 1
-                                           '01': '2 Horz', # Paddle 2
-                                           '20': '1', # Button 1
-                                           '28': '2', # Button 2
-                                          },
-                        'calibration' : {},
-                        'cal_center' : False, #Paddles don't have a center
-                       },
-                       '/dev/input/by-id/usb-retronicdesign.com_Paddles_Retro_Adapter_v3.0_000000-event-joystick':
-                       {
-                        'name' : "Atari 2600 Paddles",
-                        'control_types' : {'01': "Button",
-                                           '03': "Joystick"
-                                          },
-                        'control_ids' :   {'00': '1 Horz', # Joysticks
-                                           '01': '2 Horz',
-                                           '20': '1', # Buttons
-                                           '28': '2',
-                                          },
-                        'calibration' : {},
-                        'cal_center' : False, #Paddles don't have a center
-                       },
-                       '/dev/input/by-id/usb-retronicdesign.com_Retro_Joystick_Adapter_v3.0_000000-event-joystick':
-                       {
-                        'name' : "Atari 2600 Joystick",
-                        'control_types' : {'01': "Button",
-                                           '03': "Joystick"
-                                          },
-                        'control_ids' :   {'00': '1 Horz', # Joysticks
-                                           '01': '2 Horz',
-                                           '20': '1', # Buttons
-                                           '28': '2',
-                                          },
-                        'calibration' : {},
-                        'cal_center' : True,
-                       },
-                       
-                       }
     
     
-    def __init__(self, device=None, timeout=.2):
+    def __init__(self, device=None, known_devices='joystick.yml', timeout=.2):
+
+        js_file = open(known_devices, 'r')
+        self.known_devices = yaml.load(js_file)
+
         if device:
             # TODO: Check if given dev is valid
             self.dev_name = device
@@ -308,8 +207,8 @@ class joystick():
                         print (ev)
                     else:
                         if ev[0] in self.device['control_types'].keys():
-                            ndata = self.normalize_joystick_data(ev[2], int(ev[4], 16))
-                            print("Control type: {} | Control id: {} | Data: {} | Normalized data: {:}".format(ev[0], ev[2], ev[4], ndata))
+#                            ndata = self.normalize_joystick_data(ev[2], int(ev[4], 16))
+                            print("Control type: {} | Control id: {} | Data: {}".format(ev[0], ev[2], ev[4]))
                     ev = []
         pipe.close()
         print("debug done")
