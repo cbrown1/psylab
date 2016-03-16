@@ -494,6 +494,63 @@ def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
         hax.add_line(plt.Line2D([.4, .8],[.3, .4],linewidth=lw,color=c))
         hax.add_line(plt.Line2D([.4, .7],[.2, .25],linewidth=lw,color=c))
 
+def marker_loudspeaker(angle):
+    """Generates a simple loudspeaker-shaped marker for use with matplotlib
+    
+        This might be useful in (and is intended for) drawing a schematic of 
+        a loudspeaker array as is often used in free-field listening 
+        environments, in which the angle of each loudspeaker changes with its
+        location
+        
+        Parameters
+        ----------
+        angle : float
+            The angle of rotation of the marker. 0 would yeild a 
+            downward-facing marker, -90 a rightward facing marker, and 90 a 
+            leftward-facing marker
+            
+        Returns
+        -------
+        marker : list of tuples
+            Each tuple is an x,y point. This list can be passed as is to 
+            matplotlib's plot function, using the 'marker' keyword
+        
+        Example
+        -------
+        fig = plt.figure(figsize=(8,8)) # the fig should be symmetrical to look right
+        rect = .1,.1,.8,.8 # Axes should be symmetric in fig as well
+        ax = fig.add_axes(rect)
+
+        radius = 6
+        
+        for loc in np.arange(-90, 90, 15):
+            x = np.cos(np.deg2rad(loc+90)) * radius # +90 puts zero at the top
+            y = np.sin(np.deg2rad(loc+90)) * radius
+            marker = marker_loudspeaker(loc)
+            plt.plot(x, y, mew=1, markersize=20, mfc='none', mec='k', marker=marker)
+        
+        plt.ylim(-10, 10)
+        plt.xlim(-10, 10)
+        psylab.tools.plot_tools.add_head(w=.1, h=.1, dutchPart=True)
+        
+        plt.show()
+    """
+
+    marker=[[-0.5, .866], [-0.5, .5], [-1, 0], [1, 0], [.5, .5], [.5, .866], [-0.5, .866]]
+    
+    angle = np.deg2rad(angle)
+    
+    marker_rotated = []
+    
+    for p in marker:
+    
+        x = p[0]*np.cos(angle) - p[1]*np.sin(angle)
+        y = p[0]*np.sin(angle) + p[1]*np.cos(angle)
+    
+        marker_rotated.append((x,y))
+
+    return marker_rotated
+
 
 def plot_discrete_signal(x,y):
     
