@@ -47,6 +47,8 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
+marker_loudspeaker = [(-0.5, .866), (-0.5, .5), (-1, 0), (1, 0), (.5, .5), (.5, .866), (-0.5, .866)]
+
 from itertools import groupby
 
 # A roughly estimated points to pixels conversion dict
@@ -494,16 +496,19 @@ def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
         hax.add_line(plt.Line2D([.4, .8],[.3, .4],linewidth=lw,color=c))
         hax.add_line(plt.Line2D([.4, .7],[.2, .25],linewidth=lw,color=c))
 
-def marker_loudspeaker(angle):
-    """Generates a simple loudspeaker-shaped marker for use with matplotlib
+def rotate_marker(marker, angle):
+    """Rotates the specified custom mpl marker to the specified angle. 
     
         This might be useful in (and is intended for) drawing a schematic of 
         a loudspeaker array as is often used in free-field listening 
-        environments, in which the angle of each loudspeaker changes with its
-        location
+        environments, in which the angle of rotation of each loudspeaker 
+        changes with its location
         
         Parameters
         ----------
+        marker : list of x,y tuples
+            Each tuple is an x,y point. This list can be passed to 
+            matplotlib's plot function using the 'marker' keyword
         angle : float
             The angle of rotation of the marker. 0 would yeild a 
             downward-facing marker, -90 a rightward facing marker, and 90 a 
@@ -511,12 +516,13 @@ def marker_loudspeaker(angle):
             
         Returns
         -------
-        marker : list of tuples
+        marker : list of x,y tuples
             Each tuple is an x,y point. This list can be passed as is to 
             matplotlib's plot function, using the 'marker' keyword
         
         Example
         -------
+        marker_loudspeaker = [(-0.5, .866), (-0.5, .5), (-1, 0), (1, 0), (.5, .5), (.5, .866), (-0.5, .866)]
         fig = plt.figure(figsize=(8,8)) # the fig should be symmetrical to look right
         rect = .1,.1,.8,.8 # Axes should be symmetric in fig as well
         ax = fig.add_axes(rect)
@@ -526,7 +532,7 @@ def marker_loudspeaker(angle):
         for loc in np.arange(-90, 90, 15):
             x = np.cos(np.deg2rad(loc+90)) * radius # +90 puts zero at the top
             y = np.sin(np.deg2rad(loc+90)) * radius
-            marker = marker_loudspeaker(loc)
+            marker = rotate_marker(marker_loudspeaker, loc)
             plt.plot(x, y, mew=1, markersize=20, mfc='none', mec='k', marker=marker)
         
         plt.ylim(-10, 10)
@@ -536,8 +542,6 @@ def marker_loudspeaker(angle):
         plt.show()
     """
 
-    marker=[[-0.5, .866], [-0.5, .5], [-1, 0], [1, 0], [.5, .5], [.5, .866], [-0.5, .866]]
-    
     angle = np.deg2rad(angle)
     
     marker_rotated = []
@@ -564,6 +568,23 @@ def plot_discrete_signal(x,y):
     plt.vlines(pos,zp,y[pos])
     plt.vlines(neg,zn,y[neg])
 
+
+def jitter_x_vals(xdata, maxRowWidth=0.8):
+    """Returns an array of xvals that are jittered so similar datapoints don't overlap
+    """
+   
+    from scipy.stats import gaussian_kde
+    
+    kde = gaussian_kde(xdata)
+    density = kde(xdata)     # estimate the local density at each datapoint
+    
+    # generate some random jitter between 0 and 1
+    jitter = np.random.rand(*xdata.shape) - 0.5 
+    
+    # scale the jitter by the KDE estimate and add it to the centre x-coordinate
+    j_xvals = 1 + (density * jitter * maxRowWidth * 2)
+    return j_xvals
+    
 
 class Widget(object):
     """
