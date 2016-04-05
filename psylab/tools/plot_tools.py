@@ -569,22 +569,16 @@ def plot_discrete_signal(x,y):
     plt.vlines(neg,zn,y[neg])
 
 
-def jitter_x_vals(xdata, maxRowWidth=0.8):
-    """Returns an array of xvals that are jittered so similar datapoints don't overlap
+def jitter_x_vals(xdata, jitter):
+    """Returns an array of xvals that are jittered so similar datapoints don't overlap completely
     """
    
-    from scipy.stats import gaussian_kde
-    
-    kde = gaussian_kde(xdata)
-    density = kde(xdata)     # estimate the local density at each datapoint
-    
-    # generate some random jitter between 0 and 1
-    jitter = np.random.rand(*xdata.shape) - 0.5 
-    
-    # scale the jitter by the KDE estimate and add it to the centre x-coordinate
-    j_xvals = 1 + (density * jitter * maxRowWidth * 2)
-    return j_xvals
-    
+    j = np.random.rand(len(xdata))*jitter
+    j = j - (jitter/2.)
+    j = j - j.mean()
+
+    return xdata + j
+
 
 class Widget(object):
     """
