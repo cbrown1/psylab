@@ -64,29 +64,69 @@ class joystick():
         ------------
         linux OS
     """
-    
-    
-    def __init__(self, device=None, known_devices='joystick.yml', timeout=.2):
 
-        js_file = open(known_devices, 'r')
+    def __init__(self, device=None, devices_file='joystick.yml', timeout=.2):
+
+        js_file = open(devices_file, 'r')
         self.known_devices = yaml.load(js_file)
+        self.dev_id = None
 
         if device:
-            # TODO: Check if given dev is valid
-            self.dev_name = device
+            for dev in self.known_devices.keys():
+                if device == self.known_devices[dev]['name']:
+                    self.dev_id = dev
+                    break
+                elif device == dev:
+                    self.dev_id = dev
+                    break
+                elif device == self.known_devices[dev]['path']:
+                    self.dev_id = dev
+                    break
+                elif (self.known_devices[dev].has_key('nickname') and device == self.known_devices[dev]['nickname']):
+                    self.dev_id = dev
+                    break
+            if not self.dev_id:
+                raise Exception("Device not found: {}".format(device))
         else:
             self.device = None
             for dev in self.known_devices.keys():
                 if os.path.exists(dev):
-                    self.dev_name = dev
+                    self.dev_id = dev
                     break
-            if not self.dev_name:
+            if not self.dev_id:
                 raise Exception("No valid devices found!")
         self.timeout = timeout
-        self.device = self.known_devices[self.dev_name]
+        self.device = self.known_devices[self.dev_id]
         self.name = self.device['name']
-        self.calibration = self.device['calibration']
-        self.cal_center = self.device['cal_center']
+        self.path = self.device['path']
+
+        if self.device.has_key('cal_min'):
+            self.cal_min = self.device['cal_min']
+        else:
+            self.cal_min = {}
+            for key, val in self.device['control_ids'].items():
+                if len(val) > 2 and val[-4:] in ['Vert', 'Horz']:
+                    self.cal_min[str(key)] = None
+
+        if self.device.has_key('cal_max'):
+            self.cal_max = self.device['cal_max']
+        else:
+            self.cal_max = {}
+            for key, val in self.device['control_ids'].items():
+                if len(val) > 2 and val[-4:] in ['Vert', 'Horz']:
+                    self.cal_max[str(key)] = None
+
+        if not self.device.has_key('cal_has_center'):
+            self.device['cal_has_center'] = True
+        self.cal_has_center = self.device['cal_has_center']
+        if self.device.has_key('cal_center'):
+            self.cal_center = self.device['cal_center']
+        else:
+            self.cal_center = {}
+            for key, val in self.device['control_ids'].items():
+                if len(val) > 2 and val[-4:] in ['Vert', 'Horz']:
+                    self.cal_center[str(key)] = None
+
         self.n_joysticks = 0
         self.n_buttons = 0
         self.pipe = None
@@ -132,12 +172,14 @@ class joystick():
         c_js_id_h = None
         c_js_id_v = None
         # Data:
-        ax_h_cen = None
         ax_h_min = 999
         ax_h_max = -999
-        ax_v_cen = None
         ax_v_min = 999
         ax_v_max = -999
+
+        ax_h_cen = None
+        ax_v_cen = None
+
         # Get ids for button 1 (for exit) and for the h and v axes of specified joystick
         for key, val in self.device['control_ids'].items():
             if val == "1":
@@ -152,22 +194,29 @@ class joystick():
         if not c_js_id_h and not c_js_id_v:
             raise Exception("Could not find axis info on joystick {}".format(str(joystick)))
 
-        print("Move joystick {} around its perimeter, then return to center and press button {} to end.").format(str(joystick), "1")
-        pipe = open(self.dev_name, 'r')
+        print("Move joystick {} around its perimeter, then return to center and press button {} to end").format(str(joystick), "1")
+        pipe = open(self.path, 'r')
         while wait:
             for character in pipe.read(1):
                 ev.append( '{:02X}'.format(ord(character)) )
             if len(ev) == 8:
                 if ev[0] in self.device['control_types'].keys():
                     if ev[0] == self.id_joystick:
+                    	feedback = ""
                         if ev[2] == c_js_id_v:
-                            ax_v_cen = int(ev[4], 16)
-                            ax_v_min = min(ax_v_min, ax_v_cen)
-                            ax_v_max = max(ax_v_max, ax_v_cen)
+                            ax_v_min = min(int(ev[4], 16), ax_v_min)
+                            ax_v_max = max(int(ev[4], 16), ax_v_max)
+                            if self.cal_has_center is not None:
+                                ax_v_cen = int(ev[4], 16)
+                            feedback += "Vert: ({:}, {:}, {:})  ".format(ax_v_min, ax_v_cen, ax_v_max)
                         elif ev[2] == c_js_id_h:
-                            ax_h_cen = int(ev[4], 16)
-                            ax_h_min = min(ax_h_min, ax_h_cen)
-                            ax_h_max = max(ax_h_max, ax_h_cen)
+                            ax_h_min = min(int(ev[4], 16), ax_h_min)
+                            ax_h_max = max(int(ev[4], 16), ax_h_max)
+                            if self.cal_has_center is not None:
+                                ax_h_cen = int(ev[4], 16)
+                            feedback += "Horz: ({:}, {:}, {:})  ".format(ax_h_min, ax_h_cen, ax_h_max)
+                        if feedback is not "":
+                            print(feedback)
                     elif ev[0] == self.id_button and ev[2] == b1_id and ev[4] == '00':
                         wait = False
                 ev = []
@@ -177,28 +226,27 @@ class joystick():
         if ax_v_min ==  999: ax_v_min = None
         if ax_v_max == -999: ax_v_max = None
         if c_js_id_h:
-            if self.known_devices[self.dev_name]['cal_center']:
-                data = (ax_h_min, ax_h_max, ax_h_cen)
-            else:
-                data = (ax_h_min, ax_h_max)
-            print ("Control ID: {:}; data: {}".format(c_js_id_h, data))
-            self.known_devices[self.dev_name]['calibration'][str(c_js_id_h)] = data
-            self.calibration[str(c_js_id_h)] = (ax_h_min, ax_h_max, ax_h_cen)
+            self.cal_min[str(c_js_id_h)] = ax_h_min
+            self.cal_max[str(c_js_id_h)] = ax_h_max
+            print ("Control ID: {:}; min: {}".format(c_js_id_h, ax_h_min))
+            print ("Control ID: {:}; max: {}".format(c_js_id_h, ax_h_max))
+            if self.cal_has_center:
+                self.cal_center[str(c_js_id_h)] = ax_h_cen
+                print ("Control ID: {:}; cen: {}".format(c_js_id_h, ax_h_cen))
         if c_js_id_v:
-            if self.known_devices[self.dev_name]['cal_center']:
-                data = (ax_v_min, ax_v_max, ax_v_cen)
-            else:
-                data = (ax_v_min, ax_v_max)
-            print ("Control ID: {:}; data: {}".format(c_js_id_v, data))
-            self.known_devices[self.dev_name]['calibration'][str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
-            self.calibration[str(c_js_id_v)] = (ax_v_min, ax_v_max, ax_v_cen)
-
+            self.cal_min[str(c_js_id_v)] = ax_v_min
+            self.cal_max[str(c_js_id_v)] = ax_v_max
+            print ("Control ID: {:}; min: {}".format(c_js_id_v, ax_v_min))
+            print ("Control ID: {:}; max: {}".format(c_js_id_v, ax_v_max))
+            if self.cal_has_center:
+                self.cal_center[str(c_js_id_v)] = ax_v_cen
+                print ("Control ID: {:}; cen: {}".format(c_js_id_v, ax_v_cen))
 
     def debug(self, dur=15, verbose=False):
         print("debug will run for {:} secs and print all activity on device: {}".format(dur, self.name))
         start = time.time()
         ev = []
-        pipe = open(self.dev_name, 'r')
+        pipe = open(self.path, 'r')
         while time.time() - start < dur:
             for character in pipe.read(1):
                 ev.append( '{:02X}'.format(ord(character)) )
@@ -218,10 +266,11 @@ class joystick():
         """Scales the value in data to the range 0 >= 255, 
             based on the calibration values for the specified control.
         """
-        minim = float(self.calibration[control_id][ 0 ] )
-        maxim = float(self.calibration[control_id][ 1 ] )
-        if self.cal_center:
-            center = float(self.calibration[control_id][ 2 ] )
+        minim = float(self.cal_min[control_id] )
+        maxim = float(self.cal_max[control_id] )
+
+        if self.cal_has_center:
+            center = float(self.cal_center[control_id] )
             if data > center:
                 #print("In: {:} | Out: {:}".format(data, np.minimum(int((data / maxim)*(255. - center) + center), 255)))
                 return np.minimum(int((data / maxim)*(255. - center) + center), 255)
@@ -233,8 +282,8 @@ class joystick():
             return np.maximum(int(((data - minim) / (maxim - minim)) * maxim), 0)
 
     def start(self):
-        self.pipe = os.open( self.dev_name, os.O_RDONLY | os.O_NONBLOCK )
-#        self.pipe = open(self.dev_name, 'rb', buffering=0)
+        self.pipe = os.open( self.path, os.O_RDONLY | os.O_NONBLOCK )
+#        self.pipe = open(self.path, 'rb', buffering=0)
 
     def stop(self):
         os.close(self.pipe)
@@ -288,9 +337,9 @@ class joystick():
                         if ev[0] in self.device['control_types'].keys():
                             control_type = self.device['control_types'][ ev[0] ]
                             if ev[2] in self.device['control_ids'].keys():
-                                control_id = self.device['control_ids'][ ev[2] ]
+                                control_id = str(self.device['control_ids'][ ev[2] ])
                                 data = int(ev[4], 16)
-                                if ev[0] == self.id_joystick and cal and self.calibration.has_key(control_id):
+                                if ev[0] == self.id_joystick and cal and self.cal_min.has_key(control_id) and self.cal_max.has_key(control_id):
                                     data = self.normalize_joystick_data(control_id, data)
                                 return control_type, control_id, data
                             else:
@@ -299,4 +348,10 @@ class joystick():
                         else:
                             ev = []
         # Timed out. Return Nones
+        return ret
+
+    def get_known_device_names(self):
+        ret = []
+        for key,val in self.known_devices.iteritems():
+            ret.append(val['name'])
         return ret
