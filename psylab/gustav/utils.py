@@ -420,14 +420,14 @@ def menu_condition(exp):
     """Prompts the experiment to choose the conditions to run
     """
     debug(exp, "Deriving presentation order via menu")
-    strtable = exp.utils.get_variable_strtable(exp) + "\nSelected Conditions: ["
+    strtable = exp.utils.get_variable_strtable(exp)
     sel = []
     conditions = []
     message = ""
     for i in range(1,exp.var.nlevels_total+1):
         conditions.append(str(i))
     while True:
-        disp = strtable
+        disp = strtable + "\nExperiment: {}\nSelected Conditions: [".format(exp.name)
         for s in sel:
             disp += " " + s
         disp += " ]\n\n{}Menu".format(message)
@@ -454,18 +454,10 @@ def menu_condition(exp):
             break;
         elif ret in ["c"]:
             sel = []
-        elif ret in ["r"]:
+        elif ret in ["r", "s"]:
             if len(sel) > 0:
-                sel = np.random.permutation(sel).tolist()
-                for s in sel:
-                    exp.var.orderarray.append(int(s)-1)
-                exp.run.nblocks = len(exp.var.orderarray)
-                exp.run.gustav_is_go = True
-                break;
-            else:
-                message = "You must select at least 1 condition to run!\n\n"
-        elif ret in ["s"]:
-            if len(sel) > 0:
+                if ret == "r":
+                    sel = np.random.permutation(sel).tolist()
                 for s in sel:
                     exp.var.orderarray.append(int(s)-1)
                 exp.run.nblocks = len(exp.var.orderarray)
