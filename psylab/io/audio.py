@@ -73,18 +73,40 @@ def read_audio_file(file_path):
     data,fs = m.read_file(file_path)
     return data,fs
 
-def assign_to_output_channels(audio, channels):
+def assign_to_output_channels(data, channels):
     """Zero-pads columns to assign multi-channel audio data to desired output channels
 
         Intended for multi-channel playback situations in which non-contiguous
         output channels are to be used. Columns of zeros will be inserted between channels
         as needed, so that each channel of audio data will be assigned to the correct output
-        channel upon playback. EG.:
+        channel upon playback.
+
+        Remember, channel IDs are zero-based.
+
+        Parameters
+        ----------
+        data : 2-d array
+            The audio data, with each channel in a column (2nd numpy dim)
+        channels : list
+            The output channels to assign each audio channel to. The list length must be
+            equal to data.shape[1]. Eg., if you have 2 columns of audio, and you pass the
+            list [2,5], then the first column of audio will be assigned to output channel
+            2 (the third channel; two columns of zeros will be prepended), and the second
+            column of audio data will be assigned to output channel 5 (three more columns
+            of zeros will be inserted)
+
+        Returns
+        -------
+        out : 2-d array
+            The output array
+
+        Example
+        -------
 
         >>> c1 = np.ones(4)
         >>> c2 = np.ones(4)*2
-        >>> ar = np.column_stack((c1,c2))
-        >>> out = assign_to_output_channels(ar, [2,6])
+        >>> ar = np.column_stack((c1,c2)) # Two channels of fake audio
+        >>> out = assign_to_output_channels(ar, [2,6]) # Assign to channels 2 and 6
         >>> out
         array([[ 0.,  0.,  1.,  0.,  0.,  0.,  2.],
                [ 0.,  0.,  1.,  0.,  0.,  0.,  2.],
@@ -93,9 +115,8 @@ def assign_to_output_channels(audio, channels):
         >>> 
     """
 
-    i = 0
-    out = np.zeros((audio.shape[0], channels[-1]+1))
-    for channel in channels:
-            out[:,channel] = audio[:,i]
+    out = np.zeros((data.shape[0], channels[-1]+1))
+    for i in range(len(channels)):
+            out[:,channels[i]] = data[:,i]
             i += 1
     return out
