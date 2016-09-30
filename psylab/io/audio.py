@@ -81,9 +81,9 @@ def assign_to_output_channels(audio, channels):
         as needed, so that each channel of audio data will be assigned to the correct output
         channel upon playback. EG.:
 
-        >>> a = np.ones(4)
-        >>> b = np.ones(4)*2
-        >>> ar = np.column_stack((a,b))
+        >>> c1 = np.ones(4)
+        >>> c2 = np.ones(4)*2
+        >>> ar = np.column_stack((c1,c2))
         >>> out = assign_to_output_channels(ar, [2,6])
         >>> out
         array([[ 0.,  0.,  1.,  0.,  0.,  0.,  2.],
@@ -92,7 +92,6 @@ def assign_to_output_channels(audio, channels):
                [ 0.,  0.,  1.,  0.,  0.,  0.,  2.]])
         >>> 
     """
-
 
     i = 0
     out = np.zeros((audio.shape[0], channels[-1]+1))
