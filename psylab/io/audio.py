@@ -115,7 +115,7 @@ def assign_to_output_channels(data, channels):
         >>> 
     """
 
-    out = np.zeros((data.shape[0], channels[-1]+1))
+    out = np.zeros((data.shape[0], np.max(channels)+1))
     for i in range(len(channels)):
             out[:,channels[i]] = data[:,i]
 
