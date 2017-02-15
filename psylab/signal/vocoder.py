@@ -237,21 +237,29 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
         voc = voc.sum(axis=1)
 
     return voc
-   
+
 
 def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
     '''Prototype vocoder where channel width is independent of channel spacing
-        
+
         That is, channels are not necessarily contiguous
-    
+
+        The channel_width parameter is in octaves, and channel cfs are
+        logarithmically spaced from flo to fhi
+
+        E.g., the following set of parameters would yield contiguous bands from 88 to 11314 Hz:
+        psylab.signal.vocoder_overlap(sig,fs,6,1,125,8000)
+
         vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi)
     '''
     signal = signal - np.mean(signal)
-    cfs = np.round(np.linspace(flo,fhi,channel_n))
+    cfs = np.float32(np.round(np.linspace(flo,fhi,channel_n)))
+    cfs = freqs_logspace(flo, fhi, channel_n)
+
     cw = np.float32(channel_width/2.)
     nyq=np.float32(fs/2.)
-    envfilter = 400
-    
+    envfilter = 400.
+    print("Channel width: {:} Oct".format(channel_width))
     noisecarrier = np.random.randn(len(signal))
     noisecarrier = noisecarrier/max(np.abs(noisecarrier))
     summed_carriers = np.zeros(len(signal))
@@ -259,7 +267,9 @@ def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
     for cf in cfs:
         lo = np.round(cf*(2.**-cw))
         hi = np.round(cf*(2.**cw))
-        
+
+        print("  lo {:}; cf {:}; hi {:}".format(lo,cf,hi))
+
         [b_band_hp,a_band_hp]=filters.butter(3,(lo/nyq),btype='high')
         [b_band_lp,a_band_lp]=filters.butter(3,(hi/nyq))
 

@@ -37,7 +37,7 @@ import numpy as np
 import csv
 import codecs
 from itertools import product
-from scipy.stats import nanmean, nanstd
+from numpy import nanmean, nanstd
 import psylab.stats
 
 class Dataset:

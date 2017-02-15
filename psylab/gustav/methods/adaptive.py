@@ -199,10 +199,10 @@ def finish_trial(exp):
             exp.run.block_on = False
             exp.var.dynamic['good_run'] = True
             exp.var.dynamic['msg'] = "A maximum of {:} trials reached".format(exp.var.dynamic['max_trials'])
-        elif exp.var.dynamic['n_reversals'] == len(exp.var.dynamic['steps']):
+        elif exp.var.dynamic['n_reversals'] == len(exp.var.dynamic['steps'])-1: # -1 because we added one to len in pre_exp
             exp.run.block_on = False
             exp.var.dynamic['good_run'] = True
-            exp.var.dynamic['msg'] = "{:} reversals reached".format(len(exp.var.dynamic['steps']))
+            exp.var.dynamic['msg'] = "{:} reversals reached".format(len(exp.var.dynamic['steps'])-1)
 
 def pre_block(exp):
     missing_vars = ''
@@ -245,6 +245,9 @@ def post_block(exp):
 
 
 def pre_exp(exp):
+    # Repeat the first step, to be used at reversal 0 (the start)
+    exp.var.dynamic['steps'].insert(0, exp.var.dynamic['steps'][0])
+
     # Only set these if None, in case they were set in experiment file setup, which has run already
     if exp.logString_pre_exp == None:
         exp.logString_pre_exp = "Experiment $name started at $time\n"
