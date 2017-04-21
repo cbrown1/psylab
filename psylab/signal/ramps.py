@@ -66,19 +66,27 @@ def ramps(data, fs, duration=10, shape='raisedcosine', set='onoff'):
         rf = hamming(wspace)
     elif shape is 'linear':
         r = np.linspace(0, 1, dur)
-        rf = np.concatenate((r, r[::-1]),1)
+        rf = np.concatenate((r, r[::-1]))
     else:
         raise Exception("shape not recognized")
     
-    if len(data.shape) == 2:
-        rf_1d = rf.copy()
-        for c in range(data.shape[1]-1):
-            rf = np.column_stack((rf, rf_1d))
-
-    y = data
+    f_ramp = np.ones(data.shape[0])
     if set in ['on', 'onoff']:
-        y[0:dur,] = y[0:dur,]*rf[0:dur,]
+        f_ramp[0:dur] = rf[0:dur]
     if set in ['off', 'onoff']:
         durp1 = dur-1
-        y[-(durp1):,] = y[-(durp1):,]*rf[-(durp1):,]
-    return y
+        f_ramp[-(durp1):] = rf[-(durp1):]
+
+#    if len(data.shape) == 2:
+#        f_ramp_1d = rf.copy()
+#        for c in range(data.shape[1]-1):
+#            f_ramp = np.column_stack((f_ramp, f_ramp_1d))
+
+    return (data.T * f_ramp).T
+#    y = data
+#    if set in ['on', 'onoff']:
+#        y[0:dur,] = y[0:dur,]*rf[0:dur,]
+#    if set in ['off', 'onoff']:
+#        durp1 = dur-1
+#        y[-(durp1):,] = y[-(durp1):,]*rf[-(durp1):,]
+#    return y

@@ -114,6 +114,11 @@ def setup(exp):
 #                              'equate': 3,  # A custom value
 #                            };
 
+    exp.stim.cal = {'250': 112,
+                    '500': 112,
+                    '1000': 112,
+                    '4000': 112}
+
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and ordered
 
@@ -195,7 +200,7 @@ def setup(exp):
                     'max_trials': 60,    # Maximum number of trials to run
                     'vals_to_avg': 6,    # The number of values to average
                     'step': step,        # A custom step function. Signature: def step(exp)
-                    'max_level': 80, 
+                    'max_level': 80,
                    }
 
     """CONDITION PRESENTATION ORDER
@@ -246,22 +251,24 @@ def prompt_response(exp):
     This function gets called on every trial to generate the stimulus, and
     do any other processing you need. All settings and variables are
     available. For the current level of a variable, use
-    var.current['varname']. 
+    var.current['varname'].
 """
 def pre_trial(exp):
     isi = np.zeros(psylab.signal.ms2samp(exp.user.isi,exp.user.fs))
     interval_noi = np.zeros(exp.user.interval/1000.*exp.user.fs)
     interval_sig = psylab.signal.tone(float(exp.var.current['frequency']),exp.user.fs,exp.user.interval)
     interval_sig = psylab.signal.ramps(interval_sig,exp.user.fs)
-    interval_sig = psylab.signal.atten(interval_sig,exp.var.dynamic['max_level']-exp.var.dynamic['value'])
+    #print ("Cal: {}".format(exp.stim.cal[exp.var.current['frequency']]))
+    #print ("Val: {}; Atten: {}".format(exp.var.dynamic['value'], exp.stim.cal[exp.var.current['frequency']]-exp.var.dynamic['value']))
+    interval_sig = psylab.signal.atten(interval_sig,exp.stim.cal[exp.var.current['frequency']]-exp.var.dynamic['value'])
 
     exp.var.dynamic['correct'] = np.random.randint(1, exp.var.dynamic['alternatives']+1)
     if exp.var.dynamic['correct'] == 1:
         exp.stim.out = np.hstack((interval_sig, isi, interval_noi))
     else:
         exp.stim.out = np.hstack((interval_noi, isi, interval_sig))
-        
-    
+
+
 def present_trial(exp):
     #pass
     #m.play_array(stim.out,user.fs)
