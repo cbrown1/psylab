@@ -1089,7 +1089,8 @@ def subplots_ax_labels_where(rows, cols, ax='x'):
 
     return ret
 
-def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white'):
+def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', color_bg='gray'):
+
     """Draw Hinton diagram for visualizing a weight matrix.
         
         Matrix should be a 2d array of weights
@@ -1101,7 +1102,7 @@ def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white'):
     if not max_weight:
         max_weight = 2 ** np.ceil(np.log(np.abs(matrix).max()) / np.log(2))
 
-    ax.patch.set_facecolor('gray')
+    ax.patch.set_facecolor(color_bg)
     
     ax.xaxis.set_major_locator(plt.NullLocator())
     ax.yaxis.set_major_locator(plt.NullLocator())
