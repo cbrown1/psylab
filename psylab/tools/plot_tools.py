@@ -1069,3 +1069,45 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             ap.text(lx, ly, l, fd)
 
     return ap
+
+def subplots_ax_labels_where(rows, cols, ax='x'):
+
+    """subplots_ax_labels_where computes the subplot indexes that should received x or y axis lables for a good looking grid
+    
+       For example if you are plotting a 3 row x 4 column grid of subplots, it is most often
+       desirable to have y axis labels on the left-most subplots (1, 5, and 9), 
+       and x axis labels on the bottom 4 subplots (9, 10, 11, and 12). This function returns
+       an array of indexes for x or y labels accordingly, given a number of rows, and columns.
+        
+    """
+    total = rows * cols
+    
+    if ax == 'y':
+        ret = np.arange(total-cols+1, total+1)
+    else:
+        ret = np.arange(1, total, cols)
+
+    return ret
+
+def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white'):
+    """Draw Hinton diagram for visualizing a weight matrix.
+        
+        Matrix should be a 2d array of weights
+    
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if not max_weight:
+        max_weight = 2 ** np.ceil(np.log(np.abs(matrix).max()) / np.log(2))
+
+    ax.patch.set_facecolor('gray')
+    
+    ax.xaxis.set_major_locator(plt.NullLocator())
+    ax.yaxis.set_major_locator(plt.NullLocator())
+
+    for (x, y), w in np.ndenumerate(matrix):
+        color = color_p if w > 0 else color_n
+        size = np.sqrt(np.abs(w) / max_weight) * 12
+        plt.plot(x,y,'s', mfc = color, mec = color, ms = size)
+    return ax
