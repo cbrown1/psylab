@@ -813,6 +813,7 @@ class Slider(AxesWidget):
         if (self.val != self.valinit):
             self.set_val(self.valinit)
 
+
 def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[], vmerge=[], omit=[]):
 
     """Generates tables in mpl with basic control over cell height and width
@@ -1070,6 +1071,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
 
     return ap
 
+
 def subplots_ax_labels_where(rows, cols, ax='x'):
 
     """subplots_ax_labels_where computes the subplot indexes that should received x or y axis lables for a good looking grid
@@ -1083,11 +1085,12 @@ def subplots_ax_labels_where(rows, cols, ax='x'):
     total = rows * cols
     
     if ax == 'y':
-        ret = np.arange(total-cols+1, total+1)
-    else:
         ret = np.arange(1, total, cols)
+    else:
+        ret = np.arange(total-cols+1, total+1)
 
     return ret
+
 
 def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', color_bg='gray'):
 
