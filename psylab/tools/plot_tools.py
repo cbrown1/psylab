@@ -1115,3 +1115,22 @@ def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', c
         size = np.sqrt(np.abs(w) / max_weight) * 12
         plt.plot(x,y,'s', mfc = color, mec = color, ms = size)
     return ax
+
+
+def get_nearest_factors(n):
+    """Give a number, returns its factor pair nearest each other
+        EG., for the number 6, it would return (2,3), 20: (4,5)
+
+        Intended usecase is to aid with layout of a multi-axes grid,
+        in which the returned tuple would be used to specify the 
+        number of rows and columns of the figure. EG, I've 12 panels
+        to plot, so the desired layout would be 3x4.
+
+        Function won't work with n <=0
+
+    """
+    testNum = int(np.sqrt(n))
+    while n % testNum != 0:
+        testNum -= 1
+    return (testNum, int(n / float(testNum)))
+
