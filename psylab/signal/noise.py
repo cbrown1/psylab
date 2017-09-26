@@ -45,9 +45,9 @@ def white(n, channels=None):
             The white noise.
     """
     if channels:
-        out = np.random.randn(n, channels)
+        out = np.random.randn(np.int(n), np.int(channels))
     else:
-        out = np.random.randn(n)
+        out = np.random.randn(np.int(n))
     return out/np.max(np.abs(out), axis=0)
         
     
@@ -81,13 +81,13 @@ def pink(n, channels=None):
     a = np.array((1, -2.494956002, 2.017265875, -0.522189400))
     nT60 = np.round(np.log(1000)/(1-np.max(np.abs(np.roots(a))))) # T60 est.
     if channels:
-        v = np.random.randn(n+nT60, channels) # Gaussian white noise: N(0,1)
+        v = np.random.randn(np.int(n+nT60), np.int(channels)) # Gaussian white noise: N(0,1)
         x = np.zeros_like(v)
         for i in np.arange(channels):
             x[:,i] = lfilter(b,a,v[:,i])   # Apply 1/F roll-off to PSD
         out = x[nT60+1:,:]                 # Skip transient response
     else:
-        v = np.random.randn(n+nT60) # Gaussian white noise: N(0,1)
+        v = np.random.randn(np.int(n+nT60)) # Gaussian white noise: N(0,1)
         x = lfilter(b,a,v)                 # Apply 1/F roll-off to PSD
         out = x[nT60+1:]                   # Skip transient response
     return out/np.max(np.abs(out), axis=0)
@@ -119,7 +119,7 @@ def irn(dur, fs, delay, gain, its, type=1):
         y : array
             The rippled noise.
     '''
-    dd = dur/1000.;
+    dd = np.int(dur/1000.);
     wbn = np.random.randn(fs);
     rip = wbn;
     

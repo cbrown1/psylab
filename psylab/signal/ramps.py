@@ -55,7 +55,7 @@ def ramps(data, fs, duration=10, shape='raisedcosine', set='onoff'):
             The ramped signal.
         
     '''
-    dur = np.round(np.float32(duration)*(np.float32(fs)/1000.))
+    dur = np.int(np.round(np.float32(duration)*(np.float32(fs)/1000.)))
     wspace=np.round(2.*dur)
 
     if shape is 'raisedcosine':

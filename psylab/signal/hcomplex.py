@@ -60,22 +60,22 @@ def hcomplex_old(f, fs, **kwargs):
         kwargs['amp'] = 1.;
     if not 'offset' in kwargs:
         kwargs['offset'] = 0.;
-    f = np.float32(f);
-    fs = np.float32(fs);
-    dur = np.round((np.float32(kwargs['dur']) / 1000.) * fs);
-    amp = np.float32(kwargs['amp']);
-    nc = np.float32(kwargs['ncomponents']);
-    offset = np.float32(kwargs['offset']);
+    f = np.float32(f)
+    fs = np.float32(fs)
+    dur = np.int(np.round((np.float32(kwargs['dur']) / 1000.) * fs))
+    amp = np.float32(kwargs['amp'])
+    nc = np.float32(kwargs['ncomponents'])
+    offset = np.float32(kwargs['offset'])
     
     if amp <= 0:
-        amp = 10. ** (amp / 20.);
+        amp = 10. ** (amp / 20.)
 
-    comp = np.linspace(f, f*nc, nc) + offset;
-    y = np.zeros(dur);
+    comp = np.linspace(f, f*nc, nc) + offset
+    y = np.zeros(dur)
     for i in range(nc):
-        buff = np.ones(dur) * comp[i];
-        y = y + (amp * np.sin(2 * np.pi * np.cumsum(buff) / fs));
-    return y;
+        buff = np.ones(dur) * comp[i]
+        y = y + (amp * np.sin(2 * np.pi * np.cumsum(buff) / fs))
+    return y
 
 def hcomplex(f, fs, dur, ncomponents, amp=1, offset=0):
     '''Generates harmonic complexes
@@ -103,8 +103,8 @@ def hcomplex(f, fs, dur, ncomponents, amp=1, offset=0):
             The waveform
     '''    
     if amp <= 0:
-        amp = 10. ** (amp / 20.);
-    dur = np.round((dur / 1000.) * fs);
+        amp = 10. ** (amp / 20.)
+    dur = np.int(np.round((dur / 1000.) * fs))
     fh = ((np.arange(ncomponents) + 1) * f) + offset
     out = np.sin(2*np.pi * np.cumsum(np.ones((dur,ncomponents))*fh,axis=0) / fs) * amp
     return out.sum(axis=1)

@@ -88,18 +88,16 @@ def tone(f, fs, dur, **kwargs):
 
     f = np.array(np.float64(f))
     fs = np.float64(fs)
-    dur = np.float64(dur)
+    dur = np.int(np.round((np.float64(dur) / 1000.) * fs))
     amp = np.array(np.float64(amp))
     phase = np.float64(phase)*np.pi/180.
 
     if f.size == 2:
-        dur = np.round((dur / 1000.) * fs)
         freq = np.linspace(f[0], f[1], dur)
     elif f.size == 1:
-        dur = np.round((dur / 1000.) * fs)
         freq = np.ones(dur) * f
     else:
-        dur = f.size
+        dur = np.int(f.size)
         freq = f
 
     if amp.size == 2:
