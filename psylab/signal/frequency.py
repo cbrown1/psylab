@@ -186,3 +186,49 @@ def place2f(x):
             A frequency, in Hz.
     '''
     return 165.4*(10**(.06*x)-.88)
+
+def angle2f(x):
+    '''Converts an angle in degrees to a frequency in Hz
+        
+        Takes an angle (degrees), and computes a frequency (Hz), 
+        using a logarithmic spiral function [1].
+        
+        [1] Kang Cheng, Vivien Cheng and Chang-Hua Zou, 2008. A Logarithmic Spiral 
+        Function to Plot a Cochleaogram. Trends in Medical Research, 3: 36-40.
+        
+        The function assumes that each 90 degrees represents a 1-octave change.
+
+        Parameters
+        ----------
+        x : scalar
+            An angle, in degrees.
+        
+        Returns
+        -------
+        f : scalar
+            A frequency, in Hz.
+    '''
+    return 2048. * (2.**((360.-x)/90.))
+
+def f2angle(f):
+    '''Converts a frequency in Hz into an angle in degrees
+        
+        Takes a frequency (Hz), and computes an angle (degrees), 
+        using a logarithmic spiral function [1].
+        
+        [1] Kang Cheng, Vivien Cheng and Chang-Hua Zou, 2008. A Logarithmic Spiral 
+        Function to Plot a Cochleaogram. Trends in Medical Research, 3: 36-40.
+        
+        The function assumes that each 90 degrees represents a 1-octave change.
+
+        Parameters
+        ----------
+        f : scalar
+            A frequency, in Hz.
+        
+        Returns
+        -------
+        x : scalar
+            An angle, in degrees.
+    '''
+    return 1350. - ((np.log2(f.)/11.)*990)

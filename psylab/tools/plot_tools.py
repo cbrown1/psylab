@@ -569,11 +569,11 @@ def plot_discrete_signal(x,y):
     plt.vlines(neg,zn,y[neg])
 
 
-def jitter_x_vals(xdata, jitter):
-    """Returns an array of xvals that are jittered so similar datapoints don't overlap completely
+def jitter_vals(data, jitter):
+    """Returns an array of vals that are jittered so similar datapoints don't overlap completely
     """
    
-    j = np.random.rand(len(xdata))*jitter
+    j = np.random.rand(len(data))*jitter
     j = j - (jitter/2.)
     j = j - j.mean()
 
@@ -822,11 +822,11 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
         for particular cells can be omitted from drawing
         
         Also provides facility to add labels to individual cells, with the 
-        ability to format and align each label, and specify cell padding.
+        ability to format and align each label, and specify cell padding
         
         The target usecase of this function is to generate simple tables that 
         can be saved to pdf or another format to be included , eg., in lab 
-        worksheets, for use as data-entry tables by students in a lab class, 
+        worksheets, for use as data-entry tables by students in a lab class 
         
         Parameters
         ----------
@@ -877,7 +877,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             A handle to the newly created matplotlib axes that holds the table
             
         Example
-        -------------
+        -------
         # Four columns
         col_widths = [1, 2, .5, 1, 1]
         # Five rows
@@ -1072,26 +1072,6 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
     return ap
 
 
-def subplots_ax_labels_where(rows, cols, ax='x'):
-
-    """subplots_ax_labels_where computes the subplot indexes that should received x or y axis lables for a good looking grid
-    
-       For example if you are plotting a 3 row x 4 column grid of subplots, it is most often
-       desirable to have y axis labels on the left-most subplots (1, 5, and 9), 
-       and x axis labels on the bottom 4 subplots (9, 10, 11, and 12). This function returns
-       an array of indexes for x or y labels accordingly, given a number of rows, and columns.
-        
-    """
-    total = rows * cols
-    
-    if ax == 'y':
-        ret = np.arange(1, total, cols)
-    else:
-        ret = np.arange(total-cols+1, total+1)
-
-    return ret
-
-
 def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', color_bg='gray'):
 
     """Draw Hinton diagram for visualizing a weight matrix.
@@ -1117,6 +1097,26 @@ def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', c
     return ax
 
 
+def subplots_ax_labels_where(rows, cols, ax='x'):
+
+    """subplots_ax_labels_where computes the subplot indexes that should received x or y axis lables for a good looking grid
+    
+       For example if you are plotting a 3 row x 4 column grid of subplots, it is most often
+       desirable to have y axis labels on the left-most subplots (1, 5, and 9), 
+       and x axis labels on the bottom 4 subplots (9, 10, 11, and 12). This function returns
+       an array of indexes for x or y labels accordingly, given a number of rows, and columns.
+        
+    """
+    total = rows * cols
+    
+    if ax == 'y':
+        ret = np.arange(1, total, cols)
+    else:
+        ret = np.arange(total-cols+1, total+1)
+
+    return ret
+
+
 def get_nearest_factors(n):
     """Give a number, returns its factor pair nearest each other
         EG., for the number 6, it would return (2,3), 20: (4,5)
@@ -1133,4 +1133,144 @@ def get_nearest_factors(n):
     while n % testNum != 0:
         testNum -= 1
     return (testNum, int(n / float(testNum)))
+
+
+def sigmoid_normalized(x, center, width):
+   '''Returns array of a horizontal mirrored normalized sigmoid function
+        output between 0 and 1
+
+        Parameters
+        ----------
+        center: scalar
+            The center of the sigmoid function 
+        width: scalar
+            The width of the sigmoid function
+        x : Array
+            The x axis data for the sigmoid
+
+        Example
+        -------
+        >>> center = .5
+        >>> width = 8
+        >>> x = np.linspace(0,1,5)
+        >>> sigmoid_normalized(x, center, width)
+        array([ 0.        ,  0.10499359,  0.5       ,  0.89500641,  1.        ])
+
+   '''
+   s= 1/(1+np.exp(width*(x-center)))
+   return np.flip(1*(s-np.min(s))/(np.max(s)-np.min(s)),0) # normalize function to 0-1
+
+
+# Text Wrapping
+# Defines wrapText which will attach an event to a given mpl.text object,
+# wrapping it within the parent axes object.  Also defines a the convenience
+# function textBox() which effectively converts an axes to a text box.
+def wrapText(text, margin=4):
+    """ Attaches an on-draw event to a given mpl.text object which will
+        automatically wrap its string wthin the parent axes object.
+
+        The margin argument controls the gap between the text and axes frame
+        in points.
+
+        Copied from : https://stackoverflow.com/questions/4018860/text-box-with-line-wrapping-in-matplotlib
+
+        Example
+        -------
+
+        ax = plot.plt.figure(figsize=(6, 6)).add_subplot(111)
+        an = ax.annotate(t, fontsize=12, xy=(0.5, 1), ha='center', va='top', xytext=(0, -6),
+                 xycoords='axes fraction', textcoords='offset points')
+        wrapText(an)
+    """
+    ax = text.get_axes()
+    margin = margin / 72 * ax.figure.get_dpi()
+
+    def _wrap(event):
+        """Wraps text within its parent axes."""
+        def _width(s):
+            """Gets the length of a string in pixels."""
+            text.set_text(s)
+            return text.get_window_extent().width
+
+        # Find available space
+        clip = ax.get_window_extent()
+        x0, y0 = text.get_transform().transform(text.get_position())
+        if text.get_horizontalalignment() == 'left':
+            width = clip.x1 - x0 - margin
+        elif text.get_horizontalalignment() == 'right':
+            width = x0 - clip.x0 - margin
+        else:
+            width = (min(clip.x1 - x0, x0 - clip.x0) - margin) * 2
+
+        # Wrap the text string
+        words = [''] + _splitText(text.get_text())[::-1]
+        wrapped = []
+
+        line = words.pop()
+        while words:
+            line = line if line else words.pop()
+            lastLine = line
+
+            while _width(line) <= width:
+                if words:
+                    lastLine = line
+                    line += words.pop()
+                    # Add in any whitespace since it will not affect redraw width
+                    while words and (words[-1].strip() == ''):
+                        line += words.pop()
+                else:
+                    lastLine = line
+                    break
+
+            wrapped.append(lastLine)
+            line = line[len(lastLine):]
+            if not words and line:
+                wrapped.append(line)
+
+        text.set_text('\n'.join(wrapped))
+
+        # Draw wrapped string after disabling events to prevent recursion
+        handles = ax.figure.canvas.callbacks.callbacks[event.name]
+        ax.figure.canvas.callbacks.callbacks[event.name] = {}
+        ax.figure.canvas.draw()
+        ax.figure.canvas.callbacks.callbacks[event.name] = handles
+
+    ax.figure.canvas.mpl_connect('draw_event', _wrap)
+
+def _splitText(text):
+    """ Splits a string into its underlying chucks for wordwrapping.  This
+        mostly relies on the textwrap library but has some additional logic to
+        avoid splitting latex/mathtext segments.
+    """
+    import textwrap
+    import re
+    math_re = re.compile(r'(?<!\\)\$')
+    textWrapper = textwrap.TextWrapper()
+
+    if len(math_re.findall(text)) <= 1:
+        return textWrapper._split(text)
+    else:
+        chunks = []
+        for n, segment in enumerate(math_re.split(text)):
+            if segment and (n % 2):
+                # Mathtext
+                chunks.append('${}$'.format(segment))
+            else:
+                chunks += textWrapper._split(segment)
+        return chunks
+
+def textBox(text, axes, ha='left', fontsize=12, margin=None, frame=True, **kwargs):
+    """ Converts an axes to a text box by removing its ticks and creating a
+        wrapped annotation.
+    """
+    if margin is None:
+        margin = 6 if frame else 0
+    axes.set_xticks([])
+    axes.set_yticks([])
+    axes.set_frame_on(frame)
+
+    an = axes.annotate(text, fontsize=fontsize, xy=({'left':0, 'right':1, 'center':0.5}[ha], 1), ha=ha, va='top',
+                       xytext=(margin, -margin), xycoords='axes fraction', textcoords='offset points', **kwargs)
+    wrapText(an, margin=margin)
+    return an
 
