@@ -92,7 +92,7 @@ from .equate import equate
 from .f0 import f0
 from .filter import freqs_logspace, filter_bank, pre_emphasis
 from .freq_compression import freq_compress
-from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place
+from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place, angle2f, f2angle
 from .hcomplex import hcomplex, hcomplex_old
 from .hrtf import convolve, hrtf_data
 from .interp import interp
