@@ -231,4 +231,4 @@ def f2angle(f):
         x : scalar
             An angle, in degrees.
     '''
-    return 1350. - ((np.log2(f.)/11.)*990)
+    return 1350. - ((np.log2(f)/11.)*990)
