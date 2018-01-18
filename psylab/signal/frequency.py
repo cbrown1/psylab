@@ -42,7 +42,7 @@ numpy
 '''
 
 import numpy as np
-
+import numpy.polynomial.polynomial as poly
 
 def f_logspace(start, stop, n):
     '''Calculates a frequency range in logspace
@@ -187,36 +187,57 @@ def place2f(x):
     '''
     return 165.4*(10**(.06*x)-.88)
 
-def angle2f(x):
-    '''Converts an angle in degrees to a frequency in Hz
+def angle2f(x, stakhovskaya=True):
+    '''Takes an angle into the cochlea, in degrees, and estimates a frequency in Hz
         
-        Takes an angle (degrees), and computes a frequency (Hz), 
-        using a logarithmic spiral function [1].
-        
-        [1] Kang Cheng, Vivien Cheng and Chang-Hua Zou, 2008. A Logarithmic Spiral 
+        if stakhovskaya = True [default], then polynomial coefficients derived from 
+        a least-squares fit to the data in [1] will be used. Otherwise, the 
+        mathmatical formula proposed in [2] will be used, which assumes that each 
+        90 degrees represents a 1-octave change.
+
+        [1] Stakhovskaya, O., Sridhar, D., Bonham, B., Leake, P. (2007). Frequency Map 
+        for the Human Cochlear Spiral Ganglion: Implications for Cochlear Implants. 
+        J Assoc Res Otolaryngol. 2007 June ; 8(2): 220–233.
+
+        [2] Kang Cheng, Vivien Cheng and Chang-Hua Zou, (2008). A Logarithmic Spiral 
         Function to Plot a Cochleaogram. Trends in Medical Research, 3: 36-40.
-        
-        The function assumes that each 90 degrees represents a 1-octave change.
 
         Parameters
         ----------
         x : scalar
             An angle, in degrees.
+        stakhovskaya : Bool
+            Whether to make the estimate based on Stakhovskaya's data.
         
         Returns
         -------
         f : scalar
             A frequency, in Hz.
     '''
-    return 2048. * (2.**((360.-x)/90.))
+    if stakhovskaya:
+        stakh_coeffs = np.array([  1.71238469e+04,  -1.72587384e+02,  -2.29043020e-02,
+                                1.67009544e-02,  -1.69880138e-04,   8.55464402e-07,
+                               -2.48892410e-09,   4.10578945e-12,  -2.78555293e-15,
+                               -2.34625856e-18,   6.41128833e-21,  -5.05875380e-24,
+                                1.46471401e-27])
+        ffit = poly.Polynomial(stakh_coeffs)
+        return ffit(x)
+    else:
+        return 2048. * (2.**((360.-x)/90.))
+    
+def f2angle(f, stakhovskaya=True):
+    '''Takes a frequency in Hz and estimates an angle into the cochlea, in degrees
+        
+        if stakhovskaya = True [default], then polynomial coefficients derived from 
+        a least-squares fit to the data in [1] will be used. Otherwise, the 
+        methematical formula proposed in [2] will be used, which assumes that each 
+        90 degrees represents a 1-octave change.
 
-def f2angle(f):
-    '''Converts a frequency in Hz into an angle in degrees
-        
-        Takes a frequency (Hz), and computes an angle (degrees), 
-        using a logarithmic spiral function [1].
-        
-        [1] Kang Cheng, Vivien Cheng and Chang-Hua Zou, 2008. A Logarithmic Spiral 
+        [1] Stakhovskaya, O., Sridhar, D., Bonham, B., Leake, P. (2007). Frequency Map 
+        for the Human Cochlear Spiral Ganglion: Implications for Cochlear Implants. 
+        J Assoc Res Otolaryngol. 2007 June ; 8(2): 220–233.
+
+        [2] Kang Cheng, Vivien Cheng and Chang-Hua Zou, (2008). A Logarithmic Spiral 
         Function to Plot a Cochleaogram. Trends in Medical Research, 3: 36-40.
         
         The function assumes that each 90 degrees represents a 1-octave change.
@@ -225,10 +246,23 @@ def f2angle(f):
         ----------
         f : scalar
             A frequency, in Hz.
+        stakhovskaya : Bool
+            Whether to make the estimate based on Stakhovskaya's data.
         
         Returns
         -------
         x : scalar
             An angle, in degrees.
     '''
-    return 1350. - ((np.log2(f)/11.)*990)
+
+    if stakhovskaya:
+        stakh_coeffs = np.array([ 7.65812568e+02,  -7.80101136e-01,   4.12282815e-04,
+                               -3.64080739e-08, -5.97333469e-11,   3.14151231e-14,
+                               -7.83824139e-18,  1.18105511e-21,  -1.14512584e-25,
+                                7.20438529e-30, -2.84655168e-34,   6.42398815e-39,
+                               -6.31973435e-44])
+        ffit = poly.Polynomial(stakh_coeffs)
+        return ffit(f)
+    else:
+        return 1350. - ((np.log2(f)/11.)*990)
+
