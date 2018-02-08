@@ -71,7 +71,7 @@ def apply_itd( signal, fs, itd ):
         >>> 
     '''
     # Compute delay in samples
-    itd_samp = np.round((np.float32(np.abs(itd))/1000000.)*np.float32(fs))
+    itd_samp = np.int32(np.round((np.float32(np.abs(itd))/1000000.)*np.float32(fs)))
     delay = np.zeros(itd_samp)
 
     # Ensure 2d
@@ -153,9 +153,13 @@ def apply_ild(signal, ild):
     return out
     
 
-def gso(sig, rho):
+def gso(signal, rho):
     """Varies the inter-aural correlation of a stereo signal
-        by performing Graham-Schmidt Orthogonalization
+        by performing Gram-Schmidt orthogonalization
+
+        This does not work with diotic input signals. That is, 
+        this function correlates signals that are uncorrelated,
+        not the opposite.
         
         Parameters
         ----------
@@ -163,11 +167,11 @@ def gso(sig, rho):
             The input signal. shape[1] == 2.
         rho : scalar
             The target cross-correlation. Should be 0 <= 1.
-        
+       
         Returns
         -------
         y : array
-            The decorrelated signal.
+            The correlated signal.
 
         Notes
         -----
@@ -179,14 +183,13 @@ def gso(sig, rho):
 
     y = np.zeros_like(signal)
 
-    Lrms = np.sqrt(np.mean(xL**2))
-    Rrms = np.sqrt(np.mean(xR**2))
+    Lrms = np.sqrt(np.mean(xL**2.))
+    Rrms = np.sqrt(np.mean(xR**2.))
     num = np.mean(xL*xR)
     dem = Lrms * Rrms
     rhoLR = num / dem
-    
-    factor1 = Lrms/(Rrms*np.sqrt(1-rhoLR**2))
-    factor2 = rhoLR/np.sqrt(1-rhoLR**2)
+    factor1 = Lrms/(Rrms*np.sqrt(1.-rhoLR**2.))
+    factor2 = rhoLR/np.sqrt(1.-rhoLR**2.)
     xRstar = factor1*xR-factor2*xL
     
     alpha = np.sqrt(1-rho**2.)

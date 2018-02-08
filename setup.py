@@ -32,12 +32,7 @@ version = psylab.__version__
 
 package_dir = { 'psylab': 'psylab', 
               }
-package_data = {'psylab': [ 'subject_manager/*.ui',
-                            'subject_manager/*.sql',
-                            'subject_manager/images/*.*',
-                            'misc/*.csl',
-                          ],
-                }
+package_data = {}
 
 requires = ['numpy (>=1.2)',
             'scipy (>=0.12)',
@@ -45,7 +40,6 @@ requires = ['numpy (>=1.2)',
             ]
 
 packages = ['psylab%s' % (p) for p in ['',
-                                    '.io',
                                     '.dataview',
                                     '.gustav',
                                     '.gustav.methods',
@@ -53,16 +47,9 @@ packages = ['psylab%s' % (p) for p in ['',
                                     '.tools',
                                     '.signal',
                                     '.stats',
-                                    '.subject_manager',
                                     ]
             ]
 #packages.append('psylab_examples')
-
-requires=[
-'numpy (>=1.2)',
-'scipy (>=0.12)',
-'matplotlib (>=1.1)',
-]
 
 setup(name='PsyLab',
       version=version,
