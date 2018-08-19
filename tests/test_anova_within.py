@@ -3,6 +3,8 @@ import sys, os
 sys.path.append(os.path.join("..","src"))
 import numpy as np
 import psylab
+import psylab.dataview
+import psylab.stats
 
 if __name__ == "__main__":
 

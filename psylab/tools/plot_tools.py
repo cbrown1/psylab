@@ -27,9 +27,18 @@
 plot_tools - A set of helper functions for formatting matplotlib figures
 """
 
-from matplotlib import pyplot as plt
-import matplotlib as mpl
+from itertools import groupby
 import numpy as np
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.patches as patches
+from matplotlib.path import Path
+import matplotlib.colors as colors
+import matplotlib.mathtext as mathtext
+import matplotlib.artist as artist
+import matplotlib.image as image
+
 
 colors_asu = {}
 colors_asu['maroon'] = list(np.array((153,0,51))/255.)
@@ -47,41 +56,73 @@ colors_pitt['black'] = list(np.array((13,34,63))/255.)
 
 font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 
-marker_loudspeaker = [(-0.5, .866), (-0.5, .5), (-1, 0), (1, 0), (.5, .5), (.5, .866), (-0.5, .866)]
+# Use these markers in mpl plots with the marker kwarg: ...lw=2, marker=markers.x,...
+# You can use the rotate_marker function below to rotate them: m = rotate_marker(markers.plus, 45)
 
-from itertools import groupby
+class markers:
+    loudspeaker = [(-0.5,    0.866), 
+                   (-0.5,    0.5  ), 
+                   (-1.,     0.   ), 
+                   ( 1.,     0.   ), 
+                   ( 0.5,    0.5  ), 
+                   ( 0.5,    0.866), 
+                   (-0.5,    0.866)]
 
-# A roughly estimated points to pixels conversion dict
-pt2px = {
-6: 8,
-7: 9,
-7.5: 10,
-8: 11,
-9: 12,
-10: 13,
-10.5: 14,
-11: 15,
-12: 16,
-13: 17,
-13.5: 18,
-14: 19,
-14.5: 20,
-15: 21,
-16: 22,
-17: 23,
-18: 24,
-20: 26,
-22: 29,
-24: 32,
-26: 35,
-27: 36,
-28: 37,
-29: 38,
-30: 40,
-32: 42,
-34: 45,
-36: 48,
-}
+    plus = [(-0.333,  1.), 
+            ( 0.333,  1.), 
+            ( 0.333,  0.333), 
+            ( 1.,     0.333), 
+            ( 1.,    -0.333), 
+            ( 0.333, -0.333), 
+            ( 0.333, -1.), 
+            (-0.333, -1.), 
+            (-0.333, -0.333), 
+            (-1.,    -0.333), 
+            (-1.,     0.333), 
+            (-0.333,  0.333), 
+            (-0.333,  1.)]
+
+    # This is just marker_plus rotated 45 degrees
+    x = [(-0.943,  0.472), 
+         (-0.472,  0.943), 
+         ( 0.   ,  0.471), 
+         ( 0.472,  0.943), 
+         ( 0.943,  0.472), 
+         ( 0.471, -0.   ), 
+         ( 0.943, -0.472), 
+         ( 0.472, -0.943), 
+         (-0.   , -0.471), 
+         (-0.472, -0.943), 
+         (-0.943, -0.472), 
+         (-0.471,  0.   ), 
+         (-0.943,  0.472)]
+
+    arrow = [( 0.,   1.), 
+             ( 1.,   0.), 
+             ( 0.4,  0.), 
+             ( 0.4, -1), 
+             (-0.4, -1), 
+             (-0.4,  0), 
+             (-1.,   0.), 
+             ( 0.,   1.)]
+
+    star = [( 0.,     1.   ),
+            ( 0.294,  0.405),
+            ( 0.951,  0.309),
+            ( 0.476, -0.155),
+            ( 0.588, -0.809),
+            ( 0.,    -0.5  ),
+            (-0.588, -0.809),
+            (-0.476, -0.155),
+            (-0.951,  0.309),
+            (-0.294,  0.405),
+            ( 0.,     1.   )]
+
+
+# A roughly estimated points to pixels conversion function
+def pt2px(x):
+    return np.round((4.*x)/3.)
+
 
 def show_all_markers(x,y, ms=None, dpi=None):
     """Given arrays x and y, returns them with x values adjusted so those with 
@@ -440,6 +481,197 @@ def set_legendtitlefontsize(ax, fontsize=None):
     lh = ax.get_legend()
     if lh != None:
         lh.get_title().set_fontsize(fontsize)
+
+def draw_electrode_array(electrodes, array_pos, e_height, e_width=None, direction='e', ax=None, color='k', lw=1.5):
+    """draws a simple graphical representation of a cochlear implant electrode array
+
+        Parameters
+        ----------
+        electrodes: array-like
+            A list of electrode positions, in axes coordinates.
+        array_pos: scalar
+            An axes coordinate of the array. If electrodes will be positioned along the x axis, this
+            value will specify where on the y axis to place the array, and vice versa.
+        e_height: scalar
+            Size of the electrodes, and consequently, the array, along the axes that is perpendicular 
+            to the axes along which the electrodes are positioned. That is, if electrode position is 
+            along the x axis, this will specify their height, and if it is along y, this would actually 
+            be width.
+        e_width: scalar
+            Size of the electrodes along the axes along which the electrodes are positioned. 
+            Default == e_height.
+        direction: str
+            Specifies the direction of the array. One of either 'n' (array points up), 'e' (left to 
+            right), 's' (down), or 'w' (right to left). Default == 'e'. 
+        ax: matplotlib axes handle
+            The axes to draw the array onto. Default == plt.gca()
+        color: matplotlib color
+            The color to use. Default == 'k' (black)
+
+    """
+
+    if not e_width:
+        e_width = e_height
+    if not ax:
+        ax = plt.gca()
+
+    # Compute distance between electrodes
+    e_space = np.abs((electrodes[1] - electrodes[0]))
+
+    # Used to draw tip (apical end) of array via a bezier curve
+    codes = [Path.MOVETO,
+             Path.CURVE4,
+             Path.CURVE4,
+             Path.CURVE4,
+             ]
+
+    if direction == 'w':
+        # Compute array positions
+        array_start = electrodes[0] - (e_space/8.)
+        array_end = electrodes[-1] + e_space
+        cap_end = array_start-(e_space/2.)
+        # Draw array sides and square (apical) end
+        ax.hlines([array_pos, array_pos+e_height], array_start, array_end, color=color, lw=lw)
+        ax.vlines(array_end, array_pos, array_pos+e_height, color=color)
+        # Draw electrodes
+        for place in electrodes:
+            ax.add_patch(
+                patches.Rectangle(
+                    (place-(e_width/2.), array_pos), # (x,y)
+                    e_width,                         # width
+                    e_height,                        # height
+                    facecolor=color,
+                    lw=lw,
+                )
+            )
+        # Compute tip (basal) end of array, as bezier points
+        verts = [
+            (array_start, array_pos),          # P0
+            (cap_end, array_pos),              # P1
+            (cap_end, array_pos+e_height),     # P2
+            (array_start, array_pos+e_height), # P3
+            ]
+
+    elif direction == 'e':
+        array_start = electrodes[0] - e_space
+        array_end = electrodes[-1] + (e_space/8.)
+        cap_end = array_end+(e_space/2.)
+        ax.hlines([array_pos, array_pos+e_height], array_start, array_end, color=color, lw=lw)
+        ax.vlines(array_start, array_pos, array_pos+e_height, color=color)
+        for place in electrodes:
+            ax.add_patch(
+                patches.Rectangle(
+                    (place-(e_width/2.), array_pos), # (x,y)
+                    e_width,                         # width
+                    e_height,                        # height
+                    facecolor=color,
+                    lw=lw,
+                )
+            )
+        verts = [
+
+            (array_end, array_pos),          # P0 Bezier
+            (cap_end, array_pos),            # P1 Bezier
+            (cap_end, array_pos+e_height),   # P2 Bezier
+            (array_end, array_pos+e_height), # P3 Bezier
+            ]
+
+    elif direction == 'n':
+        array_start = electrodes[0] - e_space
+        array_end = electrodes[-1] + (e_space/8.)
+        cap_end = array_end+(e_space/2.)
+        ax.vlines([array_pos, array_pos+e_height], array_start, array_end, color=color, lw=lw)
+        ax.hlines(array_start, array_pos, array_pos+e_height, color=color)
+        for place in electrodes:
+            ax.add_patch(
+                patches.Rectangle(
+                    (array_pos, place-(e_height/2.)), # (x,y)
+                    e_height,                         # width
+                    e_width,                          # height
+                    facecolor=color,
+                    lw=lw,
+                )
+            )
+        verts = [
+            (array_pos, array_end),          # P0
+            (array_pos, cap_end),            # P1
+            (array_pos+e_height, cap_end),   # P2
+            (array_pos+e_height, array_end), # P3
+            ]
+
+    else:
+        array_start = electrodes[0] - (e_space/8.)
+        array_end = electrodes[-1] + e_space
+        cap_end = array_start-(e_space/2.)
+        ax.vlines([array_pos, array_pos+e_height], array_start, array_end, color=color, lw=lw)
+        ax.hlines(array_end, array_pos, array_pos+e_height, color=color)
+        for place in electrodes:
+            ax.add_patch(
+                patches.Rectangle(
+                    (array_pos, place-(e_height/2.)), # (x,y)
+                    e_height,                         # width
+                    e_width,                          # height
+                    facecolor=color,
+                    lw=lw,
+                )
+            )
+        verts = [
+            (array_pos, array_start),          # P0
+            (array_pos, cap_end),              # P1
+            (array_pos+e_height, cap_end),     # P2
+            (array_pos+e_height, array_start), # P3
+            ]
+
+    # Draw array tip
+    path = Path(verts, codes)
+    patch = patches.PathPatch(path, ec=color, fc='none', lw=lw)
+    ax.add_patch(patch)
+
+def draw_filterbank(cutoffs, y, height, slope_width, gap=0, ax=None, **kwargs):
+    """Draws a simple graphical representation of a bank of contiguous bandpass filters
+
+        Parameters
+        ----------
+        cutoffs: array like
+            The cutoff frequencies to use, in x axis units
+        y: scalar
+            The position of the filterbank, in y axis units
+        height: scalar
+            The height of the filterbank, in y axis units
+        slope_width: scalar
+            The width of the filter slopes, in x axis units
+        gap: scalar
+            The width of the gap between contiguous filters (3-dB down points), in x axis units
+        ax: matplotlib axes handle
+            The axes to plot to. Default == plt.gca()
+        kwargs: matplotlib kwargs
+            Plotting parameters to use. Eg., lw=2, c='r', etc
+
+        Returns
+        -------
+        handles: list
+            A list of matplotlib lines2D object handles, one per bandpass filter. 
+            EG., handles[2].set_color("blue"); handles[2].set_linewidth(2)
+
+        Notes
+        -----
+        The plot function is used to draw each filter, so if you don't specify a color in
+        the kwargs, the current color map will be cycled through.
+
+    """
+
+    if not ax:
+        ax = plt.gca()
+    handles = []
+    gap1 = gap / 2.
+    gap2 = -gap / 2.
+    for i in np.arange(len(cutoffs)-1):
+        y1 = (np.float32(y), np.float32(y+height), np.float32(y+height), np.float32(y))
+        x1 = (cutoffs[i] - slope_width + gap1, cutoffs[i] + gap1, cutoffs[i+1] + gap2, cutoffs[i+1] + slope_width + gap2)
+        h, = ax.plot(x1, y1, **kwargs)
+        handles.append(h)
+
+    return handles
 
 def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
     """Draws a head, viewed from above, on the specified figure.
@@ -819,14 +1051,17 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
     """Generates tables in mpl with basic control over cell height and width
     
         Cells can be merged horizontally and/or vertically, and the borders 
-        for particular cells can be omitted from drawing
+        for particular cells can be omitted from drawing.
         
         Also provides facility to add labels to individual cells, with the 
-        ability to format and align each label, and specify cell padding
+        ability to format and align each label, and specify cell padding.
+        No check is performed on whether the text fits in the cell.
         
         The target usecase of this function is to generate simple tables that 
         can be saved to pdf or another format to be included , eg., in lab 
-        worksheets, for use as data-entry tables by students in a lab class 
+        worksheets, for use as data-entry tables by students in a lab class. 
+        This is the kind of task that is typically performed with spreadsheets,
+        but this function provides a fully scriptable solution.
         
         Parameters
         ----------
@@ -1274,3 +1509,166 @@ def textBox(text, axes, ha='left', fontsize=12, margin=None, frame=True, **kwarg
     wrapText(an, margin=margin)
     return an
 
+# Menu on a figure:
+#    fig = plt.figure()
+#    fig.subplots_adjust(left=0.3)
+#    props = ItemProperties(labelcolor='black', bgcolor='yellow',
+#                           fontsize=15, alpha=0.2)
+#    hoverprops = ItemProperties(labelcolor='white', bgcolor='blue',
+#                                fontsize=15, alpha=0.2)
+#
+#    menuitems = []
+#    for label in ('open', 'close', 'save', 'save as', 'quit'):
+#        def on_select(item):
+#            print('you selected %s' % item.labelstr)
+#        item = MenuItem(fig, label, props=props, hoverprops=hoverprops,
+#                        on_select=on_select)
+#        menuitems.append(item)
+
+
+class ItemProperties(object):
+    def __init__(self, fontsize=14, labelcolor='black', bgcolor='yellow',
+                 alpha=1.0):
+        self.fontsize = fontsize
+        self.labelcolor = labelcolor
+        self.bgcolor = bgcolor
+        self.alpha = alpha
+
+        self.labelcolor_rgb = colors.to_rgba(labelcolor)[:3]
+        self.bgcolor_rgb = colors.to_rgba(bgcolor)[:3]
+
+
+class MenuItem(artist.Artist):
+    parser = mathtext.MathTextParser("Bitmap")
+    padx = 5
+    pady = 5
+
+    def __init__(self, fig, labelstr, props=None, hoverprops=None,
+                 on_select=None):
+        artist.Artist.__init__(self)
+
+        self.set_figure(fig)
+        self.labelstr = labelstr
+
+        if props is None:
+            props = ItemProperties()
+
+        if hoverprops is None:
+            hoverprops = ItemProperties()
+
+        self.props = props
+        self.hoverprops = hoverprops
+
+        self.on_select = on_select
+
+        x, self.depth = self.parser.to_mask(
+            labelstr, fontsize=props.fontsize, dpi=fig.dpi)
+
+        if props.fontsize != hoverprops.fontsize:
+            raise NotImplementedError(
+                'support for different font sizes not implemented')
+
+        self.labelwidth = x.shape[1]
+        self.labelheight = x.shape[0]
+
+        self.labelArray = np.zeros((x.shape[0], x.shape[1], 4))
+        self.labelArray[:, :, -1] = x/255.
+
+        self.label = image.FigureImage(fig, origin='upper')
+        self.label.set_array(self.labelArray)
+
+        # we'll update these later
+        self.rect = patches.Rectangle((0, 0), 1, 1)
+
+        self.set_hover_props(False)
+
+        fig.canvas.mpl_connect('button_release_event', self.check_select)
+
+    def check_select(self, event):
+        over, junk = self.rect.contains(event)
+        if not over:
+            return
+
+        if self.on_select is not None:
+            self.on_select(self)
+
+    def set_extent(self, x, y, w, h):
+        print(x, y, w, h)
+        self.rect.set_x(x)
+        self.rect.set_y(y)
+        self.rect.set_width(w)
+        self.rect.set_height(h)
+
+        self.label.ox = x + self.padx
+        self.label.oy = y - self.depth + self.pady/2.
+
+        self.rect._update_patch_transform()
+        self.hover = False
+
+    def draw(self, renderer):
+        self.rect.draw(renderer)
+        self.label.draw(renderer)
+
+    def set_hover_props(self, b):
+        if b:
+            props = self.hoverprops
+        else:
+            props = self.props
+
+        r, g, b = props.labelcolor_rgb
+        self.labelArray[:, :, 0] = r
+        self.labelArray[:, :, 1] = g
+        self.labelArray[:, :, 2] = b
+        self.label.set_array(self.labelArray)
+        self.rect.set(facecolor=props.bgcolor, alpha=props.alpha)
+
+    def set_hover(self, event):
+        'check the hover status of event and return true if status is changed'
+        b, junk = self.rect.contains(event)
+
+        changed = (b != self.hover)
+
+        if changed:
+            self.set_hover_props(b)
+
+        self.hover = b
+        return changed
+
+
+class Menu(object):
+    def __init__(self, fig, menuitems):
+        self.figure = fig
+        fig.suppressComposite = True
+
+        self.menuitems = menuitems
+        self.numitems = len(menuitems)
+
+        maxw = max([item.labelwidth for item in menuitems])
+        maxh = max([item.labelheight for item in menuitems])
+
+        totalh = self.numitems*maxh + (self.numitems + 1)*2*MenuItem.pady
+
+        x0 = 100
+        y0 = 400
+
+        width = maxw + 2*MenuItem.padx
+        height = maxh + MenuItem.pady
+
+        for item in menuitems:
+            left = x0
+            bottom = y0 - maxh - MenuItem.pady
+
+            item.set_extent(left, bottom, width, height)
+
+            fig.artists.append(item)
+            y0 -= maxh + MenuItem.pady
+
+        fig.canvas.mpl_connect('motion_notify_event', self.on_move)
+
+    def on_move(self, event):
+        draw = False
+        for item in self.menuitems:
+            draw = item.set_hover(event)
+            if draw:
+                self.figure.canvas.draw()
+                break

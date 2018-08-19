@@ -44,7 +44,7 @@ numpy
 import numpy as np
 import numpy.polynomial.polynomial as poly
 
-def f_logspace(start, stop, n):
+def logspace(start, stop, n):
     '''Calculates a frequency range in logspace
         
         Returns a number frequencies within the specified range, in log space.
@@ -63,9 +63,16 @@ def f_logspace(start, stop, n):
         -------
         freqs : array
             An array of frequencies.
+
+        Examples
+        --------
+
+        >>> logspace(125, 500, 3)
+        array([125., 250., 500.])
+
     '''
-    n_arr = np.arange(n+1)
-    interval = np.log10(stop/float(start))/float(n)
+    n_arr = np.arange(n)
+    interval = np.log10(stop/np.float32(start))/np.float32(n-1)
     freqs = start*10.**(interval*n_arr)
     return freqs
 
@@ -89,6 +96,13 @@ def oct2f(cf, oct):
             The frequency that is oct octaves below cf.
         hi : scalar
             The frequency that is oct octaves above cf.
+
+        Examples
+        --------
+
+        >>> oct2f(1000,1)
+        ('500.0', '2000.0')
+
     '''
     lo = np.round(cf*(2.**np.float32(-oct)));
     hi = np.round(cf*(2.**np.float32(oct)));
@@ -108,6 +122,13 @@ def f2oct(f1, f2):
         -------
         oct : scalar
             The distance, in octaves, between f1 and f2.
+
+        Examples
+        --------
+
+        >>> f2oct(1000,2000)
+        1.0
+
     '''
     return np.log2(np.float32(f2)/np.float32(f1))
 
@@ -128,6 +149,7 @@ def f2erbs(f):
         -------
         erb : scalar or array
             Equivalent rectangular bandwidth (ERB) values.
+
     '''
     return 21.4 * ( np.log10( 229 + f ) - 2.36 );
 

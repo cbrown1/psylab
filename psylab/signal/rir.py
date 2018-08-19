@@ -181,14 +181,14 @@ def fconv(x, h):
     ly2 = 2**(nextpow2(ly))
 
     m = max(abs(x))
-    x = np.fft(x, ly2)
-    h = np.fft(h, ly2)
+    x = np.fft.fft(x, ly2)
+    h = np.fft.fft(h, ly2)
 
     y = x * h
 
-    y = np.real(np.ifft(y, ly2)) # Inverse fast Fourier transform
+    y = np.real(np.fft.ifft(y, ly2)) # Inverse fast Fourier transform
     y = y[:ly]
-    m = m/max(abs(y))
+    m = m/np.max(np.abs(y))
     y = m*y
 
     return y

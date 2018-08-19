@@ -127,8 +127,9 @@ def anova_between(data, factors=None):
                                 # then we care about each level...
                 product_to_take.append(range(data.shape[i]))
             else: #We don't care about the levels, so,
-                product_to_take.append([Ellipsis])
-        product_to_take.append([Ellipsis])
+                  # Ellipsis -> slice(None) because only 1 Ellipsis allowed in an index
+                product_to_take.append([slice(None)])
+        product_to_take.append([slice(None)])
         return product(*product_to_take)
 
     # Find all treatment combinations
@@ -283,8 +284,9 @@ def anova_within(data, subject_index=0, factors=None):
                                 # then we care about each level...
                 product_to_take.append(range(data.shape[i]))
             else: #We don't care about the levels, so,
-                product_to_take.append([Ellipsis])
-        product_to_take.append([Ellipsis])
+                  # Ellipsis -> slice(None) because only 1 Ellipsis allowed in an index
+                product_to_take.append([slice(None)])
+        product_to_take.append([slice(None)])
         return product(*product_to_take)
 
     # Find all treatment combinations
@@ -310,23 +312,23 @@ def anova_within(data, subject_index=0, factors=None):
 
     for s in sources:
         # Compute the sum of squares
-        squares = 0
+        squares = 0.
         for i in ss_indices(s):
-            squares += np.nansum(data[i])**2 / data[i].size
+            squares += np.nansum(data[i])**2. / data[i].size
 
         # Uncorrected SS that includes interaction effects
         unc = squares - cm
 
         # Compute correction term from interactions
         if len(s) > 1:
-            correction = np.nansum(tuple(ss[x] for x in srcs_to_inter[s]))
+            correction = np.float( np.nansum(tuple(ss[x] for x in srcs_to_inter[s])) )
         else:
-            correction = 0
+            correction = 0.
 
         ss[s] = unc - correction
 
         if s not in df:
-            df[s] = nanproduct(tuple(df[z] for z in s))
+            df[s] = np.float( nanproduct(tuple(df[z] for z in s)) )
 
         ms[s] = ss[s] / df[s]
 
@@ -337,6 +339,8 @@ def anova_within(data, subject_index=0, factors=None):
 
     ss["total"] = np.nansum(data**2) - cm
     df["total"] = 0
+
+    print(error_term_from_source)
 
     for s in sources:
         etfs = error_term_from_source[s]

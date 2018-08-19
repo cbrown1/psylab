@@ -38,4 +38,3 @@ __version__ = '0.4.7.13'
 from . import tools
 from . import signal
 from . import stats
-from . import gustav
