@@ -19,9 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Psylab is a loose collection of modules useful for various aspects of running
 psychophysical experiments, although several might be more generally useful.
 
-Current version: 1.0
-website: http://www.psylab.us
-source code: http://code.google.com/p/psylab
+website: http://www.github.com/cbrown1/psylab
 
 For installation instructions, see INSTALL.
 

@@ -96,6 +96,7 @@ from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place, angle2f, 
 from .hcomplex import hcomplex, hcomplex_old
 from .hrtf import convolve, hrtf_data
 #from .interp import interp
+from .level import spl2n0, spl2sp, spl2si, sp2spl, si2spl
 from .mix import mix
 from .noise import pink, white, irn, mls
 from .normalize import normalize
@@ -106,7 +107,6 @@ from .rms import rms
 from .samp import samp2ms, ms2samp
 from .smooth import smooth
 from .spec import lts, magspec, specgram, specplot
-from .spl import spl2sp, spl2si, sp2spl, si2spl
 from .tone import tone
 from .t60 import t60
 from .vocoder import vocoder, vocoder_vect, vocoder_overlap
