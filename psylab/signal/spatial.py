@@ -27,6 +27,104 @@
 import numpy as np
 import collections
 
+def win_cos(size):
+    """generates a cosine function, suitable for windowing applications like panning
+    """
+    win = .5 * np.sin( (3/2.*np.pi) + (2*np.pi*np.linspace(0,size,size))) + .5
+    return win
+
+
+def pan(size, locations):
+    """generates a 2d array of sinusoidal cross-fade functions 
+        given a total size (length of audio in samples) and # of locations
+
+        The output array will have the shape (size, locations), 
+        and be suitable for multiplying into an array of multi-channel 
+        audio data
+
+        The use case is for simulating moving sources using panning, either 
+        in the freefield (from one loudspeaker to the next), or over headphones 
+        (virtualize each channel to a different location, then pan).
+
+        Parameters
+        ----------
+        size: scalar
+            The length of the audio data, in samples
+        locations: scalar or array-like
+            If scalar, the number of locations and panning will smoothly progress from 
+            channel 1 to channel locations. If array-like, it will specify the order of 
+            channels to pan. They will be distributed evenly across size.
+            So, fewer locations will produce longer cross-fades for a given amount 
+            of audio.
+
+        Returns
+        -------
+        env : array
+            An array of size (size, locations), where env[:,0] starts at one and 
+            decreases sinusoidally, env[:,1] starts at zero and increases, etc.
+            
+        Example
+        -------
+        # Create a signal
+        fs = 44100
+        data = .1 * np.sin((2. * np.pi * np.cumsum(np.ones(fs*2)*2000) / fs))
+
+        # Create cross-fade array
+        env = pan(data.size, 5)
+
+        # Create left & right multitracks, the multipliers are ilds to move headphone image l-r
+        data_l = np.vstack((data*4, data*2, data, data*.5, data*.25)).T
+        data_r = np.vstack((data*.25, data*.5, data, data*2, data*4)).T
+
+        # Now apply the cross-fades
+        data_l_pan = data_l * env
+        data_r_pan = data_r * env
+
+        # Mix each l & r channel down
+        data_l_mix = np.sum(data_l_pan, axis=1)
+        data_r_mix = np.sum(data_r_pan, axis=1)
+        
+        # Combine in to stereo file for headphone playback
+        data_out_headphones = np.vstack((data_l_mix, data_r_mix)).T
+
+        # For free-field playback, a single multichannel array
+        data_freefield = np.vstack((data, data, data, data, data)).T
+        # Default will pan from channels 0 - 1 - 2 - 3 - 4
+        data_out_l_to_r = data_freefield * env
+
+        # Or, specify the channel order (here, reverse channels for r - l)
+        env2 = pan(data.size, (4,3,2,1,0))
+        data_out_r_to_l = data_freefield * env2
+
+    """
+    if isinstance(locations, (long, int)):
+        locs = np.arange(locations)
+    else:
+        locs = locations
+        locations = len(locs)
+
+    d = size / (locations-1)
+    # fade length, in samples
+    win = win_cos(d*2)
+    # The window
+    env = np.zeros((size, locations))
+    # Array to hold the cross-fade data
+    env[:d,locs[0]] = win[d:]
+    # First fade is half the window (fade in)
+    if locations == 2:
+        env[:,1] = win[:d]
+        # More than 2 locs was a pain in the ass, and didn't work with exactly 2. So just hardcode.
+    else:
+        for i in np.arange(env.shape[1]-2):
+            env[d*i:d*(i+2),locs[i+1]] = win
+            # Loop through all but last, apply full window
+        env[d*(i+1):d*(i+1)+d,locs[i+2]] = win[:d]
+        # Last is half the window (fade out)
+        env[env[:,locs[i+2]].argmax():,locs[i+2]] = 1
+        # Make any remainder = 1
+    return env
+
+
 def convolve(x, h):
     '''Convolves two signals using FFT-based fast convolution
         

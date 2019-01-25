@@ -94,14 +94,16 @@ def apply_itd( signal, fs, itd ):
     return out
     
 
-def apply_ild(signal, ild):
+def apply_ild( signal, ild, atten=1. ):
     '''Applies an interaural level difference to a signal
 
         Convenience function to apply an ild to a signal. Accepts both 1d and 
         2d (shape[1] == 2) input arrays, although the output is always 2d.
 
-        The ild is applied by always attenuating one or the other channel
-        (ie, positive gain is never applied).
+        atten is 0<=1, and specifies the proportion of the ild to apply as 
+        contralateral attenuation. Ie., when atten==1, the ild is applied by 
+        attenuating one or the other channel only, and when it is less than 1
+        that proportion is contra atten and the remainder is ipsi gain.
 
         Positive ild values will result in right-leading output signal 
         (attenuation to left channel) and negative ilds will result in 
@@ -114,6 +116,10 @@ def apply_ild(signal, ild):
             stereo].
         ild : scalar
             The ild to apply, in dB.
+        atten : scalar
+            The proportion of the ILD to be applied as contralateral 
+            attenuation. eg., .5 means half as contra atten, half as ipsi
+            gain. default = 1.
 
         Returns
         -------
@@ -122,20 +128,16 @@ def apply_ild(signal, ild):
             
         Examples
         --------
-        >>> a = np.ones(5)
+        >>> a = np.ones(2)
         >>> apply_ild(a,6)
         array([[ 0.50119163,  1.        ],
-               [ 0.50119163,  1.        ],
-               [ 0.50119163,  1.        ],
-               [ 0.50119163,  1.        ],
                [ 0.50119163,  1.        ]])
         >>> apply_ild(a,-12)
         array([[ 1.        ,  0.25119305],
-               [ 1.        ,  0.25119305],
-               [ 1.        ,  0.25119305],
-               [ 1.        ,  0.25119305],
                [ 1.        ,  0.25119305]])
-        >>> 
+        >>> apply_ild(a,6,.5)
+        array([[ 0.70794889,  1.41253135],
+               [ 0.70794889,  1.41253135]])
     '''
 
     # Ensure 2d
@@ -144,11 +146,16 @@ def apply_ild(signal, ild):
     else:
         out = signal
     
+    contra = np.float32(atten)*ild
+    ipsi = -(ild-contra)
+
     # Apply ild
     if ild > 0 :
-        out[:,0] = out[:,0] * np.exp(np.float32(-np.abs(ild))/8.6860)
+        out[:,0] = out[:,0] * np.exp(np.float32(-np.abs(contra))/8.6860)
+        out[:,1] = out[:,1] * np.exp(np.float32(np.abs(ipsi))/8.6860)
     else:
-        out[:,1] = out[:,1] * np.exp(np.float32(-np.abs(ild))/8.6860)
+        out[:,0] = out[:,0] * np.exp(np.float32(np.abs(ipsi))/8.6860)
+        out[:,1] = out[:,1] * np.exp(np.float32(-np.abs(contra))/8.6860)
 
     return out
     
