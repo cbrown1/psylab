@@ -44,7 +44,6 @@ filter_bank - Filters the input array with a bank of filters
 freq_compress - Performs frequency compression on a signal
 freqs_logspace - Computes a range of frequencies evenly spaced in log space
 gso - Varies the inter-aural correlation of a stereo signal
-hcomplex - Generates harmonic complexes
 hrtf_data - Helper class for handling hrtf data
 ild - Applies an interaural level difference to a signal
 interp - Interpolates a signal to a specified number of points
@@ -70,6 +69,7 @@ specgram - Plots a nice spectrogram
 specplot - Plots magnitude spectra
 t60 - Estimates reverberation time
 tone - Generates pure tones
+tcomplex - Generates tone complexes
 vocoder - Implements an envelope vocoder
 white - Generates white noise
 zeropad - Zero pads the shorter of two or more arrays
@@ -93,7 +93,6 @@ from .f0 import f0
 from .filter import freqs_logspace, filter_bank, pre_emphasis
 from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place, angle2f, f2angle, logspace
-from .hcomplex import hcomplex, hcomplex_old
 from .spatial import win_cos, pan, convolve, hrtf_data
 #from .interp import interp
 from .level import spl2n0, spl2sp, spl2si, sp2spl, si2spl
@@ -107,7 +106,7 @@ from .rms import rms
 from .samp import samp2ms, ms2samp
 from .smooth import smooth
 from .spec import lts, magspec, specgram, specplot
-from .tone import tone
+from .tone import tone, tcomplex
 from .t60 import t60
 from .vocoder import vocoder, vocoder_vect, vocoder_overlap
 from .window import sliding_window

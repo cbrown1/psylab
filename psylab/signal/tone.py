@@ -23,6 +23,7 @@
 # cbrown1@pitt.edu.
 #
 
+import collections
 import numpy as np
 
 def tone(f, fs, dur, **kwargs):
@@ -113,3 +114,60 @@ def tone(f, fs, dur, **kwargs):
         amp1 = amp
 
     return amp1 * np.sin(phase + (2. * np.pi * np.cumsum(freq) / fs))
+
+def tcomplex(f, fs, dur, **kwargs):
+    #, amp=1, ncomponents=100, offset=0, phase=0):
+    '''Generates tone complexes
+        
+        Parameters
+        ----------
+        f :  scalar or array-like
+            If scalar, the fundamental frequency of a harmonic complex, and 
+            use ncomponents and offset to specify components. Or pass an 
+            array to specify component frequencies of a generic tone complex
+            (in this case ncomponents and offset arguments are ignored).
+        fs : scalar
+            sampling frequency
+        dur : scalar
+            duration in ms
+
+        Kwargs
+        ------
+        amp : scalar or array-like
+            amplitude values less than or equal to 0 are treated as dB (re: 
+            +-1), and values greater than 0 will scale the waveform 
+            peak linearly. (array of length ncomponents allows setting amp 
+            of each component separately) default = 1
+        ncomponents : scalar
+            number of harmonic components. Ignored if f is an array. 
+            default = 100
+        offset : scalar or array-like
+            offset in Hz. Eg., offset = 2 would yield 102, 202, 302, 402, etc.
+              (array of length ncomponents allows setting offset of each 
+              component separately) Ignored if f is an array. default = 0
+        phase : scalar or array-like
+            starting phase of each component. (array of length ncomponents 
+            allows setting phase of each component separately) default = 0 
+
+        Returns
+        -------
+        y : array
+            The waveform
+    '''
+
+    amp = np.float64(kwargs.get('amp', 1.))
+    phase = np.float64(kwargs.get('phase', 0.))
+    ncomponents = np.float64(kwargs.get('ncomponents', 100.))
+    offset = np.float64(kwargs.get('offset', 0.))
+
+    if amp <= 0:
+        amp = 10. ** (amp / 20.)
+    dur_s = np.int(np.round((dur / 1000.) * fs))
+    phase_r = phase*np.pi/180.
+
+    if isinstance(f, (collections.Sequence, np.ndarray)):
+        fh = f
+    else:
+        fh = ((np.arange(ncomponents) + 1) * f) + offset
+    out = np.sin(phase_r + 2*np.pi * np.cumsum(np.ones((dur_s,fh.size))*fh,axis=0) / fs) * amp
+    return out.sum(axis=1)

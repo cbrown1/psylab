@@ -23,6 +23,7 @@
 # cbrown1@pitt.edu.
 #
 
+import collections
 import numpy as np
 
 def hcomplex_old(f, fs, **kwargs):
@@ -77,26 +78,31 @@ def hcomplex_old(f, fs, **kwargs):
         y = y + (amp * np.sin(2 * np.pi * np.cumsum(buff) / fs))
     return y
 
-def hcomplex(f, fs, dur, ncomponents, amp=1, offset=0):
-    '''Generates harmonic complexes
+def tcomplex(f, fs, dur, amp=1, ncomponents=100, offset=0):
+    '''Generates tone complexes
         
         Parameters
         ----------
-        f :  scalar
-            fundamental frequency
+        f :  scalar or array-like
+            If scalar, the fundamental frequency of a harmonic complex, and 
+            use ncomponents and offset to specify components. Or pass an 
+            array to specify component frequencies of a generic tone complex
+            (ncomponents and offset arguments are ignored).
         fs : scalar
             sampling frequency
         dur : scalar
             duration in ms
-        ncomponents : scalar
-            number of harmonic components
         amp : scalar
             amplitude values less than or equal to 0 are treated as dB (re: 
             +-1), and values greater than 0 are used to scale the waveform 
-            peak linearly. default is 1
+            peak linearly. default is 1 (array of length f allows setting 
+            amp of each component separately) default = 1
+        ncomponents : scalar
+            number of harmonic components. Ignored if f is an array. default = 100
         offset : scalar
             offset in Hz. Eg., offset = 2 would yield 102, 202, 302, 402, etc.
-          
+             Ignored if f is an array. (array of length f allows setting 
+             offset of each component separately) default = 0
         Returns
         -------
         y : array
@@ -105,7 +111,11 @@ def hcomplex(f, fs, dur, ncomponents, amp=1, offset=0):
     if amp <= 0:
         amp = 10. ** (amp / 20.)
     dur = np.int(np.round((dur / 1000.) * fs))
-    fh = ((np.arange(ncomponents) + 1) * f) + offset
+    if isinstance(f, (collections.Sequence, np.ndarray)):
+        fh = f
+        ncomponents = fh.size
+    else:
+        fh = ((np.arange(ncomponents) + 1) * f) + offset
     out = np.sin(2*np.pi * np.cumsum(np.ones((dur,ncomponents))*fh,axis=0) / fs) * amp
     return out.sum(axis=1)
     
