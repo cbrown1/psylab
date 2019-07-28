@@ -32,7 +32,7 @@ useful.
 
 '''
 
-__version__ = '0.4.7.15'
+__version__ = '0.4.7.16'
 
 #from dataview import dataview
 from . import tools

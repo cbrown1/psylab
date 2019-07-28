@@ -42,7 +42,6 @@ requires = ['numpy (>=1.2)',
 packages = ['psylab%s' % (p) for p in ['',
                                     '.tools',
                                     '.signal',
-                                    '.stats',
                                     ]
             ]
 #packages.append('psylab_examples')
@@ -57,7 +56,7 @@ setup(name='PsyLab',
       author_email='cbrown1@pitt.edu',
       maintainer='Christopher Brown',
       maintainer_email='cbrown1@pitt.edu',
-      url='http://www.psylab.us',
+      url='http://www.github.com/cbrown1/psylab',
       packages = packages,
       package_dir = package_dir,
       package_data = package_data,
