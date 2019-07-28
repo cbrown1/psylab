@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
 '''
-signal - A collection of functions for psychoacoustics-based signal processing. 
-Some are pedagogical in nature, others might actually be useful. 
+signal - A collection of functions for psychoacoustics-based signal processing.
+Some are pedagogical in nature, others might actually be useful.
 
 Functions include:
 
@@ -72,6 +72,7 @@ tone - Generates pure tones
 tcomplex - Generates tone complexes
 vocoder - Implements an envelope vocoder
 white - Generates white noise
+win_attack - Generates windows with control over attack times
 zeropad - Zero pads the shorter of two or more arrays
 
 Dependencies:
@@ -109,5 +110,5 @@ from .spec import lts, magspec, specgram, specplot
 from .tone import tone, tcomplex
 from .t60 import t60
 from .vocoder import vocoder, vocoder_vect, vocoder_overlap
-from .window import sliding_window
+from .window import sliding_window, win_attack
 from .zeropad import zeropad

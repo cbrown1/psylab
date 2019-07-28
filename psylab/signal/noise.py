@@ -18,9 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
@@ -29,7 +29,7 @@ from scipy.signal import lfilter
 
 def white(n, channels=None):
     """Generates white noise
-    
+
         The noise is normalized (peak == 1)
 
         Parameters
@@ -38,7 +38,7 @@ def white(n, channels=None):
             A number of samples (dim 0)
         channels : scalar
             A number of channels (dim 1)
-        
+
         Returns
         -------
         y : array
@@ -49,11 +49,11 @@ def white(n, channels=None):
     else:
         out = np.random.randn(np.int(n))
     return out/np.max(np.abs(out), axis=0)
-        
-    
+
+
 def pink(n, channels=None):
     """Generates pink noise
-    
+
         The noise is normalized (peak == 1)
 
         Parameters
@@ -62,15 +62,15 @@ def pink(n, channels=None):
             A number of samples (dim 0)
         channels : scalar
             A number of channels (dim 1)
-        
+
         Returns
         -------
         y : array
             The pink noise.
-        
+
         Notes
         -----
-        Adapted from: 
+        Adapted from:
         https://ccrma.stanford.edu/~jos/sasp/Example_Synthesis_1_F_Noise.html
         Citation:
         Smith, Julius O. Spectral Audio Signal Processing, October 2008 Draft,
@@ -85,20 +85,20 @@ def pink(n, channels=None):
         x = np.zeros_like(v)
         for i in np.arange(channels):
             x[:,i] = lfilter(b,a,v[:,i])   # Apply 1/F roll-off to PSD
-        out = x[nT60+1:,:]                 # Skip transient response
+        out = x[np.int(nT60):,:]                 # Skip transient response
     else:
         v = np.random.randn(np.int(n+nT60)) # Gaussian white noise: N(0,1)
         x = lfilter(b,a,v)                 # Apply 1/F roll-off to PSD
-        out = x[nT60+1:]                   # Skip transient response
+        out = x[np.int(nT60):]                   # Skip transient response
     return out/np.max(np.abs(out), axis=0)
 
 
 def irn(dur, fs, delay, gain, its, type=1):
     '''Generates iterated rippled noise
-    
-        Generates iterated rippled noise, or noise with a rippled spectrum, by 
-        implementing a delay-attenuate-add method. 
-        
+
+        Generates iterated rippled noise, or noise with a rippled spectrum, by
+        implementing a delay-attenuate-add method.
+
         Parameters
         ----------
         dur : scalar
@@ -113,7 +113,7 @@ def irn(dur, fs, delay, gain, its, type=1):
             The number of iterations.
         type : scalar
             1 = IRNO; 2 = IRNS.
-        
+
         Returns
         -------
         y : array
@@ -122,18 +122,18 @@ def irn(dur, fs, delay, gain, its, type=1):
     dd = np.int(dur/1000.);
     wbn = np.random.randn(fs);
     rip = wbn;
-    
+
     if type == 1:
         for it in range(its):
             rip[:fs-delay] = rip[delay:fs];
             rip = ( rip * gain ) + wbn;
-        
+
     elif type == 2:
         for it in range(its):
             rip1 = rip;
             rip[:fs-delay] = rip[delay:fs];
             rip = rip + ( gain * rip1 );
-    
+
     rip = rip / np.max(np.abs(rip))
     return rip[:np.round(dd * fs)];
 
@@ -269,4 +269,3 @@ def mls(n, rand_seed=False):
             return 1
     zero_to_neg_one = lambda x: x
     return np.array([zero_to_neg_one(lfsr.next()) for i in xrange(seqlen)], np.int32)
-

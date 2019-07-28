@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
 """
-level: Pedagogical functions involving sound level conversion. 
+level: Pedagogical functions involving sound level conversion.
 
 Sound power (sound intensity) is the cause and sound pressure is the effect.
 """
@@ -36,9 +36,9 @@ hl_conversion = {
             250: 27.0,
             500: 13.5,
             750: 9.0,
-            1000: 7.5, 
-            1500: 7.5, 
-            2000: 9.0, 
+            1000: 7.5,
+            1500: 7.5,
+            2000: 9.0,
             3000: 11.5,
             4000: 12.0,
             6000: 16.0,
@@ -47,7 +47,7 @@ hl_conversion = {
 
 def spl2hl(spl, f):
     """ Converts Sound Pressure Level (SPL) to Hearing Level (HL)
-    
+
     """
     if f in hl_conversion.keys():
         return spl + hl_conversion[f]
@@ -57,7 +57,7 @@ def spl2hl(spl, f):
 
 def hl2spl(hl, f):
     """ Converts Hearing Level (HL) to Sound Pressure Level (SPL)
-    
+
     """
     if f in hl_conversion.keys():
         return hl - hl_conversion[f]
@@ -67,7 +67,7 @@ def hl2spl(hl, f):
 
 def spl2n0(spl, fc, bw):
     """ Converts Sound Pressure Level (SPL) to Spectrum Level (N0)
-    
+
     """
     lo = np.round(fc*(2.**np.float32(-bw/2.)));
     hi = np.round(fc*(2.**np.float32(bw/2.)));
@@ -77,7 +77,7 @@ def spl2n0(spl, fc, bw):
 
 def spl2sp(spl):
     """Converts a Sound Pressure Level (SPL) value to Sound Pressure (Pa)
-    
+
     """
     ref = .00002 # Standard reference of 20 uPa
     sp = ref * np.power(10.,spl/20.)
@@ -86,24 +86,25 @@ def spl2sp(spl):
 
 def sp2spl(sp):
     """Converts a Sound Pressure (Pa) value to Sound Pressure Level (SPL)
-    
+
     """
     ref = .00002 # Standard reference of 20 uPa
     spl = 20*np.log10(sp/ref)
     return spl
 
-    
+
 def spl2si(spl):
     """Converts a Sound Pressure Level (dB SPL) value to Sound Intensity (W/m2)
-    
+
     """
     ref = .000000000001 # Standard reference of 10**−12 W/m2
     si = ref * np.power(10.,spl/10.)
     return si
+
     
 def si2spl(si):
     """Converts a Sound Intensity (W/m2) value to Sound Pressure Level (dB)
-    
+
     """
     ref = .000000000001 # Standard reference of 10**−12 W/m2
     spl = 10*np.log10(si/ref)

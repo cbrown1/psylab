@@ -26,13 +26,55 @@
 import numpy as np
 from scipy import stats
 
+
 def bonferroni(p,k):
     # Ref: http://books.google.com/books?id=3jpvrEhozGgC&pg=PA70
     return p*k
 
+
 def sidak(p,k):
     # Ref: http://books.google.com/books?id=3jpvrEhozGgC&pg=PA70
     return 1.0 - (1.0 - p)**k
+
+
+def pairwise_table(pairwise_data):
+    """Generates a nicely formatted anova summary table
+
+    Parameters:
+    -----------
+    pairwise_data : record array
+        The output of the pairwise_comparisons function
+
+    Returns:
+    --------
+    table : string
+        A formatted summary table, with space-delimited columns
+    """
+
+    lengths = [10,10,10]
+
+    for pair in pairwise_data:
+        if len(pair[0]) > lengths[0]:
+            lengths[0] = len(pair[0])
+        if len(str(pair[1])) > lengths[1]:
+            lengths[1] = len(str(pair[1]))
+        if len(str(pair[2])) > lengths[2]:
+            lengths[2] = len(str(pair[2]))
+
+    fmt = []
+    fmt.append("{{:>{:}}}".format(lengths[0]))
+    fmt.append("{{:>{:}}}".format(lengths[1]))
+    fmt.append("{{:>{:}}}".format(lengths[2]))
+
+    fmt_line = "{}: {}; {}\n".format(fmt[0], fmt[1], fmt[2])
+
+    output = fmt_line.format("Comparison", "Mean Diff", "p")
+
+    for comparison, mean_diff, p in pairwise_data:
+        output += fmt_line.format(comparison, str(mean_diff), str(p))
+
+    return output
+    
 
 def pairwise_comparisons(data, comparisons, correction=None,
                      factors=None,
@@ -47,7 +89,8 @@ def pairwise_comparisons(data, comparisons, correction=None,
 
     comparisons : list or tuple
         A list of pairs of the form `(ii,jj)`, where `ii` and `jj` are lists
-        of advanced indices used to pull samples out of `data`.
+        of advanced indices used to pull samples out of `data`. You can 
+        generate this list using dataview.indices_from_comparison
 
     correction : function
         The correction function to control the family-wise error rate.
@@ -69,7 +112,7 @@ def pairwise_comparisons(data, comparisons, correction=None,
                                  # letters of the alphabet...
             factors = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:num_factors]]
         else: # just give them indexed dummy names
-            factors = tuple("F%s" % (i) for i in xrange(len(data.shape)-1))
+            factors = tuple("F{}".format(i) for i in range(len(data.shape)-1))
 
     def samplename(indices):
         index = tuple(tuple(sorted(set(y))) for y in zip(*indices))
@@ -81,14 +124,12 @@ def pairwise_comparisons(data, comparisons, correction=None,
             if case[0] == Ellipsis:
                 pass
             elif len(case) == 1:
-                name.append("%s[%d]" % (factors[i], index[i][0]))
+                name.append("{}[{:}]".format(factors[i], index[i][0]))
             else:
-                if index[i] == tuple(xrange(index[i][0],index[i][-1]+1)):
-                    name.append("%s[%d:%d]" %
-                                (factors[i], index[i][0],index[i][-1]+1))
+                if index[i] == tuple(range(index[i][0],index[i][-1]+1)):
+                    name.append("{}[{:}:{:}]".format(factors[i], index[i][0],index[i][-1]+1))
                 else:
-                    name.append("%s[%s]" %
-                                (factors[i],
+                    name.append("{}[{}]".format(factors[i],
                                  (",".join(map(str, index[i])))))
         return ",".join(name)
 

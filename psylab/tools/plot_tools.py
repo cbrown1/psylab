@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
@@ -60,50 +60,50 @@ font_pitt = ["Janson","http://fontzone.net/font-details/janson-ssi"]
 # You can use the rotate_marker function below to rotate them: m = rotate_marker(markers.plus, 45)
 
 class markers:
-    loudspeaker = [(-0.5,    0.866), 
-                   (-0.5,    0.5  ), 
-                   (-1.,     0.   ), 
-                   ( 1.,     0.   ), 
-                   ( 0.5,    0.5  ), 
-                   ( 0.5,    0.866), 
+    loudspeaker = [(-0.5,    0.866),
+                   (-0.5,    0.5  ),
+                   (-1.,     0.   ),
+                   ( 1.,     0.   ),
+                   ( 0.5,    0.5  ),
+                   ( 0.5,    0.866),
                    (-0.5,    0.866)]
 
-    plus = [(-0.333,  1.), 
-            ( 0.333,  1.), 
-            ( 0.333,  0.333), 
-            ( 1.,     0.333), 
-            ( 1.,    -0.333), 
-            ( 0.333, -0.333), 
-            ( 0.333, -1.), 
-            (-0.333, -1.), 
-            (-0.333, -0.333), 
-            (-1.,    -0.333), 
-            (-1.,     0.333), 
-            (-0.333,  0.333), 
+    plus = [(-0.333,  1.),
+            ( 0.333,  1.),
+            ( 0.333,  0.333),
+            ( 1.,     0.333),
+            ( 1.,    -0.333),
+            ( 0.333, -0.333),
+            ( 0.333, -1.),
+            (-0.333, -1.),
+            (-0.333, -0.333),
+            (-1.,    -0.333),
+            (-1.,     0.333),
+            (-0.333,  0.333),
             (-0.333,  1.)]
 
     # This is just marker_plus rotated 45 degrees
-    x = [(-0.943,  0.472), 
-         (-0.472,  0.943), 
-         ( 0.   ,  0.471), 
-         ( 0.472,  0.943), 
-         ( 0.943,  0.472), 
-         ( 0.471, -0.   ), 
-         ( 0.943, -0.472), 
-         ( 0.472, -0.943), 
-         (-0.   , -0.471), 
-         (-0.472, -0.943), 
-         (-0.943, -0.472), 
-         (-0.471,  0.   ), 
+    x = [(-0.943,  0.472),
+         (-0.472,  0.943),
+         ( 0.   ,  0.471),
+         ( 0.472,  0.943),
+         ( 0.943,  0.472),
+         ( 0.471, -0.   ),
+         ( 0.943, -0.472),
+         ( 0.472, -0.943),
+         (-0.   , -0.471),
+         (-0.472, -0.943),
+         (-0.943, -0.472),
+         (-0.471,  0.   ),
          (-0.943,  0.472)]
 
-    arrow = [( 0.,   1.), 
-             ( 1.,   0.), 
-             ( 0.4,  0.), 
-             ( 0.4, -1), 
-             (-0.4, -1), 
-             (-0.4,  0), 
-             (-1.,   0.), 
+    arrow = [( 0.,   1.),
+             ( 1.,   0.),
+             ( 0.4,  0.),
+             ( 0.4, -1),
+             (-0.4, -1),
+             (-0.4,  0),
+             (-1.,   0.),
              ( 0.,   1.)]
 
     star = [( 0.,     1.   ),
@@ -125,16 +125,16 @@ def pt2px(x):
 
 
 def show_all_markers(x,y, ms=None, dpi=None):
-    """Given arrays x and y, returns them with x values adjusted so those with 
-        common y values do not overlap. 
-        
+    """Given arrays x and y, returns them with x values adjusted so those with
+        common y values do not overlap.
+
         Example
         -------
-        CA = [0,4,0,3,0,5]  
-        CB = [0,0,4,4,2,2,2,2,3,0,5]  
-        
+        CA = [0,4,0,3,0,5]
+        CB = [0,0,4,4,2,2,2,2,3,0,5]
+
         x,y = show_all_markers(CA, CB, ms=12)
-        
+
         ret = plt.plot(x, y, 'o', ms=12)
         plt.xlim((0,3))
     """
@@ -169,36 +169,36 @@ def update_plotline(line, x, y):
 
 class slider_array():
     """Provide a set of sliders to manipulate the levels of a set of variables
-    
-        Given a dict with variable names as keys and lists of levels as vals, 
-        this class provides a matplotlib figure with a slider for each 
-        variable specified, each having a number of ticks equal to the number 
+
+        Given a dict with variable names as keys and lists of levels as vals,
+        this class provides a matplotlib figure with a slider for each
+        variable specified, each having a number of ticks equal to the number
         of levels for that variable.
-        
+
         You also specify a callback function, which recevies an updated dict
-        of vars and current levels whenever a slider is moved. 
-        
-        One usecase for this is for interacting with factorial data. Suppose 
-        you have multiple levels of multiple factorialized variables, and it 
-        would be useful to see how your data change as the levels do. You can 
-        specify a callback in which you would update a figure with new data 
-        based on the current combination of variable levels, and then as you 
-        slide the sliders, the figure will be updated. 
-        
+        of vars and current levels whenever a slider is moved.
+
+        One usecase for this is for interacting with factorial data. Suppose
+        you have multiple levels of multiple factorialized variables, and it
+        would be useful to see how your data change as the levels do. You can
+        specify a callback in which you would update a figure with new data
+        based on the current combination of variable levels, and then as you
+        slide the sliders, the figure will be updated.
+
         Parameters
         ----------
         data: dict
-            dict with variable names as keys and lists of levels as vals. 
+            dict with variable names as keys and lists of levels as vals.
         callback: function
-            The name of a function to call when a slider is moved. should 
-            accept a dict that will contain variable names as keys and the 
+            The name of a function to call when a slider is moved. should
+            accept a dict that will contain variable names as keys and the
             current variable levels as vals.
-            
+
         Example
         -------
         # Assume raw_data is a pandas object with variables 'color',
         # 'position', 'quality', and 'Resp'
-        >>> keyvals = {'color': ['red','blue','green'], 
+        >>> keyvals = {'color': ['red','blue','green'],
                        'position': ['left','right','center','up','down'],
                        'quality': ['good','bad']}
         >>> data = raw_data.copy()  # Make an intial plot
@@ -254,11 +254,11 @@ class slider_array():
 
 def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, ax_width=6., ax_height=4.5, ax_x=None, ax_y=None, dpi=None):
     """Returns a matplotlib axes that resides on a page,
-        such as to create a slide for a presenation, or a figure page for a 
-        manuscript. The page itself is also an axes with units in inches, so 
-        it is easy to place text (eg, Titles, Fig captions, etc) and other 
-        items on it. 
-        
+        such as to create a slide for a presenation, or a figure page for a
+        manuscript. The page itself is also an axes with units in inches, so
+        it is easy to place text (eg, Titles, Fig captions, etc) and other
+        items on it.
+
         Parameters
         ----------
         page_image: str
@@ -270,25 +270,25 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
             The height of the page, in inches. [default = 11]
         ax_image: str
             The path to an image to be shown on the axes. If supplied,
-            ax_width and ax_height are used as maximum constraints (aspect 
-            ratio will be maintained), and all axes ticks marks and spines 
+            ax_width and ax_height are used as maximum constraints (aspect
+            ratio will be maintained), and all axes ticks marks and spines
             will be turned off
         ax_width: scalar
             The width of the axes, in inches. [default = 6]
         ax_height: scalar
             The height of the axes, in inches. [default = 4.5]
         ax_x: scalar
-            The x location of the lower-left corner of the axes, in inches. 
+            The x location of the lower-left corner of the axes, in inches.
             [default = centered]
         ax_y: scalar
-            The y location of the lower-left corner of the axes, in inches. 
+            The y location of the lower-left corner of the axes, in inches.
             [default = centered]
         dpi: scalar
-            The resolution, in dots-per-inch, to use. Because the coordinates 
-            used are inches, you might want to set this value. The default is 
-            matplotlib's savefig default (plt.rcParams[savefig.dpi]) because 
-            then if you save the figure, any images will be scaled correctly. 
-            
+            The resolution, in dots-per-inch, to use. Because the coordinates
+            used are inches, you might want to set this value. The default is
+            matplotlib's savefig default (plt.rcParams[savefig.dpi]) because
+            then if you save the figure, any images will be scaled correctly.
+
 
         Returns
         -------
@@ -301,27 +301,27 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
 
         Notes
         -----
-        When using an axis image, there is at least one possibly unexpected 
-        outcome. Because the aspect ratio is maintained, if the image is less 
-        than the axes along an axis, there will be space on either side of the 
-        image. For example, an image that is wide and short will likely have 
-        blank space above and below. As a result, in this example if you set 
-        ax_y, the image will appear to be above that position because of the 
-        blank space below it. 
-        
+        When using an axis image, there is at least one possibly unexpected
+        outcome. Because the aspect ratio is maintained, if the image is less
+        than the axes along an axis, there will be space on either side of the
+        image. For example, an image that is wide and short will likely have
+        blank space above and below. As a result, in this example if you set
+        ax_y, the image will appear to be above that position because of the
+        blank space below it.
+
         Another potential confusion stems from the fact that when saving a fig,
-        the default resolution may be different than the display resolution. 
+        the default resolution may be different than the display resolution.
         So, when saving figures, be sure to use the same dpi as the figure:
-        
+
         plt.savefig('example.png',dpi = f.get_dpi())
-        
-        If you use images and would like to save to a vector format (svg, pdf), 
-        try using a dpi of 72 for both ax_on_page and savefig, which is the 
-        only resolution that produces good-looking vector-based figures on my 
+
+        If you use images and would like to save to a vector format (svg, pdf),
+        try using a dpi of 72 for both ax_on_page and savefig, which is the
+        only resolution that produces good-looking vector-based figures on my
         machine.
 
         Example:
-        
+
         # Generate axes with default page size
         f,ap,ax = ax_on_slide()
         # plot something
@@ -329,12 +329,12 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         # add some text to the page, towards the bottom, centered:
         ap.text(5.5,1,"A slide title!", horizontalalignment='center', fontsize='x-large')
     """
-    
+
     page_width = float(page_width)
     page_height = float(page_height)
     ax_width = float(ax_width)
     ax_height = float(ax_height)
-    
+
     if page_image is not None:
         if dpi is not None:
             dpi = float(dpi)
@@ -351,7 +351,7 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         f = plt.figure(figsize=(page_width, page_height))
     # Set up a `page` axis, to place text etc.
     ap = f.add_axes([0, 0, 1, 1])
-    ap.set_axis_bgcolor('none')
+    ap.set_facecolor('none')
     ap.set_xticks([])
     ap.set_yticks([])
     for spine in ap.spines:
@@ -380,26 +380,26 @@ def ax_on_page(page_image=None, page_width=8.5, page_height=11., ax_image=None, 
         ax.set_yticks([])
         for spine in ax.spines:
             ax.spines[spine].set_visible(False)
-        
+
     return f,ap,ax
 
 
 def set_foregroundcolor(ax, color=None):
     '''For the specified axes, sets the color of the frame, major ticks,
-        tick labels, axis labels, title and legend. 
-        
+        tick labels, axis labels, title and legend.
+
         Defaults to current axes.
     '''
-    
+
     if color is None:
         color = ax
         ax = plt.gca()
-    
+
     for spine in ax.spines:
         ax.spines[spine].set_edgecolor(color)
-        
+
     ax.tick_params(colors=color)
-    
+
     ax.axes.xaxis.label.set_color(color)
     ax.axes.yaxis.label.set_color(color)
     ax.axes.title.set_color(color)
@@ -416,13 +416,13 @@ def set_backgroundcolor(ax, color=None):
         Use 'None' (with quotes) for transparent. To get transparent
         background on saved figures, use:
         plt.savefig("fig1.svg", transparent=True)
-        
+
         Defaults to current axes.
     '''
     if color is None:
         color = ax
         ax = plt.gca()
-    
+
     ax.patch.set_facecolor(color)
     lh = ax.get_legend()
     if lh != None:
@@ -430,13 +430,13 @@ def set_backgroundcolor(ax, color=None):
 
 def set_framelinewidth(ax, width=None):
     '''For the specified axes, sets the linewidth of the frame and major ticks.
-         
+
         Defaults to current axes.
     '''
     if width is None:
         width = ax
         ax = plt.gca()
-    
+
     ax.tick_params(width=width)
     for spine in ax.spines:
         ax.spines[spine].set_linewidth(width)
@@ -444,13 +444,13 @@ def set_framelinewidth(ax, width=None):
 def set_fontsize(ax, fontsize=None):
     '''Sets the fontsize for the most common figure text
         (title, tick labels, axis labels, and legend text)
-        
+
         Defaults to current axes.
     '''
     if fontsize is None:
         fontsize = ax
         ax = plt.gca()
-    
+
     ax.tick_params(labelsize=fontsize)
     ax.axes.title.set_fontsize(fontsize)
     ax.axes.xaxis.label.set_fontsize(fontsize)
@@ -464,20 +464,20 @@ def set_fontsize(ax, fontsize=None):
 
 def set_ticklabelfontsize(ax, fontsize=None):
     '''Sets the, uh, ticklabelfontsize.
-    
+
         Defaults to current axes.
     '''
     if fontsize is None:
         fontsize = ax
         ax = plt.gca()
-    
+
     ax.tick_params(labelsize=fontsize)
 
 def set_legendtitlefontsize(ax, fontsize=None):
     if fontsize is None:
         fontsize = ax
         ax = plt.gca()
-    
+
     lh = ax.get_legend()
     if lh != None:
         lh.get_title().set_fontsize(fontsize)
@@ -493,16 +493,16 @@ def draw_electrode_array(electrodes, array_pos, e_height, e_width=None, directio
             An axes coordinate of the array. If electrodes will be positioned along the x axis, this
             value will specify where on the y axis to place the array, and vice versa.
         e_height: scalar
-            Size of the electrodes, and consequently, the array, along the axes that is perpendicular 
-            to the axes along which the electrodes are positioned. That is, if electrode position is 
-            along the x axis, this will specify their height, and if it is along y, this would actually 
+            Size of the electrodes, and consequently, the array, along the axes that is perpendicular
+            to the axes along which the electrodes are positioned. That is, if electrode position is
+            along the x axis, this will specify their height, and if it is along y, this would actually
             be width.
         e_width: scalar
-            Size of the electrodes along the axes along which the electrodes are positioned. 
+            Size of the electrodes along the axes along which the electrodes are positioned.
             Default == e_height.
         direction: str
-            Specifies the direction of the array. One of either 'n' (array points up), 'e' (left to 
-            right), 's' (down), or 'w' (right to left). Default == 'e'. 
+            Specifies the direction of the array. One of either 'n' (array points up), 'e' (left to
+            right), 's' (down), or 'w' (right to left). Default == 'e'.
         ax: matplotlib axes handle
             The axes to draw the array onto. Default == plt.gca()
         color: matplotlib color
@@ -650,7 +650,7 @@ def draw_filterbank(cutoffs, y, height, slope_width, gap=0, ax=None, **kwargs):
         Returns
         -------
         handles: list
-            A list of matplotlib lines2D object handles, one per bandpass filter. 
+            A list of matplotlib lines2D object handles, one per bandpass filter.
             EG., handles[2].set_color("blue"); handles[2].set_linewidth(2)
 
         Notes
@@ -675,16 +675,16 @@ def draw_filterbank(cutoffs, y, height, slope_width, gap=0, ax=None, **kwargs):
 
 def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
     """Draws a head, viewed from above, on the specified figure.
-    
+
         Notes
         -----
        Coordinates and dimensions are in figure units ( 0 <= 1 ).
-       
-       The aspect ratio is always 1, meaning the head will always be a circle, 
+
+       The aspect ratio is always 1, meaning the head will always be a circle,
        and the size will always be the smaller of w and h.
-       
+
        The Dutch part is optional.
-       
+
        Defaults to current figure.
     """
 
@@ -729,29 +729,29 @@ def add_head( f=None, x=.5, y=.5, w=.5, h=.5, c='k', lw=1, dutchPart=False ):
         hax.add_line(plt.Line2D([.4, .7],[.2, .25],linewidth=lw,color=c))
 
 def rotate_marker(marker, angle):
-    """Rotates the specified custom mpl marker to the specified angle. 
-    
-        This might be useful in (and is intended for) drawing a schematic of 
-        a loudspeaker array as is often used in free-field listening 
-        environments, in which the angle of rotation of each loudspeaker 
+    """Rotates the specified custom mpl marker to the specified angle.
+
+        This might be useful in (and is intended for) drawing a schematic of
+        a loudspeaker array as is often used in free-field listening
+        environments, in which the angle of rotation of each loudspeaker
         changes with its location
-        
+
         Parameters
         ----------
         marker : list of x,y tuples
-            Each tuple is an x,y point. This list can be passed to 
+            Each tuple is an x,y point. This list can be passed to
             matplotlib's plot function using the 'marker' keyword
         angle : float
-            The angle of rotation of the marker. 0 would yeild a 
-            downward-facing marker, -90 a rightward facing marker, and 90 a 
+            The angle of rotation of the marker. 0 would yeild a
+            downward-facing marker, -90 a rightward facing marker, and 90 a
             leftward-facing marker
-            
+
         Returns
         -------
         marker : list of x,y tuples
-            Each tuple is an x,y point. This list can be passed as is to 
+            Each tuple is an x,y point. This list can be passed as is to
             matplotlib's plot function, using the 'marker' keyword
-        
+
         Example
         -------
         marker_loudspeaker = [(-0.5, .866), (-0.5, .5), (-1, 0), (1, 0), (.5, .5), (.5, .866), (-0.5, .866)]
@@ -760,41 +760,41 @@ def rotate_marker(marker, angle):
         ax = fig.add_axes(rect)
 
         radius = 6
-        
+
         for loc in np.arange(-90, 90, 15):
             x = np.cos(np.deg2rad(loc+90)) * radius # +90 puts zero at the top
             y = np.sin(np.deg2rad(loc+90)) * radius
             marker = rotate_marker(marker_loudspeaker, loc)
             plt.plot(x, y, mew=1, markersize=20, mfc='none', mec='k', marker=marker)
-        
+
         plt.ylim(-10, 10)
         plt.xlim(-10, 10)
         psylab.tools.plot_tools.add_head(w=.1, h=.1, dutchPart=True)
-        
+
         plt.show()
     """
 
     angle = np.deg2rad(angle)
-    
+
     marker_rotated = []
-    
+
     for p in marker:
-    
+
         x = p[0]*np.cos(angle) - p[1]*np.sin(angle)
         y = p[0]*np.sin(angle) + p[1]*np.cos(angle)
-    
+
         marker_rotated.append((x,y))
 
     return marker_rotated
 
 
 def plot_discrete_signal(x,y):
-    
+
     pos = np.where(y>0)[0]
     neg = np.where(y<0)[0]
     zp = np.zeros(pos.shape[0])
     zn = np.zeros(neg.shape[0])
-    
+
     plt.axhline(color='k')
     plt.plot(x,y,'ko')
     plt.vlines(pos,zp,y[pos])
@@ -804,7 +804,7 @@ def plot_discrete_signal(x,y):
 def jitter_vals(data, jitter):
     """Returns an array of vals that are jittered so similar datapoints don't overlap completely
     """
-   
+
     j = np.random.rand(len(data))*jitter
     j = j - (jitter/2.)
     j = j - j.mean()
@@ -1046,71 +1046,71 @@ class Slider(AxesWidget):
             self.set_val(self.valinit)
 
 
-def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[], vmerge=[], omit=[]):
+def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[], vmerge=[], omit=[], color='k'):
 
     """Generates tables in mpl with basic control over cell height and width
-    
-        Cells can be merged horizontally and/or vertically, and the borders 
+
+        Cells can be merged horizontally and/or vertically, and the borders
         for particular cells can be omitted from drawing.
-        
-        Also provides facility to add labels to individual cells, with the 
+
+        Also provides facility to add labels to individual cells, with the
         ability to format and align each label, and specify cell padding.
         No check is performed on whether the text fits in the cell.
-        
-        The target usecase of this function is to generate simple tables that 
-        can be saved to pdf or another format to be included , eg., in lab 
-        worksheets, for use as data-entry tables by students in a lab class. 
+
+        The target usecase of this function is to generate simple tables that
+        can be saved to pdf or another format to be included , eg., in lab
+        worksheets, for use as data-entry tables by students in a lab class.
         This is the kind of task that is typically performed with spreadsheets,
         but this function provides a fully scriptable solution.
-        
+
         Parameters
         ----------
         col_widths: scalar or array
             The width(s) of the columns. If an array is used, its length will
             specify the number of columns (and cols is ignored), and each list
-            item is the length of each correspoding column. If a scalar is 
-            used, all columns will have the same width, and the number of 
-            columns must be specified using cols. 
+            item is the length of each correspoding column. If a scalar is
+            used, all columns will have the same width, and the number of
+            columns must be specified using cols.
         row_heights: scalar or array
             The height(s) of the rows. If an array is used, its length will
             specify the number of rows (and rows is ignored), and each list
-            item is the height of each corresponding row. If a scalar is used, 
-            all rows will have the same height, and the number of rows must be 
-            specified using rows. 
+            item is the height of each corresponding row. If a scalar is used,
+            all rows will have the same height, and the number of rows must be
+            specified using rows.
         cols : Scalar
             The number of columns, only used if column_widths is a scalar
         rows : Scalar
             The number of rows, only used if row_heights is a scalar
         labels : dict
-            A dict to specify cell labels. Each key is a string representation 
-            of a 2-element tuple, where the first element is the row number and 
+            A dict to specify cell labels. Each key is a string representation
+            of a 2-element tuple, where the first element is the row number and
             the second element is the column number (top to bottom) of the cell
-            in which to apply the label. Each value is either a string (the 
-            label text) or a list. If a list is specified, the first element is 
-            the string label, the second is an mpl fontdict (eg., 
-            {'weight': 'bold', 'ha': 'left'}), and the third is optionally a 
-            float indicating the amount of padding, which is used when an 
-            alignment is not center. By default, labels will be centered both 
+            in which to apply the label. Each value is either a string (the
+            label text) or a list. If a list is specified, the first element is
+            the string label, the second is an mpl fontdict (eg.,
+            {'weight': 'bold', 'ha': 'left'}), and the third is optionally a
+            float indicating the amount of padding, which is used when an
+            alignment is not center. By default, labels will be centered both
             vertically and horizontally within a cell.
         hmerge : list
-            A list of indices. For each item listed, merge it with the cell to 
-            the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be 
+            A list of indices. For each item listed, merge it with the cell to
+            the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be
             merged. Must be < the number of columns
         vmerge : list
-            A list of indices. For each item listed, merge it with the cell 
-            below. Eg., if an item is '0,1', then 0,1 and 0,2 will be 
+            A list of indices. For each item listed, merge it with the cell
+            below. Eg., if an item is '0,1', then 0,1 and 0,2 will be
             merged. Must be < the number of rows
         omit : list
-            A list of indices to cells that should not be drawn. Note that if 
-            a cell is specified that is surrounded on all four sides with 
-            other cells, this will have no visible effect since the borders of 
+            A list of indices to cells that should not be drawn. Note that if
+            a cell is specified that is surrounded on all four sides with
+            other cells, this will have no visible effect since the borders of
             those cells will still be visible
 
         Returns
         -------
         ax: mpl axes handle
             A handle to the newly created matplotlib axes that holds the table
-            
+
         Example
         -------
         # Four columns
@@ -1159,7 +1159,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
     # Create mpl figure, remove all default items (ticks, spines, etc)
     f = plt.figure(figsize=(page_width, page_height))
     ap = f.add_axes([0, 0, 1, 1])
-    ap.set_axis_bgcolor('none')
+    ap.set_facecolor('none')
     ap.set_xticks([])
     ap.set_yticks([])
     for spine in ap.spines:
@@ -1175,8 +1175,8 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
     hmerged = []
     vmerged = []
     # For all subsequent comments, assume:
-    # Current cell in loop is 0,0, & that 
-    # hmerge = ['0,0', '1,0'] (cells to horizontally merge: 0,0 1,0 2,0), 
+    # Current cell in loop is 0,0, & that
+    # hmerge = ['0,0', '1,0'] (cells to horizontally merge: 0,0 1,0 2,0),
     # and vmerge = ['0,0'] (cells to vertically merge: 0,0 0,1)
     for yh in row_heights:
         #print ("Y{:}: {:}".format(y_ind, yy))
@@ -1245,19 +1245,22 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
                             this_i = ",".join((str(hm), str(vm)))
                             # Add those to vmerged
                             vmerged.append(this_i)
-                    
+
                 if ind not in omit:
+
                     ap.add_patch(
                         mpl.patches.Rectangle(
                             (xx, yy),
                             xwm,
                             yhm,
-                            fill=False      # remove background
-                        ))
+                            fill=False,      # remove background
+                            ec=color,
+                        )
+                    )
             else:
                 #print ("    a previous merge: {}".format(ind))
                 pass
-            
+
             xx += xw
             x_ind += 1
         yy += yh
@@ -1279,7 +1282,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
                 l = label
                 fd = {'weight': 'normal'}
                 pad = .1
-            
+
             cell_x,cell_y = i.split(',')
             cell_x = int(cell_x)
             cell_y = int(cell_y)
@@ -1310,9 +1313,9 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
 def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', color_bg='gray'):
 
     """Draw Hinton diagram for visualizing a weight matrix.
-        
+
         Matrix should be a 2d array of weights
-    
+
     """
     if ax is None:
         ax = plt.gca()
@@ -1321,7 +1324,7 @@ def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', c
         max_weight = 2 ** np.ceil(np.log(np.abs(matrix).max()) / np.log(2))
 
     ax.patch.set_facecolor(color_bg)
-    
+
     ax.xaxis.set_major_locator(plt.NullLocator())
     ax.yaxis.set_major_locator(plt.NullLocator())
 
@@ -1335,15 +1338,15 @@ def hinton(matrix, max_weight=None, ax=None, color_n='black', color_p='white', c
 def subplots_ax_labels_where(rows, cols, ax='x'):
 
     """subplots_ax_labels_where computes the subplot indexes that should received x or y axis lables for a good looking grid
-    
+
        For example if you are plotting a 3 row x 4 column grid of subplots, it is most often
-       desirable to have y axis labels on the left-most subplots (1, 5, and 9), 
+       desirable to have y axis labels on the left-most subplots (1, 5, and 9),
        and x axis labels on the bottom 4 subplots (9, 10, 11, and 12). This function returns
        an array of indexes for x or y labels accordingly, given a number of rows, and columns.
-        
+
     """
     total = rows * cols
-    
+
     if ax == 'y':
         ret = np.arange(1, total, cols)
     else:
@@ -1357,7 +1360,7 @@ def get_nearest_factors(n):
         EG., for the number 6, it would return (2,3), 20: (4,5)
 
         Intended usecase is to aid with layout of a multi-axes grid,
-        in which the returned tuple would be used to specify the 
+        in which the returned tuple would be used to specify the
         number of rows and columns of the figure. EG, I've 12 panels
         to plot, so the desired layout would be 3x4.
 
@@ -1377,7 +1380,7 @@ def sigmoid_normalized(x, center, width):
         Parameters
         ----------
         center: scalar
-            The center of the sigmoid function 
+            The center of the sigmoid function
         width: scalar
             The width of the sigmoid function
         x : Array
@@ -1672,3 +1675,26 @@ class Menu(object):
             if draw:
                 self.figure.canvas.draw()
                 break
+
+
+def range_brace(x_min, x_max, mid=0.5, 
+                beta1=100.0, beta2=100.0, height=1, 
+                initial_divisions=11, resolution_factor=1.5):
+    # determine x0 values adaptively using second derivitive
+    # could be replaced with less snazzy:
+    #   x0 = np.arange(0, 0.5, .001)
+    x0 = np.array(())
+    tmpx = np.linspace(0, 0.5, initial_divisions)
+    tmp = beta1**2 * (np.exp(beta1*tmpx)) * (1-np.exp(beta1*tmpx)) / np.power((1+np.exp(beta1*tmpx)),3)
+    tmp += beta2**2 * (np.exp(beta2*(tmpx-0.5))) * (1-np.exp(beta2*(tmpx-0.5))) / np.power((1+np.exp(beta2*(tmpx-0.5))),3)
+    for i in np.arange(0, len(tmpx)-1):
+        t = np.int32(np.ceil(resolution_factor*max(np.abs(tmp[i:i+2]))/np.float32(initial_divisions)))
+        x0 = np.append(x0, np.linspace(tmpx[i],tmpx[i+1],t))
+    x0 = np.sort(np.unique(x0)) # sort and remove dups
+    # half brace using sum of two logistic functions
+    y0 = mid*2*((1/(1.+np.exp(-1*beta1*x0)))-0.5)
+    y0 += (1-mid)*2*(1/(1.+np.exp(-1*beta2*(x0-0.5))))
+    # concat and scale x
+    x = np.concatenate((x0, 1-x0[::-1])) * np.float32((x_max-x_min)) + x_min
+    y = np.concatenate((y0, y0[::-1])) * np.float32(height)
+    return (x,y)

@@ -38,7 +38,8 @@ import csv
 import codecs
 from itertools import product
 from numpy import nanmean, nanstd
-import psylab.stats
+#import psylab.stats
+from .. import anova
 
 class Dataset:
     """Representation of a set of data with one dependent variable.
@@ -70,14 +71,14 @@ class Dataset:
     comments = ""
 
     def anova_between(self):
-        return psylab.stats.anova.anova_between(self.data, self.ivs)
+        return anova.anova_between(self.data, self.ivs)
 
     def anova_within(self, looks=None):
         if looks == None:
-            return psylab.stats.anova.anova_within(self.data,
+            return anova.anova_within(self.data,
                                                 factors=self.ivs)
         else:
-            return psylab.stats.anova.anova_within(self.data,
+            return anova.anova_within(self.data,
                                                 looks_index=self.index_from_var[looks],
                                                 factors=self.ivs)
 
@@ -88,6 +89,7 @@ class Dataset:
         """Takes a dict in which keys are [str] var names and vals are lists of [str] levels
         """
         collapsedIndex = [[Ellipsis] for x in self.data.shape]
+#        collapsedIndex = [[slice(None)] for x in self.data.shape]
         for group in d:
             i = self.index_from_var[group]
             collapsedIndex[i] = sorted(self.index_from_level[(group,level)] for level in d[group])
@@ -96,7 +98,9 @@ class Dataset:
         maxlen = max(len(x) for x in collapsedIndex)
         for i in collapsedIndex:
             if i == Ellipsis:
+#            if i == slice(None):
                 takeThisProduct.append([Ellipsis])
+#                takeThisProduct.append([slice(None)])
             else:
                 takeThisProduct.append(i)
         indices = product(*takeThisProduct)
@@ -185,8 +189,10 @@ class Dataset:
         for t in product(*[l for v,l in labels[:-1]]):
             z = zip(ivs,t)
 
-            i = [Ellipsis] * len(ds.data.shape)
-            j = [Ellipsis] * len(self.data.shape)
+#            i = [Ellipsis] * len(ds.data.shape)
+#            j = [Ellipsis] * len(self.data.shape)
+            i = [slice(None)] * len(ds.data.shape)
+            j = [slice(None)] * len(self.data.shape)
             for v,l in z:
                 i[ds.index_from_var[v]] = ds.index_from_level[(v,l)]
                 j[self.index_from_var[v]] = self.index_from_level[(v,l)]
@@ -576,7 +582,8 @@ class DatasetView:
             index = tuple(self.dataset.index_from_level[(v,l)] for
                           (v,l) in zip(self.dataset.ivs, eval(t)))
                           
-            index = index + (Ellipsis,)
+#            index = index + (Ellipsis,)
+            index = index + (slice(None),)
             loop_data = self.data[index]
             
 

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
@@ -31,3 +31,4 @@ from . import path_tools
 from . import plot_tools
 from . import stats_tools
 from . import time_tools
+from . import list_tools

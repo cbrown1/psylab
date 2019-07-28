@@ -37,4 +37,4 @@ __version__ = '0.4.7.15'
 #from dataview import dataview
 from . import tools
 from . import signal
-from . import stats
+#from . import stats

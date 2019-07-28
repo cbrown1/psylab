@@ -27,8 +27,10 @@ import numpy as np
 from scipy import stats
 from itertools import combinations, product
 
+
 def nanproduct(arr):
     return np.product(tuple(x for x in arr if not np.isnan(x)))
+
 
 def anova_table(anova_data):
     """Generates a nicely formatted anova summary table
@@ -45,21 +47,24 @@ def anova_table(anova_data):
     """
     sourcetab = 8
     mintab = 10
-    sfmts = "%"+str(mintab)+"s"
-    sfmt = "%"+str(mintab)+".4g"
+    sfmts = "{{:>{:}}}".format(mintab)
+    sfmt = "{{:>{:}.4f}}".format(mintab)
+#    sfmt = "%"+str(mintab)+".4g"
+#    sfmts = "%"+str(mintab)+"s"
+#    sfmt = "%"+str(mintab)+".4g"
     for x in anova_data:
         if len(x[anova_data.dtype.names[0]]) > sourcetab:
             sourcetab = len(x[anova_data.dtype.names[0]])
     sourcetab += 1
     ret = anova_data.dtype.names[0] + " " * (sourcetab - len(anova_data.dtype.names[0]))
     for x in anova_data.dtype.names[1:]:
-        ret += sfmts % x
+        ret += sfmts.format(x)
     ret += "\n"
     for x in anova_data:
         ret += x[anova_data.dtype.names[0]] + " " * (sourcetab - len(x[anova_data.dtype.names[0]]))
         for y in range(1,6):
             if not np.isnan( x[anova_data.dtype.names[y]]):
-                ret += sfmt % x[anova_data.dtype.names[y]]
+                ret += sfmt.format(x[anova_data.dtype.names[y]])
         if x['p'] < .001:
             ret += "  ***"
         elif x['p'] < .01:
@@ -68,6 +73,7 @@ def anova_table(anova_data):
             ret += "  *"
         ret += "\n"
     return ret
+
 
 def anova_between(data, factors=None):
     """Performs a between-subjects analysis of variance for any number of factors.
@@ -114,7 +120,7 @@ def anova_between(data, factors=None):
                                  # letters of the alphabet...
             factors = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:num_factors]]
         else: # just give them indexed dummy names
-            factors = tuple("F%s" % (i) for i in xrange(len(data.shape)-1))
+            factors = tuple("F{}".format(i) for i in range(len(data.shape)-1))
 
     assert "error" not in factors
     assert "total" not in factors
@@ -122,7 +128,7 @@ def anova_between(data, factors=None):
     def ss_indices(s):
         product_to_take = []
         # Considering each dimension...
-        for i in xrange(len(data.shape)-1):
+        for i in range(len(data.shape)-1):
             if factors[i] in s: #...if this is a specified factor,
                                 # then we care about each level...
                 product_to_take.append(range(data.shape[i]))
@@ -134,7 +140,7 @@ def anova_between(data, factors=None):
 
     # Find all treatment combinations
     sources = []
-    for i in xrange(1, 1+len(factors)):
+    for i in range(1, 1+len(factors)):
         sources.extend(tuple(combinations(factors, i)))
 
     # Compute the interaction terms for each source
@@ -146,7 +152,7 @@ def anova_between(data, factors=None):
                 inter.append(x)
         srcs_to_inter[s] = inter
 
-    for i in xrange(len(factors)):
+    for i in range(len(factors)):
         df[factors[i]] = data.shape[i] - 1
 
     cm = np.nansum(data.flatten())**2 / n["total"]
@@ -202,6 +208,7 @@ def anova_between(data, factors=None):
     anova_table = np.rec.fromrecords(anova_table, names=dt_names)
 
     return anova_table
+
 
 def anova_within(data, subject_index=0, factors=None):
     """Performs a within-subjects analysis of variance for any number of factors.
@@ -263,13 +270,13 @@ def anova_within(data, subject_index=0, factors=None):
         else: # just give them indexed dummy names
             factors = []
             j = 0
-            for i in xrange(num_factors):
+            for i in range(num_factors):
                 if i == subject_index:
                     factors.append("S")
                 else:
-                    factors.append("A%d" % (j))
+                    factors.append("A{:}".format(j))
                     j += 1
-            factors = tuple("F%s" % (i) for i in xrange(num_factors))
+            factors = tuple("F{:}".format(i) for i in range(num_factors))
 
     subject = (factors[subject_index],)
 
@@ -279,7 +286,7 @@ def anova_within(data, subject_index=0, factors=None):
     def ss_indices(s):
         product_to_take = []
         # Considering each dimension...
-        for i in xrange(len(data.shape)-1):
+        for i in range(len(data.shape)-1):
             if factors[i] in s: #...if this is a specified factor,
                                 # then we care about each level...
                 product_to_take.append(range(data.shape[i]))
@@ -291,7 +298,7 @@ def anova_within(data, subject_index=0, factors=None):
 
     # Find all treatment combinations
     sources = []
-    for i in xrange(1, 1+len(factors)):
+    for i in range(1, 1+len(factors)):
         sources.extend(tuple(combinations(factors, i)))
 
     # Compute the interaction terms for each source
@@ -303,7 +310,7 @@ def anova_within(data, subject_index=0, factors=None):
                 inter.append(x)
         srcs_to_inter[s] = inter
 
-    for i in xrange(len(factors)):
+    for i in range(len(factors)):
         df[factors[i]] = data.shape[i] - 1
 
     cm = np.nansum(data.flatten())**2 / n["total"]

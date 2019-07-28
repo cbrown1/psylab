@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# Bug reports, bug fixes, suggestions, enhancements, or other
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
 
@@ -28,9 +28,9 @@ import scipy.signal
 
 def pre_emphasis(signal, fs, hp=50):
     """Applies a pre-emphasis filter to a signal
-        
-        Applies a 6 dB per octave highpass filter to the specified signal. 
-    
+
+        Applies a 6 dB per octave highpass filter to the specified signal.
+
         Parameters
         ----------
         signal : 1-d array
@@ -39,7 +39,7 @@ def pre_emphasis(signal, fs, hp=50):
             The sampling frequency
         hp : scalar
             The high-pass cutoff frequency to use [default = 50 Hz]
-            
+
         Notes
         -----
         The formula for alpha was taken from PRAAT.
@@ -47,22 +47,22 @@ def pre_emphasis(signal, fs, hp=50):
     alpha = np.exp(-2 * np.pi * hp / fs) # PRAAT
     sig = np.insert(signal,0,0)
     return sig[1:] - alpha * sig[:-1]
-    
+
 
 def filter_bank(signal, fs, order, cfs, btype='band'):
     """Filters the input array with a bank of filters
-        
-        Filters a signal with the cutoff frequencies specified in cfs. 
-        
-        Note: The returned array will be 2-d with one fewer column (dim=1) 
-        than len(cfs). cfs[:-1] will be used as highpass cutoff frequencies, 
-        and cfs[1:] will be used as lowpass cutoff frequencies. 
-        
-        The signal can either be 1-d, or 2-d where shape[1]==len(cfs)-1 
-        (ie., it can already have been filter_banked; eg., bandpass 
-        filtering followed by envelope extraction, which is the usecase 
-        that this function was written for). 
-        
+
+        Filters a signal with the cutoff frequencies specified in cfs.
+
+        Note: The returned array will be 2-d with one fewer column (dim=1)
+        than len(cfs). cfs[:-1] will be used as highpass cutoff frequencies,
+        and cfs[1:] will be used as lowpass cutoff frequencies.
+
+        The signal can either be 1-d, or 2-d where shape[1]==len(cfs)-1
+        (ie., it can already have been filter_banked; eg., bandpass
+        filtering followed by envelope extraction, which is the usecase
+        that this function was written for).
+
         Parameters
         ----------
         signal : 1- or 2-d array
@@ -75,7 +75,7 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
             An array of cutoff frequencies
         btype : str
             The type of filter to implement ['band','low','high']
-            
+
         Returns
         -------
         y : 2-d array
@@ -104,13 +104,13 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
 
 def freqs_logspace(start, stop, n):
     """Compute frequencies equally spaced in log space
-    
-        Computes n frequencies between start and stop that are evenly spaced 
-        in log space. 
-        
-        The output of this function is useful as the cfs input to filter_bank, 
+
+        Computes n frequencies between start and stop that are evenly spaced
+        in log space.
+
+        The output of this function is useful as the cfs input to filter_bank,
         when you want to create a bank of bandpass filters.
-        
+
         Parameters
         ----------
         start : scalar
@@ -118,9 +118,9 @@ def freqs_logspace(start, stop, n):
         stop : scalar
             The end frequency, in Hz
         n : scalar
-            The number of 'channels' to compute. That is, the return array 
+            The number of 'channels' to compute. That is, the return array
             will be length n+1
-    
+
         Returns
         -------
         y : array
@@ -130,3 +130,8 @@ def freqs_logspace(start, stop, n):
     interval = np.log10(stop/float(start))/float(n)
     freqs = start*10.**(interval*n_arr)
     return freqs
+
+def impz(b,a=1):
+    impulse = np.zeros(50)
+    impulse[0] = 1
+    return scipy.signal.lfilter(b,a,impulse)
