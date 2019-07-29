@@ -151,7 +151,7 @@ def pairwise_comparisons(data,
         name = []
         for i in range(len(index)):
             cases = index[i]
-            var = var_dict.keys()[i]
+            var = list(var_dict.keys())[i]
             levels = []
             for case in cases:
                 levels.append(var_dict[var][case])

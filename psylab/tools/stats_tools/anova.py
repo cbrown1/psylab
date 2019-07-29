@@ -261,7 +261,7 @@ def anova_within(data, subject_index=0, factors=None):
                                  # letters of the alphabet...
             factors = []
             j = 0
-            for i in xrange(num_factors):
+            for i in range(num_factors):
                 if i == subject_index:
                     factors.append("S")
                 else:

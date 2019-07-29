@@ -177,7 +177,8 @@ class Dataset:
         # This is determined by (size of our new array)/(product of all desired non-dv axes)
         dv_size = size / np.product([len(l) for v,l in labels if v in var_dict and v != self.dv])
 
-        shape = tuple(len(lvs) for var,lvs in labels[:-1] if var in var_dict) + (dv_size,)
+        shape = tuple(len(lvs) for var,lvs in labels[:-1] if var in var_dict) + (np.int32(dv_size),)
+#        print(shape)
         data = np.ones(shape)
 
         ds.data = data
@@ -258,7 +259,7 @@ def from_csv(csv_path, dv, ivs=None):
         return tuple(row)
 
     # A temporary recarray for computing other values
-    temp_array = np.rec.fromrecords(map(format_row, file_data), names=labels)
+    temp_array = np.rec.fromrecords(list(map(format_row, file_data)), names=labels)
 
     # Compute index mappings
     index_from_var = {}
@@ -276,7 +277,7 @@ def from_csv(csv_path, dv, ivs=None):
         shape[i] = len(unique)
         i += 1
 
-    axis_from_var = dict([x[::-1] for x in index_from_var.iteritems()])
+    axis_from_var = dict([x[::-1] for x in index_from_var.items()])
 
     treatments = {}
     for r in temp_array:
@@ -301,7 +302,7 @@ def from_csv(csv_path, dv, ivs=None):
             i += 1
         return tuple(index)
 
-    for t,vals in treatments.iteritems():
+    for t,vals in treatments.items():
         index = treatment_to_index(t)
         i = 0
         for v in vals:
@@ -312,11 +313,16 @@ def from_csv(csv_path, dv, ivs=None):
     var_dict = OrderedDict()
 
     for var in labels:
-        levels = []
+        levels = [None for (v,l),i in items if v == var]
         if var == dv:
             levels = None
         else:
-            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
+            for (v,l),i in items:
+                if v == var:
+ #                   print((i,l))
+                    levels[i] = l
+#            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
+#            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
         var_dict[var] = levels
 #        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
 #        if t[0] == dv:
@@ -531,7 +537,7 @@ class DatasetView:
             
 
         # Update values of `data`
-        for t,d in treatments.iteritems():
+        for t,d in treatments.items():
             i = tuple(index_from_level[(x,y)] for (x,y) in
                       zip(tuple(tuple(v for (v,l) in labels[:-1])), t))
             j = 0
@@ -549,7 +555,7 @@ class DatasetView:
                 j = index_from_var[looks] # index we are deleting
                 index_from_var.pop(looks)
 
-                for v,i in index_from_var.iteritems():
+                for v,i in index_from_var.items():
                     if j <= index_from_var[v]:
                         index_from_var[v] -= 1
 
@@ -581,7 +587,7 @@ class DatasetView:
         self.var_dict = var_dict
         self.looks = looks
 
-        for i in xrange(self.treatments.size):
+        for i in range(self.treatments.size):
             t = self.treatments[i]
             # print "DEBUG:", self.dataset.ivs
             # print "DEBUG:", eval(t)
