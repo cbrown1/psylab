@@ -3,8 +3,6 @@
 import sys
 sys.path.append("..")
 
-import numpy
-
 import psylab
 
 filename = "/some/path/to/a/filename.ext"

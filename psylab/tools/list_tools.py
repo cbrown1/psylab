@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+from functools import reduce
 import numpy as np
 
 def str_to_list(s):
@@ -29,14 +32,16 @@ def str_to_list(s):
                 return []
             else:
                 #return map(int, x)
-                return [int(x[0])-1]
+                return [int(x[0])]
         elif len(x) == 2:
             a,b = x
-            return range(int(a)-1, int(b))
+            return range(int(a), int(b)+1)
         else:
             raise ValueError
 
-    result = reduce(list.__add__, [parse(x) for x in tokens])
+    result = list()
+    for tok in tokens:
+        result += parse(tok)
 
     if randomize:
         np.random.shuffle(result)

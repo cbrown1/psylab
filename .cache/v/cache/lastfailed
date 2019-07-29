@@ -1,0 +1,13 @@
+{
+  "tests/test_stats_tools.py::test_anova_between": true,
+  "tests/test_stats_tools.py::test_anova_table": true,
+  "tests/test_stats_tools.py::test_anova_within": true,
+  "tests/test_stats_tools.py::test_dataview_design": true,
+  "tests/test_stats_tools.py::test_dataview_dv": true,
+  "tests/test_stats_tools.py::test_dataview_filter_ivs": true,
+  "tests/test_stats_tools.py::test_dataview_ivs": true,
+  "tests/test_stats_tools.py::test_dataview_view_data": true,
+  "tests/test_stats_tools.py::test_dataview_view_looks": true,
+  "tests/test_stats_tools.py::test_pairwise": true,
+  "tests/test_stats_tools.py::test_pairwise_table": true
+}

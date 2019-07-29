@@ -88,8 +88,8 @@ class Dataset:
     def indices_from_vars(self, d):
         """Takes a dict in which keys are [str] var names and vals are lists of [str] levels
         """
-        collapsedIndex = [[Ellipsis] for x in self.data.shape]
-#        collapsedIndex = [[slice(None)] for x in self.data.shape]
+#        collapsedIndex = [[Ellipsis] for x in self.data.shape]
+        collapsedIndex = [[slice(None)] for x in self.data.shape]
         for group in d:
             i = self.index_from_var[group]
             collapsedIndex[i] = sorted(self.index_from_level[(group,level)] for level in d[group])
@@ -97,10 +97,10 @@ class Dataset:
         takeThisProduct = []
         maxlen = max(len(x) for x in collapsedIndex)
         for i in collapsedIndex:
-            if i == Ellipsis:
-#            if i == slice(None):
-                takeThisProduct.append([Ellipsis])
-#                takeThisProduct.append([slice(None)])
+#            if i == Ellipsis:
+            if i == slice(None):
+#                takeThisProduct.append([Ellipsis])
+                takeThisProduct.append([slice(None)])
             else:
                 takeThisProduct.append(i)
         indices = product(*takeThisProduct)
@@ -596,13 +596,13 @@ class DatasetView:
                 self.sd[i] = nanstd(loop_data)
             self.se[i] = self.sd[i] / np.sqrt(self.n[i])
 
-        self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for
-                                                  t in self.treatments),
-                                            self.n,
-                                            self.mean,
-                                            self.sd,
-                                            self.se),
-                                        names="treatment,n,mean,sd,se")
+#        self.stats = np.rec.fromrecords(zip(tuple("|".join(eval(t)) for
+#                                                  t in self.treatments),
+#                                            self.n,
+#                                            self.mean,
+#                                            self.sd,
+#                                            self.se),
+#                                        names="treatment,n,mean,sd,se")
 
     def as_dataset(self):
         return self.dataset.from_var_dict(self.var_dict)

@@ -23,4 +23,4 @@
 # cbrown1@pitt.edu.
 #
 
-from dataview import Dataset, DatasetView, from_csv
+from .dataview import Dataset, DatasetView, from_csv

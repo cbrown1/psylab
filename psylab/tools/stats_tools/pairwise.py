@@ -74,7 +74,7 @@ def pairwise_table(pairwise_data):
         output += fmt_line.format(comparison, str(mean_diff), str(p))
 
     return output
-    
+
 
 def pairwise_comparisons(data, comparisons, correction=None,
                      factors=None,

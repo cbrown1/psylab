@@ -41,4 +41,4 @@ from .rau import rau
 from .anova import anova_between, anova_within, anova_table
 from .pairwise import pairwise_comparisons, pairwise_table, bonferroni, sidak
 from .rms_error import rms_error
-import dataview
+from . import dataview
