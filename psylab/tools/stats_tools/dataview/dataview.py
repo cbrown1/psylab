@@ -33,6 +33,7 @@
 
 '''
 
+from collections import OrderedDict
 import numpy as np
 import csv
 import codecs
@@ -65,7 +66,7 @@ class Dataset:
     dv = None
     ivs = None
     labels = None
-    design = None
+    var_dict = None
     index_from_var = None
     index_from_level = None
     comments = ""
@@ -124,7 +125,8 @@ class Dataset:
 
         Parameters
         ----------
-        var_dict : dict
+        var_dict : collections.OrderedDict
+
 
         Returns
         -------
@@ -183,7 +185,7 @@ class Dataset:
         ds.ivs = ivs
         ds.index_from_level = index_from_level
         ds.index_from_var = index_from_var
-        ds.design = dict(labels)
+        ds.var_dict = OrderedDict(labels)
         ds.dv = self.dv
 
         for t in product(*[l for v,l in labels[:-1]]):
@@ -307,18 +309,23 @@ def from_csv(csv_path, dv, ivs=None):
             i += 1
 
     items = index_from_level.items()
-    design_list = []
+    var_dict = OrderedDict()
 
     for var in labels:
-        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
-        if t[0] == dv:
-            t = (t[0], None)
-        design_list.append(t)
-
+        levels = []
+        if var == dv:
+            levels = None
+        else:
+            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
+        var_dict[var] = levels
+#        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
+#        if t[0] == dv:
+#            t = (t[0], None)
+#        var_dict_list.append(t)
     ds = Dataset()
     ds.data = array
-    ds.labels = tuple((v,l) for v,l in design_list if v in ivs or v == dv)
-    ds.design = dict(design_list)
+    ds.labels = tuple((v,l) for v,l in var_dict.items() if v in ivs or v == dv)
+    ds.var_dict = var_dict
     ds.dv = dv
     ds.ivs = ivs
     ds.index_from_var = index_from_var
@@ -422,18 +429,18 @@ def from_arrays(labels=None, *args):
             i += 1
 
     items = index_from_level.items()
-    design_list = []
+    var_dict_list = []
 
     for var in labels:
         t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
         if t[0] == dv:
             t = (t[0], None)
-        design_list.append(t)
+        var_dict_list.append(t)
 
     ds = Dataset()
     ds.data = array
-    ds.labels = tuple((v,l) for v,l in design_list if v in ivs or v == dv)
-    ds.design = dict(design_list)
+    ds.labels = tuple((v,l) for v,l in var_dict_list if v in ivs or v == dv)
+    ds.var_dict = OrderedDict(var_dict_list)
     ds.dv = dv
     ds.ivs = ivs
     ds.index_from_var = index_from_var
@@ -471,7 +478,7 @@ class DatasetView:
         # expand them using the level information in `ds`
         for v in var_dict:
             if var_dict[v] == []:
-                var_dict[v] = ds.design[v]
+                var_dict[v] = ds.var_dict[v]
 
         dv = ds.dv
         
@@ -481,7 +488,7 @@ class DatasetView:
                 self.vars.append(v)
                 labels.append((v,tuple(var_dict[v])))
             elif v == looks:
-                labels.append((v,ds.design[v]))
+                labels.append((v,ds.var_dict[v]))
             elif v == ds.dv:
                 labels.append((v,None))
         labels = tuple(labels)
@@ -547,7 +554,7 @@ class DatasetView:
                         index_from_var[v] -= 1
 
                 data = nanmean(data, -1).reshape(shape[:-1] + (1,))
-                dv_size = len(ds.design[looks])
+                dv_size = len(ds.var_dict[looks])
                 shape = tuple(len(l) for (v,l) in labels if v in var_dict) + (dv_size,)
                 data = data.swapaxes(-2, j).reshape(shape)
                 labels = tuple((v,l) for (v,l) in labels if v != looks)
@@ -558,7 +565,7 @@ class DatasetView:
         self.dataset.factors = tuple(v for (v,l) in labels[:-1])
         self.dataset.ivs = tuple(x for x in self.dataset.factors if x != self.dataset.dv)
         self.dataset.labels = labels
-        self.dataset.design = dict(labels)
+        self.dataset.var_dict = dict(labels)
         self.dataset.index_from_var = index_from_var
         self.dataset.index_from_level = index_from_level
 

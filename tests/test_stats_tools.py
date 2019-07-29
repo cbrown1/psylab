@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections import OrderedDict
 import numpy as np
 import numpy.testing as np_testing
 import pandas as pd
@@ -56,22 +57,20 @@ total          4950.4000   39.0000
 
 def test_pairwise():
 
-    ref = [('Task[0],Age[1],Stim[1] -- Task[0],Age[1],Stim[0]', -34.00000000000001, 6.117916422272445e-10)]
+    ref = [('Task[1],Age[C],Stim[W] -- Task[1],Age[C],Stim[P]', -34.00000000000001, 6.117916422272445e-10)]
 
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/hyperstat_3f_between.csv", dv="dv")
 
-    ci = d.indices_from_comparison([
-    [{'Task':['1'],'Age':['C'], 'Stim':['W']},{'Task':['1'],'Age':['C'], 'Stim':['P']}],
-    ])
-    c = psylab.tools.stats_tools.pairwise_comparisons(d.data,ci, correction=psylab.tools.stats_tools.bonferroni, factors=["Task", "Age", "Stim"])
-    assert ref == c
+    ci = d.indices_from_comparison([ [{'Task':['1'],'Age':['C'], 'Stim':['W']},{'Task':['1'],'Age':['C'], 'Stim':['P']}], ])
+    c = psylab.tools.stats_tools.pairwise_comparisons(d.data,ci, correction=psylab.tools.stats_tools.bonferroni, var_dict=d.var_dict)
+    assert all([a == b for a, b in zip(ref[0], c[0])])
     return
 
 
 def test_pairwise_table():
 
     ref = """                                      Comparison:          Mean Diff;                      p
-Task[0],Age[0],Stim[1] -- Task[0],Age[0],Stim[0]: -5.828933915240022; 0.00039203885258633193
+Task[1],Age[A],Stim[W] -- Task[1],Age[A],Stim[P]: -5.828933915240022; 0.00039203885258633193
 """
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/hyperstat_3f_between.csv", dv="dv")
     an = d.anova_between()
@@ -79,7 +78,7 @@ Task[0],Age[0],Stim[1] -- Task[0],Age[0],Stim[0]: -5.828933915240022; 0.00039203
     ci = d.indices_from_comparison([
     [{'Task':['1'],'Age':['A'], 'Stim':['W']},{'Task':['1'],'Age':['A'], 'Stim':['P']}],
     ])
-    c = psylab.tools.stats_tools.pairwise_comparisons(d.data,ci, correction=psylab.tools.stats_tools.bonferroni, factors=["Task", "Age", "Stim"])
+    c = psylab.tools.stats_tools.pairwise_comparisons(d.data,ci, correction=psylab.tools.stats_tools.bonferroni, var_dict=d.var_dict)
     t = psylab.tools.stats_tools.pairwise_table(c)
     assert ref == t
     return
@@ -101,22 +100,20 @@ def test_dataview_dv():
     return
 
 
-def test_dataview_design():
+def test_dataview_var_dict():
 
-    ref = {'color': ('blue', 'red'), 'score': None, 'size': ('small', 'med', 'large')}
+    ref = OrderedDict([('size', ['small', 'med', 'large']), ('color', ['blue', 'red']), ('score', None)])
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/small_2x3.csv", dv="score")
-    assert ref == d.design
+    assert all([a == b for a, b in zip(ref.items(), d.var_dict.items())])
     return
 
 
 def test_dataview_filter_ivs():
 
-    ref = {'color': (), 'score': None, 'size': ('small', 'med', 'large')}
-    # Get only 1 variable
+    ref = OrderedDict([('size', ['small', 'med', 'large']), ('color', []), ('score', None)])    # Get only 1 variable
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/small_2x3.csv", "score", ['size'])
-    assert ref == d.design
+    assert ref == d.var_dict
     return
-
 
 
 def test_dataview_view_data():

@@ -23,6 +23,7 @@
 # cbrown1@pitt.edu.
 #
 
+from collections import OrderedDict, Hashable
 import numpy as np
 from scipy import stats
 
@@ -76,11 +77,12 @@ def pairwise_table(pairwise_data):
     return output
 
 
-def pairwise_comparisons(data, comparisons, correction=None,
-                     factors=None,
-                     levels=None,
-                     within=False):
-    """Computes a table of pairwise comparisons.
+def pairwise_comparisons(data, 
+                         comparisons,
+                         var_dict=None,
+                         correction=None,
+                         within=False):
+    """Computes pairwise comparisons
 
     Parameters:
     -----------
@@ -92,12 +94,16 @@ def pairwise_comparisons(data, comparisons, correction=None,
         of advanced indices used to pull samples out of `data`. You can 
         generate this list using dataview.indices_from_comparison
 
+    var_dict : dict
+        A dict with var names as keys, and lists of var levels as vals.
+        (ie., dataview.var_dict)
+
     correction : function
         The correction function to control the family-wise error rate.
         Possible values include: None [default], bonferroni, sidak.
 
-    factors : list or tuple
-        String of human-readable factor names.
+    within : bool
+        True if the comparisons are within subjects, otherwise False
 
     Returns:
     --------
@@ -106,7 +112,7 @@ def pairwise_comparisons(data, comparisons, correction=None,
     """
 
 
-    if factors is None: #If factors aren't specified
+    if var_dict is None: 
         num_factors = len(data.shape) - 1
         if num_factors <= 26: # If the factor dimensions can be mapped to
                                  # letters of the alphabet...
@@ -114,16 +120,22 @@ def pairwise_comparisons(data, comparisons, correction=None,
         else: # just give them indexed dummy names
             factors = tuple("F{}".format(i) for i in range(len(data.shape)-1))
 
-    def samplename(indices):
-        index = tuple(tuple(sorted(set(y))) for y in zip(*indices))
+        var_dict = OrderedDict()
+        for ii in range(len(factors)):
+            this_levels = []
+            for levels in range(data.shape[ii]):
+                    this_levels.append("{}{:}".format(factors[ii],levels))
+            var_dict[factors[ii]] = this_levels
+
+
+    def orig_samplename(indices):
+        index = tuple(tuple(sorted(set(y))) for y in zip(*indices) if not isinstance(y[0], slice) )
 
         name = []
         # This is broken if level names are actually passed
-        for i in xrange(len(index)-1):
+        for i in range(len(index)-1):
             case = index[i]
-            if case[0] == Ellipsis:
-                pass
-            elif len(case) == 1:
+            if  len(case) == 1:
                 name.append("{}[{:}]".format(factors[i], index[i][0]))
             else:
                 if index[i] == tuple(range(index[i][0],index[i][-1]+1)):
@@ -133,11 +145,23 @@ def pairwise_comparisons(data, comparisons, correction=None,
                                  (",".join(map(str, index[i])))))
         return ",".join(name)
 
+    def samplename(indices):
+        index = tuple(tuple(sorted(set(y))) for y in zip(*indices) if not isinstance(y[0], slice) )
+
+        name = []
+        for i in range(len(index)):
+            cases = index[i]
+            var = var_dict.keys()[i]
+            levels = []
+            for case in cases:
+                levels.append(var_dict[var][case])
+            name.append("{}[{:}]".format(var, ",".join(levels)))
+        return ",".join(name)
+
     k = len(comparisons)
     result = []
     for x in comparisons:
         ii,jj = x
-
         comp_str = " -- ".join(map(samplename, (ii,jj)))
 
         sample_a = []
