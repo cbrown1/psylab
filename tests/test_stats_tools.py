@@ -50,7 +50,7 @@ total          4950.4000   39.0000
 
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/hyperstat_3f_between.csv", dv="dv")
     an = d.anova_between()
-    table = psylab.tools.stats_tools.anova_table(an)
+    table = psylab.tools.stats_tools.anova_table(an, decimals=4)
     assert ref == table
     return
 

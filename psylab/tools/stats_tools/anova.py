@@ -32,7 +32,7 @@ def nanproduct(arr):
     return np.product(tuple(x for x in arr if not np.isnan(x)))
 
 
-def anova_table(anova_data):
+def anova_table(anova_data, decimals=4):
     """Generates a nicely formatted anova summary table
 
     Parameters:
@@ -48,7 +48,7 @@ def anova_table(anova_data):
     sourcetab = 8
     mintab = 10
     sfmts = "{{:>{:}}}".format(mintab)
-    sfmt = "{{:>{:}.4f}}".format(mintab)
+    sfmt = "{{:>{:}.{:}f}}".format(mintab, decimals)
 #    sfmt = "%"+str(mintab)+".4g"
 #    sfmts = "%"+str(mintab)+"s"
 #    sfmt = "%"+str(mintab)+".4g"
