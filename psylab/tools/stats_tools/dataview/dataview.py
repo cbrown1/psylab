@@ -262,21 +262,25 @@ def from_csv(csv_path, dv, ivs=None):
     temp_array = np.rec.fromrecords(list(map(format_row, file_data)), names=labels)
 
     # Compute index mappings
-    index_from_var = {}
-    index_from_level = {}
+    index_from_var = OrderedDict()
+    index_from_level = OrderedDict()
     shape = [0 for x in [y for y in labels[:-1] if y in ivs]]
-
+#    print("temp_array: {:}".format(temp_array))
     i = 0
+#    print("ivs: {:}".format(ivs))
     for v in ivs:
+#        print("                              {:}".format(temp_array(v)))
         index_from_var[v] = i
         j = 0
-        unique = set(temp_array[v])
+        unique = set(temp_array[v]) # temp_array has data, so do we need set?
+#        print("                               {:}".format(unique))
         for l in unique:
             index_from_level[(v,l)] = j
             j += 1
         shape[i] = len(unique)
         i += 1
-
+#    print ("index_from_level: {:}".format(index_from_level))
+#    print ("index_from_var: {:}".format(index_from_var))
     axis_from_var = dict([x[::-1] for x in index_from_var.items()])
 
     treatments = {}
@@ -319,11 +323,12 @@ def from_csv(csv_path, dv, ivs=None):
         else:
             for (v,l),i in items:
                 if v == var:
- #                   print((i,l))
+#                    print((i,l))
                     levels[i] = l
 #            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
 #            levels = [l for i,l in sorted((i,l) for (v,l),i in items if v == var)]
         var_dict[var] = levels
+#    print(var_dict)
 #        t = var, tuple(l for i,l in sorted((i,l) for (v,l),i in items if v == var))
 #        if t[0] == dv:
 #            t = (t[0], None)
