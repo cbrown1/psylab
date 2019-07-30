@@ -80,8 +80,8 @@ def test_pairwise():
 
 def test_pairwise_table():
 
-    ref = """                                      Comparison:          Mean Diff;                      p
-Task[1],Age[A],Stim[W] -- Task[1],Age[A],Stim[P]: -5.828933915240022; 0.00039203885258633193
+    ref = """                                      Comparison:  Mean Diff;          p
+Task[1],Age[A],Stim[W] -- Task[1],Age[A],Stim[P]:    -5.8289;     0.0004  ***
 """
     d = psylab.tools.stats_tools.dataview.from_csv("tests/data/hyperstat_3f_between.csv", dv="dv")
     an = d.anova_between()

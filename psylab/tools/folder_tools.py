@@ -234,7 +234,7 @@ class concurrent_files:
                 A list of filenames, one from each file list.
         """
         f = []
-        for name, files in self.file_dict.iteritems():
+        for name, files in self.file_dict.items():
             got_file = False
             reset = False
 
@@ -306,7 +306,7 @@ class concurrent_files:
         file_keys = []
         if not file_names:
             file_names = []
-            for name, files in self.file_dict.iteritems():
+            for name, files in self.file_dict.items():
                 file_names.append(files['files'][files['index']])
         for file_name in file_names:
             if file_name in self.text.keys():  # Try filename as is
@@ -688,7 +688,7 @@ class synched_consecutive_files:
                 self.repeat = value
             
         n = np.inf
-        for name,g in self.group.iteritems():
+        for name,g in self.group.items():
             if g.n < n:
                 if n is not np.inf:
                     raise Exception("synched_consecutive_files members have unequal n's.")
@@ -739,7 +739,7 @@ class synched_consecutive_files:
             index = self.index_list[self.index]
 
         ret = ''
-        for name,g in self.group.iteritems():
+        for name,g in self.group.items():
             if file_list == g.name:
                 ret = g.get_filename(index, fmt)
         return ret
@@ -772,7 +772,7 @@ class synched_consecutive_files:
             index = self.index_list[self.index]
 
         ret = []
-        for name,g in self.group.iteritems():
+        for name,g in self.group.items():
             ret.append(g.get_filename(index, fmt))
         return ret
 

@@ -38,13 +38,16 @@ def sidak(p,k):
     return 1.0 - (1.0 - p)**k
 
 
-def pairwise_table(pairwise_data):
+def pairwise_table(pairwise_data, decimals=4):
     """Generates a nicely formatted anova summary table
 
     Parameters:
     -----------
     pairwise_data : record array
         The output of the pairwise_comparisons function
+
+    sig : int
+        The number of decimals to display
 
     Returns:
     --------
@@ -54,13 +57,14 @@ def pairwise_table(pairwise_data):
 
     lengths = [10,10,10]
 
+    fmt = "{{:.{:}f}}".format(decimals)
     for pair in pairwise_data:
         if len(pair[0]) > lengths[0]:
             lengths[0] = len(pair[0])
-        if len(str(pair[1])) > lengths[1]:
-            lengths[1] = len(str(pair[1]))
-        if len(str(pair[2])) > lengths[2]:
-            lengths[2] = len(str(pair[2]))
+        if len(fmt.format(pair[1])) > lengths[1]:
+            lengths[1] = len(fmt.format(pair[1]))
+        if len(fmt.format(pair[2])) > lengths[2]:
+            lengths[2] = len(fmt.format(pair[2]))
 
     fmt = []
     fmt.append("{{:>{:}}}".format(lengths[0]))
@@ -71,8 +75,23 @@ def pairwise_table(pairwise_data):
 
     output = fmt_line.format("Comparison", "Mean Diff", "p")
 
+    fmt = []
+    fmt.append("{{:>{:}}}".format(lengths[0]))
+    fmt.append("{{:>{:}.{:}f}}".format(lengths[1], decimals))
+    fmt.append("{{:>{:}.{:}f}}".format(lengths[2], decimals))
+
+    fmt_line = "{}: {}; {}{}\n".format(fmt[0], fmt[1], fmt[2], "{}")
+
     for comparison, mean_diff, p in pairwise_data:
-        output += fmt_line.format(comparison, str(mean_diff), str(p))
+        if p < .001:
+            sig = "  ***"
+        elif p < .01:
+            sig = "  **"
+        elif p < .05:
+            sig += "  *"
+        else:
+            sig = " "
+        output += fmt_line.format(comparison, mean_diff, p, sig)
 
     return output
 
