@@ -13,12 +13,6 @@ concurrent_file_folders = [
                           'tests/data/concurrent_files/4_object'
                           ]
                           
-consecutive_file_folders = [
-                          'tests/data/consecutive_files/condition_1', 
-                          'tests/data/consecutive_files/condition_2',
-                          'tests/data/consecutive_files/condition_3',
-                          ]
-
                           
 def test_cd():
     ref = "tests"
@@ -37,7 +31,7 @@ def test_concurrent_files_get_filenames():
 
 
 def test_concurrent_files_use():
-    ref = ['0_jean', '0_took', '0_no', '0_white', '0_toys']
+    ref = '0_jean'
     f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
                                                    use={'0_name':'0_jean'}, # Only use name Jean
                                                    repeat=True,
@@ -45,8 +39,9 @@ def test_concurrent_files_use():
     ret1 = f.get_filenames(fmt='file')
     ret2 = f.get_filenames(fmt='file')
     ret3 = f.get_filenames(fmt='file')
-    assert ref[0] == ret1[0] == ret2[0] == ret3[0]
-    assert not ref[1] == ret1[1] == ret2[1] == ret3[1]
+    assert ref == ret1[0] == ret2[0] == ret3[0] # Names should all be the same
+    verbs = [ret1[1], ret2[1], ret3[1]]
+    assert len(set(verbs)) == len(verbs) # Verbs should all be different
 
 
 def test_concurrent_files_fullfile():
@@ -122,7 +117,7 @@ def test_consecutive_files_range():
     f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
                                                     file_range='2:3',
                                                    )
-    ret = f.get_filename(fmt='file') # File1
+    ret = f.get_filename(fmt='file') # File2
     assert ref == ret
 
 
