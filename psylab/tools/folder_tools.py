@@ -30,6 +30,7 @@ Helper classes for working with folders and files in less typical ways
 
 import os
 import collections
+from functools import reduce # Available as built-in in py2, but not in py3
 import numpy as np
 
 
@@ -73,7 +74,7 @@ class concurrent_files:
         Parameters
         ----------
         path_list : list of strings
-            A list of the the paths where the files are.
+            A list of the the paths to where the files are
         file_ext : string
             A string of semicolon-separated extensions to mask (eg. '.wav;.WAV'). 
             [Default = all files]
@@ -88,20 +89,20 @@ class concurrent_files:
             The keys are basenames from path_list, the vals are lists of 
             filenames to specifically use. If this is specified, only filenames 
             on this list are used and all others are skipped. This overrides 
-            skip.
+            skip
         skip : dict
             The keys are basenames from path_list, the vals are lists of 
-            filenames to ignore.
+            filenames to ignore
         text_file : string
             the full path to a text file that specifies text for each token.
             There should be one line per token, and the format can be
             specified (see below). Because one textfile is assumed, all 
-            filenames must be unique.
+            filenames must be unique
         text_format : string
             Indicates the format of the lines in text_file. Should be something 
             like "file,kw,text" where `file` is the only mandatory item, and 
             indicates the position of the filename, which is used as the 
-            identifier.
+            identifier
 
         Usage
         -----
@@ -177,7 +178,7 @@ class concurrent_files:
                         elif not f in self.skip[name] and not os.path.splitext(f)[0] in self.skip[name]:
                             files['files'].append(os.path.join(path,f))
             self.file_dict[name] = files
-            self.reset(name)
+            self._reset(name)
 
         # Text
         if self.text_file:
@@ -202,7 +203,9 @@ class concurrent_files:
                         self.text[thistext[fileind]][tkn] = thistext[fmt_toks.index(tkn)].strip()
 
 
-    def reset(self, name):
+    def _reset(self, name):
+        """This function is meant to be called by self, when the end of filelist is reached
+        """
         self.file_dict[name]['index'] = -1
         if self.random:
             np.random.shuffle(self.file_dict[name]['files'])
@@ -218,11 +221,11 @@ class concurrent_files:
             use : dict
                 A dictionary with keys as list names and vals as lists of 
                 filenames. If specified, then only the files listed will be 
-                drawn from. You can specify only the list names you want.
+                drawn from. You can specify only the list names you want
             skip : dict
                 A dictionary with keys as list names and vals as lists of 
                 filenames. If specified, then the files listed will be 
-                ignored. You can specify only the list names you want.
+                ignored. You can specify only the list names you want
             fmt : str
                 'file' returns the filename only with no path
                 'base' returns the filebase with no path or extension
@@ -261,12 +264,12 @@ class concurrent_files:
                         if self.repeat:
                             # Protect against possible infinit loop: no need to reset more than once
                             if reset:
-                                raise Exception("'%s' file list contains no allowable files (ie., that are not in skip)!" % name)
+                                raise RuntimeError("'{}' file list contains no allowable files (ie., that are not in skip)!".format(name))
                             else:
-                                self.reset(name)
+                                self._reset(name)
                                 reset = True
                         else: 
-                            raise Exception('%s file list is exhausted!' % name)
+                            raise StopIteration('{} file list is exhausted!'.format(name))
                 
                 filepath = files['files'][files['index']]
                 filename = os.path.split(filepath)[1]
@@ -325,7 +328,7 @@ class concurrent_files:
                         got_file = True
                         break
                 if not got_file:
-                    file_keys.append("[[%s]]" % os.path.basename(file_name)) # None found. Use filename.
+                    file_keys.append("[[{}]]".format(os.path.basename(file_name))) # None found. Use filename.
         if file_keys:
             file_texts =[]
             for key in file_keys:
@@ -339,7 +342,7 @@ class concurrent_files:
 
 
 class consecutive_files:
-    """A simple class for retrieving filesnames in a folder, one at a time
+    """A simple class for retrieving filenames in a folder, one at a time
 
         This class tries to make it easy to access files in a folder 
         one-at-a-time, and to access bits of text associated with each
@@ -351,10 +354,10 @@ class consecutive_files:
         Parameters
         ----------
         path : string
-            The full path where the files are.
+            The path where the files are
         name : string
             A name to distinuish this set from others. If None, the basename of 
-            path will be used.
+            path will be used
         file_ext : string
             A string of semicolon-separated extensions to mask (eg. '.wav;.WAV'). 
             [Default = all files]
@@ -368,12 +371,12 @@ class consecutive_files:
         text_file : string
             the full path to a text file that specifies text for each token.
             There should be one line per token, and the format can be
-            specified (see below). 
+            specified (see below) 
         text_format : string
             Indicates the format of the lines in text_file. Should be something 
             like "file,kw,text" where `file` is the only mandatory item, and 
             indicates the position of the filename which is used as the 
-            identifier.
+            identifier
 
         Usage
         -----
@@ -480,13 +483,15 @@ class consecutive_files:
                     for tkn in fmt_toks:
                         self.text[thistext[fileind]][tkn] = thistext[fmt_toks.index(tkn)].strip()
 
-    def reset(self):
+    def _reset(self):
+        """This function is meant to be called by self, when the end of filelist is reached
+        """
         if self.repeat:
             self.index = -1
             if self.random:
                 np.random.shuffle(self.index_list)
         else:
-            raise Exception('%s file list is exhausted!' % self.name)
+            raise StopIteration('{} file list is exhausted!'.format(self.name))
 
     def get_filename(self, index=None, fmt='full'):
         """ Gets a filename.
@@ -498,16 +503,16 @@ class consecutive_files:
                 is incremented and the next filename in the list is returned 
                 (current index+1). If zero or positive, the filename of 
                 the specified index is returned. If negative, the filename of the  
-                current index is returned (index is unchanged). 
+                current index is returned (index is unchanged)
             fmt : str
-                'file' returns the filename only with no path (default)
+                'file' returns the filename only with no path
                 'base' returns the filebase with no path or extension
                 'full' returns the full file path (default)
         """
         if index != 0 and not index:
             self.index += 1
             if self.index == self.n:
-                self.reset()
+                self._reset()
         else:
             if index > -1: # If non-negative, use that index. (Don't change if negative)
                 self.index = index
@@ -521,7 +526,7 @@ class consecutive_files:
     def get_text(self, file_name=None, item='text'):
         """Gets a specified item of text associated with the specified filename.
             If no filename is specified, the file name of the current index is used. 
-            The filename extension is optional. The default item is 'text'.
+            The filename extension is optional. The default item is 'text'
 
             Parameters
             ----------
@@ -532,7 +537,7 @@ class consecutive_files:
                 including removing the file extension, etc. [default = current file name]  
             item : string
                 The name of the text item you would like. It should be one of the items you
-                specified in the text_format argument when you instantiated the class. 
+                specified in the text_format argument when you instantiated the class
                 [default = `text`]
                 
             Returns
@@ -562,7 +567,7 @@ class consecutive_files:
         """Translate a print-range style string to a list of integers
 
           The input should be a string of comma-delimited values, each of
-          which can be either a number, or a colon-delimited range. 
+          which can be either a number, or a colon-delimited range
 
           >>> str_to_range('1:5, 20, 22')
           [1, 2, 3, 4, 5, 20, 22]
@@ -585,7 +590,7 @@ class consecutive_files:
                 a,b = x
                 return range(int(a)-1, int(b))
             else:
-                raise ValueError
+                raise ValueError("Expected len of 1 or 2: {}".format(x))
 
         result = reduce(list.__add__, [parse(x) for x in tokens])
 
@@ -597,14 +602,14 @@ class synched_consecutive_files:
         
         This convenience class allows you to group consecutive_files lists 
         and synchronize their indexes. Thus, when the file index changes for 
-        one list, the indexes of the other lists are changed as well. 
+        one list, the indexes of the other lists are changed as well
 
         An example usecase is when you are running an experiment and have  
         folders of pre-processed speech stimuli, with each folder  
         representing the same speech set processed in a different condition.  
         In this case, when you change conditions you want to continue with 
         the same index you were using, so as not to repeat the same speech
-        tokens. 
+        tokens
 
         Parameters
         ----------
@@ -615,7 +620,7 @@ class synched_consecutive_files:
             meaning all lists will have the same random order
         repeat : bool
             Whether to repeat the lists when they are exhausted. If random is 
-            true, the lists will be re-randomized.
+            true, the lists will be re-randomized
 
         Examples:
         ---------
@@ -691,7 +696,7 @@ class synched_consecutive_files:
         for name,g in self.group.items():
             if g.n < n:
                 if n is not np.inf:
-                    raise Exception("synched_consecutive_files members have unequal n's.")
+                    raise ValueError("synched_consecutive_files members have unequal n's.")
                 n = g.n
         self.n = n
         self.index_list = range(self.n)
@@ -719,10 +724,10 @@ class synched_consecutive_files:
             Parameters
             ----------
             file_list : string
-                The name of the `consecutive` file list to draw from.
+                The name of the `consecutive` file list to draw from
             index : int
                 The index of the desired filename. If unspecified, then next filename 
-                in the list is returned, and the index will be incremented.
+                in the list is returned, and the index will be incremented
             fmt : str
                 'file' returns the filename only with no path (default)
                 'base' returns the filebase with no path or extension
@@ -752,16 +757,16 @@ class synched_consecutive_files:
             Parameters
             ----------
             file_list : string
-                The name of the `consecutive` file list to draw from.
+                The name of the `consecutive` file list to draw from
             index : int
                 The index of the desired filename. If unspecified, then next filename 
-                in the list is returned, and the index will be incremented.
+                in the list is returned, and the index will be incremented
             fmt : str
                 'file' returns the filename only with no path (default)
                 'base' returns the filebase with no path or extension
                 'full' returns the full file path
         """
-
+        # TODO: What does this function do?
         if index != 0 and not index: # 0 == None
             if self.repeat and  self.index == self.n-1:
                 self.index = 0

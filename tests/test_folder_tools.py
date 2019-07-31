@@ -12,12 +12,26 @@ concurrent_file_folders = [
                           'tests/data/concurrent_files/3_color',
                           'tests/data/concurrent_files/4_object'
                           ]
+                          
+consecutive_file_folders = [
+                          'tests/data/consecutive_files/condition_1', 
+                          'tests/data/consecutive_files/condition_2',
+                          'tests/data/consecutive_files/condition_3',
+                          ]
+
+                          
+def test_cd():
+    ref = "tests"
+    with psylab.tools.folder_tools.cd(ref):
+        path = os.getcwd()
+    base = os.path.basename(path)
+    assert ref == base
+
 
 def test_concurrent_files_get_filenames():
     ref = ['0_jean', '0_took', '0_no', '0_white', '0_toys']
 
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
-                          )
+    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
     ret = f.get_filenames(fmt='file')
     assert ref == ret
 
@@ -44,6 +58,27 @@ def test_concurrent_files_fullfile():
     assert ref == ret2[0]
 
 
+def test_concurrent_files_repeat():
+    f_no_repeat = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
+    f_repeat = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
+                                                             repeat=True)
+    for i in range(10):
+        ret = f_no_repeat.get_filenames()
+        ret = f_repeat.get_filenames()
+
+    good = False
+    try:
+        ret = f_no_repeat.get_filenames() # Should raise StopIteration exception
+    except StopIteration as e:
+        good = True                       # So this is good
+    assert good
+    
+    try:
+        ret = f_repeat.get_filenames() # Should NOT raise StopIteration exception
+    except StopIteration as e:
+        assert False
+
+
 def test_concurrent_files_text():
     ref = 'took'
     f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
@@ -55,3 +90,76 @@ def test_concurrent_files_text():
     print(ret2.split(",")[1])
     assert ref == ret2.split(",")[1]
 
+
+def test_consecutive_files_get_filenames():
+    ref = 'file1'
+    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
+    ret = f.get_filename(fmt='file')
+    assert ref == ret
+
+
+def test_consecutive_files_fullfile():
+    ref = 'tests/data/consecutive_files/condition_1/file1'
+    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
+    ret = f.get_filename()
+    assert ref == ret
+
+
+def test_consecutive_files_text():
+    ref = 'This is file 2 text.'
+    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+                                                    text_file='tests/data/consecutive_files/consecutive_files.txt',
+                                                    text_format='file,kw,sentence',
+                                                   )
+    ret1 = f.get_filename() # File1
+    ret2 = f.get_filename() # File2
+    ret3 = f.get_text(item='sentence')
+    assert ref == ret3
+
+
+def test_consecutive_files_range():
+    ref = 'file2'
+    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+                                                    file_range='2:3',
+                                                   )
+    ret = f.get_filename(fmt='file') # File1
+    assert ref == ret
+
+
+def test_consecutive_files_repeat():
+    ref = 'file1'
+    f_no_repeat = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
+    f_repeat = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+                                                    repeat=True,
+                                                   )
+    ret = f_no_repeat.get_filename()
+    ret = f_no_repeat.get_filename()
+    ret = f_no_repeat.get_filename()
+    ret = f_repeat.get_filename()
+    ret = f_repeat.get_filename()
+    ret = f_repeat.get_filename()
+
+    good = False
+    try:
+        ret = f_no_repeat.get_filename() # Should raise StopIteration exception
+    except StopIteration as e:
+        good = True                      # So this is good
+    assert good
+    
+    try:
+        ret = f_repeat.get_filename() # Should NOT raise StopIteration exception
+    except StopIteration as e:
+        assert False
+
+
+def synched_consecutive_files_get_file():
+    ref = 'file2'
+    f = psylab.tools.folder_tools.synched_consecutive_files(
+            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1'),
+            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_2'),
+            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_3'),
+        )
+    ret1 = f.get_filename('condition_1')
+    ret2 = f.get_filename('condition_3')
+    
+    assert ref == ret2

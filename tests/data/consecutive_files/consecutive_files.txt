@@ -1,0 +1,3 @@
+file1,3,This is the text for file 1.
+file2,2,This is file 2 text.
+file3,6,File 3 contains more text that files 1 or 2.
