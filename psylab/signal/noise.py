@@ -175,51 +175,51 @@ mls_taps = {2 : [1, 0],
        }
 
 # Encodings of the above polynomials as binary digits in a hexadecimal representation.
-# For a given k in "taps", the argument to np.uint32 is determined by sum([2**i for i in taps[k]])
-mls_bintaps = {2 : np.uint32(3),
-           3 : np.uint32(5),
-           4 : np.uint32(9),
-           5 : np.uint32(18),
-           6 : np.uint32(33),
-           7 : np.uint32(65),
-           8 : np.uint32(177),
-           9 : np.uint32(264),
-           10 : np.uint32(516),
-           11 : np.uint32(1026),
-           12 : np.uint32(2124),
-           13 : np.uint32(4109),
-           14 : np.uint32(11265),
-           15 : np.uint32(16385),
-           16 : np.uint32(32790),
-           17 : np.uint32(65540),
-           18 : np.uint32(131076),
-           19 : np.uint32(262193),
-           20 : np.uint32(524292),
-           21 : np.uint32(1048578),
-           22 : np.uint32(2097153),
-           23 : np.uint32(4194320),
-           24 : np.uint32(8388621),
-           25 : np.uint32(16777220),
-           26 : np.uint32(33554625),
-           27 : np.uint32(67109057),
-           28 : np.uint32(134217732),
-           29 : np.uint32(268435458),
-           30 : np.uint32(536920065),
-           31 : np.uint32(1073741828),
-           32 : np.uint32(2348810241)
+# For a given k in "taps", the argument to np.int64 is determined by sum([2**i for i in taps[k]])
+mls_bintaps = {2 : 3,
+           3 : 5,
+           4 : 9,
+           5 : 18,
+           6 : 33,
+           7 : 65,
+           8 : 177,
+           9 : 264,
+           10 : 516,
+           11 : 1026,
+           12 : 2124,
+           13 : 4109,
+           14 : 11265,
+           15 : 16385,
+           16 : 32790,
+           17 : 65540,
+           18 : 131076,
+           19 : 262193,
+           20 : 524292,
+           21 : 1048578,
+           22 : 2097153,
+           23 : 4194320,
+           24 : 8388621,
+           25 : 16777220,
+           26 : 33554625,
+           27 : 67109057,
+           28 : 134217732,
+           29 : 268435458,
+           30 : 536920065,
+           31 : 1073741828,
+           32 : 2348810241
           }
 
-def generate_lfsr(n, use_rand_seed):
+def generate_lfsr(n, use_rand_seed=False):
     toggle_mask = mls_bintaps[n]
     if use_rand_seed:
-        lfsr = np.uint32(np.random.randint(1, (2**n - 1)))
+        lfsr = np.random.randint(1, (2**n - 1))
     else:
-        lfsr = np.uint32(1)
+        lfsr = 1
 
     while 1:
-        lsb = lfsr & np.uint32(1)
+        lsb = lfsr & 1
         yield lsb
-        lfsr = (lfsr >> np.uint32(1)) ^ (np.uint32(0) - (lfsr & np.uint32(1)) & toggle_mask)
+        lfsr = (lfsr >> np.int64(1)) ^ (np.int64(0) - (lfsr & np.int64(1)) & toggle_mask)
 
 def mls(n, rand_seed=False):
     '''Generates maximum-length sequences
@@ -256,7 +256,7 @@ def mls(n, rand_seed=False):
     except:
         print("n must be an integer in the interval [2, 32].")
 
-    seqlen = 2**n - 1;
+    seqlen = 2**n - 1
 
     # Initialize the linear feedback shift register, val = 1 for all indices.
     lfsr = generate_lfsr(n, rand_seed)
@@ -268,4 +268,4 @@ def mls(n, rand_seed=False):
         else:
             return 1
     zero_to_neg_one = lambda x: x
-    return np.array([zero_to_neg_one(lfsr.next()) for i in xrange(seqlen)], np.int32)
+    return np.array([zero_to_neg_one(next(lfsr)) for i in np.arange(seqlen)], np.int32)
