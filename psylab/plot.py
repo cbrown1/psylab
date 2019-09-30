@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2014 Christopher Brown
+# Copyright (c) 2010-2019 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Bug reports, bug fixes, suggestions, enhancements, or other
-# contributions are welcome. Go to http://code.google.com/p/psylab/
-# for more information and to contribute. Or send an e-mail to:
+# Bug reports, bug fixes, suggestions, enhancements, or other 
+# contributions are welcome. Go to http://github.com/cbrown1/psylab/ 
+# for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
 

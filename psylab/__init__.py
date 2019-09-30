@@ -32,9 +32,15 @@ useful.
 
 '''
 
-__version__ = '0.4.7.16'
+__version__ = '1.0.0.1'
 
-#from dataview import dataview
-from . import tools
+from . import config
+from . import data
+from . import folder
+from . import list
+from . import measurement
+from . import path
+from . import plot
 from . import signal
-#from . import stats
+from . import stats
+from . import time

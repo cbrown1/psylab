@@ -16,7 +16,7 @@ concurrent_file_folders = [
                           
 def test_cd():
     ref = "tests"
-    with psylab.tools.folder_tools.cd(ref):
+    with psylab.folder.cd(ref):
         path = os.getcwd()
     base = os.path.basename(path)
     assert ref == base
@@ -25,14 +25,14 @@ def test_cd():
 def test_concurrent_files_get_filenames():
     ref = ['0_jean', '0_took', '0_no', '0_white', '0_toys']
 
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
+    f = psylab.folder.concurrent_files(concurrent_file_folders)
     ret = f.get_filenames(fmt='file')
     assert ref == ret
 
 
 def test_concurrent_files_use():
     ref = '0_jean'
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
+    f = psylab.folder.concurrent_files(concurrent_file_folders,
                                                    use={'0_name':'0_jean'}, # Only use name Jean
                                                    repeat=True,
                                                   )
@@ -45,17 +45,17 @@ def test_concurrent_files_use():
 
 
 def test_concurrent_files_fullfile():
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
+    f = psylab.folder.concurrent_files(concurrent_file_folders)
     ret1 = f.get_filenames(fmt='file')
     ref = os.path.join(f.path_list[0], ret1[0])
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
+    f = psylab.folder.concurrent_files(concurrent_file_folders)
     ret2 = f.get_filenames()
     assert ref == ret2[0]
 
 
 def test_concurrent_files_repeat():
-    f_no_repeat = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders)
-    f_repeat = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
+    f_no_repeat = psylab.folder.concurrent_files(concurrent_file_folders)
+    f_repeat = psylab.folder.concurrent_files(concurrent_file_folders,
                                                              repeat=True)
     for i in range(10):
         ret = f_no_repeat.get_filenames()
@@ -76,7 +76,7 @@ def test_concurrent_files_repeat():
 
 def test_concurrent_files_text():
     ref = 'took'
-    f = psylab.tools.folder_tools.concurrent_files(concurrent_file_folders,
+    f = psylab.folder.concurrent_files(concurrent_file_folders,
                                                    text_file='tests/data/concurrent_files/concurrent_files.txt',
                                                    text_format='files,word',
                                                   )
@@ -88,21 +88,21 @@ def test_concurrent_files_text():
 
 def test_consecutive_files_get_filenames():
     ref = 'file1'
-    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
+    f = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1')
     ret = f.get_filename(fmt='file')
     assert ref == ret
 
 
 def test_consecutive_files_fullfile():
     ref = 'tests/data/consecutive_files/condition_1/file1'
-    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
+    f = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1')
     ret = f.get_filename()
     assert ref == ret
 
 
 def test_consecutive_files_text():
     ref = 'This is file 2 text.'
-    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+    f = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1',
                                                     text_file='tests/data/consecutive_files/consecutive_files.txt',
                                                     text_format='file,kw,sentence',
                                                    )
@@ -114,7 +114,7 @@ def test_consecutive_files_text():
 
 def test_consecutive_files_range():
     ref = 'file2'
-    f = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+    f = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1',
                                                     file_range='2:3',
                                                    )
     ret = f.get_filename(fmt='file') # File2
@@ -123,8 +123,8 @@ def test_consecutive_files_range():
 
 def test_consecutive_files_repeat():
     ref = 'file1'
-    f_no_repeat = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1')
-    f_repeat = psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1',
+    f_no_repeat = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1')
+    f_repeat = psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1',
                                                     repeat=True,
                                                    )
     ret = f_no_repeat.get_filename()
@@ -149,10 +149,10 @@ def test_consecutive_files_repeat():
 
 def synched_consecutive_files_get_file():
     ref = 'file2'
-    f = psylab.tools.folder_tools.synched_consecutive_files(
-            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_1'),
-            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_2'),
-            psylab.tools.folder_tools.consecutive_files('tests/data/consecutive_files/condition_3'),
+    f = psylab.folder.synched_consecutive_files(
+            psylab.folder.consecutive_files('tests/data/consecutive_files/condition_1'),
+            psylab.folder.consecutive_files('tests/data/consecutive_files/condition_2'),
+            psylab.folder.consecutive_files('tests/data/consecutive_files/condition_3'),
         )
     ret1 = f.get_filename('condition_1')
     ret2 = f.get_filename('condition_3')

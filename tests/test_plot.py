@@ -5,5 +5,5 @@ import psylab
 
 
 def test_range_brace():
-    x,y = psylab.tools.plot_tools.range_brace(0, 100)
+    x,y = psylab.plot.range_brace(0, 100)
 

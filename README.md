@@ -1,6 +1,20 @@
-PsyLab - Psychophysics Lab
+# PsyLab - Psychophysics Lab
 
-Copyright (c) 2010-2012 Christopher A. Brown
+## About
+
+Psylab is a loose collection of modules useful for various aspects of running
+psychophysical experiments, although several might be more generally useful.
+
+- Current version: 1.0.1
+- [License](COPYING)
+- [Website](https://github.com/cbrown1/psylab)
+- [Version History](NEWS.md)
+- [Authors](AUTHORS.md)
+- [Installation instructions](INSTALL.md)
+
+## Copyright & License
+
+*Copyright (c) 2010-2019 Christopher A. Brown*
 
 Psylab is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,13 +27,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-Psylab is a loose collection of modules useful for various aspects of running
-psychophysical experiments, although several might be more generally useful.
-
-website: http://www.github.com/cbrown1/psylab
-
-For installation instructions, see INSTALL.
+along with this program.  If not, see http://www.gnu.org/licenses/.
 

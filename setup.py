@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2014 Christopher Brown
+# Copyright (c) 2010-2019 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -18,14 +18,15 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# contributions are welcome. Go to http://github.com/cbrown1/psylab/ 
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
 
 #from distutils.core import setup
 from distutils.sysconfig import get_python_lib
-from setuptools import setup
+import setuptools
+#from setuptools import setup
 import sys, os
 import psylab
 version = psylab.__version__
@@ -39,14 +40,22 @@ requires = ['numpy (>=1.2)',
             'matplotlit (>=1.2)',
             ]
 
-packages = ['psylab%s' % (p) for p in ['',
-                                    '.tools',
+packages = ['psylab{}'.format(p) for p in ['',
+                                    '.config',
+                                    '.data',
+                                    '.folder',
+                                    '.list',
+                                    '.measurement',
+                                    '.path',
+                                    '.plot',
                                     '.signal',
+                                    '.stats',
+                                    '.time',
                                     ]
             ]
 #packages.append('psylab_examples')
 
-setup(name='PsyLab',
+setuptools.setup(name='PsyLab',
       version=version,
       description='PsyLab: Psychophysics Lab',
       long_description='''\
@@ -57,23 +66,28 @@ setup(name='PsyLab',
       maintainer='Christopher Brown',
       maintainer_email='cbrown1@pitt.edu',
       url='http://www.github.com/cbrown1/psylab',
-      packages = packages,
+      packages = setuptools.find_packages(),
       package_dir = package_dir,
       package_data = package_data,
       requires = requires,
       platforms = ['any'],
       classifiers = [
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU General Public License (GPL)',
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
         'Operating System :: Unix',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: MacOS',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Environment :: Console",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
         'Topic :: Multimedia :: Sound/Audio :: Speech',
         'Topic :: Multimedia :: Sound/Audio :: Analysis',
         'Topic :: Scientific/Engineering',

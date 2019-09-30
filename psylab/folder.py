@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014 Christopher Brown
+# Copyright (c) 2010-2019 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -18,7 +18,7 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# contributions are welcome. Go to http://github.com/cbrown1/psylab/ 
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
@@ -455,7 +455,7 @@ class consecutive_files:
                 i += 1
         else:
             self.file_list = ffiles
-        self.index_list = range(len(self.file_list))
+        self.index_list = np.arange(len(self.file_list))
 
         if self.random:
             np.random.shuffle(self.index_list)
