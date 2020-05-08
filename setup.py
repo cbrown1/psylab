@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2019 Christopher Brown
+# Copyright (c) 2010-2020 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -28,8 +28,11 @@ from distutils.sysconfig import get_python_lib
 import setuptools
 #from setuptools import setup
 import sys, os
-import psylab
-version = psylab.__version__
+import subprocess
+
+out = subprocess.Popen(['python', 'psylab/version.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+stdout,stderr = out.communicate()
+version = str(stdout)
 
 package_dir = { 'psylab': 'psylab', 
               }
@@ -37,14 +40,17 @@ package_data = {}
 
 requires = ['numpy (>=1.2)',
             'scipy (>=0.12)',
-            'matplotlit (>=1.2)',
+            'matplotlib (>=1.2)',
+            'pyaml',
+            'yamlreader',
+            'daiquiri',
             ]
 
 packages = ['psylab{}'.format(p) for p in ['',
                                     '.config',
                                     '.data',
                                     '.folder',
-                                    '.list',
+                                    '.list_str',
                                     '.measurement',
                                     '.path',
                                     '.plot',
@@ -55,30 +61,30 @@ packages = ['psylab{}'.format(p) for p in ['',
             ]
 #packages.append('psylab_examples')
 
-setuptools.setup(name='PsyLab',
+setuptools.setup(name="PsyLab",
       version=version,
-      description='PsyLab: Psychophysics Lab',
-      long_description='''\
+      description="PsyLab: Psychophysics Lab",
+      long_description="""\
  Psylab is a loose collection of modules useful for various aspects of running
- psychophysics experiments, although some might be more generally useful.''',
-      author='Christopher Brown',
-      author_email='cbrown1@pitt.edu',
-      maintainer='Christopher Brown',
-      maintainer_email='cbrown1@pitt.edu',
-      url='http://www.github.com/cbrown1/psylab',
+ psychophysics experiments, although some might be more generally useful.""",
+      author="Christopher Brown",
+      author_email="cbrown1@pitt.edu",
+      maintainer="Christopher Brown",
+      maintainer_email="cbrown1@pitt.edu",
+      url="http://www.github.com/cbrown1/psylab",
       packages = setuptools.find_packages(),
       package_dir = package_dir,
       package_data = package_data,
-      requires = requires,
-      platforms = ['any'],
+      install_requires = requires,
+      platforms = ["any"],
       classifiers = [
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Operating System :: POSIX',
-        'Operating System :: Unix',
-        'Operating System :: Microsoft :: Windows',
-        'Operating System :: MacOS',
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Operating System :: POSIX",
+        "Operating System :: Unix",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.5",
@@ -88,8 +94,8 @@ setuptools.setup(name='PsyLab',
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        'Topic :: Multimedia :: Sound/Audio :: Speech',
-        'Topic :: Multimedia :: Sound/Audio :: Analysis',
-        'Topic :: Scientific/Engineering',
+        "Topic :: Multimedia :: Sound/Audio :: Speech",
+        "Topic :: Multimedia :: Sound/Audio :: Analysis",
+        "Topic :: Scientific/Engineering",
         ],
      )

@@ -44,3 +44,22 @@ def get_filename(filename):
 
 def get_path(filename):
     return path.dirname(filename)
+
+def tail(filename):
+    """A simple python version of tail
+
+    	tail listens to a file and returns any new text
+
+    	Usage
+    	-----
+	    fh = open(logfile,"r")
+	    loglines = tail(fh)
+	    for line in loglines:
+	        print(line, end='')
+    """
+    while True:
+        line = filename.readline()
+        if not line:
+            time.sleep(0.1)
+        else:
+            yield line

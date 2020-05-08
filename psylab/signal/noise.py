@@ -267,5 +267,5 @@ def mls(n, rand_seed=False):
             return -1
         else:
             return 1
-    zero_to_neg_one = lambda x: x
-    return np.array([zero_to_neg_one(next(lfsr)) for i in np.arange(seqlen)], np.int32)
+#    zero_to_neg_one = lambda x: x
+    return np.array([zero_to_neg_one(next(lfsr)) for i in np.arange(seqlen)], np.float64)

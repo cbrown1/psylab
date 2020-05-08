@@ -31,14 +31,15 @@ psychophysical experiments, although several might be more generally
 useful.
 
 '''
-
-__version__ = '1.0.1'
+from . import version
+__version__ = version.__version__
 
 from . import config
 from . import data
 from . import folder
-from . import list
+from . import string
 from . import measurement
+from . import stimulus_manager
 from . import path
 from . import plot
 from . import signal

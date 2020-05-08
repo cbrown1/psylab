@@ -142,20 +142,21 @@ def apply_ild( signal, ild, atten=1. ):
 
     # Ensure 2d
     if len(signal.shape) == 1:
-        out = np.vstack((signal, signal)).T
+        out = np.vstack((signal.copy(), signal.copy())).T
     else:
-        out = signal
-    
-    contra = np.float32(atten)*ild
-    ipsi = -(ild-contra)
+        out = signal.copy()
+
+    if ild < 0:
+        atten_r = -ild * np.float32(atten)
+        atten_l = ild + atten_r
+    else:
+        atten_l = ild * np.float32(atten)
+        atten_r = -ild + atten_l
+    print(atten_l, atten_r)
 
     # Apply ild
-    if ild > 0 :
-        out[:,0] = out[:,0] * np.exp(np.float32(-np.abs(contra))/8.6860)
-        out[:,1] = out[:,1] * np.exp(np.float32(np.abs(ipsi))/8.6860)
-    else:
-        out[:,0] = out[:,0] * np.exp(np.float32(np.abs(ipsi))/8.6860)
-        out[:,1] = out[:,1] * np.exp(np.float32(-np.abs(contra))/8.6860)
+    out[:,0] *= np.exp(-atten_l/8.6860)
+    out[:,1] *= np.exp(-atten_r/8.6860)
 
     return out
     

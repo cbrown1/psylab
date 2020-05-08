@@ -202,13 +202,13 @@ class slider_array():
                        'position': ['left','right','center','up','down'],
                        'quality': ['good','bad']}
         >>> data = raw_data.copy()  # Make an intial plot
-        >>> for key,val in keyvals.iteritems():
+        >>> for key,val in keyvals.items():
                 data = data[ data[key] == val[0] ]
         >>> p, = plt.plot(data['Resp'])
         >>> update(current): # function will run everytime a slider is updated
                 data = raw_data.copy()
                 # Filter data to include only current levels
-                for key,val in current.iteritems:
+                for key,val in current.items:
                     data = data[ data[ key ] == val ]
                 p.set_ydata(data['Resp'])
                 p.axes.figure.canvas.draw_idle()
@@ -219,7 +219,7 @@ class slider_array():
         self.vars_dict = vars_dict
         self.keys = []
         self.vals = []
-        for key, val in vars_dict.iteritems():
+        for key, val in vars_dict.items():
             self.keys.append(key)
             self.vals.append(val)
         self.callback = callback
@@ -1020,7 +1020,7 @@ class Slider(AxesWidget):
         if self.drawon: self.ax.figure.canvas.draw()
         self.val = val
         if not self.eventson: return
-        for cid, func in self.observers.iteritems():
+        for cid, func in self.observers.items():
             func(val)
 
     def on_changed(self, func):
@@ -1270,7 +1270,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
 #    ap.vlines(x, 0, page_height)
 
     if labels:
-        for i,label in labels.iteritems():
+        for i,label in labels.items():
             if isinstance(label, list):
                 l = label[0]
                 fd = label[1]
@@ -1287,7 +1287,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             cell_x = int(cell_x)
             cell_y = int(cell_y)
 
-            if not fd.has_key('ha'):
+            if 'ha' not in fd:
                 fd['ha'] = 'center'
             if fd['ha'] == 'left':
                 lx = x[cell_x] + pad
@@ -1296,7 +1296,7 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             else:
                 lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
 
-            if not fd.has_key('va'):
+            if 'va' not in fd:
                 fd['va'] = 'center'
             if fd['va'] == 'top':
                 ly = y[cell_y] + pad

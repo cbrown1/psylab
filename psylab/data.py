@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2019 Christopher Brown
+# Copyright (c) 2010-2020 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -63,12 +63,14 @@ def read_csv(filename, comment="#"):
                 lines += line + "\n"
     return StringIO(lines)
 
+
 def is_number(s):
     try:
         float(s)
         return True
     except ValueError:
         return False
+
 
 def random_derangement(n):
     """Generates a random permutation of size n with no fixed points.
@@ -102,3 +104,4 @@ def random_derangement(n):
         else:
             if v[0] != 0:
                 return v
+

@@ -88,7 +88,7 @@ def pairwise_table(pairwise_data, decimals=4):
         elif p < .01:
             sig = "  **"
         elif p < .05:
-            sig += "  *"
+            sig = "  *"
         else:
             sig = " "
         output += fmt_line.format(comparison, mean_diff, p, sig)

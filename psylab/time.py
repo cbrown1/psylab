@@ -23,6 +23,8 @@
 # cbrown1@pitt.edu.
 #
 
+import datetime
+
 class timer():
     """ Simple high-precision timer class
         
@@ -182,6 +184,44 @@ def wait_us(delay_us):
     while (timestamp_us() - t_start < delay_us):
       pass #do nothing 
     return 
+
+def get_week_number(strdate, fmt='%Y-%m-%d'):
+    """Returns the week of the year in which a date occurs
+
+    """
+    return datetime.datetime.strptime(strdate,fmt).date().strftime("%V")
+
+def seconds_to_time(seconds):
+    """Returns a string representation of time given a number of seconds
+
+        If seconds is an int, the format of the string returned is 'hh:mm:ss'
+        If it is a float with a decimal, the return string format is 'hh:mm:ss.sss'
+        where sss is milliseconds
+
+    """
+
+    secs, d = divmod(seconds, 1)
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    ret = '{:02d}:{:02d}:{:02d}'.format(int(h), int(m), int(s))
+    if d > 0:
+        ret = "{}.{:03d}".format(ret, round(d*1000))
+    return ret
+
+
+def time_to_seconds(strtime):
+    """Returns a number of seconds as an int from a time string
+
+        strtime format can be in the form hh:mm:ss.ms; the only required params are mm and ss
+    """
+    # return int(sum(x * int(t) for x, t in zip([3600, 60, 1, .001], strtime.split(":"))))
+    if "." in strtime:
+        t,ms = strtime.split(".")
+    else:
+        t = strtime
+        ms = "000"
+    sec = float(sum(x * int(t) for x, t in zip([1, 60, 3600], reversed(strtime.split(":")))))
+    return sec + (float(ms)/1000.) 
 
 #-------------------------------------------------------------------
 #EXAMPLES:
