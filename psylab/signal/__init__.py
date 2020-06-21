@@ -96,6 +96,7 @@ from .freq_compression import freq_compress
 from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place, angle2f, f2angle, logspace
 from .spatial import win_cos, pan, convolve, hrtf_data
 #from .interp import interp
+from .ir import ir
 from .level import spl2n0, spl2sp, spl2si, sp2spl, si2spl
 from .mix import mix
 from .noise import pink, white, irn, mls

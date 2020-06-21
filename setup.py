@@ -50,18 +50,18 @@ packages = ['psylab{}'.format(p) for p in ['',
                                     '.config',
                                     '.data',
                                     '.folder',
-                                    '.list_str',
                                     '.measurement',
                                     '.path',
                                     '.plot',
                                     '.signal',
                                     '.stats',
+                                    '.string',
                                     '.time',
                                     ]
             ]
 #packages.append('psylab_examples')
 
-setuptools.setup(name="PsyLab",
+setuptools.setup(name="psylab",
       version=version,
       description="PsyLab: Psychophysics Lab",
       long_description="""\
