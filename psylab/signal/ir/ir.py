@@ -122,7 +122,7 @@ def get_level_difference(ir_1, ir_2):
 
     rms_1 = np.sqrt(np.mean(np.square(ir_1)))
     rms_2 = np.sqrt(np.mean(np.square(ir_2)))
-    return 20 * np.log10(rms_1/rms_2)
+    return 20 * np.log10(rms_2/rms_1)
 
 
 def apply_level_difference(ir_1, ir_2, db):
