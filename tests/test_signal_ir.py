@@ -66,6 +66,7 @@ def test_apply_level_difference():
     np.testing.assert_allclose(ar1, ref1, rtol=1e-5)
     np.testing.assert_allclose(ar1, ref2, rtol=1e-5)
 
+
 def test_get_ir():
     ref = np.array([[-4.82561940e-02, -5.78861860e-02, -6.79692758e-02,
         -7.84663954e-02, -8.93534691e-02, -1.00567516e-01,
@@ -89,4 +90,5 @@ def test_get_ir():
     rec = np.concatenate((sig,np.zeros(550)))
     ir = psylab.signal.ir.get_ir(rec,inv, ir_length=50)
     np.testing.assert_allclose(ref, ir, rtol=1e-5)
+
 

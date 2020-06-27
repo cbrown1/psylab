@@ -104,7 +104,7 @@ def gen_sweep(f1=50, f2=18000, fs=44100, dur=5):
     return sweep, inv_filter
 
 
-def get_level_difference(ir_1, ir_2):
+def get_level_difference(rec_1, rec_2):
     """Convenience function to compute the dB RMS difference between 2 arrays
 
         Intended use case is when you are making binaural IR recordings.
@@ -118,14 +118,28 @@ def get_level_difference(ir_1, ir_2):
         ir_1 is > ir_2. Then, use apply_level_difference to actually do 
         the compensation to all binaural pairs 
 
+        Parameters
+        ----------
+        rec_1: array
+            Recording 1, would typically be the left ear for binaural recordings
+        rec_2: array
+            Recording 2, would typically be the right ear for binaural recordings
+
+        Returns
+        -------
+        out_1 : array
+            Recording 1, with any level adjustment applied
+        out_2 : array
+            Recording 2, with any level adjustment applied
+
     """
 
-    rms_1 = np.sqrt(np.mean(np.square(ir_1)))
-    rms_2 = np.sqrt(np.mean(np.square(ir_2)))
+    rms_1 = np.sqrt(np.mean(np.square(rec_1)))
+    rms_2 = np.sqrt(np.mean(np.square(rec_2)))
     return 20 * np.log10(rms_2/rms_1)
 
 
-def apply_level_difference(ir_1, ir_2, db):
+def apply_level_difference(rec_1, rec_2, db):
     """Attenuates one or another array as specified by dB
         
         Intended to be used with get_level_difference to adjust the level 
@@ -135,11 +149,11 @@ def apply_level_difference(ir_1, ir_2, db):
     """
 
     if db < 0:
-        out_1 = ir_1 * np.exp(np.float32(-db)/8.6860)
-        out_2 = ir_2
+        out_1 = rec_1 * np.exp(np.float32(-db)/8.6860)
+        out_2 = rec_2
     else:
-        out_1 = ir_1
-        out_2 = ir_2 * np.exp(np.float32(-db)/8.6860)
+        out_1 = rec_1
+        out_2 = rec_2 * np.exp(np.float32(-db)/8.6860)
 
     return out_1, out_2
 
