@@ -18,7 +18,7 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other
-# contributions are welcome. Go to http://code.google.com/p/psylab/
+# contributions are welcome. Go to https://github.com/cbrown1/psylab/
 # for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
@@ -35,17 +35,34 @@ def win_attack(ws, rs, ramp_fun=np.bartlett):
         the shape of ramp (can be np.hanning, np.bartlett, etc).
 
         If rs is shorter than ws, then the rest of the window
-        will be ones. If rs is longer than ws, then the value
-        of the last element will be less than one. Eg., if
-        ws is half of rs, the window will be length ws, and
-        the last element will be .5.
+        will be ones. 
+        
+           1 |   _________
+        A    |  /
+        m    | /
+        p  0 |/
+             +------------->
+                |        |
+               rs       ws
 
-         1    _________
-             /
-            /
-         0 /
-              |      |
-             att    wsize
+        If rs is longer than ws, then the value of the last
+        element will be less than one. Eg., if ws is half of rs, 
+        the window will be length ws, and the last element will 
+        be .5.
+
+          1 |
+            |
+            |
+        A   |       
+        m   |    /  
+        p   |   / 
+            |  /
+            | /
+          0 |/
+            +------------>
+                 |     |  
+                ws    rs
+
 
         Parameters
         ----------
@@ -90,7 +107,7 @@ def win_attack(ws, rs, ramp_fun=np.bartlett):
 
             # this_win is a window of data from sliding_window
             # attwin is the output of this function
-            this_win *= (attwin * (amp_cur-amp_prev))+amp_prev
+            this_win *= (attwin * (amp_cur - amp_prev)) + amp_prev
 
     """
     win = np.ones(ws)
@@ -179,5 +196,5 @@ def sliding_window(sig, ws, ss = None, flatten = True):
     firstdim = (np.product(newshape[:-meat]),) if ws.shape else ()
     dim = firstdim + (newshape[-meat:])
     # remove any dimensions with size 1
-    dim = filter(lambda i : i != 1,dim)
+    dim = list(filter(lambda i : i != 1,dim)) # Added list for py3 compat; py3 filter returns generator
     return strided.reshape(dim)

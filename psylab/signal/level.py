@@ -18,7 +18,7 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other
-# contributions are welcome. Go to http://code.google.com/p/psylab/
+# contributions are welcome. Go to https://github.com/cbrown1/psylab/
 # for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #

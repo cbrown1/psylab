@@ -19,7 +19,7 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
+# contributions are welcome. Go to https://github.com/cbrown1/psylab/
 # for more information and to contribute. Or send an e-mail to: 
 # cbrown1@pitt.edu.
 #
@@ -29,6 +29,27 @@ import collections
 
 def win_cos(size):
     """generates a cosine function, suitable for windowing applications like panning
+
+
+         |                             *******
+         |                           **       **
+         |                         **           **
+         |                       **               **
+         |                      *                   *
+         |                    **                     **
+         |                   *                         *
+         |                  *                           *
+         |                 *                             *
+         |               **                               **
+         |              *                                   *
+         |             *                                     *
+         |           **                                       **
+         |          *                                           *
+         |        **                                             **
+         |     ***                                                 ***
+         |  ***                                                       ***
+         +----------------------------------------------------------------->
+
     """
     win = .5 * np.sin( (3/2.*np.pi) + (2*np.pi*np.linspace(0,size,size))) + .5
     return win
@@ -37,6 +58,13 @@ def win_cos(size):
 def pan(size, locations):
     """generates a 2d array of sinusoidal cross-fade functions 
         given a total size (length of audio in samples) and # of locations
+
+          ^  _   _   _   _
+        A |   \ / \ / \ /
+        m |  1 V 2 V 3 V 4   <-Channel
+        p |    |   |   |
+          +---------------->
+                 time
 
         The output array will have the shape (size, locations), 
         and be suitable for multiplying into an array of multi-channel 
@@ -54,7 +82,7 @@ def pan(size, locations):
             If scalar, the number of locations and panning will smoothly progress from 
             channel 1 to channel locations. If array-like, it will specify the order of 
             channels to pan. They will be distributed evenly across size.
-            So, fewer locations will produce longer cross-fades for a given amount 
+            So, fewer locations will produce slower cross-fades for a given amount 
             of audio.
 
         Returns

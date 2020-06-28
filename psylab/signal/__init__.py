@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2014 Christopher Brown
+# Copyright (c) 2010-2020 Christopher Brown
 #
 # This file is part of Psylab.
 #
@@ -18,7 +18,7 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other
-# contributions are welcome. Go to http://code.google.com/p/psylab/
+# contributions are welcome. Go to https://github.com/cbrown1/psylab/
 # for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
 #
@@ -88,8 +88,7 @@ from .atten import atten
 from .binaural import apply_itd, apply_ild, gso
 from .compensate import compensate
 from .compression import compress
-from .envelope import envelope
-from .equate import equate
+from .envelope import envelope, env_hilbert
 from .f0 import f0
 from .filter import freqs_logspace, filter_bank, pre_emphasis
 from .freq_compression import freq_compress
@@ -100,13 +99,13 @@ from .ir import ir
 from .level import spl2n0, spl2sp, spl2si, sp2spl, si2spl
 from .mix import mix
 from .noise import pink, white, irn, mls
-from .normalize import normalize
 from .peakpick import pick_peaks
 from .ramps import ramps
 from .rir import rir, fconv
 from .rms import rms
 from .samp import samp2ms, ms2samp
 from .smooth import smooth
+from .soundfile import equate, normalize
 from .spec import lts, magspec, specgram, specplot
 from .tone import tone, tcomplex
 from .t60 import t60
