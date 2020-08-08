@@ -90,9 +90,9 @@ from .compensate import compensate
 from .compression import compress
 from .envelope import envelope, env_hilbert
 from .f0 import f0
-from .filter import freqs_logspace, filter_bank, pre_emphasis
+from .filter import filter_bank, pre_emphasis
 from .freq_compression import freq_compress
-from .frequency import f2oct, oct2f, f2erbs, erbs2f, place2f, f2place, angle2f, f2angle, logspace
+from .frequency import f2oct, oct2f, f2erb, erb2f, place2f, f2place, angle2f, f2angle, logspace
 from .spatial import win_cos, pan, convolve, hrtf_data
 #from .interp import interp
 from .ir import ir

@@ -29,7 +29,8 @@ import scipy.signal
 from .tone import tone
 from .peakpick import pick_peaks
 from .zeropad import zeropad
-from .filter import filter_bank, freqs_logspace
+from .filter import filter_bank
+from .frequency import logspace
 
 def vocoder(signal, fs, channels, inlo, inhi, **kwargs):
     '''Implements an envelope vocoder
@@ -188,8 +189,8 @@ def vocoder_vect(signal, fs, channels, inlo, inhi, **kwargs):
     #except:
         
     # Compute cutoff frequencies
-    cfs_in = freqs_logspace(inlo, inhi, channels)
-    cfs_out= freqs_logspace(outlo, outhi, channels)
+    cfs_in = logspace(inlo, inhi, channels)
+    cfs_out= logspace(outlo, outhi, channels)
     
     # Analysis filterbank
     sig_fb = filter_bank(signal, fs, order, cfs_in)
@@ -254,7 +255,7 @@ def vocoder_overlap(signal, fs, channel_n, channel_width, flo, fhi):
     '''
     signal = signal - np.mean(signal)
     cfs = np.float32(np.round(np.linspace(flo,fhi,channel_n)))
-    cfs = freqs_logspace(flo, fhi, channel_n)
+    cfs = logspace(flo, fhi, channel_n)
 
     cw = np.float32(channel_width/2.)
     nyq=np.float32(fs/2.)

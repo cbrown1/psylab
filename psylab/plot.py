@@ -1091,7 +1091,11 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             {'weight': 'bold', 'ha': 'left'}), and the third is optionally a
             float indicating the amount of padding, which is used when an
             alignment is not center. By default, labels will be centered both
-            vertically and horizontally within a cell.
+            vertically and horizontally within a cell. In addition to 'left',
+            'right', and 'center', the 'ha' parameter has two special values,
+            'center-left' and 'center-right', which will center the label on
+            either the left or right edge of the cell. This is useful if you
+            have hmerged two cells and want to center the label across both.
         hmerge : list
             A list of indices. For each item listed, merge it with the cell to
             the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be
@@ -1167,6 +1171,16 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
     ap.set_xlim([0, page_width])   # Page coordinates are
     ap.set_ylim([0, page_height])  # now in units of inches
     ap.invert_yaxis()
+    #ap.add_patch(
+    #    mpl.patches.Rectangle(
+    #        (0, 0),
+    #        w,
+    #        h,
+    #        fill=False,      # remove background
+    #        ec=color,
+    #    )
+    #)
+
 
     # Draw each cell as a rect
     # xx and yy are the x and y coords of the current rect
@@ -1277,7 +1291,10 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
                 if len(label) == 3:
                     pad = label[2]
                 else:
-                    pad = .1
+                    if 'ha' in fd.keys() and fd['ha'].startswith('center-'):
+                        pad = 0.
+                    else:
+                        pad = .1
             else:
                 l = label
                 fd = {'weight': 'normal'}
@@ -1293,6 +1310,12 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
                 lx = x[cell_x] + pad
             elif fd['ha'] == 'right':
                 lx = x[cell_x+1] - pad
+            elif fd['ha'] == 'center-left':
+                fd['ha'] = 'center'
+                lx = x[cell_x]
+            elif fd['ha'] == 'center-right':
+                fd['ha'] = 'center'
+                lx = x[cell_x+1]
             else:
                 lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
 

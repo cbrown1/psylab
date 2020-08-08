@@ -102,35 +102,6 @@ def filter_bank(signal, fs, order, cfs, btype='band'):
     return out
 
 
-def freqs_logspace(start, stop, n):
-    """Compute frequencies equally spaced in log space
-
-        Computes n frequencies between start and stop that are evenly spaced
-        in log space.
-
-        The output of this function is useful as the cfs input to filter_bank,
-        when you want to create a bank of bandpass filters.
-
-        Parameters
-        ----------
-        start : scalar
-            The start frequency, in Hz
-        stop : scalar
-            The end frequency, in Hz
-        n : scalar
-            The number of 'channels' to compute. That is, the return array
-            will be length n+1
-
-        Returns
-        -------
-        y : array
-            The frequency values, ready to be input to filter_bank
-    """
-    n_arr = np.arange(n+1)
-    interval = np.log10(stop/float(start))/float(n)
-    freqs = start*10.**(interval*n_arr)
-    return freqs
-
 def impz(b,a=1):
     impulse = np.zeros(50)
     impulse[0] = 1

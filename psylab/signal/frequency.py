@@ -44,11 +44,17 @@ numpy
 import numpy as np
 import numpy.polynomial.polynomial as poly
 
+
 def logspace(start, stop, n):
-    '''Calculates a frequency range in logspace
+    '''Calculates a frequency range in log space
         
-        Returns a number frequencies within the specified range, in log space.
-        The array returns will have a length of n + 1.
+        Returns n frequencies within the specified range, in log space.
+
+        Note that this function returns exactly n frequencies, whereas the 
+        deprecated function freqs_logspace returned n+1.
+
+        The output of this function is useful as the cfs input to filter_bank,
+        when you want to create a bank of bandpass filters.
     
         Parameters
         ----------
@@ -101,12 +107,13 @@ def oct2f(cf, oct):
         --------
 
         >>> oct2f(1000,1)
-        ('500.0', '2000.0')
+        (500.0, 2000.0)
 
     '''
     lo = np.round(cf*(2.**np.float32(-oct)));
     hi = np.round(cf*(2.**np.float32(oct)));
     return lo,hi
+
 
 def f2oct(f1, f2):
     '''Calculates the distance in octaves between two frequencies
@@ -132,11 +139,12 @@ def f2oct(f1, f2):
     '''
     return np.log2(np.float32(f2)/np.float32(f1))
 
-def f2erbs(f):
-    '''Converts frequency values to erb numbers
 
-        converts an array of frequencies (in Hz) to the corresponding 
-        values on the ERB-rate scale on which the human ear has 
+def f2erb(f):
+    '''Converts frequency values to erb values
+
+        converts a frequency or array of frequencies (in Hz) to 
+        the corresponding values on the ERB scale on which the human ear has 
         roughly constant resolution as judged by psychophysical 
         measurements of the cochlear filters.
         
@@ -153,7 +161,8 @@ def f2erbs(f):
     '''
     return 21.4 * ( np.log10( 229 + f ) - 2.36 );
 
-def erbs2f(erbs):
+
+def erb2f(erbs):
     '''Converts erb numbers to frequency values
 
         converts a vector of ERB-rate values
@@ -173,6 +182,7 @@ def erbs2f(erbs):
     '''
     return ( 10 ** ( erbs/21.4 + 2.36)  ) - 229;
 
+
 def f2place(x):
     '''Converts a frequency (Hz) to a basilar membrane place (mm)
         
@@ -190,7 +200,8 @@ def f2place(x):
             A basilar membrane distance, in mm.
     '''
     return np.log10((x/165.4)+.88)/.06
-    
+
+
 def place2f(x):
     '''Converts a basilar membrane place (mm) to a frequency (Hz)
         
@@ -208,6 +219,7 @@ def place2f(x):
             A frequency, in Hz.
     '''
     return 165.4*(10**(.06*x)-.88)
+
 
 def angle2f(x, stakhovskaya=True):
     '''Takes an angle into the cochlea, in degrees, and estimates a frequency in Hz
@@ -246,7 +258,8 @@ def angle2f(x, stakhovskaya=True):
         return ffit(x)
     else:
         return 2048. * (2.**((360.-x)/90.))
-    
+
+
 def f2angle(f, stakhovskaya=True):
     '''Takes a frequency in Hz and estimates an angle into the cochlea, in degrees
         

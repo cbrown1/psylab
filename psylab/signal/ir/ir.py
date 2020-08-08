@@ -121,16 +121,14 @@ def get_level_difference(rec_1, rec_2):
         Parameters
         ----------
         rec_1: array
-            Recording 1, would typically be the left ear for binaural recordings
+            Recording 1, which  would typically be the left ear for binaural recordings
         rec_2: array
-            Recording 2, would typically be the right ear for binaural recordings
+            Recording 2, which would typically be the right ear for binaural recordings
 
         Returns
         -------
-        out_1 : array
-            Recording 1, with any level adjustment applied
-        out_2 : array
-            Recording 2, with any level adjustment applied
+        db : scalar
+            The difference between the two input arrays, in dB RMS
 
     """
 
@@ -144,7 +142,24 @@ def apply_level_difference(rec_1, rec_2, db):
         
         Intended to be used with get_level_difference to adjust the level 
         of binaural IRs to compensate for sensitivity differences 
-        across microphones 
+        across microphones
+
+        Applied gain is always negative. That is, alway via attenuation 
+
+        Parameters
+        ----------
+        rec_1: array
+            Recording 1, which would typically be the left ear for binaural recordings
+        rec_2: array
+            Recording 2, which would typically be the right ear for binaural recordings
+
+        Returns
+        -------
+        out_1 : array
+            Recording 1, with any level adjustment applied
+        out_2 : array
+            Recording 2, with any level adjustment applied
+
 
     """
 
