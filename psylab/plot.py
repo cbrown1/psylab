@@ -1046,7 +1046,7 @@ class Slider(AxesWidget):
             self.set_val(self.valinit)
 
 
-def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[], vmerge=[], omit=[], color='k'):
+def table(col_widths, row_heights, cols=None, rows=None, labels=None, fmts=[], pads=[], hmerge=[], vmerge=[], omit=[], color='k'):
 
     """Generates tables in mpl with basic control over cell height and width
 
@@ -1070,13 +1070,13 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             specify the number of columns (and cols is ignored), and each list
             item is the length of each correspoding column. If a scalar is
             used, all columns will have the same width, and the number of
-            columns must be specified using cols.
+            columns must be specified using cols
         row_heights: scalar or array
             The height(s) of the rows. If an array is used, its length will
             specify the number of rows (and rows is ignored), and each list
             item is the height of each corresponding row. If a scalar is used,
             all rows will have the same height, and the number of rows must be
-            specified using rows.
+            specified using rows
         cols : Scalar
             The number of columns, only used if column_widths is a scalar
         rows : Scalar
@@ -1085,21 +1085,29 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
             A dict to specify cell labels. Each key is a string representation
             of a 2-element tuple, where the first element is the row number and
             the second element is the column number (top to bottom) of the cell
-            in which to apply the label. Each value is either a string (the
-            label text) or a list. If a list is specified, the first element is
-            the string label, the second is an mpl fontdict (eg.,
-            {'weight': 'bold', 'ha': 'left'}), and the third is optionally a
-            float indicating the amount of padding, which is used when an
-            alignment is not center. By default, labels will be centered both
-            vertically and horizontally within a cell. In addition to 'left',
-            'right', and 'center', the 'ha' parameter has two special values,
-            'center-left' and 'center-right', which will center the label on
-            either the left or right edge of the cell. This is useful if you
-            have hmerged two cells and want to center the label across both.
+            in which to apply the label (eg., '0,1'). Each value is the label 
+            text as a string
+        fmt : dict
+            A dict to specicy cell label formatting. Each keys is a tuple, same 
+            as for labels, and each value is an mpl fontdict (eg., {'weight': 
+            'bold', 'ha': 'left'}). The 'ha' (horizontal align) parameter has 
+            two special values in addition to 'left', 'right', and 'center'. 
+            These special values are 'center-left' and 'center-right', which 
+            will center the label on either the left or right edge of the cell. 
+            This is useful if you have hmerged two cells and want to center a 
+            label across both. By default, labels will be centered both 
+            vertically and horizontally within a cell 
+        pad : dict
+            A dict with the same tuple keys as labels, and vals as floats 
+            indicating the amount of padding for each cell, which is used when 
+            an alignment is not center. The default pad is .1. While default 
+            padding is not applied with 'center-left' and 'center-right' 
+            horizontal aligns, specified padding is
         hmerge : list
             A list of indices. For each item listed, merge it with the cell to
-            the left. Eg., if an item is '0,1', then 0,1 and 1,1 will be
-            merged. Must be < the number of columns
+            the right. Eg., if an item is '0,1', then 0,1 and 1,1 will be
+            merged. Must be < the number of columns. Note that merging applies
+            only to drawing cell borders, and is irrelevant for label placement
         vmerge : list
             A list of indices. For each item listed, merge it with the cell
             below. Eg., if an item is '0,1', then 0,1 and 0,2 will be
@@ -1284,51 +1292,49 @@ def table(col_widths, row_heights, cols=None, rows=None, labels=None, hmerge=[],
 #    ap.vlines(x, 0, page_height)
 
     if labels:
-        for i,label in labels.items():
-            if isinstance(label, list):
-                l = label[0]
-                fd = label[1]
-                if len(label) == 3:
-                    pad = label[2]
-                else:
-                    if 'ha' in fd.keys() and fd['ha'].startswith('center-'):
-                        pad = 0.
-                    else:
-                        pad = .1
+        for i,l in labels.items():
+            if fmts and i in fmts.keys():
+                fmt = fmts[i].copy()
             else:
-                l = label
-                fd = {'weight': 'normal'}
-                pad = .1
+                fmt = {'weight': 'normal'}
+
+            if pads and i in pads.keys():
+                pad = pads[i].copy()
+            else:
+                if 'ha' in fmt.keys() and fmt['ha'].startswith('center-'):
+                    pad = 0.
+                else:
+                    pad = .1
 
             cell_x,cell_y = i.split(',')
             cell_x = int(cell_x)
             cell_y = int(cell_y)
 
-            if 'ha' not in fd:
-                fd['ha'] = 'center'
-            if fd['ha'] == 'left':
+            if 'ha' not in fmt.keys():
+                fmt['ha'] = 'center'
+            if fmt['ha'] == 'left':
                 lx = x[cell_x] + pad
-            elif fd['ha'] == 'right':
+            elif fmt['ha'] == 'right':
                 lx = x[cell_x+1] - pad
-            elif fd['ha'] == 'center-left':
-                fd['ha'] = 'center'
+            elif fmt['ha'] == 'center-left':
+                fmt['ha'] = 'center'
                 lx = x[cell_x]
-            elif fd['ha'] == 'center-right':
-                fd['ha'] = 'center'
+            elif fmt['ha'] == 'center-right':
+                fmt['ha'] = 'center'
                 lx = x[cell_x+1]
             else:
                 lx = x[cell_x] + ((x[cell_x+1]-x[cell_x])/2.)
 
-            if 'va' not in fd:
-                fd['va'] = 'center'
-            if fd['va'] == 'top':
+            if 'va' not in fmt:
+                fmt['va'] = 'center'
+            if fmt['va'] == 'top':
                 ly = y[cell_y] + pad
-            elif fd['va'] == 'bottom':
+            elif fmt['va'] == 'bottom':
                 ly = y[cell_y+1] - pad
             else:
                 ly = y[cell_y] + ((y[cell_y+1]-y[cell_y])/2.)
 
-            ap.text(lx, ly, l, fd)
+            ap.text(lx, ly, l, fmt)
 
     return ap
 
